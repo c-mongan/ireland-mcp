@@ -3,8 +3,10 @@ import type { AnyTool, SourceModule, ToolContext } from "./gateway/module.js";
 import { buildServer } from "./gateway/server.js";
 import type { TelemetrySink } from "./gateway/telemetry.js";
 import { csoModule } from "./sources/cso/index.js";
+import { geohiveModule } from "./sources/geohive/index.js";
+import { oireachtasModule } from "./sources/oireachtas/index.js";
 
-export const sourceModules: SourceModule[] = [csoModule];
+export const sourceModules: SourceModule[] = [csoModule, oireachtasModule, geohiveModule];
 
 export function crossSourceTools(_modules: SourceModule[]): AnyTool[] {
   return [];

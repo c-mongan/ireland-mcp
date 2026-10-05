@@ -1,0 +1,27 @@
+{
+ "objectIdFieldName": "ESRI_OID",
+ "uniqueIdField": {
+  "name": "ESRI_OID",
+  "isSystemMaintained": true
+ },
+ "globalIdFieldName": "",
+ "geometryProperties": {
+  "shapeAreaFieldName": "Shape__Area",
+  "shapeLengthFieldName": "Shape__Length",
+  "units": "esriMeters"
+ },
+ "geometryType": "esriGeometryPolygon",
+ "spatialReference": {
+  "wkid": 2157,
+  "latestWkid": 2157
+ },
+ "features": [
+  {
+   "attributes": {
+    "ENG_NAME_VALUE": "Dublin Central (4)",
+    "GLE_NAME_VALUE": "Baile Átha Cliath Láir (4)",
+    "BDY_TYPE_VALUE": "Constituency National"
+   }
+  }
+ ]
+}

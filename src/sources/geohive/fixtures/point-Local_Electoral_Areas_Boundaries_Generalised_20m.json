@@ -1,0 +1,36 @@
+{
+ "objectIdFieldName": "OBJECTID_1",
+ "uniqueIdField": {
+  "name": "OBJECTID_1",
+  "isSystemMaintained": true
+ },
+ "globalIdFieldName": "",
+ "geometryProperties": {
+  "shapeAreaFieldName": "Shape__Area",
+  "shapeLengthFieldName": "Shape__Length",
+  "units": "esriMeters"
+ },
+ "geometryType": "esriGeometryPolygon",
+ "spatialReference": {
+  "wkid": 2157,
+  "latestWkid": 2157
+ },
+ "features": [
+  {
+   "attributes": {
+    "GUID": "2AE196293EF513A3E055000000000001",
+    "LE_ID": "13260426",
+    "LE_ENGLISH": "NORTH INNER CITY (8)",
+    "LE_GAEILGE": " ",
+    "COUNTY": "Dublin",
+    "CONTAE": "Baile Átha Cliath",
+    "PROVINCE": "Leinster",
+    "CENTROID_X": "716505",
+    "CENTROID_Y": "735470",
+    "OBJECTID_1": 17,
+    "Shape__Area": 9493224.732055664,
+    "Shape__Length": 18711.50835370787
+   }
+  }
+ ]
+}

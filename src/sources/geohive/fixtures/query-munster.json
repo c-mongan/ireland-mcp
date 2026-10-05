@@ -1,0 +1,37 @@
+{
+ "objectIdFieldName": "OBJECTID",
+ "uniqueIdField": {
+  "name": "OBJECTID",
+  "isSystemMaintained": true
+ },
+ "globalIdFieldName": "",
+ "geometryType": "esriGeometryPolygon",
+ "spatialReference": {
+  "wkid": 2157,
+  "latestWkid": 2157
+ },
+ "exceededTransferLimit": true,
+ "features": [
+  {
+   "attributes": {
+    "ENGLISH": "CLARE",
+    "GAEILGE": "An Clár",
+    "PROVINCE": "Munster"
+   }
+  },
+  {
+   "attributes": {
+    "ENGLISH": "CORK",
+    "GAEILGE": "Corcaigh",
+    "PROVINCE": "Munster"
+   }
+  },
+  {
+   "attributes": {
+    "ENGLISH": "KERRY",
+    "GAEILGE": "Ciarraí",
+    "PROVINCE": "Munster"
+   }
+  }
+ ]
+}

@@ -1,0 +1,45 @@
+{
+ "objectIdFieldName": "OBJECTID_1",
+ "uniqueIdField": {
+  "name": "OBJECTID_1",
+  "isSystemMaintained": true
+ },
+ "globalIdFieldName": "",
+ "geometryProperties": {
+  "shapeAreaFieldName": "Shape__Area",
+  "shapeLengthFieldName": "Shape__Length",
+  "units": "esriMeters"
+ },
+ "geometryType": "esriGeometryPolygon",
+ "spatialReference": {
+  "wkid": 2157,
+  "latestWkid": 2157
+ },
+ "features": [
+  {
+   "attributes": {
+    "OBJECTID_1": 13538,
+    "GUID": "4c07d11e-2d5c-851d-e053-ca3ca8c0ca7f",
+    "NUTS1": "IE",
+    "NUTS1NAME": "Ireland",
+    "NUTS2": "IE06",
+    "NUTS2NAME": "Eastern and Midland",
+    "NUTS3": "IE061",
+    "NUTS3NAME": "Dublin",
+    "COUNTY": "DC",
+    "COUNTYNAME": "Dublin City",
+    "CSOED": "02075",
+    "OSIED": "268106",
+    "EDNAME": "North City",
+    "SA_PUB2011": "268106016",
+    "SMALL_AREA": "268106016",
+    "GEOGID": "A268106016",
+    "AREA": 0,
+    "CHANGECODE": 0,
+    "ESRI_OID": 13538,
+    "Shape__Area": 139799.6260986328,
+    "Shape__Length": 2031.8620733477217
+   }
+  }
+ ]
+}

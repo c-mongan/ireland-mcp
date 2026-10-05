@@ -1,0 +1,38 @@
+{
+ "objectIdFieldName": "OBJECTID",
+ "uniqueIdField": {
+  "name": "OBJECTID",
+  "isSystemMaintained": true
+ },
+ "globalIdFieldName": "",
+ "geometryProperties": {
+  "shapeAreaFieldName": "Shape__Area",
+  "shapeLengthFieldName": "Shape__Length",
+  "units": "esriMeters"
+ },
+ "geometryType": "esriGeometryPolygon",
+ "spatialReference": {
+  "wkid": 2157,
+  "latestWkid": 2157
+ },
+ "features": [
+  {
+   "attributes": {
+    "OBJECTID": 5,
+    "CO_ID": "260000",
+    "ENGLISH": "DUBLIN",
+    "GAEILGE": "Baile Átha Cliath",
+    "LOGAINM_ID": "100002",
+    "GUID": "2ae19629-144f-13a3-e055-000000000001",
+    "CONTAE": "Baile Átha Cliath",
+    "COUNTY": "DUBLIN",
+    "PROVINCE": "Leinster",
+    "CENTROID_X": 714929.28,
+    "CENTROID_Y": 740960.44,
+    "AREA": 925760879.36,
+    "Shape__Area": 925760879.3545837,
+    "Shape__Length": 366198.61246608174
+   }
+  }
+ ]
+}

@@ -1,0 +1,39 @@
+{
+ "objectIdFieldName": "OBJECTID_1",
+ "uniqueIdField": {
+  "name": "OBJECTID_1",
+  "isSystemMaintained": true
+ },
+ "globalIdFieldName": "",
+ "geometryProperties": {
+  "shapeAreaFieldName": "Shape__Area",
+  "shapeLengthFieldName": "Shape__Length",
+  "units": "esriMeters"
+ },
+ "geometryType": "esriGeometryPolygon",
+ "spatialReference": {
+  "wkid": 2157,
+  "latestWkid": 2157
+ },
+ "features": [
+  {
+   "attributes": {
+    "OBJECTID_1": 469,
+    "ED_ID": "268106",
+    "ED_ENGLISH": "NORTH CITY",
+    "ED_GAEILGE": " ",
+    "COUNTY": "DUBLIN",
+    "CONTAE": "Baile Átha Cliath",
+    "PROVINCE": "Leinster",
+    "CENTROID_X": "715705.997453973",
+    "CENTROID_Y": "734618.265716065",
+    "GUID_": "2AE196291DB213A3E055000000000001",
+    "CSOED_3409": "02075",
+    "OSIED_3441": "268106",
+    "CSOED_34_1": "North City",
+    "Shape__Area": 570022.2352905273,
+    "Shape__Length": 3289.5280639383373
+   }
+  }
+ ]
+}
