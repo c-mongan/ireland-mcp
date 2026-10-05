@@ -142,7 +142,7 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
     pinned: true,
     title: "What is at this location",
     description:
-      "For a WGS84 point in Ireland: county, local authority, constituency, electoral division, small area and settlement (GeoHive), the nearest Met Éireann station and forecast, recorded monuments within 500 m (SMR) and NPWS protected sites at the point.",
+      "For a WGS84 point in Ireland: county, local authority, constituency, electoral division, small area and settlement (GeoHive), the nearest Met Éireann station and forecast, recorded monuments within 500 m (SMR) and NPWS protected sites at the point. Not live observations, river levels, buoys, bikes or populations: use ireland_call for those.",
     inputSchema: {
       lat: z.number().min(-90).max(90).describe("Latitude, e.g. 53.3498."),
       lon: z.number().min(-180).max(180).describe("Longitude, e.g. -6.2603."),
