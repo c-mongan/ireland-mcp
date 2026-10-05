@@ -1,0 +1,30 @@
+# Ireland MCP
+
+Ireland MCP is a public, read-only Model Context Protocol server for Irish public data. It needs no API key, account or login.
+
+Endpoint: https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp
+Future endpoint: https://mcp.irishopendata.ie/mcp
+Transport: Streamable HTTP JSON-RPC over POST
+Auth: none
+Default tool surface: ~7 tools, about 1.4k tokens
+
+Install:
+- VS Code: open vscode://mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ffunc-ireland-mcp-aofsjpwgy4hva.azurewebsites.net%2Fmcp%22%7D
+- Claude Code: claude mcp add --transport http ireland https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp
+- Generic JSON: {"servers":{"ireland":{"type":"http","url":"https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp"}}}
+
+Default tools:
+- ireland_catalogue: compact domain/source/operation catalogue.
+- ireland_describe: arguments and metadata for one source/operation.
+- ireland_call: execute an operation by source and operation name.
+- ireland_about: server, policy and citation guidance.
+- search: cross-source search.
+- fetch: fetch an ireland:// resource or search hit.
+- nearby: place-aware shortcut.
+
+Toolsets:
+- Default is lean.
+- All typed source tools: add ?toolsets=all.
+- One source: /mcp/x/{source-id} or ?toolsets={source-id}.
+
+Source domains include stats, transport, environment, energy, law/politics and places/property. Data remains under each publisher licence; responses include source and licence metadata where available.

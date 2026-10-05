@@ -13,7 +13,8 @@ export const DEFAULT_ALLOWED_ORIGINS: readonly string[] = [
   "http://127.0.0.1:*",
   "https://lemon-meadow-03b2b8903.3.azurestaticapps.net",
   "https://irishopendata.ie",
-  "https://www.irishopendata.ie"
+  "https://www.irishopendata.ie",
+  "https://irishopendata.com"
 ];
 
 /**

@@ -13,3 +13,7 @@ __azurite_*
 __blobstorage__/
 __queuestorage__/
 .scratch/
+
+test-results/
+playwright-report/
+graphify-out/

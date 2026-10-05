@@ -15,6 +15,7 @@ describe("isOriginAllowed", () => {
       "https://lemon-meadow-03b2b8903.3.azurestaticapps.net",
       "https://irishopendata.ie",
       "https://www.irishopendata.ie",
+      "https://irishopendata.com",
       "HTTPS://Claude.AI"
     ]) {
       expect(isOriginAllowed(origin, allow), origin).toBe(true);

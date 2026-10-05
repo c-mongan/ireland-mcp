@@ -48,7 +48,8 @@
     "ppr:build": "node dist/src/sources/ppr/buildIndexCli.js",
     "eval": "node scripts/eval.mjs",
     "prepublishOnly": "npm run build",
-    "skills:package": "node scripts/package-skills.mjs"
+    "skills:package": "node scripts/package-skills.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@azure/data-tables": "^13.3.2",
@@ -63,10 +64,12 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^10.0.1",
     "@opentelemetry/context-async-hooks": "2.11.0",
     "@opentelemetry/sdk-metrics": "2.11.0",
     "@opentelemetry/sdk-trace-base": "2.11.0",
+    "@playwright/test": "^1.63.0",
     "@types/node": "^22.19.0",
     "@vitest/coverage-v8": "^5.0.3",
     "eslint": "^10.12.0",
