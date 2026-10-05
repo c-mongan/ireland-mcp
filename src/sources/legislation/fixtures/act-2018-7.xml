@@ -1,0 +1,492 @@
+<?xml version="1.0"?>
+<!DOCTYPE act SYSTEM "legislation.dtd">
+<act>
+<metadata>
+<title>DATA PROTECTION ACT 2018</title>
+<number>7</number>
+<year>2018</year>
+<dateofenactment>20180524</dateofenactment>
+</metadata>
+<frontmatter>
+<p class="0 0 0 center 1 0" just="left"><graphic href="harp.jpg" quality="GOOD"/></p>
+<p class="0 0 0 center 1 0" just="left"><hr1/></p>
+<actnumber>
+<p class="0 0 0 center 1 0" just="left"><i>Number</i> 7 <i>of</i> 2018</p>
+</actnumber>
+<p class="0 0 0 center 1 0" just="left"><hr1/></p>
+<p class="0 0 0 center 1 0" just="left"><b>DATA PROTECTION ACT 2018</b></p>
+<p class="0 0 0 center 1 0" just="left"><hr1/></p>
+<acttoc>
+<p class="0 0 0 center 1 0" just="left">CONTENTS</p>
+<p class="0 0 0 center 1 0" just="left">PART 1</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Preliminary and General</font></p>
+<p class="-3 11 0 left 1 0" just="left">1. Short title, citation and commencement</p>
+<p class="-3 11 0 left 1 0" just="left">2. Interpretation</p>
+<p class="-3 11 0 left 1 0" just="left">3. Designation by appropriate authority</p>
+<p class="-3 11 0 left 1 0" just="left">4. Obligation not to require data subject to exercise right of access under Data Protection Regulation and Directive in certain circumstances</p>
+<p class="-3 11 0 left 1 0" just="left">5. Expenses</p>
+<p class="-3 11 0 left 1 0" just="left">6. Regulations</p>
+<p class="-3 11 0 left 1 0" just="left">7. Repeals and revocations</p>
+<p class="-3 11 0 left 1 0" just="left">8. Application of Data Protection Act 1988</p>
+<p class="0 0 0 center 1 0" just="left">PART 2</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Data Protection Commission</font></p>
+<p class="-3 11 0 left 1 0" just="left">9. Establishment day</p>
+<p class="-3 11 0 left 1 0" just="left">10. Establishment of Data Protection Commission</p>
+<p class="-3 11 0 left 1 0" just="left">11. Supervisory authority for Data Protection Regulation and Directive</p>
+<p class="-3 11 0 left 1 0" just="left">12. Functions of Commission</p>
+<p class="-3 11 0 left 1 0" just="left">13. Performance of functions of Commission by Commissioner or member of staff</p>
+<p class="-3 11 0 left 1 0" just="left">14. Transfer of functions of Data Protection Commissioner to Commission</p>
+<p class="-3 11 0 left 1 0" just="left">15. Membership of Commission</p>
+<p class="-3 11 0 left 1 0" just="left">16. Appointment of chairperson of Commission</p>
+<p class="-3 11 0 left 1 0" just="left">17. Resignation, removal, disqualification of Commissioner, ineligibility to become Commissioner</p>
+<p class="-3 11 0 left 1 0" just="left">18. Acting Commissioner</p>
+<p class="-3 11 0 left 1 0" just="left">19. Accountability of Commissioner to Oireachtas Committees</p>
+<p class="-3 11 0 left 1 0" just="left">20. Assignment and transfer of staff to Commission</p>
+<p class="-3 11 0 left 1 0" just="left">21. Staff of Commission</p>
+<p class="-3 11 0 left 1 0" just="left">22. Superannuation of Commissioners</p>
+<p class="-3 11 0 left 1 0" just="left">23. Accounts of Commission</p>
+<p class="-3 11 0 left 1 0" just="left">24. Annual report</p>
+<p class="-3 11 0 left 1 0" just="left">25. Accountability for accounts of Commission</p>
+<p class="-3 11 0 left 1 0" just="left">26. Prohibition on disclosure of confidential information</p>
+<p class="-3 11 0 left 1 0" just="left">27. Civil proceedings for contravention of section 26</p>
+<p class="0 0 0 center 1 0" just="left">PART 3</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Data Protection Regulation</font></p>
+<p class="0 0 0 center 1 0" just="left">Chapter 1</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">General</font></p>
+<p class="-3 11 0 left 1 0" just="left">28. Fees</p>
+<p class="-3 11 0 left 1 0" just="left">29. Child for purposes of application of Data Protection Regulation</p>
+<p class="-3 11 0 left 1 0" just="left">30. Micro-targeting and profiling of children</p>
+<p class="-3 11 0 left 1 0" just="left">31. Consent of child in relation to information society services</p>
+<p class="-3 11 0 left 1 0" just="left">32. Codes of conduct: children</p>
+<p class="-3 11 0 left 1 0" just="left">33. Right to be forgotten: children</p>
+<p class="-3 11 0 left 1 0" just="left">34. Designation of data protection officer</p>
+<p class="-3 11 0 left 1 0" just="left">35. Accreditation of certification bodies by Irish National Accreditation Board</p>
+<p class="-3 11 0 left 1 0" just="left">36. Suitable and specific measures for processing</p>
+<p class="-3 11 0 left 1 0" just="left">37. Limitation on transfers of personal data outside the European Union</p>
+<p class="-3 11 0 left 1 0" just="left">38. Processing for a task carried out in the public interest or in the exercise of official authority</p>
+<p class="-3 11 0 left 1 0" just="left">39. Communication with data subjects by political parties, candidates for and holders of certain elective political offices</p>
+<p class="-3 11 0 left 1 0" just="left">40. Processing of personal data and special categories of personal data by elected representatives</p>
+<p class="-3 11 0 left 1 0" just="left">41. Processing for purpose other than purpose for which data collected</p>
+<p class="-3 11 0 left 1 0" just="left">42. Processing for archiving purposes in the public interest, scientific or historical research purposes or statistical purposes</p>
+<p class="-3 11 0 left 1 0" just="left">43. Data processing and freedom of expression and information</p>
+<p class="-3 11 0 left 1 0" just="left">44. Data processing and public access to official documents</p>
+<p class="0 0 0 center 1 0" just="left">Chapter 2</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Processing of special categories of personal data and processing of personal data relating to criminal convictions and offences</font></p>
+<p class="-3 11 0 left 1 0" just="left">45. Processing of special categories of personal data</p>
+<p class="-3 11 0 left 1 0" just="left">46. Processing of special categories of personal data for purposes of employment and social welfare law</p>
+<p class="-3 11 0 left 1 0" just="left">47. Processing of special categories of personal data for purpose of legal advice and legal proceedings</p>
+<p class="-3 11 0 left 1 0" just="left">48. Processing of personal data revealing political opinions for electoral activities and functions of Referendum Commission</p>
+<p class="-3 11 0 left 1 0" just="left">49. Processing of special categories of personal data for purposes of administration of justice and performance of functions</p>
+<p class="-3 11 0 left 1 0" just="left">50. Processing of special categories of personal data for insurance and pension purposes</p>
+<p class="-3 11 0 left 1 0" just="left">51. Processing of special categories of personal data and Article 10 data for reasons of substantial public interest</p>
+<p class="-3 11 0 left 1 0" just="left">52. Processing of special categories of personal data for purposes of Article 9(2)(h)</p>
+<p class="-3 11 0 left 1 0" just="left">53. Processing of special categories of personal data for purposes of public interest in the area of public health</p>
+<p class="-3 11 0 left 1 0" just="left">54. Processing of special categories of personal data for archiving purposes in the public interest, scientific or historical research purposes or statistical purposes</p>
+<p class="-3 11 0 left 1 0" just="left">55. Processing of personal data relating to criminal convictions and offences</p>
+<p class="0 0 0 center 1 0" just="left">Chapter 3</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Rights, and restrictions of rights, of data subject and restrictions on obligations of controllers</font></p>
+<p class="-3 11 0 left 1 0" just="left">56. Right of access to results and scripts of examination and results of appeal</p>
+<p class="-3 11 0 left 1 0" just="left">57. Rights in relation to automated decision making</p>
+<p class="-3 11 0 left 1 0" just="left">58. Direct marketing for purposes of Article 21</p>
+<p class="-3 11 0 left 1 0" just="left">59. Restriction on right of data subject to object to processing for election purposes and processing by Referendum Commission</p>
+<p class="-3 11 0 left 1 0" just="left">60. Restrictions on obligations of controllers and rights of data subjects for important objectives of general public interest</p>
+<p class="-3 11 0 left 1 0" just="left">61. Restriction on exercise of data subjects<csq/> rights: archiving purposes in the public interest, scientific or historical research purposes or statistical purposes</p>
+<p class="0 0 0 center 1 0" just="left">PART 4</p>
+<p class="0 0 0 center 1 0" just="left"><font size="normal" smallcaps="yes">Provisions Consequent on Repeal of Certain Provisions of Data Protection Act 1988</font></p>
+<p class="-3 11 0 left 1 0" just="left">62. Transfer of property of Data Protection Commissioner to Commission</p>
+<p class="-3 11 0 left 1 0" just="left">63. Transfer of rights and liabilities of Data Protection Commissioner to Commission</p>
+<p class="-3 11 0 left 1 0" just="left">64. Liability for loss occurring before establishment day</p>
+<p class="-3 11 0 left 1 0" just="left">65. Provisions consequent upon transfer of functions, assets, rights and liabilities to Commission</p>
+<p class="-3 11 0 left 1 0" just="left">66. Final accounts and final annual report of Data Protection Commissioner</p>
+<p class="-3 11 0 left 1 0" just="left">67. Saver for scheme relating to superannuation</p>
+<p class="-3 11 0 left 1 0" just="left">68. Saver for regulations under Act of 1988</p>
+<p class="0 0 0 center 1 0" just="left">PART 5</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Processing of Personal Data for Law Enforcement Purposes</font></p>
+<p class="0 0 0 center 1 0" just="left">Chapter 1</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Preliminary and general (Part 5)</font></p>
+<p class="-3 11 0 left 1 0" just="left">69. Interpretation (Part 5)</p>
+<p class="-3 11 0 left 1 0" just="left">70. Application of Part 5</p>
+<p class="0 0 0 center 1 0" just="left">Chapter 2</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">General principles of data protection</font></p>
+<p class="-3 11 0 left 1 0" just="left">71. Processing of personal data</p>
+<p class="-3 11 0 left 1 0" just="left">72. Security measures for personal data</p>
+<p class="-3 11 0 left 1 0" just="left">73. Processing of special categories of personal data (Part 5)</p>
+<p class="-3 11 0 left 1 0" just="left">74. Data quality</p>
+<p class="0 0 0 center 1 0" just="left">Chapter 3</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Obligations of controllers and processors</font></p>
+<p class="-3 11 0 left 1 0" just="left">75. General obligations of controller with regard to technical and organisational measures</p>
+<p class="-3 11 0 left 1 0" just="left">76. Data protection by design and by default</p>
+<p class="-3 11 0 left 1 0" just="left">77. Security of automated processing</p>
+<p class="-3 11 0 left 1 0" just="left">78. Technical and organisational measures</p>
+<p class="-3 11 0 left 1 0" just="left">79. Joint controllers</p>
+<p class="-3 11 0 left 1 0" just="left">80. Processors</p>
+<p class="-3 11 0 left 1 0" just="left">81. Record of data processing activities</p>
+<p class="-3 11 0 left 1 0" just="left">82. Data logging for automated processing system</p>
+<p class="-3 11 0 left 1 0" just="left">83. Cooperation with Commission</p>
+<p class="-3 11 0 left 1 0" just="left">84. Data protection impact assessment and prior consultation with Commission</p>
+<p class="-3 11 0 left 1 0" just="left">85. Notification of personal data breach by processor</p>
+<p class="-3 11 0 left 1 0" just="left">86. Notification of personal data breach to Commission, etc.</p>
+<p class="-3 11 0 left 1 0" just="left">87. Communication of personal data breach to data subject</p>
+<p class="-3 11 0 left 1 0" just="left">88. Data protection officer</p>
+<p class="0 0 0 center 1 0" just="left">Chapter 4</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Rights, and restriction of rights, of data subject (Part 5)</font></p>
+<p class="-3 11 0 left 1 0" just="left">89. Rights in relation to automated decision making (Part 5)</p>
+<p class="-3 11 0 left 1 0" just="left">90. Right to information</p>
+<p class="-3 11 0 left 1 0" just="left">91. Right of access</p>
+<p class="-3 11 0 left 1 0" just="left">92. Right to rectification or erasure and restriction of processing</p>
+<p class="-3 11 0 left 1 0" just="left">93. Communication with data subject</p>
+<p class="-3 11 0 left 1 0" just="left">94. Restrictions on exercise of data subject rights (Part 5)</p>
+<p class="-3 11 0 left 1 0" just="left">95. Indirect exercise of rights and verification by Commission</p>
+<p class="0 0 0 center 1 0" just="left">Chapter 5</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Transfers of personal data to third countries or international organisations</font></p>
+<p class="-3 11 0 left 1 0" just="left">96. Transfer to third country or international organisation</p>
+<p class="-3 11 0 left 1 0" just="left">97. Adequacy decision</p>
+<p class="-3 11 0 left 1 0" just="left">98. Transfer subject to appropriate safeguards</p>
+<p class="-3 11 0 left 1 0" just="left">99. Derogations for specific situations</p>
+<p class="-3 11 0 left 1 0" just="left">100. Transfer to recipient in third country</p>
+<p class="0 0 0 center 1 0" just="left">Chapter 6</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Independent supervisory authority</font></p>
+<p class="-3 11 0 left 1 0" just="left">101. Functions of Commission under Part 5</p>
+<p class="-3 11 0 left 1 0" just="left">102. Power of the Commission to advise and issue opinions</p>
+<p class="-3 11 0 left 1 0" just="left">103. Mutual assistance</p>
+<p class="-3 11 0 left 1 0" just="left">104. Requests by Commission for mutual assistance</p>
+<p class="0 0 0 center 1 0" just="left">PART 6</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Enforcement of Data Protection Regulation and Directive</font></p>
+<p class="0 0 0 center 1 0" just="left">Chapter 1</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Preliminary</font></p>
+<p class="-3 11 0 left 1 0" just="left">105. Interpretation (Part 6)</p>
+<p class="-3 11 0 left 1 0" just="left">106. Service of documents (Part 6)</p>
+<p class="0 0 0 center 1 0" just="left">Chapter 2</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Enforcement of Data Protection Regulation</font></p>
+<p class="-3 11 0 left 1 0" just="left">107. Interpretation (Chapter 2)</p>
+<p class="-3 11 0 left 1 0" just="left">108. Complaints under Chapter 2: General</p>
+<p class="-3 11 0 left 1 0" just="left">109. Commission to handle complaint under Chapter 2</p>
+<p class="-3 11 0 left 1 0" just="left">110. Commission may conduct inquiry into suspected infringement of relevant enactment</p>
+<p class="-3 11 0 left 1 0" just="left">111. Decision of Commission where inquiry under Chapter 2 conducted of own volition</p>
+<p class="-3 11 0 left 1 0" just="left">112. Decision of Commission where inquiry conducted in respect of complaint to which Article 55 or 56(5) applies</p>
+<p class="-3 11 0 left 1 0" just="left">113. Complaint to which Article 60 applies</p>
+<p class="-3 11 0 left 1 0" just="left">114. Commission to adopt decision in certain circumstances</p>
+<p class="-3 11 0 left 1 0" just="left">115. Exercise by Commission of corrective power</p>
+<p class="-3 11 0 left 1 0" just="left">116. Notification of decision of Commission under Chapter 2</p>
+<p class="-3 11 0 left 1 0" just="left">117. Judicial remedy for infringement of relevant enactment</p>
+<p class="0 0 0 center 1 0" just="left">Chapter 3</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Enforcement of Directive</font></p>
+<p class="-3 11 0 left 1 0" just="left">118. Interpretation (Chapter 3)</p>
+<p class="-3 11 0 left 1 0" just="left">119. Data subject may lodge complaint with Commission</p>
+<p class="-3 11 0 left 1 0" just="left">120. Representation of data subjects</p>
+<p class="-3 11 0 left 1 0" just="left">121. Complaints under Chapter 3: General</p>
+<p class="-3 11 0 left 1 0" just="left">122. Commission to handle complaint under Chapter 3</p>
+<p class="-3 11 0 left 1 0" just="left">123. Commission may conduct inquiry into suspected infringements of relevant provision</p>
+<p class="-3 11 0 left 1 0" just="left">124. Decision of Commission in respect of inquiry under Chapter 3 conducted of own volition</p>
+<p class="-3 11 0 left 1 0" just="left">125. Decision of Commission where inquiry conducted in respect of complaint under Chapter 3</p>
+<p class="-3 11 0 left 1 0" just="left">126. Notification of decision of Commission under Chapter 3</p>
+<p class="-3 11 0 left 1 0" just="left">127. Corrective powers of Commission (Chapter 3)</p>
+<p class="-3 11 0 left 1 0" just="left">128. Judicial remedy for infringement of relevant provision</p>
+<p class="0 0 0 center 1 0" just="left">Chapter 4</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Inspection, Audit and Enforcement</font></p>
+<p class="-3 11 0 left 1 0" just="left">129. Authorised officers</p>
+<p class="-3 11 0 left 1 0" just="left">130. Powers of authorised officers</p>
+<p class="-3 11 0 left 1 0" just="left">131. Search warrants</p>
+<p class="-3 11 0 left 1 0" just="left">132. Information notice</p>
+<p class="-3 11 0 left 1 0" just="left">133. Enforcement notice</p>
+<p class="-3 11 0 left 1 0" just="left">134. Circumstances in which application may be made to the High Court for suspension or restriction of processing of data</p>
+<p class="-3 11 0 left 1 0" just="left">135. Power to require report</p>
+<p class="-3 11 0 left 1 0" just="left">136. Data Protection Audit</p>
+<p class="0 0 0 center 1 0" just="left">Chapter 5</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Investigations</font></p>
+<p class="-3 11 0 left 1 0" just="left">137. Investigations</p>
+<p class="-3 11 0 left 1 0" just="left">138. Conduct of investigation under section 137</p>
+<p class="-3 11 0 left 1 0" just="left">139. Investigation report</p>
+<p class="-3 11 0 left 1 0" just="left">140. Commission to consider investigation report</p>
+<p class="0 0 0 center 1 0" just="left">Chapter 6</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Administrative Fines</font></p>
+<p class="-3 11 0 left 1 0" just="left">141. Power of Commission to decide to impose administrative fine: General</p>
+<p class="-3 11 0 left 1 0" just="left">142. Appeal against administrative fine</p>
+<p class="-3 11 0 left 1 0" just="left">143. Circuit Court to confirm decision to impose administrative fine</p>
+<p class="0 0 0 center 1 0" just="left">Chapter 7</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Offences</font></p>
+<p class="-3 11 0 left 1 0" just="left">144. Unauthorised disclosure by processor</p>
+<p class="-3 11 0 left 1 0" just="left">145. Disclosure of personal data obtained without authority</p>
+<p class="-3 11 0 left 1 0" just="left">146. Offences by directors, etc., of bodies corporate</p>
+<p class="-3 11 0 left 1 0" just="left">147. Prosecution of summary offences by Commission</p>
+<p class="0 0 0 center 1 0" just="left">Chapter 8</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Miscellaneous</font></p>
+<p class="-3 11 0 left 1 0" just="left">148. General provisions relating to complaints</p>
+<p class="-3 11 0 left 1 0" just="left">149. Publication of convictions, sanctions, etc.</p>
+<p class="-3 11 0 left 1 0" just="left">150. Right to effective judicial remedy (Part 6)</p>
+<p class="-3 11 0 left 1 0" just="left">151. Privileged legal material</p>
+<p class="-3 11 0 left 1 0" just="left">152. Presumptions</p>
+<p class="-3 11 0 left 1 0" just="left">153. Expert evidence</p>
+<p class="-3 11 0 left 1 0" just="left">154. Immunity from suit</p>
+<p class="-3 11 0 left 1 0" just="left">155. Jurisdiction of Circuit Court</p>
+<p class="-3 11 0 left 1 0" just="left">156. Hearing of proceedings</p>
+<p class="0 0 0 center 1 0" just="left">PART 7</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Miscellaneous Provisions</font></p>
+<p class="-3 11 0 left 1 0" just="left">157. Supervisory authority for courts acting in judicial capacity</p>
+<p class="-3 11 0 left 1 0" just="left">158. Restrictions on obligations of controllers and rights of data subjects for objective of safeguarding judicial independence and court proceedings</p>
+<p class="-3 11 0 left 1 0" just="left">159. Processing of personal data where court is controller</p>
+<p class="-3 11 0 left 1 0" just="left">160. Publication of judgment or decision of court or court list</p>
+<p class="-3 11 0 left 1 0" just="left">161. Rules of court for data protection actions</p>
+<p class="-3 11 0 left 1 0" just="left">162. Legal privilege</p>
+<p class="-3 11 0 left 1 0" just="left">163. Application to High Court concerning adequate level of protection or appropriate safeguards</p>
+<p class="-3 11 0 left 1 0" just="left">164. Court may order destruction, erasure of data</p>
+<p class="0 0 0 center 1 0" just="left">PART 8</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Amendments of other Acts of Oireachtas</font></p>
+<p class="-3 11 0 left 1 0" just="left">165. Reference to personal data in enactment</p>
+<p class="-3 11 0 left 1 0" just="left">166. Reference to processing in enactment</p>
+<p class="-3 11 0 left 1 0" just="left">167. Amendment of Firearms Act 1925</p>
+<p class="-3 11 0 left 1 0" just="left">168. Amendment of section 33AK of Central Bank Act 1942</p>
+<p class="-3 11 0 left 1 0" just="left">169. Amendment of section 2 of Civil Service Regulation Act 1956</p>
+<p class="-3 11 0 left 1 0" just="left">170. Amendment of section 24 of Misuse of Drugs Act 1977</p>
+<p class="-3 11 0 left 1 0" just="left">171. Amendment of section 15A of Control of Clinical Trials Act 1987</p>
+<p class="-3 11 0 left 1 0" just="left">172. Amendment of Data Protection Act 1988</p>
+<p class="-3 11 0 left 1 0" just="left">173. Amendment of Bankruptcy Act 1988</p>
+<p class="-3 11 0 left 1 0" just="left">174. Amendment of Firearms and Offensive Weapons Act 1990</p>
+<p class="-3 11 0 left 1 0" just="left">175. Amendment of section 13A of Electoral Act 1992</p>
+<p class="-3 11 0 left 1 0" just="left">176. Amendment of Comptroller and Auditor General (Amendment) Act 1993</p>
+<p class="-3 11 0 left 1 0" just="left">177. Amendment of section 8 of Interception of Postal Packets and Telecommunications Messages (Regulation) Act 1993</p>
+<p class="-3 11 0 left 1 0" just="left">178. Amendment of section 24 of Statistics Act 1993</p>
+<p class="-3 11 0 left 1 0" just="left">179. Amendment of section 57B of Irish Aviation Authority Act 1993</p>
+<p class="-3 11 0 left 1 0" just="left">180. Amendment of section 18F of Health Insurance Act 1994</p>
+<p class="-3 11 0 left 1 0" just="left">181. Amendment of section 142 of Consumer Credit Act 1995</p>
+<p class="-3 11 0 left 1 0" just="left">182. Amendment of section 32B of Irish Medicines Board Act 1995</p>
+<p class="-3 11 0 left 1 0" just="left">183. Amendment of section 77 of Central Bank Act 1997</p>
+<p class="-3 11 0 left 1 0" just="left">184. Amendment of section 1 of Health (Provision of Information) Act 1997</p>
+<p class="-3 11 0 left 1 0" just="left">185. Amendment of section 9M of Electricity Regulation Act 1999</p>
+<p class="-3 11 0 left 1 0" just="left">186. Amendment of British-Irish Agreement Act 1999</p>
+<p class="-3 11 0 left 1 0" just="left">187. Amendment of section 7D of Comhairle Act 2000</p>
+<p class="-3 11 0 left 1 0" just="left">188. Amendment of section 33 of Commission To Inquire Into Child Abuse Act 2000</p>
+<p class="-3 11 0 left 1 0" just="left">189. Amendment of section 2 of Merchant Shipping (Investigation of Marine Casualties) Act 2000</p>
+<p class="-3 11 0 left 1 0" just="left">190. Amendment of section 28 of Education (Welfare) Act 2000</p>
+<p class="-3 11 0 left 1 0" just="left">191. Amendment of section 38 of Planning and Development Act 2000</p>
+<p class="-3 11 0 left 1 0" just="left">192. Amendment of section 14 of Dormant Accounts Act 2001</p>
+<p class="-3 11 0 left 1 0" just="left">193. Amendment of section 30 of Residential Institutions Redress Act 2002</p>
+<p class="-3 11 0 left 1 0" just="left">194. Amendment of section 2 of Official Languages Act 2003</p>
+<p class="-3 11 0 left 1 0" just="left">195. Amendment of section 86 of Personal Injuries Assessment Board Act 2003</p>
+<p class="-3 11 0 left 1 0" just="left">196. Amendment of section 12 of Unclaimed Life Assurance Policies Act 2003</p>
+<p class="-3 11 0 left 1 0" just="left">197. Amendment of section 66 of Civil Registration Act 2004</p>
+<p class="-3 11 0 left 1 0" just="left">198. Amendment of section 39 of Commissions of Investigation Act 2004</p>
+<p class="-3 11 0 left 1 0" just="left">199. Amendment of section 55H of Health Act 2004</p>
+<p class="-3 11 0 left 1 0" just="left">200. Amendment of section 2 of Safety, Health and Welfare at Work Act 2005</p>
+<p class="-3 11 0 left 1 0" just="left">201. Amendment of section 265 of Social Welfare Consolidation Act 2005</p>
+<p class="-3 11 0 left 1 0" just="left">202. Amendment of Disability Act 2005</p>
+<p class="-3 11 0 left 1 0" just="left">203. Amendment of section 2 of Railway Safety Act 2005</p>
+<p class="-3 11 0 left 1 0" just="left">204. Amendment of section 12 of Health (Repayment Scheme) Act 2006</p>
+<p class="-3 11 0 left 1 0" just="left">205. Amendment of section 19 of Electoral (Amendment) Act 2006</p>
+<p class="-3 11 0 left 1 0" just="left">206. Amendment of section 67 of Pharmacy Act 2007</p>
+<p class="-3 11 0 left 1 0" just="left">207. Amendment of Passports Act 2008</p>
+<p class="-3 11 0 left 1 0" just="left">208. Amendment of Criminal Justice (Mutual Assistance) Act 2008</p>
+<p class="-3 11 0 left 1 0" just="left">209. Amendment of section 2 of Chemicals Act 2008</p>
+<p class="-3 11 0 left 1 0" just="left">210. Amendment of Nursing Homes Support Scheme Act 2009</p>
+<p class="-3 11 0 left 1 0" just="left">211. Amendment of section 23 of Criminal Justice (Miscellaneous Provisions) Act 2009</p>
+<p class="-3 11 0 left 1 0" just="left">212. Amendment of section 201 of National Asset Management Agency Act 2009</p>
+<p class="-3 11 0 left 1 0" just="left">213. Amendment of Criminal Justice (Money Laundering and Terrorist Financing) Act 2010</p>
+<p class="-3 11 0 left 1 0" just="left">214. Amendment of section 12 of Communications (Retention of Data) Act 2011</p>
+<p class="-3 11 0 left 1 0" just="left">215. Amendment of section 17A of Ministers and Secretaries (Amendment) Act 2011</p>
+<p class="-3 11 0 left 1 0" just="left">216. Amendment of section 28 of Student Support Act 2011</p>
+<p class="-3 11 0 left 1 0" just="left">217. Amendment of Communications Regulation (Postal Services) Act 2011</p>
+<p class="-3 11 0 left 1 0" just="left">218. Amendment of Property Services (Regulation) Act 2011</p>
+<p class="-3 11 0 left 1 0" just="left">219. Amendment of section 56 of Credit Union and Co-operation with Overseas Regulators Act 2012</p>
+<p class="-3 11 0 left 1 0" just="left">220. Amendment of Europol Act 2012</p>
+<p class="-3 11 0 left 1 0" just="left">221. Amendment of Personal Insolvency Act 2012</p>
+<p class="-3 11 0 left 1 0" just="left">222. Amendment of section 2 of Animal Health and Welfare Act 2013</p>
+<p class="-3 11 0 left 1 0" just="left">223. Amendment of section 8 of Health (Alteration of Criteria for Eligibility) Act 2013</p>
+<p class="-3 11 0 left 1 0" just="left">224. Insertion of section 957A to Companies Act 2014</p>
+<p class="-3 11 0 left 1 0" just="left">225. Amendment of Health Identifiers Act 2014</p>
+<p class="-3 11 0 left 1 0" just="left">226. Amendment of section 15 of Freedom of Information Act 2014</p>
+<p class="-3 11 0 left 1 0" just="left">227. Amendment of section 41 of Customs Act 2015</p>
+<p class="-3 11 0 left 1 0" just="left">228. Amendment of section 7 of Regulation of Lobbying Act 2015</p>
+<p class="-3 11 0 left 1 0" just="left">229. Amendment of Sport Ireland Act 2015</p>
+<p class="-3 11 0 left 1 0" just="left">230. Amendment of section 12 of Criminal Justice (Spent Convictions and Certain Disclosures) Act 2016</p>
+<p class="-3 11 0 left 1 0" just="left">231. Amendment of section 62 of Financial Services and Pensions Ombudsman Act 2017</p>
+<p class="-3 11 0 left 1 0" just="left">232. Amendment of National Shared Services Office Act 2017</p>
+<p class="0 0 0 center 1 0" just="center">SCHEDULE 1</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Statutory Instruments Revoked</font></p>
+<p class="0 0 0 center 1 0" just="center">SCHEDULE 2</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Data Protection Commission</font></p>
+<p class="0 0 0 center 1 0" just="center">SCHEDULE 3</p>
+<p class="0 0 0 center 1 0" just="center"><font size="normal" smallcaps="yes">Provisions Applicable to Oral Hearing Conducted by an Authorised Officer Under Section 138</font></p>
+</acttoc>
+<p class="0 0 0 center 1 0" just="left"><hr1/></p>
+<actsreferredto>
+<title>
+<p class="0 0 0 center 1 0" just="left">Acts Referred to</p>
+</title>
+<p class="-3 11 0 left 1 0" just="left">Animal Health and Welfare Act 2013 (No. 15)</p>
+<p class="-3 11 0 left 1 0" just="left">Bankruptcy Act 1988 (No. 27)</p>
+<p class="-3 11 0 left 1 0" just="left">British-Irish Agreement Act 1999 (No. 1)</p>
+<p class="-3 11 0 left 1 0" just="left">Central Bank Act 1942 (No. 22)</p>
+<p class="-3 11 0 left 1 0" just="left">Central Bank Act 1997 (No. 8)</p>
+<p class="-3 11 0 left 1 0" just="left">Chemicals Act 2008 (No. 13)</p>
+<p class="-3 11 0 left 1 0" just="left">Children Act 2001 (No. 24)</p>
+<p class="-3 11 0 left 1 0" just="left">Civil Registration Act 2004 (No. 3)</p>
+<p class="-3 11 0 left 1 0" just="left">Civil Service Regulation Act 1956 (No. 46)</p>
+<p class="-3 11 0 left 1 0" just="left">Comhairle Act 2000 (No. 1)</p>
+<p class="-3 11 0 left 1 0" just="left">Commission To Inquire Into Child Abuse Act 2000 (No. 7)</p>
+<p class="-3 11 0 left 1 0" just="left">Commissions of Investigation Act 2004 (No. 23)</p>
+<p class="-3 11 0 left 1 0" just="left">Communications (Retention of Data) Act 2011 (No. 3)</p>
+<p class="-3 11 0 left 1 0" just="left">Communications Regulation (Postal Services) Act 2011 (No. 21)</p>
+<p class="-3 11 0 left 1 0" just="left">Companies Act 2014 (No. 38)</p>
+<p class="-3 11 0 left 1 0" just="left">Competition Act 2002 (No. 14)</p>
+<p class="-3 11 0 left 1 0" just="left">Comptroller and Auditor General (Amendment) Act 1993 (No. 8)</p>
+<p class="-3 11 0 left 1 0" just="left">Consumer Credit Act 1995 (No. 24)</p>
+<p class="-3 11 0 left 1 0" just="left">Control of Clinical Trials Act 1987 (No. 28)</p>
+<p class="-3 11 0 left 1 0" just="left">Credit Union and Co-operation with Overseas Regulators Act 2012 (No. 40)</p>
+<p class="-3 11 0 left 1 0" just="left">Criminal Justice (Forensic Evidence and DNA Database System) Act 2014 (No. 11)</p>
+<p class="-3 11 0 left 1 0" just="left">Criminal Justice (Miscellaneous Provisions) Act 2009 (No. 28)</p>
+<p class="-3 11 0 left 1 0" just="left">Criminal Justice (Money Laundering and Terrorist Financing) Act 2010 (No. 6)</p>
+<p class="-3 11 0 left 1 0" just="left">Criminal Justice (Mutual Assistance) Act 2008 (No. 7)</p>
+<p class="-3 11 0 left 1 0" just="left">Criminal Justice (Spent Convictions and Certain Disclosures) Act 2016 (No. 4)</p>
+<p class="-3 11 0 left 1 0" just="left">Customs Act 2015 (No. 18)</p>
+<p class="-3 11 0 left 1 0" just="left">Data Protection (Amendment) Act 2003 (No. 6)</p>
+<p class="-3 11 0 left 1 0" just="left">Data Protection Act 1988 (No. 25)</p>
+<p class="-3 11 0 left 1 0" just="left">Data Protection Acts 1988 and 2003</p>
+<p class="-3 11 0 left 1 0" just="left">Data Protection Acts 1988 to 2003</p>
+<p class="-3 11 0 left 1 0" just="left">Defence Act 1954 (No. 18)</p>
+<p class="-3 11 0 left 1 0" just="left">Dentists Act 1985 (No. 9)</p>
+<p class="-3 11 0 left 1 0" just="left">Disability Act 2005 (No. 14)</p>
+<p class="-3 11 0 left 1 0" just="left">Dormant Accounts Act 2001 (No. 32)</p>
+<p class="-3 11 0 left 1 0" just="left">Education (Welfare) Act 2000 (No. 22)</p>
+<p class="-3 11 0 left 1 0" just="left">Education Act 1998 (No. 51)</p>
+<p class="-3 11 0 left 1 0" just="left">Electoral (Amendment) Act 2006 (No. 33)</p>
+<p class="-3 11 0 left 1 0" just="left">Electoral Act 1992 (No. 23)</p>
+<p class="-3 11 0 left 1 0" just="left">Electricity Regulation Act 1999 (No. 23)</p>
+<p class="-3 11 0 left 1 0" just="left">European Parliament Elections Act 1997 (No. 2)</p>
+<p class="-3 11 0 left 1 0" just="left">Europol Act 2012 (No. 53)</p>
+<p class="-3 11 0 left 1 0" just="left">Financial Services and Pensions Ombudsman Act 2017 (No. 22)</p>
+<p class="-3 11 0 left 1 0" just="left">Firearms (Firearm Certificates For Non-Residents) Act 2000 (No. 20)</p>
+<p class="-3 11 0 left 1 0" just="left">Firearms Act 1925 (No. 17)</p>
+<p class="-3 11 0 left 1 0" just="left">Firearms and Offensive Weapons Act 1990 (No. 12)</p>
+<p class="-3 11 0 left 1 0" just="left">Freedom of Information Act 2014 (No. 30)</p>
+<p class="-3 11 0 left 1 0" just="left">Health (Alteration of Criteria for Eligibility) Act 2013 (No. 10)</p>
+<p class="-3 11 0 left 1 0" just="left">Health (Corporate Bodies) Act 1961 (No. 27)</p>
+<p class="-3 11 0 left 1 0" just="left">Health (Provision of Information) Act 1997 (No. 9)</p>
+<p class="-3 11 0 left 1 0" just="left">Health (Repayment Scheme) Act 2006 (No. 17)</p>
+<p class="-3 11 0 left 1 0" just="left">Health Act 2004 (No. 42)</p>
+<p class="-3 11 0 left 1 0" just="left">Health Identifiers Act 2014 (No. 15)</p>
+<p class="-3 11 0 left 1 0" just="left">Health Insurance Act 1994 (No. 16)</p>
+<p class="-3 11 0 left 1 0" just="left">Interception of Postal Packets and Telecommunications Messages (Regulation) Act 1993 (No. 10)</p>
+<p class="-3 11 0 left 1 0" just="left">Interpretation Act 2005 (No. 23)</p>
+<p class="-3 11 0 left 1 0" just="left">Irish Aviation Authority Act 1993 (No. 29)</p>
+<p class="-3 11 0 left 1 0" just="left">Irish Medicines Board Act 1995 (No. 29)</p>
+<p class="-3 11 0 left 1 0" just="left">Local Government Act 2001 (No. 37)</p>
+<p class="-3 11 0 left 1 0" just="left">Medical Practitioners Act 1978 (No. 4)</p>
+<p class="-3 11 0 left 1 0" just="left">Medical Practitioners Act 2007 (No. 25)</p>
+<p class="-3 11 0 left 1 0" just="left">Merchant Shipping (Investigation of Marine Casualties) Act 2000 (No. 14)</p>
+<p class="-3 11 0 left 1 0" just="left">Ministers and Secretaries (Amendment) Act 2011 (No. 10)</p>
+<p class="-3 11 0 left 1 0" just="left">Misuse of Drugs Act 1977 (No. 12)</p>
+<p class="-3 11 0 left 1 0" just="left">National Asset Management Agency Act 2009 (No. 34)</p>
+<p class="-3 11 0 left 1 0" just="left">National Shared Services Office Act 2017 (No. 26)</p>
+<p class="-3 11 0 left 1 0" just="left">Nursing Homes Support Scheme Act 2009 (No. 15)</p>
+<p class="-3 11 0 left 1 0" just="left">Official Languages Act 2003 (No. 32)</p>
+<p class="-3 11 0 left 1 0" just="left">Passports Act 2008 (No. 4)</p>
+<p class="-3 11 0 left 1 0" just="left">Personal Injuries Assessment Board Act 2003 (No. 46)</p>
+<p class="-3 11 0 left 1 0" just="left">Personal Insolvency Act 2012 (No. 44)</p>
+<p class="-3 11 0 left 1 0" just="left">Petty Sessions (Ireland) Act 1851 (14 &amp; 15 Vict., c.93)</p>
+<p class="-3 11 0 left 1 0" just="left">Pharmacy Act 2007 (No. 20)</p>
+<p class="-3 11 0 left 1 0" just="left">Planning and Development Act 2000 (No. 30)</p>
+<p class="-3 11 0 left 1 0" just="left">Prisons Acts 1826 to 2015</p>
+<p class="-3 11 0 left 1 0" just="left">Property Services (Regulation) Act 2011 (No. 40)</p>
+<p class="-3 11 0 left 1 0" just="left">Public Service Superannuation (Miscellaneous Provisions) Act 2004 (No. 7)</p>
+<p class="-3 11 0 left 1 0" just="left">Railway Safety Act 2005 (No. 31)</p>
+<p class="-3 11 0 left 1 0" just="left">Regulation of Lobbying Act 2015 (No. 5)</p>
+<p class="-3 11 0 left 1 0" just="left">Residential Institutions Redress Act 2002 (No. 13)</p>
+<p class="-3 11 0 left 1 0" just="left">Safety, Health and Welfare at Work Act 2005 (No. 10)</p>
+<p class="-3 11 0 left 1 0" just="left">Social Welfare Consolidation Act 2005 (No. 26)</p>
+<p class="-3 11 0 left 1 0" just="left">Sport Ireland Act 2015 (No. 15)</p>
+<p class="-3 11 0 left 1 0" just="left">Statistics Act 1993 (No. 21)</p>
+<p class="-3 11 0 left 1 0" just="left">Student Support Act 2011 (No. 4)</p>
+<p class="-3 11 0 left 1 0" just="left">Unclaimed Life Assurance Policies Act 2003 (No. 2)</p>
+<p class="-3 11 0 left 1 0" just="left">Vehicle Registration Data (Automated Searching and Exchange) Act 2018 (No. 5)</p>
+</actsreferredto>
+<p class="0 0 0 center 1 0" just="left"><graphic href="harp.jpg" quality="GOOD"/></p>
+<p class="0 0 0 center 1 0" just="left"><hr1/></p>
+<actnumber>
+<p class="0 0 0 center 1 0" just="left"><i>Number</i> 7 <i>of</i> 2018
+</p>
+</actnumber>
+<p class="0 6 4 center 1 0" just="left"><hr1/>
+</p>
+<p class="0 0 0 center 1 0" just="left"><b>DATA PROTECTION ACT 2018</b>
+</p>
+<p class="0 6 4 center 1 0" just="left"><hr1/>
+</p>
+<p class="0 8 0 left 1 0" just="left">An Act to establish a body to be known as An Coimisi<ufada/>n um Chosaint Sonra<ifada/> or, in the English language, the Data Protection Commission; to give further effect to Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016<fn><marker><su>1</su></marker><p class="-0 0 0 left 1 0" just="left"><font size="small" smallcaps="no"><su>1</su>OJ No. L 119, 4.5.2016, p.1</font></p></fn> on the protection of natural persons with regard to the processing of personal data and on the free movement of such data, and repealing Directive 95/46/EC (General Data Protection Regulation); to give effect to Directive (EU) 2016/680 of the European Parliament and of the Council of 27 April 2016<fn><marker><su>2</su></marker><p class="-0 0 0 left 1 0" just="left"><font size="small" smallcaps="no"><su>2</su>OJ No. L 119, 4.5.2016, p.89</font></p></fn> on the protection of natural persons with regard to the processing of personal data by competent authorities for the purposes of the prevention, investigation, detection or prosecution of criminal offences or the execution of criminal penalties, and on the free movement of such data, and repealing Council Framework Decision 2008/977/JHA; to give further effect to the Convention for the Protection of Individuals with regard to Automatic Processing of Personal Data done at Strasbourg on the 28th day of January 1981 and for those and other purposes to amend the Data Protection Act 1988; to provide for the consequential amendment of certain other enactments; and to provide for related matters. </p>
+<p class="0 8 0 left 1 0" just="left">[24<i>th May</i> , 2018] </p>
+<p class="-3 11 0 left 1 0" just="left"><b>Be it enacted by the Oireachtas as follows:</b></p>
+</frontmatter>
+<body>
+<part id="PART1">
+<title>
+<p class="0 0 0 center 1 0" just="left"><font size="large" smallcaps="no">PART 1</font></p>
+<p class="0 0 0 center 1 0" just="center">
+<font size="normal" smallcaps="yes">Preliminary and General</font></p>
+</title>
+<sect id="SEC1">
+<number>1.</number>
+<title>
+<p class="-3 11 0 left 1 0" just="left"><b>Short title, citation and commencement</b></p>
+</title>
+<p class="-3 11 0 left 1 0" just="left"><b>1.</b> (1) This Act may be cited as the Data Protection Act 2018.</p>
+<p class="-3 11 0 left 1 0" just="left">(2) This Act and the Data Protection Acts 1988 and 2003 may be cited together as the Data Protection Acts 1988 to 2018.</p>
+<p class="-3 11 0 left 1 0" just="left">(3) This Act shall come into operation on such day or days as the Minister may by order or orders appoint either generally or with reference to any particular purpose or provision and different days may be so appointed for different purposes or different provisions, and for the repeal of different enactments or provisions of enactments effected by <i>section 7</i>.</p>
+</sect>
+<sect id="SEC2">
+<number>2.</number>
+<title>
+<p class="-3 11 0 left 1 0" just="left"><b>Interpretation</b></p>
+</title>
+<p class="-3 11 0 left 1 0" just="left"><b>2.</b> (1) In this Act<emdash/></p>
+<p class="0 11 0 left 1 0" just="left"><odq/>Act of 1988<cdq/> means the Data Protection Act 1988;</p>
+<p class="0 11 0 left 1 0" just="left"><odq/>Act of 2014<cdq/> means the Companies Act 2014;</p>
+<p class="0 11 0 left 1 0" just="left"><odq/>authorised officer<cdq/> means a person appointed, or deemed to be appointed, to be an authorised officer under <i>section 129</i>;</p>
+<p class="0 11 0 left 1 0" just="left"><odq/>chairperson<cdq/> means the chairperson of the Commission;</p>
+<p class="0 11 0 left 1 0" just="left"><odq/>civil servant<cdq/> has the meaning assigned to it by the Civil Service Regulation Act 1956;</p>
+<p class="0 11 0 left 1 0" just="left"><odq/>Commission<cdq/> has the meaning assigned to it by <i>section 10</i>;</p>
+<p class="0 11 0 left 1 0" just="left"><odq/>Commissioner<cdq/> has the meaning assigned to it by <i>section 15</i> and includes a member of staff authorised to act in place of a Commissioner under <i>section 18</i>;</p>
+<p class="0 11 0 left 1 0" just="left"><odq/>Data Protection Regulation<cdq/> means Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016<fn><marker><su>3</su></marker><p class="-0 0 0 left 1 0" just="left"><font size="small" smallcaps="no"><su>3</su>OJ No. L 119, 4.5.2016, p.1</font></p></fn> on the protection of natural persons with regard to the processing of personal data and on the free movement of such data, and repealing Directive 95/46/EC (General Data Protection Regulation);</p>
+<p class="0 11 0 left 1 0" just="left"><odq/>Directive<cdq/> means Directive (EU) 2016/680 of the European Parliament and of the Council of 27 April 2016<fn><marker><su>4</su></marker><p class="-0 0 0 left 1 0" just="left"><font size="small" smallcaps="no"><su>4</su>OJ No. L 119, 4.5.2016, p.89</font></p></fn> on the protection of natural persons with regard to the processing of personal data by competent authorities for the purposes of the prevention, investigation, detection or prosecution of criminal offences or the execution of criminal penalties, and on the free movement of such data, and repealing Council Framework Decision 2008/977/JHA;</p>
+<p class="0 11 0 left 1 0" just="left"><odq/>enactment<cdq/> has the same meaning as it has in the Interpretation Act 2005;</p>
+<p class="0 11 0 left 1 0" just="left"><odq/>local authority<cdq/> means a local authority within the meaning of section 2 of the Local Government Act 2001;</p>
+<p class="0 11 0 left 1 0" just="left"><odq/>Minister<cdq/> means the Minister for Justice and Equality;</p>
+<p class="0 11 0 left 1 0" just="left"><odq/>political party<cdq/> means a political party registered in the Register of Political Parties in accordance with section 25 of the Electoral Act 1992;</p>
+<p class="0 11 0 left 1 0" just="left"><odq/>prescribe<cdq/> means prescribe by regulations;</p>
+<p class="0 11 0 left 1 0" just="left"><odq/>public authority<cdq/> means<emdash/></p>
+<p class="-3 14 0 left 1 0" just="left">(a) a Department of State,</p>
+<p class="-3 14 0 left 1 0" just="left">(b) a regional assembly,</p>
+<p class="-3 14 0 left 1 0" just="left">(c) a local authority,</p>
+<p class="-3 14 0 left 1 0" just="left">(d) the office of the Director of Corporate Enforcement,</p>
+<p class="-3 14 0 left 1 0" just="left">(e) the Irish Auditing and Accounting Supervisory Authority,</p>
+<p class="-3 14 0 left 1 0" just="left">(f) any other person established by or under an enactment (other than the Act of 2014 or a former enactment relating to companies within the meaning of section 5 of that Act) other than<emdash/></p>
+<p class="-3 17 0 left 1 0" just="left">(i) a recognised school or board within the meaning of section 2 of the Education Act 1998 but including a recognised school established and maintained by an education and training board and a board of a school so established and maintained, and</p>
+<p class="-3 17 0 left 1 0" just="left">(ii) a management committee established under section 37(3) of the Education Act 1998,</p>
+<p class="-3 14 0 left 1 0" just="left">(g) a person with whom the Health Service Executive has, under section 38(1) of the Health Act 2004, entered into an arrangement for the provision of a health or personal social service by that person on behalf of the Executive,</p>
+<p class="-3 14 0 left 1 0" just="left">(h) the Garda S<ifada/>och<afada/>na;</p>
+<p class="0 11 0 left 1 0" just="left"><odq/>public body<cdq/> means<emdash/></p>
+<p class="-3 14 0 left 1 0" just="left">(a) a company (within the meaning of the Act of 2014 or a former enactment relating to companies within the meaning of section 5 of that Act) a majority of the shares in which are held by or on behalf of a Minister of the Government,</p>
+<p class="-3 14 0 left 1 0" just="left">(b) a subsidiary (within the meaning of section 7 of the Act of 2014) of a company referred to in <i>paragraph (a)</i>;</p>
+<p class="0 11 0 left 1 0" just="left"><odq/>special categories of personal data<cdq/>, other than in <i>Part 5</i>, means<emdash/></p>
+<p class="-3 14 0 left 1 0" just="left">(a) personal data revealing<emdash/></p>
+<p class="-3 17 0 left 1 0" just="left">(i) the racial or ethnic origin of the data subject,</p>
+<p class="-3 17 0 left 1 0" just="left">(ii) the political opinions or the religious or philosophical beliefs of the data subject, or</p>
+<p class="-3 17 0 left 1 0" just="left">(iii) whether the data subject is a member of a trade union,</p>
+<p class="-3 14 0 left 1 0" just="left">(b) genetic data,</p>
+<p class="-3 14 0 left 1 0" just="left">(c) biometric data for the purposes of uniquely identifying an individual,</p>
+<p class="-3 14 0 left 1 0" just="left">(d) data concerning health, or</p>
+<p class="-3 14 0 left 1 0" just="left">(e) personal data concerning an individual<csq/>s sex life or sexual orientation.</p>
+<p class="-3 11 0 left 1 0" just="left">(2) Subject to <i>subsection (1)</i>, a word or expression used in this Act, other than in <i>Part 5</i>, that is also used in the Data Protection Regulation has, unless the context otherwise requires, the same meaning in this Act as it has in that Regulation.</p>
+<p class="-3 11 0 left 1 0" just="left">(3) Unless the context otherwise requires, a reference in this Act (other than in <i>Part 5</i>) to a numbered Article is a reference to the Article so numbered of the Data Protection Regulation.</p>
+</sect>
+<sect id="SEC3">
+<number>3.</number>
+<title>
+<p class="-3 11 0 left 1 0" just="left"><b>Designation by appropriate authority</b></p>
+</title>
+<p class="-3 11 0 left 1 0" just="left"><b>3.</b> (1) An appropriate authority (within the meaning of the Civil Service Regulation Act 1956) may, as respects all or part of the personal data kept by the authority, designate a civil servant in relation to whom it is the appropriate authority to be a controller and while the designation is in force the civil servant so designated shall, other than for the purposes of <i>sections 105(3)</i> and <i>141(2)</i> and <i>(3)</i>, be deemed, for the purposes of this Act and the Data Protection Regulation, to be the controller in respect of the data concerned.</p>
+<p class="-3 11 0 left 1 0" just="left">(2) Without prejudice to <i>subsection (1)</i>, the Minister for Defence may, as respects all or part of the personal data kept by him in relation to the Defence Forces, designate an officer of the Permanent Defence Force who holds a commissioned rank therein to be a controller and while the designation is in force the officer so designated shall, other than for the purposes of <i>sections 105(3)</i> and <i>141(2)</i> and <i>(3)</i>, be deemed, for the purposes of this Act and the Data Protection Regulation, to be the controller in respect of the data concerned.</p>
+<p class="-3 11 0 left 1 0" just="left">(3) For the purposes of this Act and the Data Protection Regulation<emdash/></p>
+<p class="-3 14 0 left 1 0" just="left">(a) where a designation by the relevant appropriate authority under <i>subsection (1)</i> is not in force, a civil servant in relation to whom that authority is the appropriate authority shall be deemed to be its employee and, where such a designation is in force, such a civil servant (other than the civil servant the subject of the designation) shall be deemed to be an employee of the last mentioned civil servant,</p>
+<p class="-3 14 0 left 1 0" just="left">(b) where a designation under <i>subsection (2)</i> is not in force, a member of the Defence Forces shall be deemed to be an employee of the Minister for Defence and, where such a designation is in force, such a member (other than the officer the subject of the designation) shall be deemed to be an employee of that officer, and</p>
+<p class="-3 14 0 left 1 0" just="left">(c) a member of the Garda S<ifada/>och<afada/>na (other than the Commissioner of the Garda S<ifada/>och<afada/>na) shall be deemed to be an employee of the Commissioner of the Garda S<ifada/>och<afada/>na.</p>
+</sect>
+</part></body></act>
