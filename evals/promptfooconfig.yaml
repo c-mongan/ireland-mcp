@@ -48,6 +48,51 @@ tests:
       - type: icontains-any
         value: [cso_search_tables, search]
   - vars:
+      question: "Find Eurostat datasets about population for Ireland."
+    assert:
+      - type: icontains-any
+        value: [eurostat_search_datasets, search]
+  - vars:
+      question: "Get Ireland's 2024 population from Eurostat dataset demo_pjan."
+    assert:
+      - type: icontains-any
+        value: [eurostat_get_data]
+  - vars:
+      question: "Compare Ireland with the EU27 in a Eurostat population dataset."
+    assert:
+      - type: icontains-any
+        value: [eurostat_compare_ie_eu, eurostat_get_data]
+  - vars:
+      question: "What is the latest ECB euro to US dollar exchange rate?"
+    assert:
+      - type: icontains-any
+        value: [ecb_exchange_rate, ecb_get_series]
+  - vars:
+      question: "Show the latest ECB main refinancing rate."
+    assert:
+      - type: icontains-any
+        value: [ecb_interest_rates, ecb_get_series]
+  - vars:
+      question: "Fetch ECB series FM.B.U2.EUR.4F.KR.MRR_FR.LEV."
+    assert:
+      - type: icontains-any
+        value: [ecb_get_series]
+  - vars:
+      question: "Look up Galway as an Irish place in Wikidata."
+    assert:
+      - type: icontains-any
+        value: [wikidata_place]
+  - vars:
+      question: "Summarise Wikidata entity Q27."
+    assert:
+      - type: icontains-any
+        value: [wikidata_entity]
+  - vars:
+      question: "Find the Irish name and coordinates for Cork in Wikidata."
+    assert:
+      - type: icontains-any
+        value: [wikidata_place]
+  - vars:
       question: "Which TDs are members for Dublin Bay South?"
     assert:
       - type: icontains-any

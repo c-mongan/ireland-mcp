@@ -11,8 +11,16 @@ import { createAppServer } from "../dist/src/registry.js";
 const year = new Date().getUTCFullYear();
 const CASES = [
   ["cso", "cso_area_profile", { area: "Galway" }, (d) => d.census?.length > 0],
+  [
+    "eurostat",
+    "eurostat_get_data",
+    { dataset: "demo_pjan", filters: { sex: ["T"], age: ["TOTAL"], unit: ["NR"], time: ["2024"] }, limit: 3 },
+    (d) => d.rows?.[0]?.value > 5_000_000
+  ],
+  ["ecb", "ecb_exchange_rate", { currency: "USD", lastNObservations: 3 }, (d) => d.observations?.length > 0],
   ["oireachtas", "oireachtas_search_bills", { query: "housing", limit: 3 }, (d) => JSON.stringify(d).length > 50],
   ["geohive", "geohive_boundaries_at_point", { lat: 53.3498, lon: -6.2603 }, (d) => d.county?.name],
+  ["wikidata", "wikidata_entity", { qid: "Q27" }, (d) => d.qid === "Q27" && d.label],
   ["data-gov-ie", "datagov_search_datasets", { query: "population", limit: 3 }, (d) => d.total > 0],
   ["smart-dublin", "smartdublin_search_datasets", { query: "bike", limit: 3 }, (d) => d.total > 0],
   ["met-eireann", "met_get_forecast", { lat: 53.3498, lon: -6.2603, hours: 3 }, (d) => d.forecast?.length === 3],

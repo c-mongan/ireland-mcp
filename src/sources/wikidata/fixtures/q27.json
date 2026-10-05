@@ -1,0 +1,23 @@
+{
+  "head" : {
+    "vars" : [ "item", "itemLabel", "itemDescription" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q27"
+      },
+      "itemLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Ireland"
+      },
+      "itemDescription" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "country in Northwestern Europe"
+      }
+    } ]
+  }
+}

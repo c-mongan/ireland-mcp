@@ -189,6 +189,8 @@ export class UpstreamBudgets {
 const HOST_SOURCES: Record<string, string> = {
   "data.cso.ie": "cso",
   "ws.cso.ie": "cso",
+  "ec.europa.eu": "eurostat",
+  "data-api.ecb.europa.eu": "ecb",
   "api.oireachtas.ie": "oireachtas",
   "data.oireachtas.ie": "oireachtas",
   "www.oireachtas.ie": "oireachtas",
@@ -209,7 +211,8 @@ const HOST_SOURCES: Record<string, string> = {
   "erddap.marine.ie": "marine",
   "waterlevel.ie": "opw-water",
   "api.ted.europa.eu": "ted",
-  "api.citybik.es": "bikes"
+  "api.citybik.es": "bikes",
+  "query.wikidata.org": "wikidata"
 };
 
 /** Maps an upstream URL to its source id; unknown hosts fall back to the hostname (never the path or query). */

@@ -1,0 +1,8 @@
+"title"	"code"	"type"	"last update of data"	"last table structure change"	"data start"	"data end"	"values"
+"Database by themes"	"data"	"folder"	" "	" "	" "	" "	
+"    Population and social conditions"	"popul"	"folder"	" "	" "	" "	" "	
+"        Demography, population stock and balance"	"demo"	"folder"	" "	" "	" "	" "	
+"            Population on 1 January by age and sex"	"demo_pjan"	"table"	"27.06.2026"	"27.06.2026"	"1960"	"2026"	3723888
+"            Population change - demographic balance and crude rates at national level"	"demo_gind"	"table"	"27.06.2026"	"27.06.2026"	"1960"	"2025"	146952
+"    Economy and finance"	"econ"	"folder"	" "	" "	" "	" "	
+"            HICP - monthly data (index)"	"prc_hicp_midx"	"table"	"18.09.2026"	"18.09.2026"	"1996-01"	"2026-08"	1420000

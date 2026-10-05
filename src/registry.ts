@@ -15,6 +15,8 @@ import { smartDublinModule } from "./sources/smart-dublin/index.js";
 import { irishRailModule } from "./sources/irish-rail/index.js";
 import { luasModule } from "./sources/luas/index.js";
 import { eirgridModule } from "./sources/eirgrid/index.js";
+import { ecbModule } from "./sources/ecb/index.js";
+import { eurostatModule } from "./sources/eurostat/index.js";
 import { marineModule } from "./sources/marine/index.js";
 import { opwWaterModule } from "./sources/opw-water/index.js";
 import { planningModule } from "./sources/planning/index.js";
@@ -23,11 +25,15 @@ import { heritageModule } from "./sources/heritage/index.js";
 import { environmentSitesModule } from "./sources/environment-sites/index.js";
 import { tedModule } from "./sources/ted/index.js";
 import { bikesModule } from "./sources/bikes/index.js";
+import { wikidataModule } from "./sources/wikidata/index.js";
 
 export const sourceModules: SourceModule[] = [
   csoModule,
+  eurostatModule,
+  ecbModule,
   oireachtasModule,
   geohiveModule,
+  wikidataModule,
   dataGovIeModule,
   smartDublinModule,
   metModule,
