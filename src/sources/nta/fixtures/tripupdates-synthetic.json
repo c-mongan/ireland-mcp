@@ -1,0 +1,39 @@
+{
+  "header": { "gtfs_realtime_version": "2.0", "incrementality": "FULL_DATASET", "timestamp": "1791216000" },
+  "entity": [
+    {
+      "id": "T1",
+      "trip_update": {
+        "trip": { "trip_id": "4497_1001", "route_id": "4497_86595", "start_time": "13:00:00", "start_date": "20261005", "schedule_relationship": "SCHEDULED", "direction_id": 0 },
+        "stop_time_update": [
+          { "stop_sequence": 1, "stop_id": "8220DB000007", "arrival": { "delay": 60 }, "departure": { "delay": 60 }, "schedule_relationship": "SCHEDULED" },
+          { "stop_sequence": 2, "stop_id": "8220DB000008", "arrival": { "delay": 180 }, "schedule_relationship": "SCHEDULED" }
+        ]
+      }
+    },
+    {
+      "id": "T2",
+      "trip_update": {
+        "trip": { "trip_id": "4497_1002", "route_id": "4497_86595", "start_time": "13:10:00", "start_date": "20261005", "schedule_relationship": "CANCELED" }
+      }
+    },
+    {
+      "id": "T3",
+      "tripUpdate": {
+        "trip": { "tripId": "4502_2001", "routeId": "4502_90001", "startTime": "13:05:00", "startDate": "20261005", "scheduleRelationship": "SCHEDULED" },
+        "stopTimeUpdate": [
+          { "stopSequence": 4, "stopId": "8350DB000123", "departure": { "delay": -30 } }
+        ]
+      }
+    },
+    {
+      "id": "T4",
+      "trip_update": {
+        "trip": { "trip_id": "4502_2002", "route_id": "4502_90001", "start_time": "13:20:00", "start_date": "20261005", "schedule_relationship": "ADDED" },
+        "stop_time_update": [
+          { "stop_sequence": 1, "stop_id": "8350DB000124", "schedule_relationship": "SKIPPED" }
+        ]
+      }
+    }
+  ]
+}
