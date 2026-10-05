@@ -124,7 +124,7 @@ export async function listActs(ctx: ToolContext, year: number) {
   checkYear(year, ctx.now());
   const url = `${EISB}/eli/${year}/act/`;
   const result = await ctx.cachedText(url, TTL, { label: "Irish Statute Book" });
-  const acts: ActListing[] = [...result.value.matchAll(/<tr><td class="align-center">(\d+)<\/td><td><a href="[^"]*">([^<]+)<\/a>/g)].map((m) => ({
+  const acts: ActListing[] = [...result.value.matchAll(/<tr>\s*<td class="align-center">\s*(\d+)\s*<\/td>\s*<td>\s*<a href="[^"]*">([^<]+)<\/a>/g)].map((m) => ({
     number: Number(m[1]),
     title: toText(m[2]!),
     url: actUri(year, Number(m[1]))

@@ -34,6 +34,15 @@ describe("Oireachtas module", () => {
     expect(body.data.bills[0].long_title).not.toContain("<p>");
   });
 
+  it("never asks the API for more than 250 bills, which would exceed the response bound", async () => {
+    const fetch = fakeFetch(routes);
+    await callTool(mod, "oireachtas_search_bills", { query: "tobacco" }, fetch);
+    await callTool(mod, "oireachtas_search_bills", { limit: 500 }, fetch);
+    const limits = fetch.calls.map((c) => Number(new URL(c.url).searchParams.get("limit")));
+    expect(limits.length).toBeGreaterThan(0);
+    expect(Math.max(...limits)).toBeLessThanOrEqual(250);
+  });
+
   it("lists bills without a query and reports truncation against the total", async () => {
     const { body } = await callTool(mod, "oireachtas_search_bills", { limit: 2 }, fakeFetch(routes));
     expect(body.data.bills).toHaveLength(2);

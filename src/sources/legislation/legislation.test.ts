@@ -8,6 +8,7 @@ const f = (n: string) => fixturePath(import.meta.url, n);
 const routes: Route[] = [
   { match: /eli\/2018\/act\/7\/enacted\/en\/xml$/, file: f("act-2018-7.xml") },
   { match: /eli\/2018\/act\/$/, file: f("year-2018.html") },
+  { match: /eli\/2025\/act\/$/, file: f("year-2025-multiline.html") },
   { match: /eli\/\d{4}\/act\/$/, body: "<html><table></table></html>" },
   { match: /eli\/2018\/act\/99\/enacted\/en\/xml$/, status: 404, body: "" }
 ];
@@ -16,6 +17,13 @@ describe("legislation module", () => {
   it("lists and filters Acts for a year", async () => {
     const { body } = await callTool(mod, "legislation_list_acts", { year: 2018, query: "data protection" }, fakeFetch(routes));
     expect(body.data.acts).toEqual([{ number: 7, title: "Data Protection Act 2018", url: "https://www.irishstatutebook.ie/eli/2018/act/7/enacted/en/html" }]);
+  });
+
+  it("parses the multi-line listing layout used for recent years", async () => {
+    const { body } = await callTool(mod, "legislation_list_acts", { year: 2025 }, fakeFetch(routes));
+    expect(body.data.total).toBe(2);
+    expect(body.data.acts[1]).toMatchObject({ number: 2, url: "https://www.irishstatutebook.ie/eli/2025/act/2/enacted/en/html" });
+    expect(body.data.acts[0].title).toMatch(/Act 2025$/);
   });
 
   it("returns act metadata and the table of sections", async () => {

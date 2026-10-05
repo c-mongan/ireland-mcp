@@ -19,6 +19,9 @@ export const CURRENT_HOUSE = { dail: "34", seanad: "27" } as const;
 /* eslint-disable @typescript-eslint/no-explicit-any -- the Oireachtas API is large and loosely typed; we pick fields defensively. */
 type Json = any;
 
+// Bill records are ~10KB each; 250 keeps a page well under the 5MB response bound.
+const BILL_SCAN = 250;
+
 const limit = z.number().int().min(1).max(MAX_LIMIT).default(50).describe("Maximum results (1-500).");
 const chamber = z.enum(["dail", "seanad"]).default("dail").describe("dail (Dáil Éireann) or seanad (Seanad Éireann).");
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD");
@@ -127,7 +130,7 @@ const billsTool = defineTool({
   name: "oireachtas_search_bills",
   title: "Search Oireachtas bills",
   description:
-    "Search bills before or passed by the Oireachtas, most recently updated first. Filter by words in the title, year and status (Current, Enacted, Lapsed, Withdrawn, Defeated, Rejected).",
+    "Search bills before or passed by the Oireachtas, most recently updated first. Filter by words in the title, year and status (Current, Enacted, Lapsed, Withdrawn, Defeated, Rejected). Title words are matched within the 250 most recently updated bills for the chosen year/status, so add a year for older bills.",
   inputSchema: {
     query: z.string().max(120).optional().describe("Words that must appear in the bill's short title."),
     year: z.string().regex(/^\d{4}$/).optional().describe("Bill year, e.g. 2025."),
@@ -135,7 +138,7 @@ const billsTool = defineTool({
     limit
   },
   handler: async ({ query, year, status, limit: max }, ctx) => {
-    const list = await getList(ctx, "legislation", { bill_year: year, bill_status: status, limit: query ? 500 : max, lang: "en" });
+    const list = await getList(ctx, "legislation", { bill_year: year, bill_status: status, limit: query ? BILL_SCAN : Math.min(max, BILL_SCAN), lang: "en" });
     const words = query ? fold(query).split(/\s+/).filter(Boolean) : [];
     const bills = list.results.map(summariseBill).filter((b) => words.every((w) => fold(`${b.title} ${b.long_title}`).includes(w)));
     const { items, truncated } = bound(bills, max);
@@ -280,7 +283,7 @@ const votesTool = defineTool({
 async function search(query: string, max: number, ctx: ToolContext) {
   const [members, bills] = await Promise.all([
     membersOf(ctx, "dail", CURRENT_HOUSE.dail),
-    getList(ctx, "legislation", { limit: 500, lang: "en" })
+    getList(ctx, "legislation", { limit: BILL_SCAN, lang: "en" })
   ]);
   const words = fold(query).split(/\s+/).filter((w) => w.length > 2);
   const score = (text: string) => words.filter((w) => fold(text).includes(w)).length;
