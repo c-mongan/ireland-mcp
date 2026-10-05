@@ -10,7 +10,8 @@ The service runs on Azure Functions Flex Consumption (FC1) in North Europe.
 | Resource group `rg-<env>` | Holds everything below |
 | Function app (Flex FC1, Node 22, system identity) | `/mcp` (plus `/mcp/x/{source}` for one typed toolset), `/healthz` and the nightly PPR index timer |
 | Storage account (no shared keys, no public blobs) | Deployment package, `ppr` index container, `mcpcache` table |
-| Application Insights + Log Analytics (1 GB/day cap) | Telemetry, Entra auth only |
+| Application Insights + Log Analytics (1 GB/day cap) | OpenTelemetry traces and metrics, Entra auth only |
+| Standard availability test (`enableAvailabilityTest`, default on) | GET `/healthz` every 15 minutes from three EU regions |
 | Key Vault (only when `NTA_API_KEY` is set) | Holds the NTA key; the app reads it by Key Vault reference |
 | Budget (only when `BUDGET_CONTACT_EMAIL` is set) | Emails at 80% actual and 100% forecast spend |
 

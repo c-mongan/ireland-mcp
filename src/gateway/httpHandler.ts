@@ -1,12 +1,17 @@
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { clientKey, RateLimiter } from "./rateLimit.js";
+import { endMcpOperations, startMcpOperations, withOperationContext } from "./mcpTelemetry.js";
+import { DEFAULT_ALLOWED_ORIGINS, isOriginAllowed } from "./origin.js";
+import { hashedClientKey } from "./privacy.js";
+import type { RateLimiter } from "./rateLimit.js";
 import { UnknownToolsetError } from "./toolsets.js";
 
 export interface McpHttpOptions {
   /** Builds a fresh server per request; receives the request so it can read `?toolsets=` or `/mcp/x/{source}`. */
   createServer: (request: Request) => McpServer;
   rateLimiter?: RateLimiter;
+  /** Browser origins allowed to call the endpoint. Defaults to DEFAULT_ALLOWED_ORIGINS. */
+  allowedOrigins?: readonly string[];
 }
 
 const MAX_BODY_CHARS = 1_000_000;
@@ -25,16 +30,34 @@ function countMessages(bodyText: string): number {
 const CORS_HEADERS: Record<string, string> = {
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "POST, OPTIONS",
-  "access-control-allow-headers": "content-type, accept, mcp-protocol-version, mcp-session-id",
-  "access-control-expose-headers": "mcp-session-id, retry-after"
+  "access-control-allow-headers": "content-type, accept, mcp-protocol-version, mcp-session-id, last-event-id",
+  "access-control-expose-headers": "mcp-session-id, retry-after",
+  "access-control-max-age": "600"
 };
+
+/** Allowed browser origins are echoed (with Vary) rather than answered with "*". */
+function corsFor(origin: string | null): Record<string, string> {
+  return origin ? { ...CORS_HEADERS, "access-control-allow-origin": origin, vary: "Origin" } : CORS_HEADERS;
+}
 
 /**
  * Stateless Streamable HTTP: every POST gets a fresh server and transport, so any
  * Functions instance can answer any request. Responses are plain JSON, not SSE.
  */
 export async function handleMcpHttp(request: Request, options: McpHttpOptions): Promise<Response> {
-  if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS_HEADERS });
+  // MCP 2025-11-25: validate Origin when present. Absent Origin means a non-browser client.
+  const origin = request.headers.get("origin");
+  if (origin !== null && !isOriginAllowed(origin, options.allowedOrigins ?? DEFAULT_ALLOWED_ORIGINS)) {
+    return new Response(JSON.stringify({ jsonrpc: "2.0", error: { code: -32000, message: "Origin not allowed." }, id: null }), {
+      status: 403,
+      headers: { "content-type": "application/json", vary: "Origin" }
+    });
+  }
+  const cors = corsFor(origin);
+  const jsonRpcError = (status: number, code: number, message: string, headers: Record<string, string> = {}) =>
+    errorResponse(status, code, message, { ...cors, ...headers });
+
+  if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
   if (request.method !== "POST") {
     return jsonRpcError(405, -32000, "Method not allowed. This server is stateless: send JSON-RPC over POST.", {
       allow: "POST, OPTIONS"
@@ -52,7 +75,8 @@ export async function handleMcpHttp(request: Request, options: McpHttpOptions): 
   }
 
   if (options.rateLimiter) {
-    const verdict = options.rateLimiter.check(clientKey(request.headers), messageCount);
+    // The limiter only ever sees a salted hash of the address; see PRIVACY.md.
+    const verdict = options.rateLimiter.check(hashedClientKey(request.headers), messageCount);
     if (!verdict.allowed) {
       return jsonRpcError(429, -32029, "RATE_LIMITED: too many requests from this address.", {
         "retry-after": String(verdict.retryAfterSeconds)
@@ -67,6 +91,26 @@ export async function handleMcpHttp(request: Request, options: McpHttpOptions): 
     if (error instanceof UnknownToolsetError) return jsonRpcError(400, -32602, error.message);
     throw error;
   }
+
+  const operations = startMcpOperations(bodyText, request.headers);
+  let status = 500;
+  let body: string | null = null;
+  try {
+    const response = await withOperationContext(operations, () => serve(server, request, bodyText, cors));
+    status = response.status;
+    body = response.body;
+    return new Response(body, { status, headers: response.headers });
+  } finally {
+    endMcpOperations(operations, status, body);
+  }
+}
+
+async function serve(
+  server: McpServer,
+  request: Request,
+  bodyText: string,
+  cors: Record<string, string>
+): Promise<{ status: number; headers: Headers; body: string | null }> {
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
     enableJsonResponse: true
@@ -77,18 +121,18 @@ export async function handleMcpHttp(request: Request, options: McpHttpOptions): 
       new Request(request.url, { method: "POST", headers: request.headers, body: bodyText })
     );
     const headers = new Headers(response.headers);
-    for (const [key, value] of Object.entries(CORS_HEADERS)) headers.set(key, value);
+    for (const [key, value] of Object.entries(cors)) headers.set(key, value);
     const body = response.body ? await response.text() : null;
-    return new Response(body, { status: response.status, headers });
+    return { status: response.status, headers, body };
   } finally {
     await transport.close().catch(() => undefined);
     await server.close().catch(() => undefined);
   }
 }
 
-function jsonRpcError(status: number, code: number, message: string, headers: Record<string, string> = {}): Response {
+function errorResponse(status: number, code: number, message: string, headers: Record<string, string>): Response {
   return new Response(JSON.stringify({ jsonrpc: "2.0", error: { code, message }, id: null }), {
     status,
-    headers: { "content-type": "application/json", ...CORS_HEADERS, ...headers }
+    headers: { "content-type": "application/json", ...headers }
   });
 }
