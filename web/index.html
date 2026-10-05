@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en-IE" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ireland MCP — Irish public data for AI assistants</title>
+  <meta name="description" content="A free, read-only Model Context Protocol server for Irish public data: CSO, Oireachtas, GeoHive, data.gov.ie, Smart Dublin, Met Éireann, NTA, Irish Statute Book and the Property Price Register.">
+  <!-- Set this after deploying: the public Function App MCP URL. Local dev uses same-origin /mcp. -->
+  <meta name="mcp-endpoint" content="">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1L10 5.5H14.5L11 8.5L12.5 13L8 10.5L3.5 13L5 8.5L1.5 5.5H6L8 1Z' fill='%2334c08a'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="wrap center">
+      <p class="eyebrow">
+        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1L10 5.5H14.5L11 8.5L12.5 13L8 10.5L3.5 13L5 8.5L1.5 5.5H6L8 1Z" fill="currentColor"/></svg>
+        Model Context Protocol
+      </p>
+      <h1>Ireland<br><span class="accent">MCP</span></h1>
+      <p class="lede">One read-only server that lets Claude, ChatGPT, Copilot and other AI assistants query Irish public data — with the source, licence and retrieval time attached to every answer.</p>
+      <div class="stats" id="stats">
+        <span><strong>9</strong> sources</span><span class="dot">·</span>
+        <span><strong>33</strong> tools</span><span class="dot">·</span>
+        <span><strong>0</strong> sign-ups</span>
+      </div>
+      <nav class="cta">
+        <a class="btn primary" href="#connect">Connect a client</a>
+        <a class="btn" href="#try">Try it</a>
+        <a class="btn" href="https://github.com/c-mongan/ireland-mcp">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="sources" aria-labelledby="sources-h">
+      <h2 id="sources-h">Sources</h2>
+      <ul class="grid">
+        <li class="card"><h3>CSO PxStat</h3><p>Census, prices, labour and every national statistics table.</p><code>cso_*</code></li>
+        <li class="card"><h3>Oireachtas</h3><p>Members, bills, debates, parliamentary questions and votes.</p><code>oireachtas_*</code></li>
+        <li class="card"><h3>GeoHive</h3><p>Which county, constituency and electoral division a point is in.</p><code>geohive_*</code></li>
+        <li class="card"><h3>data.gov.ie</h3><p>Search and query the national open data catalogue.</p><code>datagov_*</code></li>
+        <li class="card"><h3>Smart Dublin</h3><p>Dublin council datasets: bikes, parking, footfall and more.</p><code>smartdublin_*</code></li>
+        <li class="card"><h3>Met Éireann</h3><p>Point forecasts, station observations and weather warnings.</p><code>met_*</code></li>
+        <li class="card"><h3>NTA</h3><p>Live GTFS-R delays and cancellations for public transport.</p><code>nta_*</code></li>
+        <li class="card"><h3>Irish Statute Book</h3><p>Acts by year and section text through ELI identifiers.</p><code>legislation_*</code></li>
+        <li class="card"><h3>Property Price Register</h3><p>Residential sale prices and area statistics since 2010.</p><code>ppr_*</code></li>
+      </ul>
+      <p class="muted small">Plus cross-source tools: <code>search</code>, <code>fetch</code>, <code>list_sources</code>, <code>ireland_snapshot</code> and <code>nearby</code>.</p>
+    </section>
+
+    <section id="connect" aria-labelledby="connect-h">
+      <h2 id="connect-h">Connect a client</h2>
+      <p class="muted">Use the hosted endpoint, or run it on your own machine with <code>npx -y ireland-mcp</code> (Node 22.12+).</p>
+      <div class="tabs" role="tablist">
+        <button role="tab" aria-selected="true" data-tab="claude">Claude Desktop</button>
+        <button role="tab" aria-selected="false" data-tab="vscode">VS Code</button>
+        <button role="tab" aria-selected="false" data-tab="copilot">Copilot CLI</button>
+        <button role="tab" aria-selected="false" data-tab="chatgpt">ChatGPT</button>
+      </div>
+      <div class="panel" data-panel="claude">
+        <p class="small muted"><code>claude_desktop_config.json</code> — or add the hosted URL under Settings → Connectors.</p>
+        <pre><code>{
+  "mcpServers": {
+    "ireland": { "command": "npx", "args": ["-y", "ireland-mcp"] }
+  }
+}</code></pre>
+      </div>
+      <div class="panel" data-panel="vscode" hidden>
+        <p class="small muted"><code>.vscode/mcp.json</code></p>
+        <pre><code>{
+  "servers": {
+    "ireland": { "type": "http", "url": "<span class="endpoint">https://YOUR-APP.azurewebsites.net/mcp</span>" }
+  }
+}</code></pre>
+      </div>
+      <div class="panel" data-panel="copilot" hidden>
+        <p class="small muted"><code>.mcp.json</code> or <code>~/.copilot/mcp-config.json</code></p>
+        <pre><code>{
+  "mcpServers": {
+    "ireland": { "type": "http", "url": "<span class="endpoint">https://YOUR-APP.azurewebsites.net/mcp</span>", "tools": ["*"] }
+  }
+}</code></pre>
+      </div>
+      <div class="panel" data-panel="chatgpt" hidden>
+        <p class="small muted">Settings → Apps &amp; Connectors → Advanced → Developer mode, then create a connector with:</p>
+        <pre><code><span class="endpoint">https://YOUR-APP.azurewebsites.net/mcp</span>
+Authentication: none</code></pre>
+        <p class="small muted">Deep research uses the <code>search</code> and <code>fetch</code> tools. Availability of developer mode varies by plan and region.</p>
+      </div>
+    </section>
+
+    <section id="try" aria-labelledby="try-h">
+      <h2 id="try-h">Try it</h2>
+      <p class="muted">Calls the live server from your browser. Requests are rate limited to about 60 a minute per address.</p>
+      <form id="try-form" class="console">
+        <label>Endpoint <input id="endpoint" type="url" required spellcheck="false" placeholder="https://YOUR-APP.azurewebsites.net/mcp"></label>
+        <div class="row">
+          <label class="grow">Tool <select id="tool"><option>Load tools first</option></select></label>
+          <button type="button" id="load" class="btn">Load tools</button>
+        </div>
+        <p id="tool-desc" class="small muted"></p>
+        <label>Arguments (JSON) <textarea id="args" rows="4" spellcheck="false">{}</textarea></label>
+        <div class="row"><button type="submit" class="btn primary">Run</button><span id="status" class="small muted" role="status"></span></div>
+        <pre id="output" class="output" aria-live="polite"></pre>
+      </form>
+    </section>
+
+    <section aria-labelledby="trust-h">
+      <h2 id="trust-h">Built to be trusted</h2>
+      <ul class="bullets">
+        <li><strong>Read-only.</strong> Every tool is annotated <code>readOnlyHint</code>; nothing writes anywhere.</li>
+        <li><strong>Evidence on every answer.</strong> Source, licence, upstream URL and retrieval time travel with the data.</li>
+        <li><strong>Honest failures.</strong> Typed errors — <code>UPSTREAM_DOWN</code>, <code>NOT_FOUND</code>, <code>BAD_ARGS</code>, <code>RATE_LIMITED</code> — and clearly marked stale cache when a source is down.</li>
+        <li><strong>No accounts, no tracking.</strong> No sign-in and no personal data stored.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="wrap small muted">
+    <p>Open source under the MIT licence. Data remains under each publisher's licence — mostly CC BY 4.0; see <a href="https://github.com/c-mongan/ireland-mcp/blob/main/NOTICE">NOTICE</a>. Met Éireann data is © Met Éireann, used under CC BY 4.0. Not affiliated with any Irish government body.</p>
+  </footer>
+
+  <script src="app.js" defer></script>
+</body>
+</html>

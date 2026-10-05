@@ -153,7 +153,6 @@ resource app 'Microsoft.Web/sites@2024-04-01' = {
     siteConfig: {
       minTlsVersion: '1.2'
       ftpsState: 'Disabled'
-      cors: { allowedOrigins: ['*'] }
       appSettings: concat(baseSettings, ntaSettings)
     }
   }

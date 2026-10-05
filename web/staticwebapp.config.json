@@ -1,0 +1,8 @@
+{
+  "navigationFallback": { "rewrite": "/index.html" },
+  "globalHeaders": {
+    "content-security-policy": "default-src 'self'; connect-src 'self' https://*.azurewebsites.net http://localhost:7071; img-src 'self' data:; style-src 'self'; script-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+    "x-content-type-options": "nosniff",
+    "referrer-policy": "no-referrer"
+  }
+}

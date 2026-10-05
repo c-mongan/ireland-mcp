@@ -40,6 +40,7 @@
     "test:coverage": "vitest run --coverage",
     "start": "func start",
     "stdio": "node dist/src/cli.js",
+    "dev:http": "node scripts/dev-http.mjs",
     "inspector:check": "node scripts/inspector-check.mjs",
     "live:sanity": "node scripts/live-sanity.mjs",
     "ppr:build": "node dist/src/sources/ppr/buildIndexCli.js",
