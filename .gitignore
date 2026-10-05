@@ -12,3 +12,4 @@ promptfoo-output/
 __azurite_*
 __blobstorage__/
 __queuestorage__/
+.scratch/

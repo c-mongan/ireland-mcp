@@ -1,0 +1,16 @@
+{
+  "name": "ireland-mcp",
+  "owner": { "name": "Conor Mongan" },
+  "description": "Ireland Open Data plugin: skills plus the hosted Ireland MCP server.",
+  "plugins": [
+    {
+      "name": "ireland-mcp",
+      "source": "./",
+      "description": "Agent Skills and the hosted read-only MCP server for Irish public data.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "keywords": ["ireland", "open-data", "mcp"],
+      "category": "data"
+    }
+  ]
+}

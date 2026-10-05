@@ -47,7 +47,8 @@
     "measure:tools": "node scripts/measure-tools.mjs",
     "ppr:build": "node dist/src/sources/ppr/buildIndexCli.js",
     "eval": "node scripts/eval.mjs",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "skills:package": "node scripts/package-skills.mjs"
   },
   "dependencies": {
     "@azure/data-tables": "^13.3.2",

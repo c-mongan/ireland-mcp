@@ -208,6 +208,16 @@ values or IPs. See [PRIVACY.md](PRIVACY.md).
   and a 7-day [`status/history.json`](https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/history.json)
   on the `status` branch.
 
+## Skills & plugins
+
+This repo is also a plugin and plugin marketplace: it bundles the hosted MCP server with nine
+[Agent Skills](skills/) (area report, house prices, TD briefing, commute and weather, grid, flood watch,
+CSO charts, legislation, open-data finder).
+
+- Claude Code: `/plugin marketplace add c-mongan/ireland-mcp` then `/plugin install ireland-mcp@ireland-mcp`
+- Copilot CLI: `copilot plugin install c-mongan/ireland-mcp`
+- VS Code Agent Plugins and claude.ai skill zips (`npm run skills:package`): see [docs/plugins.md](docs/plugins.md)
+
 ## Run from source
 
 Needs Node 22.12 or later.
