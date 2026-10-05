@@ -33,6 +33,10 @@ retrieved_at, and sometimes `stale`). Use it. These rules apply to every skill i
 | `eirgrid` | EirGrid | Public information, attribution required | Source: EirGrid Smart Grid Dashboard |
 | `marine` | Marine Institute | CC BY 4.0 | Source: Marine Institute Irish Weather Buoy Network, CC BY 4.0 |
 | `opw-water` | Office of Public Works | CC BY 4.0 | Source: OPW, waterlevel.ie, CC BY 4.0 |
+| `planning` | Department of Housing, Local Government and Heritage | CC BY 4.0 | Source: National Planning Application Database, CC BY 4.0 |
+| `census-areas` | Tailte Éireann / OSi and CSO | CC BY 4.0 | Source: Census 2022 small areas, Tailte Éireann / CSO, CC BY 4.0 |
+| `heritage` | National Monuments Service | CC BY 4.0 | Source: National Monuments Service SMR, CC BY 4.0 |
+| `environment-sites` | National Parks and Wildlife Service | CC BY 4.0 | Source: NPWS Designated Areas, CC BY 4.0 |
 | `data-gov-ie`, `smart-dublin` | Each dataset's publisher | Per dataset (mostly CC BY 4.0) | Name the dataset publisher and its licence field |
 
 If the tool's `source.attribution` differs from this table, the tool wins.

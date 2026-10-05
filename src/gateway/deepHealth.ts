@@ -9,6 +9,7 @@ import { TRIP_UPDATES_URL } from "../sources/nta/index.js";
 import { OIREACHTAS_API } from "../sources/oireachtas/index.js";
 import { OPW_BASE } from "../sources/opw-water/index.js";
 import { PPR_DOWNLOADS } from "../sources/ppr/parse.js";
+import { ARCGIS_LAYERS } from "../sources/arcgis/client.js";
 import type { FetchLike } from "./http.js";
 
 export interface Probe {
@@ -60,7 +61,11 @@ export function defaultProbes(env: Record<string, string | undefined>): Probe[] 
       url: `${EIRGRID_BASE}?region=ALL&chartType=default&dateRange=day&dateFrom=${dublinDate()}+00:00&dateTo=${dublinDate()}+23:59&areas=demandactual`
     },
     { source: "marine", url: "https://erddap.marine.ie/erddap/info/IWBNetwork/index.json" },
-    { source: "opw-water", url: `${OPW_BASE}/geojson/latest/` }
+    { source: "opw-water", url: `${OPW_BASE}/geojson/latest/` },
+    { source: "planning", url: `${ARCGIS_LAYERS.planningPoints}?f=json` },
+    { source: "census-areas", url: `${ARCGIS_LAYERS.censusSmallAreas}?f=json` },
+    { source: "heritage", url: `${ARCGIS_LAYERS.smr}?f=json` },
+    { source: "environment-sites", url: `${ARCGIS_LAYERS.npwsSac}?f=json` }
   ];
 }
 

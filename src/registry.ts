@@ -17,8 +17,31 @@ import { luasModule } from "./sources/luas/index.js";
 import { eirgridModule } from "./sources/eirgrid/index.js";
 import { marineModule } from "./sources/marine/index.js";
 import { opwWaterModule } from "./sources/opw-water/index.js";
+import { planningModule } from "./sources/planning/index.js";
+import { censusAreasModule } from "./sources/census-areas/index.js";
+import { heritageModule } from "./sources/heritage/index.js";
+import { environmentSitesModule } from "./sources/environment-sites/index.js";
 
-export const sourceModules: SourceModule[] = [csoModule, oireachtasModule, geohiveModule, dataGovIeModule, smartDublinModule, metModule, ntaModule, legislationModule, pprModule, irishRailModule, luasModule, eirgridModule, marineModule, opwWaterModule];
+export const sourceModules: SourceModule[] = [
+  csoModule,
+  oireachtasModule,
+  geohiveModule,
+  dataGovIeModule,
+  smartDublinModule,
+  metModule,
+  ntaModule,
+  legislationModule,
+  pprModule,
+  irishRailModule,
+  luasModule,
+  eirgridModule,
+  marineModule,
+  opwWaterModule,
+  planningModule,
+  censusAreasModule,
+  heritageModule,
+  environmentSitesModule
+];
 
 /**
  * The cross-source tools split in two: `search`/`fetch` stay top-level for the ChatGPT contract, while
@@ -46,4 +69,3 @@ export function createAppServer(context: ToolContext, telemetry?: TelemetrySink,
     ...(toolsets ? { toolsets } : {})
   });
 }
-

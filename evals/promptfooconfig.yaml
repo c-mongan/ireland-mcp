@@ -93,6 +93,31 @@ tests:
       - type: icontains-any
         value: [geohive_boundaries_at_point, nearby]
   - vars:
+      question: "Find planning applications for apartments near the Spire in Dublin."
+    assert:
+      - type: icontains-any
+        value: [planning_search]
+  - vars:
+      question: "Look up planning application WEB1741/25."
+    assert:
+      - type: icontains-any
+        value: [planning_get]
+  - vars:
+      question: "What Census 2022 small area and population contain 53.3498, -6.2603?"
+    assert:
+      - type: icontains-any
+        value: [census_small_area_at]
+  - vars:
+      question: "What recorded archaeological monuments are near Dublin Castle?"
+    assert:
+      - type: icontains-any
+        value: [heritage_monuments_near]
+  - vars:
+      question: "Are there SAC or SPA protected sites near North Bull Island?"
+    assert:
+      - type: icontains-any
+        value: [protected_sites_near, protected_sites_at]
+  - vars:
       question: "Find datasets on data.gov.ie about air quality."
     assert:
       - type: icontains-any

@@ -9,9 +9,10 @@ Irish public data. Ask "What's the population of Galway?", "Any weather warnings
 today?" or "What did houses sell for in Ennis last year?" and the assistant gets
 real figures, with the source, licence and retrieval time attached.
 
-- **14 sources, 41 tools.** CSO, Oireachtas, GeoHive, data.gov.ie, Smart Dublin,
+- **18 sources, 47 tools.** CSO, Oireachtas, GeoHive, data.gov.ie, Smart Dublin,
   Met Éireann, NTA, the Irish Statute Book, the Property Price Register, Irish Rail,
-  Luas, EirGrid, Marine Institute weather buoys and OPW river levels.
+  Luas, EirGrid, Marine Institute weather buoys, OPW river levels, planning,
+  Census 2022 small areas, National Monuments and NPWS protected sites.
 - **Two ways to run it.** A hosted Streamable HTTP endpoint (`/mcp`), or locally
   over stdio with `npx -y ireland-mcp`.
 - **No accounts.** Nothing to sign up for. Nothing is written anywhere.
@@ -25,7 +26,7 @@ real figures, with the source, licence and retrieval time attached.
 ## Tool surface: lean by default
 
 By default `tools/list` is small: **7 tools, about 5,100 chars (≈1.3k tokens)**,
-down from 41 typed tools at about 35,700 chars (≈8.9k tokens). That keeps clients
+down from 47 typed tools at about 48,400 chars (≈12.1k tokens). That keeps clients
 such as Cursor well under their ~40-tool limit and saves context. A CI test fails
 if the default list grows past 16,000 chars (≈4k tokens); `npm run measure:tools`
 prints the current figure.
@@ -50,12 +51,13 @@ client works better with them:
 | --- | --- |
 | HTTP query | `/mcp?toolsets=cso,irish-rail` (comma list of source ids) |
 | HTTP path | `/mcp/x/irish-rail` (one source) |
-| Everything | `/mcp?toolsets=all` (all 41 typed tools plus the meta tools, ≈10.8k tokens) |
+| Everything | `/mcp?toolsets=all` (all 47 typed tools plus the meta tools) |
 | stdio | `npx -y ireland-mcp --toolsets=cso,irish-rail`, or `IRELAND_MCP_TOOLSETS=all` |
 
 Source ids: `cso`, `oireachtas`, `geohive`, `data-gov-ie`, `smart-dublin`,
 `met-eireann`, `nta`, `legislation`, `ppr`, `irish-rail`, `luas`, `eirgrid`,
-`marine`, `opw-water`, `cross`. An unknown id is a clear error (HTTP 400 with the
+`marine`, `opw-water`, `planning`, `census-areas`, `heritage`,
+`environment-sites`, `cross`. An unknown id is a clear error (HTTP 400 with the
 valid list, or exit code 1 on stdio).
 
 **Response budget.** Each result is capped at about 2,000 tokens (chars ÷ 4).
@@ -85,6 +87,10 @@ Results also come back as `structuredContent`.
 | EirGrid | `grid_get_status` | Live demand, wind generation and carbon intensity |
 | Marine Institute | `marine_get_buoys` | Offshore wind, waves, air and sea temperature |
 | OPW (waterlevel.ie) | `water_find_stations`, `water_get_level` | River and lake levels at ~460 gauges, last 36 hours |
+| Planning (NPAD) | `planning_search`, `planning_get` | National planning applications by location, council, text, date or reference |
+| Census areas | `census_small_area_at` | Census 2022 Small Area / ED / county at a point, with population where available |
+| Heritage | `heritage_monuments_near` | National Monuments Service Sites and Monuments Record near a point |
+| Environment sites | `protected_sites_at`, `protected_sites_near` | NPWS SPA, SAC, NHA and proposed NHA protected sites |
 | Cross-source | `search`, `fetch`, `list_sources`, `ireland_snapshot`, `nearby` | Search everything, fetch by id, place summaries |
 
 All of these are reachable on the default surface through `ireland_call`; they

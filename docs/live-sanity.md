@@ -6,6 +6,19 @@ Each call is a real MCP client round trip. By default it goes through
 `ireland_call` on the lean surface; `EVAL_TOOLSETS=all npm run live:sanity` calls
 the typed tools directly instead.
 
+## 2026-10-05, ArcGIS sources (`feat/sources-arcgis-planning-census`), local run
+
+Default surface (7 tools listed, every case through `ireland_call`): 21 PASS,
+1 SKIP (`nta_get_realtime_summary`, `NTA_API_KEY` not set), 0 FAIL.
+
+| Source | Tool | Result | ms | Note |
+|---|---|---|---|---|
+| planning | planning_search | PASS | 261 | NPAD ArcGIS keyless, CC BY 4.0 |
+| planning | planning_get | PASS | 798 | NPAD ArcGIS keyless, CC BY 4.0 |
+| census-areas | census_small_area_at | PASS | 457 | CSO/Tailte Éireann ArcGIS keyless, CC BY 4.0 |
+| heritage | heritage_monuments_near | PASS | 406 | NMS SMR ArcGIS keyless, CC BY 4.0 |
+| environment-sites | protected_sites_near | PASS | 433 | NPWS designated areas ArcGIS keyless, CC BY 4.0 |
+
 ## 2026-10-05, lean surface (`feat/lean-surface`), local run
 
 Default surface (7 tools listed, every case through `ireland_call`): 16 PASS,
