@@ -22,6 +22,51 @@ real figures, with the source, licence and retrieval time attached.
 > (Streamable HTTP, no key needed). The npm package is not published yet; until it is,
 > run the stdio server from source (see [Run from source](#run-from-source)).
 
+## Tool surface: lean by default
+
+By default `tools/list` is small: **7 tools, about 5,100 chars (≈1.3k tokens)**,
+down from 41 typed tools at about 35,700 chars (≈8.9k tokens). That keeps clients
+such as Cursor well under their ~40-tool limit and saves context. A CI test fails
+if the default list grows past 16,000 chars (≈4k tokens); `npm run measure:tools`
+prints the current figure.
+
+| Tool | Purpose |
+| --- | --- |
+| `ireland_catalogue(domain?)` | Sources grouped by domain (stats, transport, environment, energy, law/politics, places/property), each with its operations |
+| `ireland_describe(source, operation)` | The operation's JSON schema, description and a working example |
+| `ireland_call(source, operation, args, max_tokens?)` | Validates `args` server-side and runs the operation. Bad args return the schema and an example |
+| `ireland_about` | Licence, attribution, status URL, and how to enable typed toolsets |
+| `search`, `fetch` | Cross-source search and fetch (ChatGPT deep research contract) |
+| `nearby` | Kept top level because it is small (<300 tokens) |
+
+Every typed tool below is an **operation** of its source, with the same name, so
+`ireland_call {source: "irish-rail", operation: "rail_get_departures", args: {station: "Heuston"}}`
+does the same thing as calling `rail_get_departures` directly.
+
+**Typed toolsets on demand.** Add a source's typed tools to `tools/list` when a
+client works better with them:
+
+| Where | How |
+| --- | --- |
+| HTTP query | `/mcp?toolsets=cso,irish-rail` (comma list of source ids) |
+| HTTP path | `/mcp/x/irish-rail` (one source) |
+| Everything | `/mcp?toolsets=all` (all 41 typed tools plus the meta tools, ≈10.8k tokens) |
+| stdio | `npx -y ireland-mcp --toolsets=cso,irish-rail`, or `IRELAND_MCP_TOOLSETS=all` |
+
+Source ids: `cso`, `oireachtas`, `geohive`, `data-gov-ie`, `smart-dublin`,
+`met-eireann`, `nta`, `legislation`, `ppr`, `irish-rail`, `luas`, `eirgrid`,
+`marine`, `opw-water`, `cross`. An unknown id is a clear error (HTTP 400 with the
+valid list, or exit code 1 on stdio).
+
+**Response budget.** Each result is capped at about 2,000 tokens (chars ÷ 4).
+Pass `max_tokens` (100–8,000) to change it. When a large list is cut, the result
+carries `truncated: true`, `returned`, `total` and a hint to narrow the request.
+Results also come back as `structuredContent`.
+
+**Resources and prompts.** Each source is a resource, `ireland://sources/{id}`
+(licence, attribution, coverage, operations). Three prompts are included:
+`area_profile(place)`, `commute_check(station)` and `compare_counties(metric, counties)`.
+
 ## Tools
 
 | Source | Tools | Data |
@@ -41,6 +86,9 @@ real figures, with the source, licence and retrieval time attached.
 | Marine Institute | `marine_get_buoys` | Offshore wind, waves, air and sea temperature |
 | OPW (waterlevel.ie) | `water_find_stations`, `water_get_level` | River and lake levels at ~460 gauges, last 36 hours |
 | Cross-source | `search`, `fetch`, `list_sources`, `ireland_snapshot`, `nearby` | Search everything, fetch by id, place summaries |
+
+All of these are reachable on the default surface through `ireland_call`; they
+are listed as tools only when their toolset is enabled (see above).
 
 `search` and `fetch` follow the ChatGPT deep research contract. `search` returns
 `[{id, title, url}]` with ids such as `cso:FY003A`, `oireachtas:bill/2024/12` or
@@ -69,6 +117,10 @@ each with a hint the model can act on. Lists default to 50 items, max 500.
 
 The hosted URL is `https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp`.
 If you deploy your own copy, use your own function app URL instead.
+
+Any URL below can take `?toolsets=...` or the `/mcp/x/{source}` form, for example
+`https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp?toolsets=irish-rail,luas`.
+For stdio, add `"--toolsets=cso"` to `args`.
 
 ### Claude Desktop (local, stdio)
 
@@ -128,6 +180,7 @@ Local alternative: `{ "type": "stdio", "command": "npx", "args": ["-y", "ireland
 | `NTA_API_KEY` | `nta_*` tools. Free key from [developer.nationaltransport.ie](https://developer.nationaltransport.ie) | unset: NTA tools return a clear error |
 | `PPR_INDEX_PATH` | Faster PPR lookups from a prebuilt index (`npm run ppr:build`) | `.ppr-cache/index-v1.json.gz`; falls back to live county CSVs |
 | `IRELAND_MCP_TELEMETRY` | Set to `off` to silence the one-line JSON tool logs on stderr | on |
+| `IRELAND_MCP_TOOLSETS` | Typed toolsets to list, e.g. `cso,irish-rail` or `all` (same as `--toolsets=`) | unset: meta tools only |
 
 The hosted app also reads `RATE_LIMIT_PER_MINUTE` (default 60 per IP),
 `AzureWebJobsStorage__accountName`, `CACHE_TABLE_NAME` and `PPR_CONTAINER`.
@@ -152,8 +205,9 @@ npx @modelcontextprotocol/inspector node dist/src/cli.js   # browse the tools
 | `npm run test:coverage` | Same, with a coverage report |
 | `npm run typecheck && npm run lint` | TypeScript and ESLint |
 | `npm run inspector:check` | MCP conformance through the Inspector CLI (also in CI) |
-| `npm run live:sanity` | One real call per source; results in [docs/live-sanity.md](docs/live-sanity.md) |
-| `npm run eval` | 40 Irish questions through promptfoo. Uses `OPENAI_API_KEY`, or Azure OpenAI with `AZURE_API_KEY`, `AZURE_API_HOST` and `AZURE_DEPLOYMENT`; skips without a key |
+| `npm run live:sanity` | One real call per source through `ireland_call`; `EVAL_TOOLSETS=all` calls the typed tools instead. Results in [docs/live-sanity.md](docs/live-sanity.md) |
+| `npm run eval` | 40 Irish questions through promptfoo. Uses `OPENAI_API_KEY`, or Azure OpenAI with `AZURE_API_KEY`, `AZURE_API_HOST` and `AZURE_DEPLOYMENT`; skips without a key. Runs on the default surface; `EVAL_TOOLSETS=all` runs on the full one. A call via `ireland_call` with `operation: X` counts as calling `X` |
+| `npm run measure:tools [-- all]` | Size of `tools/list` in chars and estimated tokens (after `npm run build`) |
 | `npm run ppr:build` | Build the Property Price Register index locally |
 
 CI runs lint, typecheck, tests, Inspector conformance and CodeQL. A nightly

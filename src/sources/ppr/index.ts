@@ -137,6 +137,7 @@ export function createPprModule(options: PprModuleOptions = {}): SourceModule {
 
   const searchSales = defineTool({
     name: "ppr_search_sales",
+    example: { county: "Galway", address: "oranmore", limit: 5 },
     title: "Search residential property sales",
     description:
       "Search the Residential Property Price Register (declared sale prices, 2010–present) by county, address words, Eircode prefix, date and price. Newest first.",
@@ -182,6 +183,8 @@ export function createPprModule(options: PprModuleOptions = {}): SourceModule {
   return {
     info: pprInfo,
     summary: "Residential property sale prices (Property Price Register): search sales and median prices by area.",
+    domain: "places/property",
+    coverage: "Every residential sale declared to Revenue since 2010, by county and address, from the Property Services Regulatory Authority.",
     tools: [searchSales, stats]
   };
 }

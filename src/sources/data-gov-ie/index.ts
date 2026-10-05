@@ -11,5 +11,7 @@ export const dataGovIeModule = createCkanModule({
   prefix: "datagov",
   portal: "data.gov.ie",
   site: "https://data.gov.ie",
-  summary: "National open-data catalogue: find datasets from any public body and read their resources."
+  summary: "National open-data catalogue: find datasets from any public body and read their resources.",
+  domain: "stats",
+  coverage: "Metadata for every dataset in the national open-data portal, plus DataStore rows where the publisher loaded them."
 });

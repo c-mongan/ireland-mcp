@@ -344,6 +344,8 @@ async function fetchById(key: string, ctx: ToolContext) {
 export const oireachtasModule: SourceModule = {
   info: oireachtasInfo,
   summary: "Parliament: TDs and Senators, bills and their stages, debates, parliamentary questions and votes.",
+  domain: "law/politics",
+  coverage: "Houses of the Oireachtas: members, bills, debates, parliamentary questions and divisions from the Oireachtas Open Data API.",
   tools: [membersTool, billsTool, debatesTool, questionsTool, votesTool],
   search,
   fetchById

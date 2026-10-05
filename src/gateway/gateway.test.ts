@@ -290,7 +290,7 @@ describe("server", () => {
 
 describe("handleMcpHttp", () => {
   const ctx = createContext({ fetch: fakeFetch([]) });
-  const createServer = () => buildServer({ modules: [demoModule], context: ctx });
+  const createServer = () => buildServer({ modules: [demoModule], context: ctx, toolsets: "demo" });
   const post = (body: unknown, headers: Record<string, string> = {}) =>
     new Request("https://fn.example/mcp", {
       method: "POST",
@@ -316,7 +316,7 @@ describe("handleMcpHttp", () => {
       createServer
     });
     const tools = (await list.json()).result.tools as Array<{ name: string; annotations: Record<string, boolean> }>;
-    expect(tools.map((t) => t.name)).toEqual(["demo_echo", "demo_fail"]);
+    expect(tools.map((t) => t.name)).toEqual(["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about", "demo_echo", "demo_fail"]);
     expect(tools.every((t) => t.annotations.readOnlyHint && t.annotations.openWorldHint)).toBe(true);
 
     const call = await handleMcpHttp(

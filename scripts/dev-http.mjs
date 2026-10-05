@@ -10,6 +10,7 @@ import { handleMcpHttp } from "../dist/src/gateway/httpHandler.js";
 import { limitFromEnv, RateLimiter } from "../dist/src/gateway/rateLimit.js";
 import { consoleSink } from "../dist/src/gateway/telemetry.js";
 import { createAppServer } from "../dist/src/registry.js";
+import { toolsetsFromUrl } from "../dist/src/gateway/toolsets.js";
 import { healthHandler } from "../dist/src/functions/healthz.js";
 
 const port = Number(process.env.PORT ?? 7071);
@@ -22,7 +23,7 @@ const types = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": 
 createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", `http://localhost:${port}`);
   try {
-    if (url.pathname === "/mcp") {
+    if (url.pathname === "/mcp" || /^\/mcp\/x\/[^/]+\/?$/.test(url.pathname)) {
       const chunks = [];
       for await (const chunk of req) chunks.push(chunk);
       const body = req.method === "POST" ? Buffer.concat(chunks).toString("utf8") : undefined;
@@ -30,7 +31,7 @@ createServer(async (req, res) => {
       for (const [k, v] of Object.entries(req.headers)) if (typeof v === "string") headers.set(k, v);
       headers.set("x-forwarded-for", req.socket.remoteAddress ?? "local");
       const response = await handleMcpHttp(new Request(url, { method: req.method, headers, ...(body !== undefined ? { body } : {}) }), {
-        createServer: () => createAppServer(context, consoleSink),
+        createServer: (request) => createAppServer(context, consoleSink, toolsetsFromUrl(request.url)),
         rateLimiter
       });
       res.writeHead(response.status, Object.fromEntries(response.headers.entries()));

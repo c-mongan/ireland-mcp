@@ -5,13 +5,14 @@ import { execFileSync } from "node:child_process";
 
 const INSPECTOR = "@modelcontextprotocol/inspector@2.9.0";
 const NAME = /^[a-z][a-z0-9_]{2,63}$/;
-const CROSS = ["search", "fetch", "list_sources", "ireland_snapshot", "nearby"];
+const CROSS = ["search", "fetch", "list_sources", "ireland_snapshot", "nearby", "ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about"];
 const SOURCES = ["cso", "oireachtas", "geohive", "datagov", "smartdublin", "met", "nta", "legislation", "ppr"];
 
 function inspect(...args) {
   let out;
   try {
-    out = execFileSync("npx", ["-y", INSPECTOR, "--cli", "node", "dist/src/cli.js", ...args], {
+    // toolsets=all so the typed tools are checked too; the default surface is covered by the vitest budget test.
+    out = execFileSync("npx", ["-y", INSPECTOR, "--cli", "node", "dist/src/cli.js", ...args, "-e", "IRELAND_MCP_TOOLSETS=all"], {
     encoding: "utf8",
     timeout: 120_000,
     stdio: ["ignore", "pipe", "pipe"]

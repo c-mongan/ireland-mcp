@@ -80,5 +80,7 @@ const statusTool = defineTool({
 export const eirgridModule: SourceModule = {
   info: eirgridInfo,
   summary: "Energy: live electricity demand, wind generation and carbon intensity for the Irish grid (EirGrid).",
+  domain: "energy",
+  coverage: "All-island (Ireland and Northern Ireland) electricity system, 15-minute resolution, today and recent days.",
   tools: [statusTool]
 };

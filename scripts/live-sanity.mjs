@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 // Live sanity check: one real upstream call per source. Not run in unit tests; used locally and by the nightly live-smoke workflow.
 // Usage: npm run build && npm run live:sanity [-- --json]
+// Surface: by default every case goes through the lean meta tools (ireland_call {source, operation, args});
+// EVAL_TOOLSETS=all calls the typed tools directly instead. Either way it is a real MCP client round trip.
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createContext } from "../dist/src/gateway/context.js";
-import { runTool } from "../dist/src/gateway/server.js";
-import { crossSourceTools } from "../dist/src/cross/index.js";
-import { sourceModules } from "../dist/src/registry.js";
+import { createAppServer } from "../dist/src/registry.js";
 
 const year = new Date().getUTCFullYear();
 const CASES = [
@@ -27,9 +29,18 @@ const CASES = [
   ["cross", "ireland_snapshot", { place: "Galway" }, (d) => d.population?.area && d.boundaries?.county]
 ];
 
-const ctx = createContext();
-const cross = crossSourceTools(sourceModules);
-const findTool = (name) => sourceModules.flatMap((m) => m.tools).find((t) => t.name === name) ?? cross.find((t) => t.name === name);
+const toolsets = process.env.EVAL_TOOLSETS?.trim() || undefined;
+const server = createAppServer(createContext(), undefined, toolsets);
+const [serverSide, clientSide] = InMemoryTransport.createLinkedPair();
+await server.connect(serverSide);
+const client = new Client({ name: "live-sanity", version: "1.0.0" });
+await client.connect(clientSide);
+const listed = new Set((await client.listTools()).tools.map((t) => t.name));
+// Typed tools listed on this surface are called directly; everything else goes through ireland_call.
+const call = (source, name, args) =>
+  listed.has(name)
+    ? client.callTool({ name, arguments: args })
+    : client.callTool({ name: "ireland_call", arguments: { source, operation: name, args } });
 const results = [];
 
 for (const [source, name, args, ok, opts = {}] of CASES) {
@@ -39,7 +50,7 @@ for (const [source, name, args, ok, opts = {}] of CASES) {
   }
   const started = Date.now();
   try {
-    const r = await runTool(findTool(name), source, args, ctx);
+    const r = await call(source, name, args);
     const body = JSON.parse(r.content[0].text);
     const data = opts.raw ? body : body.data;
     const pass = !r.isError && Boolean(ok(data ?? {}));
@@ -55,8 +66,10 @@ for (const [source, name, args, ok, opts = {}] of CASES) {
   }
 }
 
+await client.close();
 if (process.argv.includes("--json")) console.log(JSON.stringify(results, null, 2));
 else {
+  console.log(`Surface: ${toolsets ? `toolsets=${toolsets}` : "default (meta tools)"}, ${listed.size} tools listed.\n`);
   console.log(`| Source | Tool | Result | ms | Note |\n|---|---|---|---|---|`);
   for (const r of results) console.log(`| ${r.source} | ${r.tool} | ${r.status} | ${r.ms} | ${r.note.replace(/\|/g, "/").slice(0, 120)} |`);
 }

@@ -192,5 +192,7 @@ const tripsTool = defineTool({
 export const ntaModule: SourceModule = {
   info: ntaInfo,
   summary: "Live public transport: GTFS-Realtime cancellations and delays (needs a server-side NTA key).",
+  domain: "transport",
+  coverage: "GTFS-Realtime trip updates for Dublin Bus, Bus Éireann, Go-Ahead and other NTA-licensed services; needs a server-side key.",
   tools: [summaryTool, tripsTool]
 };

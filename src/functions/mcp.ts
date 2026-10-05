@@ -4,6 +4,7 @@ import { handleMcpHttp } from "../gateway/httpHandler.js";
 import { limitFromEnv, RateLimiter } from "../gateway/rateLimit.js";
 import { tableStoreFromEnv } from "../gateway/tableStore.js";
 import { consoleSink } from "../gateway/telemetry.js";
+import { toolsetsFromUrl } from "../gateway/toolsets.js";
 import { createAppServer } from "../registry.js";
 
 const MAX_BODY_BYTES = 256 * 1024;
@@ -24,7 +25,7 @@ export async function mcpHandler(request: HttpRequest): Promise<HttpResponseInit
     ...(body !== undefined ? { body } : {})
   });
   const response = await handleMcpHttp(webRequest, {
-    createServer: () => createAppServer(context, consoleSink),
+    createServer: (req) => createAppServer(context, consoleSink, toolsetsFromUrl(req.url)),
     rateLimiter
   });
   return {
@@ -36,6 +37,14 @@ export async function mcpHandler(request: HttpRequest): Promise<HttpResponseInit
 
 app.http("mcp", {
   route: "mcp",
+  methods: ["POST", "GET", "DELETE", "OPTIONS"],
+  authLevel: "anonymous",
+  handler: mcpHandler
+});
+
+/** Typed toolset for one source, e.g. /mcp/x/irish-rail. Same handler; the path is read by toolsetsFromUrl. */
+app.http("mcpToolset", {
+  route: "mcp/x/{source}",
   methods: ["POST", "GET", "DELETE", "OPTIONS"],
   authLevel: "anonymous",
   handler: mcpHandler

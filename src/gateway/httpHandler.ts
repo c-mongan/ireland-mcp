@@ -1,9 +1,11 @@
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { clientKey, RateLimiter } from "./rateLimit.js";
+import { UnknownToolsetError } from "./toolsets.js";
 
 export interface McpHttpOptions {
-  createServer: () => McpServer;
+  /** Builds a fresh server per request; receives the request so it can read `?toolsets=` or `/mcp/x/{source}`. */
+  createServer: (request: Request) => McpServer;
   rateLimiter?: RateLimiter;
 }
 
@@ -58,7 +60,13 @@ export async function handleMcpHttp(request: Request, options: McpHttpOptions): 
     }
   }
 
-  const server = options.createServer();
+  let server: McpServer;
+  try {
+    server = options.createServer(request);
+  } catch (error) {
+    if (error instanceof UnknownToolsetError) return jsonRpcError(400, -32602, error.message);
+    throw error;
+  }
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
     enableJsonResponse: true

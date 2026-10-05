@@ -32,6 +32,10 @@ export interface ToolDefinition<Shape extends z.ZodRawShape = z.ZodRawShape> {
    * Used only by the ChatGPT search/fetch contract tools.
    */
   raw?: boolean;
+  /** Also listed as a top-level tool in the default lean surface. Keep pinned tools small (<300 tokens). */
+  pinned?: boolean;
+  /** Example arguments shown by ireland_describe. Derived from the schema when omitted. */
+  example?: Record<string, unknown>;
   handler(args: z.infer<z.ZodObject<Shape>>, ctx: ToolContext): Promise<Envelope | unknown>;
 }
 
@@ -57,10 +61,19 @@ export interface FetchedDocument {
   metadata: Record<string, unknown>;
 }
 
+/** Catalogue domains, in display order. */
+export const DOMAINS = ["stats", "transport", "environment", "energy", "law/politics", "places/property"] as const;
+export type Domain = (typeof DOMAINS)[number];
+
 export interface SourceModule {
   info: SourceInfo;
-  /** One-line description used by list_sources. */
+  /** One-line description used by list_sources and ireland_catalogue. */
   summary: string;
+  /** Catalogue group for ireland_catalogue. Every registered source must set one. */
+  domain?: Domain;
+  /** What the source covers (time span, geography, freshness). Shown in the ireland://sources/{id} resource. */
+  coverage?: string;
+  /** Each tool is also an ireland_call operation of this source, keyed by its tool name. */
   tools: AnyTool[];
   /** Participates in the cross-source `search` tool. */
   search?(query: string, limit: number, ctx: ToolContext): Promise<SearchHit[]>;
