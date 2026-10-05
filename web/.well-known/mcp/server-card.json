@@ -1,0 +1,34 @@
+{
+  "schema_version": "0.1",
+  "name": "Ireland MCP",
+  "id": "io.github.c-mongan/ireland-mcp",
+  "description": "Read-only MCP server for Irish public data. No keys, no login.",
+  "homepage": "https://irishopendata.ie/",
+  "repository": "https://github.com/c-mongan/ireland-mcp",
+  "license": "MIT",
+  "protocol": {
+    "name": "model-context-protocol",
+    "versions": ["2025-06-18", "2025-11-25"]
+  },
+  "transports": [
+    {
+      "type": "http",
+      "url": "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp",
+      "auth": { "type": "none" }
+    }
+  ],
+  "capabilities": {
+    "tools": true,
+    "resources": true,
+    "prompts": false,
+    "sampling": false
+  },
+  "toolsets": {
+    "default": "Lean cross-source surface of about 7 tools and about 1.4k tokens.",
+    "all": "Append ?toolsets=all to list every typed source tool.",
+    "source": "Use /mcp/x/{source-id} or ?toolsets={source-id} for one source."
+  },
+  "agent_docs": "https://irishopendata.ie/AGENTS.md",
+  "llms_txt": "https://irishopendata.ie/llms.txt",
+  "status": "https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json"
+}

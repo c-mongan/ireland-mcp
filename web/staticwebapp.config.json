@@ -1,13 +1,26 @@
 {
   "navigationFallback": {
-    "rewrite": "/index.html"
+    "rewrite": "/index.html",
+    "exclude": [
+      "/llms.txt",
+      "/AGENTS.md",
+      "/.well-known/mcp.json",
+      "/.well-known/mcp/server-card.json",
+      "*.mp4",
+      "*.css",
+      "*.js"
+    ]
   },
   "mimeTypes": {
-    ".mp4": "video/mp4"
+    ".mp4": "video/mp4",
+    ".txt": "text/plain; charset=utf-8",
+    ".md": "text/markdown; charset=utf-8",
+    ".json": "application/json; charset=utf-8"
   },
   "globalHeaders": {
-    "content-security-policy": "default-src 'self'; connect-src 'self' https://*.azurewebsites.net http://localhost:7071; img-src 'self' data:; style-src 'self'; script-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+    "content-security-policy": "default-src 'self'; connect-src 'self' https://*.azurewebsites.net https://raw.githubusercontent.com http://localhost:7071; img-src 'self' data:; media-src 'self'; style-src 'self'; script-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
     "x-content-type-options": "nosniff",
-    "referrer-policy": "no-referrer"
+    "referrer-policy": "no-referrer",
+    "permissions-policy": "camera=(), microphone=(), geolocation=()"
   }
 }
