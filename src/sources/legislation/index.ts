@@ -215,6 +215,8 @@ const getSectionTool = defineTool({
 export const legislationModule: SourceModule = {
   info: legislationInfo,
   summary: "Acts of the Oireachtas from the Irish Statute Book: list by year, contents and section text (as enacted).",
+  domain: "law/politics",
+  coverage: "Acts of the Oireachtas as enacted, from 1922 to the current year (Irish Statute Book).",
   tools: [listActsTool, getActTool, getSectionTool],
   async search(query, limit, ctx): Promise<SearchHit[]> {
     const now = ctx.now().getUTCFullYear();

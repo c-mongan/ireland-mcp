@@ -2,7 +2,7 @@ import { z } from "zod";
 import { HOUR } from "../../gateway/context.js";
 import { bound, envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
-import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { defineTool, type Domain, type SourceModule, type ToolContext } from "../../gateway/module.js";
 
 /** Minimal CKAN 2.x action API client shared by data.gov.ie and Smart Dublin. */
 export interface CkanConfig {
@@ -14,6 +14,8 @@ export interface CkanConfig {
   /** Site root, e.g. https://data.gov.ie */
   site: string;
   summary: string;
+  domain: Domain;
+  coverage: string;
   ttlMs?: number;
 }
 
@@ -154,6 +156,7 @@ export function createCkanModule(config: CkanConfig): SourceModule {
 
   const datastoreTool = defineTool({
     name: `${prefix}_query_datastore`,
+    example: { resource_id: "330d9b75-0e85-4c95-b948-58b86acaa577", limit: 5 },
     title: `Query a ${portal} table`,
     description: `Read rows from a ${portal} resource that has a CKAN datastore (datastore=true in ${prefix}_get_dataset). Supports full-text 'q' and exact-match column filters.`,
     inputSchema: {
@@ -188,6 +191,8 @@ export function createCkanModule(config: CkanConfig): SourceModule {
   return {
     info,
     summary: config.summary,
+    domain: config.domain,
+    coverage: config.coverage,
     tools: [searchTool, getTool, datastoreTool],
     async search(query, max, ctx) {
       const result = await packageSearch(ctx, { q: query, rows: String(max) });

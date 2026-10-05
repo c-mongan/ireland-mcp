@@ -1,6 +1,6 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { SourceModule, ToolContext } from "./gateway/module.js";
-import { crossSourceTools } from "./cross/index.js";
+import { crossInfo, crossSourceTools } from "./cross/index.js";
 import { buildServer } from "./gateway/server.js";
 import type { TelemetrySink } from "./gateway/telemetry.js";
 import { csoModule } from "./sources/cso/index.js";
@@ -20,12 +20,30 @@ import { opwWaterModule } from "./sources/opw-water/index.js";
 
 export const sourceModules: SourceModule[] = [csoModule, oireachtasModule, geohiveModule, dataGovIeModule, smartDublinModule, metModule, ntaModule, legislationModule, pprModule, irishRailModule, luasModule, eirgridModule, marineModule, opwWaterModule];
 
-export function createAppServer(context: ToolContext, telemetry?: TelemetrySink): McpServer {
+/**
+ * The cross-source tools split in two: `search`/`fetch` stay top-level for the ChatGPT contract, while
+ * list_sources, nearby and ireland_snapshot become operations of a "cross" source (nearby is also pinned).
+ */
+export function appModules(modules: SourceModule[] = sourceModules): { modules: SourceModule[]; extraTools: ReturnType<typeof crossSourceTools> } {
+  const cross = crossSourceTools(modules);
+  const raw = cross.filter((t) => t.raw);
+  const crossModule: SourceModule = {
+    info: crossInfo,
+    summary: "Combined lookups: what is at a point (nearby), a one-call place snapshot, and the source list.",
+    domain: "places/property",
+    coverage: "Combines GeoHive boundaries, Met Éireann forecasts and warnings and CSO census population for any point or major place in Ireland.",
+    tools: cross.filter((t) => !t.raw)
+  };
+  return { modules: [...modules, crossModule], extraTools: raw };
+}
+
+/** Builds the MCP server. `toolsets` is a comma list of source ids (or "all") whose typed tools are listed. */
+export function createAppServer(context: ToolContext, telemetry?: TelemetrySink, toolsets?: string): McpServer {
   return buildServer({
-    modules: sourceModules,
-    extraTools: crossSourceTools(sourceModules),
+    ...appModules(),
     context,
-    ...(telemetry ? { telemetry } : {})
+    ...(telemetry ? { telemetry } : {}),
+    ...(toolsets ? { toolsets } : {})
   });
 }
 

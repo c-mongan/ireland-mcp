@@ -113,6 +113,7 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
 
   const nearby = defineTool({
     name: "nearby",
+    pinned: true,
     title: "What is at this location",
     description:
       "For a WGS84 point in Ireland: county, local authority, constituency, electoral division, small area and settlement (GeoHive), the nearest Met Éireann station and the next hours of forecast.",
@@ -141,6 +142,7 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
 
   const snapshot = defineTool({
     name: "ireland_snapshot",
+    example: { place: "Galway" },
     title: "Snapshot of an Irish place",
     description:
       "One-call overview of an Irish county or large town: census population (CSO F1001), boundaries (GeoHive), weather forecast and national weather warnings (Met Éireann). Use the source tools for detail.",

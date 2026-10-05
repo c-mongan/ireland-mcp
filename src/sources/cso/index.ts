@@ -26,6 +26,7 @@ const tableCode = z.string().min(2).max(40).describe("CSO table code, e.g. F1001
 
 const searchTool = defineTool({
   name: "cso_search_tables",
+  example: { query: "population by county" },
   title: "Search CSO tables",
   description:
     "Search the CSO PxStat catalogue of statistical tables by keyword (e.g. 'house prices', 'unemployment', 'population county'). Returns table codes to use with cso_get_table_metadata and cso_get_data.",
@@ -54,6 +55,7 @@ const searchTool = defineTool({
 
 const metadataTool = defineTool({
   name: "cso_get_table_metadata",
+  example: { table_code: "F1001" },
   title: "CSO table metadata",
   description:
     "Get a CSO table's title, last update and dimensions with their category codes. Use the codes as filters in cso_get_data.",
@@ -89,6 +91,7 @@ const metadataTool = defineTool({
 
 const dataTool = defineTool({
   name: "cso_get_data",
+  example: { table_code: "F1001", filters: { "TLIST(A1)": ["2022"] }, limit: 10 },
   title: "CSO table data",
   description:
     "Fetch observations from a CSO table. Filter each dimension by category codes from cso_get_table_metadata; unfiltered dimensions return every category. Queries over 10,000 cells are rejected, so filter large tables.",
@@ -150,6 +153,7 @@ const F1001 = { table: "F1001", year: "TLIST(A1)", county: "C02779V03348", sex: 
 
 const areaProfileTool = defineTool({
   name: "cso_area_profile",
+  example: { area: "Galway" },
   title: "County population profile",
   description:
     "Census population for a county or the State (table F1001): latest census and the previous one, by sex, with change. Accepts a county name (e.g. 'Galway'), its F1001 code ('19') or 'State'.",
@@ -240,6 +244,8 @@ async function fetchById(key: string, ctx: ToolContext) {
 export const csoModule: SourceModule = {
   info: csoInfo,
   summary: "Official statistics: census, population, prices, labour market, housing and thousands more PxStat tables.",
+  domain: "stats",
+  coverage: "National statistics from the CSO PxStat database: censuses (incl. 2016 and 2022), population, prices, labour market and housing, at State, county and smaller geographies.",
   tools: [searchTool, metadataTool, dataTool, areaProfileTool],
   search,
   fetchById

@@ -192,6 +192,7 @@ const listLayersTool = defineTool({
 
 const queryLayerTool = defineTool({
   name: "geohive_query_layer",
+  example: { service: "Counties___OSi_National_Statutory_Boundaries", where: "PROVINCE='Munster'", out_fields: "ENGLISH,PROVINCE", limit: 3 },
   title: "Query a GeoHive layer",
   description:
     "Query attributes (no geometry) from layer 0 of a GeoHive feature service with an ArcGIS SQL where clause, e.g. service 'Counties___OSi_National_Statutory_Boundaries', where \"PROVINCE='Munster'\".",
@@ -223,5 +224,7 @@ const queryLayerTool = defineTool({
 export const geohiveModule: SourceModule = {
   info: geohiveInfo,
   summary: "Boundaries and geography: which county, constituency, electoral division or small area a point is in; GeoHive layers.",
+  domain: "places/property",
+  coverage: "Republic of Ireland statutory boundaries: counties, local authorities, constituencies, electoral divisions, small areas and settlements.",
   tools: [boundariesTool, listLayersTool, queryLayerTool]
 };

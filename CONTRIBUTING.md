@@ -55,7 +55,9 @@ source; run it by hand, not in CI.
 
    export const exampleModule: SourceModule = {
      info: exampleInfo,
-     summary: "One line for list_sources.",
+     summary: "One line for list_sources and ireland_catalogue.",
+     domain: "stats", // one of DOMAINS: stats, transport, environment, energy, law/politics, places/property
+     coverage: "What area and period the data covers, and how fresh it is.",
      tools: [
        defineTool({
          name: "example_search_things",
@@ -65,6 +67,9 @@ source; run it by hand, not in CI.
            query: z.string().min(2).describe("Words to match"),
            limit: z.number().int().min(1).max(500).optional().describe("Default 50, max 500")
          },
+         // Optional: shown by ireland_describe. Otherwise one is derived from required fields
+         // (zod examples/default/enum, or an "e.g. ..." hint in the field description).
+         example: { query: "housing", limit: 5 },
          async handler({ query, limit }, ctx) {
            const url = `${BASE}/things?q=${encodeURIComponent(query)}`;
            const res = await ctx.cachedJson<{ items: unknown[] }>(url, HOUR);
@@ -83,7 +88,12 @@ source; run it by hand, not in CI.
    them, and replace any personal data with synthetic values.
 4. Write `src/sources/<id>/<id>.test.ts` first (see `geohive.test.ts`). Cover the
    happy path, `BAD_ARGS`, `NOT_FOUND`, an upstream 5xx and truncation.
-5. Register the module in `src/registry.ts`.
+5. Register the module in `src/registry.ts` (`sourceModules`). That is all the
+   wiring needed: each tool becomes an operation in `ireland_catalogue`,
+   `ireland_describe` and `ireland_call`; the id becomes a toolset
+   (`?toolsets=<id>`, `/mcp/x/<id>`, `--toolsets=<id>`); and the module gets an
+   `ireland://sources/<id>` resource. Do not set `pinned` on a tool unless it
+   must stay in the default `tools/list` (the budget test caps it at 16,000 chars).
 6. Add one call to `scripts/live-sanity.mjs`, a row to `NOTICE`, a card to
    `web/index.html`, and a line to the README tool table.
 7. Run `npm run typecheck && npm run lint && npm test && npm run build && npm run inspector:check`.

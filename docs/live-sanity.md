@@ -2,6 +2,15 @@
 
 `npm run build && npm run live:sanity` makes one real upstream call per source.
 It does not run in unit tests or CI; the nightly `live-smoke` workflow runs it.
+Each call is a real MCP client round trip. By default it goes through
+`ireland_call` on the lean surface; `EVAL_TOOLSETS=all npm run live:sanity` calls
+the typed tools directly instead.
+
+## 2026-10-05, lean surface (`feat/lean-surface`), local run
+
+Default surface (7 tools listed, every case through `ireland_call`): 16 PASS,
+1 SKIP (`nta_get_realtime_summary`, `NTA_API_KEY` not set), 0 FAIL.
+`EVAL_TOOLSETS=all` (45 tools listed, typed tools called directly): same result.
 
 ## 2026-10-05, local run (Node 22, Dublin)
 

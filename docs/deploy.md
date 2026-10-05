@@ -8,7 +8,7 @@ The service runs on Azure Functions Flex Consumption (FC1) in North Europe.
 | Resource | Purpose |
 |---|---|
 | Resource group `rg-<env>` | Holds everything below |
-| Function app (Flex FC1, Node 22, system identity) | `/mcp`, `/healthz` and the nightly PPR index timer |
+| Function app (Flex FC1, Node 22, system identity) | `/mcp` (plus `/mcp/x/{source}` for one typed toolset), `/healthz` and the nightly PPR index timer |
 | Storage account (no shared keys, no public blobs) | Deployment package, `ppr` index container, `mcpcache` table |
 | Application Insights + Log Analytics (1 GB/day cap) | Telemetry, Entra auth only |
 | Key Vault (only when `NTA_API_KEY` is set) | Holds the NTA key; the app reads it by Key Vault reference |

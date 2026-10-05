@@ -106,5 +106,7 @@ const buoysTool = defineTool({
 export const marineModule: SourceModule = {
   info: marineInfo,
   summary: "Sea: live wind, wave and temperature readings from the Marine Institute's offshore weather buoys.",
+  domain: "environment",
+  coverage: "Irish Weather Buoy Network (M2-M6 and coastal buoys), latest hourly readings.",
   tools: [buoysTool]
 };

@@ -120,5 +120,7 @@ const listStopsTool = defineTool({
 export const luasModule: SourceModule = {
   info: luasInfo,
   summary: "Trams: live Luas arrival times and the stop list for the Red and Green lines.",
+  domain: "transport",
+  coverage: "Dublin Luas Red and Green line stops with live arrival forecasts.",
   tools: [forecastTool, listStopsTool]
 };

@@ -272,5 +272,7 @@ const warningsTool = defineTool({
 export const metModule: SourceModule = {
   info: metInfo,
   summary: "Weather: point forecasts anywhere in Ireland, today's station observations and active warnings.",
+  domain: "environment",
+  coverage: "Point forecasts for anywhere in Ireland (hourly, up to 48h here), today's synoptic station observations and national warnings.",
   tools: [forecastTool, observationsTool, warningsTool]
 };

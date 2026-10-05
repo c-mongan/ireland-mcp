@@ -128,5 +128,7 @@ const departuresTool = defineTool({
 export const irishRailModule: SourceModule = {
   info: irishRailInfo,
   summary: "Trains: Irish Rail station lookup and live DART/Commuter/Intercity departures.",
+  domain: "transport",
+  coverage: "All Irish Rail stations; live departures for the next 90 minutes (DART, Commuter, Intercity).",
   tools: [findStationTool, departuresTool]
 };
