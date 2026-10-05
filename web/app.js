@@ -95,3 +95,88 @@ $("try-form").addEventListener("submit", async (e) => {
     show(String(error.message ?? error), true);
   }
 });
+
+// Background motion, ported from the Search Ireland site. Skipped for reduced motion, data saver, touch and small or low-power devices.
+const WORDS = [
+  "Dáil", "Seanad", "Éireann", "Oireachtas", "Taoiseach", "census", "CSO", "PxStat", "Met Éireann", "forecast",
+  "Luas", "DART", "GTFS", "county", "constituency", "townland", "Bunreacht", "statute", "Act", "section",
+  "housing", "planning", "climate", "budget", "population", "rainfall", "Gaeltacht", "electoral", "division",
+  "property", "price", "data.gov.ie", "GeoHive", "Smart Dublin", "licence", "CC BY 4.0", "Corcaigh", "Gaillimh"
+];
+
+const motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
+const video = $("hero-video");
+const syncVideo = () => {
+  if (!video) return;
+  if (motionQuery.matches) video.pause();
+  else video.play().catch(() => {});
+};
+syncVideo();
+motionQuery.addEventListener("change", syncVideo);
+
+function canAnimate() {
+  const lowPower = (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory ?? 8) <= 4;
+  return !motionQuery.matches && !navigator.connection?.saveData && !lowPower
+    && innerWidth >= 768 && !matchMedia("(pointer: coarse)").matches;
+}
+
+function startTextRain() {
+  const canvas = $("text-rain");
+  const ctx = canvas?.getContext("2d");
+  if (!ctx) return;
+  const size = 13;
+  let width = 0, height = 0, drops = [], frame = 0, running = false;
+  const pick = () => WORDS[Math.floor(Math.random() * WORDS.length)];
+  const init = () => {
+    width = canvas.width = innerWidth;
+    height = canvas.height = innerHeight;
+    const columns = Math.max(8, Math.min(24, Math.ceil(width / (size * 8))));
+    drops = Array.from({ length: columns }, () => ({ y: Math.random() * -60, speed: 0.35 + Math.random() * 0.9, word: pick() }));
+  };
+  const draw = () => {
+    ctx.fillStyle = "rgba(10, 15, 26, 0.1)";
+    ctx.fillRect(0, 0, width, height);
+    ctx.font = `${size}px ui-monospace, monospace`;
+    drops.forEach((d, i) => {
+      ctx.fillStyle = Math.random() > 0.9992 ? "#fff" : d.speed > 1.2 ? "#22d3ee" : d.speed > 0.8 ? "#06b6d4" : "rgba(45, 212, 191, 0.45)";
+      ctx.fillText(d.word, i * size * 6 + size, d.y * size);
+      if (d.y * size > height && Math.random() > 0.975) Object.assign(d, { y: 0, speed: 0.5 + Math.random() * 1.5, word: pick() });
+      d.y += d.speed;
+    });
+  };
+  const loop = () => {
+    if (!running) return;
+    if (!document.hidden && ++frame % 4 === 0) draw();
+    requestAnimationFrame(loop);
+  };
+  // Re-check eligibility whenever the viewport or motion preference changes; stop drawing entirely when not eligible.
+  const update = () => {
+    const ok = canAnimate();
+    canvas.hidden = !ok;
+    if (ok) init();
+    if (ok && !running) { running = true; requestAnimationFrame(loop); }
+    if (!ok) running = false;
+  };
+  addEventListener("resize", update);
+  motionQuery.addEventListener("change", update);
+  update();
+}
+startTextRain();
+
+// Live status pill: checks the hosted endpoint from the page's meta tag, not the user-editable Try It field.
+(async () => {
+  const pill = $("live-pill"), text = $("live-text");
+  const endpoint = meta || (local ? `${location.origin}/mcp` : "");
+  if (!pill || !endpoint) return;
+  try {
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(endpoint.replace(/\/mcp\/?$/, "/healthz"), { signal: controller.signal });
+    const body = await res.json();
+    if (!res.ok || body.status !== "ok") throw new Error(String(res.status));
+    text.textContent = `Live now · ${body.sources?.length ?? 0} sources · no sign-up`;
+  } catch {
+    pill.classList.add("down");
+    text.textContent = "Hosted endpoint unreachable right now — run locally with npx";
+  }
+})();

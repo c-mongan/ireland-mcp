@@ -64,3 +64,31 @@ input, textarea, select { width: 100%; background: var(--card); color: var(--fg)
 .bullets li { margin: 0.4rem 0; }
 footer { padding: 2rem 1rem 3rem; border-top: 1px solid var(--border); }
 @media (prefers-reduced-motion: no-preference) { .card { transition: border-color 0.15s; } .card:hover { border-color: oklch(0.696 0.17 162.48 / 25%); } }
+
+/* Background motion, ported from the Search Ireland site: faint city video, word rain and entrance animation. */
+.hero, main.wrap, footer { position: relative; z-index: 2; }
+.video-background { position: fixed; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; opacity: 0.075; }
+.video-background video { position: absolute; top: 50%; left: 50%; width: 118%; height: 118%; object-fit: cover; transform: translate(-50%, -50%); }
+.text-rain-canvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; opacity: 0.035; mix-blend-mode: screen; }
+.glow-heading { filter: drop-shadow(0 0 36px oklch(0.696 0.17 162.48 / 28%)); }
+.glow::after { content: ""; position: absolute; top: 70px; left: 50%; transform: translateX(-50%); width: min(600px, 90vw); height: 360px;
+  background: radial-gradient(ellipse, oklch(0.45 0.1 220 / 5%) 0%, transparent 52%); }
+.scanner-wrap { display: flex; justify-content: center; height: 2px; margin: 0.5rem 0 1.25rem; }
+.scanner-line { height: 2px; width: 0; background: var(--emerald); box-shadow: 0 0 10px oklch(0.696 0.17 162.48 / 45%); border-radius: 2px; animation: scan 3s infinite ease-in-out; }
+@keyframes scan { 0% { width: 0; opacity: 0; } 50% { width: 200px; opacity: 1; } 100% { width: 0; opacity: 0; } }
+.pill-wrap { margin-top: 1.25rem; }
+.proof-pill { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 1rem; border-radius: 99px; font-size: 0.8rem;
+  background: oklch(1 0 0 / 4%); border: 1px solid oklch(1 0 0 / 8%); color: oklch(0.7 0 0); }
+.proof-pill .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--emerald); animation: pulse-dot 2s ease-in-out infinite; }
+.proof-pill.down .pulse { background: oklch(0.704 0.191 22.216); }
+@keyframes pulse-dot { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
+.fade-in-up { opacity: 0; transform: translateY(20px); animation: fade-in-up 0.7s ease-out forwards; }
+.fade-in-up.d1 { animation-delay: 0.15s; } .fade-in-up.d2 { animation-delay: 0.3s; }
+.fade-in-up.d3 { animation-delay: 0.45s; } .fade-in-up.d4 { animation-delay: 0.6s; }
+@keyframes fade-in-up { to { opacity: 1; transform: none; } }
+.card { backdrop-filter: blur(6px); }
+@media (prefers-reduced-motion: reduce) {
+  .video-background, .text-rain-canvas { display: none; }
+  .scanner-line, .proof-pill .pulse, .fade-in-up { animation: none !important; }
+  .fade-in-up { opacity: 1; transform: none; }
+}
