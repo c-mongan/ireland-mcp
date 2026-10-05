@@ -8,6 +8,12 @@ param maximumInstanceCount int
 @allowed([512, 2048, 4096])
 param instanceMemoryMB int = 2048
 
+@description('Comma-separated Origin allowlist for /mcp. Empty uses the built-in default list (see PRIVACY.md and README).')
+param mcpAllowedOrigins string = ''
+
+@description('Create an App Insights standard availability test against /healthz.')
+param enableAvailabilityTest bool = true
+
 var token = toLower(uniqueString(subscription().id, resourceGroup().id, environmentName))
 var appName = 'func-ireland-mcp-${token}'
 var deploymentContainer = 'app-package-${take(token, 10)}'
@@ -123,7 +129,9 @@ var baseSettings = [
   { name: 'CACHE_TABLE_NAME', value: cacheTable.name }
   { name: 'PPR_CONTAINER', value: pprContainer.name }
   { name: 'RATE_LIMIT_PER_MINUTE', value: '60' }
+  { name: 'OTEL_SERVICE_NAME', value: 'ireland-mcp' }
 ]
+var originSettings = empty(mcpAllowedOrigins) ? [] : [{ name: 'MCP_ALLOWED_ORIGINS', value: mcpAllowedOrigins }]
 var ntaSettings = hasNtaKey ? [{ name: 'NTA_API_KEY', value: '@Microsoft.KeyVault(SecretUri=${ntaSecret!.properties.secretUri})' }] : []
 
 resource app 'Microsoft.Web/sites@2024-04-01' = {
@@ -153,11 +161,12 @@ resource app 'Microsoft.Web/sites@2024-04-01' = {
     siteConfig: {
       minTlsVersion: '1.2'
       ftpsState: 'Disabled'
-      // The platform answers CORS preflights itself, so the app's own OPTIONS handler never runs.
+      // Platform CORS stays off so the app's Origin allowlist and CORS handler (httpHandler.ts) run.
+      // With platform CORS on, Azure answers preflights itself and overrides the app's headers.
       cors: {
-        allowedOrigins: ['*']
+        allowedOrigins: []
       }
-      appSettings: concat(baseSettings, ntaSettings)
+      appSettings: concat(baseSettings, originSettings, ntaSettings)
     }
   }
 }
@@ -189,6 +198,43 @@ resource vaultRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (ha
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roles.kvSecretsUser)
     principalId: app.identity.principalId
     principalType: 'ServicePrincipal'
+  }
+}
+
+// Standard availability test: GET /healthz every 15 minutes from three regions, expects 200 and "ok".
+resource healthTest 'Microsoft.Insights/webtests@2022-06-15' = if (enableAvailabilityTest) {
+  name: 'healthz-${token}'
+  location: location
+  tags: union(tags, { 'hidden-link:${insights.id}': 'Resource' })
+  kind: 'standard'
+  properties: {
+    SyntheticMonitorId: 'healthz-${token}'
+    Name: 'ireland-mcp /healthz'
+    Kind: 'standard'
+    Enabled: true
+    Frequency: 900
+    Timeout: 30
+    RetryEnabled: true
+    Locations: [
+      { Id: 'emea-nl-ams-azr' }
+      { Id: 'emea-gb-db3-azr' }
+      { Id: 'emea-fr-pra-edge' }
+    ]
+    Request: {
+      RequestUrl: 'https://${app.properties.defaultHostName}/healthz'
+      HttpVerb: 'GET'
+      ParseDependentRequests: false
+    }
+    ValidationRules: {
+      ExpectedHttpStatusCode: 200
+      SSLCheck: true
+      SSLCertRemainingLifetimeCheck: 7
+      ContentValidation: {
+        ContentMatch: '"status":"ok"'
+        IgnoreCase: true
+        PassIfTextFound: true
+      }
+    }
   }
 }
 

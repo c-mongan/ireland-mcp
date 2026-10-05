@@ -183,7 +183,30 @@ Local alternative: `{ "type": "stdio", "command": "npx", "args": ["-y", "ireland
 | `IRELAND_MCP_TOOLSETS` | Typed toolsets to list, e.g. `cso,irish-rail` or `all` (same as `--toolsets=`) | unset: meta tools only |
 
 The hosted app also reads `RATE_LIMIT_PER_MINUTE` (default 60 per IP),
-`AzureWebJobsStorage__accountName`, `CACHE_TABLE_NAME` and `PPR_CONTAINER`.
+`AzureWebJobsStorage__accountName`, `CACHE_TABLE_NAME` and `PPR_CONTAINER`, plus:
+
+| Variable | Purpose | Default |
+| --- | --- | --- |
+| `MCP_ALLOWED_ORIGINS` | Comma-separated `Origin` allowlist for `/mcp`; other browser origins get 403. Requests without `Origin` are allowed. `*` matches one host label or any port; a leading `+` extends the default list; `*` alone allows all | claude.ai, chatgpt.com, `vscode-webview://*`, localhost, 127.0.0.1, the landing page SWA, irishopendata.ie, www.irishopendata.ie |
+| `UPSTREAM_CONCURRENCY` / `UPSTREAM_MAX_QUEUE` | Concurrent calls per source, and how many may wait before `UPSTREAM_DOWN` | 8 / 32 |
+| `UPSTREAM_TIMEOUT_MS` | Per-call upstream timeout | 10000 |
+| `UPSTREAM_BREAKER_FAILURES` / `UPSTREAM_BREAKER_COOLDOWN_SECONDS` | Circuit breaker opens after N consecutive failures for M seconds; while open, calls return `UPSTREAM_DOWN` with `retryAfterSeconds`, or stale cache if any | 5 / 30 |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | Enables OpenTelemetry export through the Azure Monitor distro | unset: no-op |
+| `IRELAND_MCP_OTEL` / `IRELAND_MCP_OTEL_SAMPLING_RATIO` / `OTEL_SERVICE_NAME` | `off` disables export; trace sampling ratio; service name | on / 1 / `ireland-mcp` |
+
+Telemetry follows the OpenTelemetry MCP semantic conventions (spans named
+`tools/call <tool>`, metric `mcp.server.operation.duration`) and records no argument
+values or IPs. See [PRIVACY.md](PRIVACY.md).
+
+### Health and status
+
+- `GET /healthz` — fast liveness, no upstream calls.
+- `GET /healthz?deep=1` — one cheap real call per source in parallel (5 s timeout), with
+  per-source status, latency and circuit-breaker state. Cached for 60 s.
+- Every 30 minutes a GitHub Action publishes the deep report to
+  [`status/status.json`](https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json)
+  and a 7-day [`status/history.json`](https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/history.json)
+  on the `status` branch.
 
 ## Run from source
 

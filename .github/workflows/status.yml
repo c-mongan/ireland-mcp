@@ -1,0 +1,67 @@
+name: Status feed
+
+# Every 30 minutes, calls /healthz?deep=1 and commits status/status.json plus a 7-day
+# status/history.json to the `status` branch, force-pushed as a single orphan commit.
+# The landing page reads:
+#   https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json
+#   https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/history.json
+# Override the endpoint with the repository variable STATUS_HEALTH_URL.
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: status-feed
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    env:
+      HEALTH_URL: ${{ vars.STATUS_HEALTH_URL || 'https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/healthz?deep=1' }}
+    steps:
+      - name: Check out the status script from the default branch
+        uses: actions/checkout@v5
+        with:
+          path: app
+          sparse-checkout: src/status/history.ts
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Check out (or create) the status branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git init -q feed
+          cd feed
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git fetch -q --depth 1 origin status; then
+            git checkout -q FETCH_HEAD -- .
+          fi
+          # history.json carries the 7-day window, so the branch keeps a single commit.
+          git checkout -q --orphan status
+
+      - name: Probe and update the feed
+        run: node app/src/status/history.ts --url "$HEALTH_URL" --dir feed/status
+
+      - name: Commit and push
+        working-directory: feed
+        run: |
+          set -euo pipefail
+          git add status/status.json status/history.json
+          git commit -q -m "status: $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -q --force origin HEAD:status

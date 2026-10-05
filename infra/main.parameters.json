@@ -7,6 +7,7 @@
     "ntaApiKey": { "value": "${NTA_API_KEY=}" },
     "budgetContactEmail": { "value": "${BUDGET_CONTACT_EMAIL=}" },
     "monthlyBudget": { "value": "${MONTHLY_BUDGET=20}" },
-    "maximumInstanceCount": { "value": "${MAX_INSTANCE_COUNT=10}" }
+    "maximumInstanceCount": { "value": "${MAX_INSTANCE_COUNT=10}" },
+    "mcpAllowedOrigins": { "value": "${MCP_ALLOWED_ORIGINS=}" }
   }
 }

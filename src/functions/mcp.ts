@@ -1,17 +1,24 @@
 import { app, type HttpRequest, type HttpResponseInit } from "@azure/functions";
 import { createContext } from "../gateway/context.js";
 import { handleMcpHttp } from "../gateway/httpHandler.js";
+import { parseAllowedOrigins } from "../gateway/origin.js";
+import { initTelemetry } from "../gateway/otel.js";
 import { limitFromEnv, RateLimiter } from "../gateway/rateLimit.js";
 import { tableStoreFromEnv } from "../gateway/tableStore.js";
 import { consoleSink } from "../gateway/telemetry.js";
+import { sharedBudgets } from "../gateway/upstreamBudget.js";
 import { toolsetsFromUrl } from "../gateway/toolsets.js";
 import { createAppServer } from "../registry.js";
 
 const MAX_BODY_BYTES = 256 * 1024;
 
+// No-op unless APPLICATIONINSIGHTS_CONNECTION_STRING is set; never blocks a request.
+void initTelemetry();
+
 const store = tableStoreFromEnv();
-const context = createContext(store ? { store } : {});
+const context = createContext({ budgets: sharedBudgets(), ...(store ? { store } : {}) });
 const rateLimiter = new RateLimiter(limitFromEnv(process.env.RATE_LIMIT_PER_MINUTE));
+const allowedOrigins = parseAllowedOrigins(process.env.MCP_ALLOWED_ORIGINS);
 
 export async function mcpHandler(request: HttpRequest): Promise<HttpResponseInit> {
   const declared = Number(request.headers.get("content-length") ?? "0");
@@ -26,7 +33,8 @@ export async function mcpHandler(request: HttpRequest): Promise<HttpResponseInit
   });
   const response = await handleMcpHttp(webRequest, {
     createServer: (req) => createAppServer(context, consoleSink, toolsetsFromUrl(req.url)),
-    rateLimiter
+    rateLimiter,
+    allowedOrigins
   });
   return {
     status: response.status,

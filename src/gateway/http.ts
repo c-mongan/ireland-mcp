@@ -1,4 +1,6 @@
 import { ToolError } from "./errors.js";
+import { instruments, SpanKind, withSpan } from "./otel.js";
+import { sourceForUrl, type UpstreamBudgets } from "./upstreamBudget.js";
 
 export type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;
 
@@ -18,9 +20,40 @@ export const DEFAULT_MAX_BYTES = 5 * 1024 * 1024;
 const USER_AGENT = "ireland-mcp/1.0 (+https://github.com/c-mongan/ireland-mcp)";
 
 export class HttpClient {
-  constructor(private readonly fetchImpl: FetchLike = (input, init) => fetch(input, init)) {}
+  constructor(
+    private readonly fetchImpl: FetchLike = (input, init) => fetch(input, init),
+    private readonly budgets?: UpstreamBudgets
+  ) {}
 
+  /** One CLIENT span per logical request; the URL is not recorded because queries can carry tool arguments. */
   async bytes(url: string, options: HttpOptions = {}): Promise<Uint8Array> {
+    const source = sourceForUrl(url);
+    const method = options.method ?? "GET";
+    const attributes = {
+      "ireland_mcp.source.id": source,
+      "server.address": hostnameOf(url),
+      "http.request.method": method
+    };
+    const started = performance.now();
+    let errorType: string | undefined;
+    try {
+      return await withSpan(method, SpanKind.CLIENT, attributes, () =>
+        this.budgets
+          ? this.budgets.run(source, (timeoutMs) => this.withRetries(url, { ...options, timeoutMs: options.timeoutMs ?? timeoutMs }))
+          : this.withRetries(url, options)
+      );
+    } catch (error) {
+      errorType = error instanceof ToolError ? error.code : "_OTHER";
+      throw error;
+    } finally {
+      instruments().clientDuration.record((performance.now() - started) / 1000, {
+        ...attributes,
+        ...(errorType ? { "error.type": errorType } : {})
+      });
+    }
+  }
+
+  private async withRetries(url: string, options: HttpOptions): Promise<Uint8Array> {
     const retries = options.retries ?? 1;
     let lastError: unknown;
     for (let attempt = 0; attempt <= retries; attempt += 1) {
@@ -152,6 +185,14 @@ async function readBounded(
     offset += chunk.byteLength;
   }
   return out;
+}
+
+function hostnameOf(url: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return "upstream";
+  }
 }
 
 function hostOf(url: string): string {

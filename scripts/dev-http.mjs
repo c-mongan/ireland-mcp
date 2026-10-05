@@ -12,10 +12,13 @@ import { consoleSink } from "../dist/src/gateway/telemetry.js";
 import { createAppServer } from "../dist/src/registry.js";
 import { toolsetsFromUrl } from "../dist/src/gateway/toolsets.js";
 import { healthHandler } from "../dist/src/functions/healthz.js";
+import { parseAllowedOrigins } from "../dist/src/gateway/origin.js";
+import { sharedBudgets } from "../dist/src/gateway/upstreamBudget.js";
 
 const port = Number(process.env.PORT ?? 7071);
 const host = process.env.HOST ?? "127.0.0.1";
-const context = createContext();
+const context = createContext({ budgets: sharedBudgets() });
+const allowedOrigins = parseAllowedOrigins(process.env.MCP_ALLOWED_ORIGINS);
 const rateLimiter = new RateLimiter(limitFromEnv(process.env.RATE_LIMIT_PER_MINUTE));
 const webRoot = fileURLToPath(new URL("../web/", import.meta.url));
 const types = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml", ".json": "application/json" };
@@ -32,14 +35,15 @@ createServer(async (req, res) => {
       headers.set("x-forwarded-for", req.socket.remoteAddress ?? "local");
       const response = await handleMcpHttp(new Request(url, { method: req.method, headers, ...(body !== undefined ? { body } : {}) }), {
         createServer: (request) => createAppServer(context, consoleSink, toolsetsFromUrl(request.url)),
-        rateLimiter
+        rateLimiter,
+        allowedOrigins
       });
       res.writeHead(response.status, Object.fromEntries(response.headers.entries()));
       res.end(await response.text());
       return;
     }
     if (url.pathname === "/healthz") {
-      const h = await healthHandler();
+      const h = await healthHandler({ query: url.searchParams });
       res.writeHead(h.status ?? 200, { "content-type": "application/json", ...h.headers });
       res.end(JSON.stringify(h.jsonBody));
       return;

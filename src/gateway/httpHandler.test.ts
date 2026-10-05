@@ -1,0 +1,205 @@
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { context, metrics, trace } from "@opentelemetry/api";
+import { AsyncLocalStorageContextManager } from "@opentelemetry/context-async-hooks";
+import { BasicTracerProvider, InMemorySpanExporter, SimpleSpanProcessor } from "@opentelemetry/sdk-trace-base";
+import { AggregationTemporality, InMemoryMetricExporter, MeterProvider, PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
+import { z } from "zod";
+import { createContext } from "./context.js";
+import { envelope } from "./envelope.js";
+import { ToolError } from "./errors.js";
+import { handleMcpHttp } from "./httpHandler.js";
+import { defineTool, type SourceModule } from "./module.js";
+import { RateLimiter } from "./rateLimit.js";
+import { buildServer } from "./server.js";
+import { fakeFetch } from "../../test/helpers/fakeFetch.js";
+
+const info = { id: "cso", name: "Demo", licence: "CC BY 4.0", attribution: "Demo", homepage: "https://example.ie" };
+const fetch = fakeFetch([{ match: /ws\.cso\.ie/, body: '{"n":1}' }]);
+const ctx = createContext({ fetch });
+const demo: SourceModule = {
+  info,
+  summary: "demo",
+  tools: [
+    defineTool({
+      name: "demo_lookup",
+      title: "Lookup",
+      description: "d",
+      inputSchema: { query: z.string(), limit: z.number().optional() },
+      handler: async () => {
+        const r = await ctx.cachedJson("https://ws.cso.ie/q", 1000);
+        return envelope(info, { data: r.value, url: "https://ws.cso.ie/q", cached: r.cached });
+      }
+    }),
+    defineTool({
+      name: "demo_down",
+      title: "Down",
+      description: "d",
+      inputSchema: {},
+      handler: async () => {
+        throw new ToolError("UPSTREAM_DOWN", "nope");
+      }
+    })
+  ]
+};
+// Typed tools are opt-in since the lean surface; these tests call them directly.
+const createServer = () => buildServer({ modules: [demo], context: ctx, toolsets: "all" });
+const post = (body: unknown, headers: Record<string, string> = {}) =>
+  new Request("https://fn.example/mcp", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      accept: "application/json, text/event-stream",
+      "mcp-protocol-version": "2025-11-25",
+      ...headers
+    },
+    body: JSON.stringify(body)
+  });
+const SWA = "https://lemon-meadow-03b2b8903.3.azurestaticapps.net";
+
+describe("origin validation", () => {
+  it("rejects a disallowed Origin with 403 before touching the server", async () => {
+    let created = false;
+    const res = await handleMcpHttp(post({ jsonrpc: "2.0", id: 1, method: "tools/list" }, { origin: "https://evil.example" }), {
+      createServer: () => {
+        created = true;
+        return createServer();
+      }
+    });
+    expect(res.status).toBe(403);
+    expect(created).toBe(false);
+    expect(res.headers.get("access-control-allow-origin")).toBeNull();
+  });
+
+  it("echoes an allowed browser origin for CORS, including preflight", async () => {
+    const res = await handleMcpHttp(post({ jsonrpc: "2.0", id: 1, method: "tools/list" }, { origin: SWA }), { createServer });
+    expect(res.status).toBe(200);
+    expect(res.headers.get("access-control-allow-origin")).toBe(SWA);
+    expect(res.headers.get("vary")).toContain("Origin");
+    const preflight = await handleMcpHttp(
+      new Request("https://fn/mcp", { method: "OPTIONS", headers: { origin: SWA, "access-control-request-method": "POST" } }),
+      { createServer }
+    );
+    expect(preflight.status).toBe(204);
+    expect(preflight.headers.get("access-control-allow-origin")).toBe(SWA);
+    expect(preflight.headers.get("access-control-allow-headers")).toContain("mcp-protocol-version");
+    const blocked = await handleMcpHttp(new Request("https://fn/mcp", { method: "OPTIONS", headers: { origin: "https://evil.example" } }), {
+      createServer
+    });
+    expect(blocked.status).toBe(403);
+  });
+
+  it("allows requests without an Origin header (server-to-server clients)", async () => {
+    const res = await handleMcpHttp(post({ jsonrpc: "2.0", id: 1, method: "tools/list" }), { createServer });
+    expect(res.status).toBe(200);
+    expect(res.headers.get("access-control-allow-origin")).toBe("*");
+  });
+
+  it("honours a configured allowlist", async () => {
+    const res = await handleMcpHttp(post({ jsonrpc: "2.0", id: 1, method: "tools/list" }, { origin: SWA }), {
+      createServer,
+      allowedOrigins: ["https://only.example"]
+    });
+    expect(res.status).toBe(403);
+  });
+});
+
+describe("rate-limit keys", () => {
+  it("are hashed so the client address is never stored", async () => {
+    const keys: string[] = [];
+    class Spy extends RateLimiter {
+      override check(key: string, cost?: number) {
+        keys.push(key);
+        return super.check(key, cost);
+      }
+    }
+    await handleMcpHttp(post({ jsonrpc: "2.0", id: 1, method: "tools/list" }, { "x-forwarded-for": "198.51.100.23" }), {
+      createServer,
+      rateLimiter: new Spy(10)
+    });
+    expect(keys).toHaveLength(1);
+    expect(keys[0]).not.toContain("198.51.100");
+  });
+});
+
+describe("OpenTelemetry", () => {
+  const spans = new InMemorySpanExporter();
+  const metricExporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
+  const reader = new PeriodicExportingMetricReader({ exporter: metricExporter, exportIntervalMillis: 60_000 });
+  const contextManager = new AsyncLocalStorageContextManager();
+
+  beforeAll(() => {
+    context.setGlobalContextManager(contextManager.enable());
+    trace.setGlobalTracerProvider(new BasicTracerProvider({ spanProcessors: [new SimpleSpanProcessor(spans)] }));
+    metrics.setGlobalMeterProvider(new MeterProvider({ readers: [reader] }));
+  });
+  afterAll(() => {
+    trace.disable();
+    metrics.disable();
+    context.disable();
+  });
+  beforeEach(() => spans.reset());
+
+  const call = (id: number, name: string, args: Record<string, unknown>, headers: Record<string, string> = {}) =>
+    handleMcpHttp(post({ jsonrpc: "2.0", id, method: "tools/call", params: { name, arguments: args } }, headers), { createServer });
+
+  it("names tool spans '{mcp.method.name} {gen_ai.tool.name}' and records argument names, never values", async () => {
+    await call(1, "demo_lookup", { query: "very private question", limit: 3 }, { "x-forwarded-for": "198.51.100.23" });
+    const server = spans.getFinishedSpans().find((s) => s.name === "tools/call demo_lookup");
+    expect(server).toBeDefined();
+    expect(server!.attributes).toMatchObject({
+      "mcp.method.name": "tools/call",
+      "gen_ai.tool.name": "demo_lookup",
+      "gen_ai.operation.name": "execute_tool",
+      "mcp.protocol.version": "2025-11-25",
+      "ireland_mcp.tool.argument_names": ["limit", "query"]
+    });
+    expect(server!.attributes["error.type"]).toBeUndefined();
+    const everything = JSON.stringify(spans.getFinishedSpans().map((s) => s.attributes));
+    expect(everything).not.toContain("very private question");
+    expect(everything).not.toContain("198.51.100");
+  });
+
+  it("adds per-source upstream spans with cache flags under the tool span", async () => {
+    await call(2, "demo_lookup", { query: "x" });
+    const finished = spans.getFinishedSpans();
+    const server = finished.find((s) => s.name === "tools/call demo_lookup")!;
+    const upstream = finished.find((s) => s.name === "upstream cso")!;
+    expect(upstream.attributes).toMatchObject({ "ireland_mcp.source.id": "cso", "ireland_mcp.cache.hit": true, "ireland_mcp.cache.stale": false });
+    expect(upstream.parentSpanContext?.spanId).toBe(server.spanContext().spanId);
+  });
+
+  it("records an HTTP client span for cache misses without the URL query", async () => {
+    await call(3, "demo_lookup", { query: "x" });
+    await ctx.cachedJson("https://ws.cso.ie/q?secret=1", 1000);
+    const client = spans.getFinishedSpans().find((s) => s.name === "GET" && s.attributes["server.address"] === "ws.cso.ie");
+    expect(client?.attributes).toMatchObject({ "ireland_mcp.source.id": "cso", "http.request.method": "GET" });
+    expect(JSON.stringify(client?.attributes)).not.toContain("secret");
+  });
+
+  it("sets error.type on tool errors and JSON-RPC errors, and records the session id when present", async () => {
+    await call(4, "demo_down", {}, { "mcp-session-id": "sess-1" });
+    const failed = spans.getFinishedSpans().find((s) => s.name === "tools/call demo_down")!;
+    expect(failed.attributes).toMatchObject({ "error.type": "tool_error", "ireland_mcp.error.code": "UPSTREAM_DOWN", "mcp.session.id": "sess-1" });
+    await handleMcpHttp(post({ jsonrpc: "2.0", id: 5, method: "nope/unknown" }), { createServer });
+    const unknown = spans.getFinishedSpans().find((s) => s.attributes["mcp.method.name"] === "_OTHER")!;
+    expect(unknown.attributes["error.type"]).toBe("-32601");
+  });
+
+  it("records the client name and version from initialize", async () => {
+    await handleMcpHttp(
+      post({ jsonrpc: "2.0", id: 6, method: "initialize", params: { protocolVersion: "2025-11-25", capabilities: {}, clientInfo: { name: "inspector", version: "0.17" } } }),
+      { createServer }
+    );
+    const init = spans.getFinishedSpans().find((s) => s.name === "initialize")!;
+    expect(init.attributes).toMatchObject({ "ireland_mcp.client.name": "inspector", "ireland_mcp.client.version": "0.17" });
+  });
+
+  it("records the mcp.server.operation.duration histogram", async () => {
+    await call(7, "demo_lookup", { query: "x" });
+    await reader.forceFlush();
+    const names = metricExporter
+      .getMetrics()
+      .flatMap((m) => m.scopeMetrics.flatMap((s) => s.metrics.map((x) => x.descriptor.name)));
+    expect(names).toContain("mcp.server.operation.duration");
+  });
+});

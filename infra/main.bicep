@@ -23,6 +23,9 @@ param monthlyBudget int = 20
 @description('Hard cap on Flex Consumption scale-out; bounds cost under abuse.')
 param maximumInstanceCount int = 10
 
+@description('Comma-separated Origin allowlist for /mcp; empty keeps the app default.')
+param mcpAllowedOrigins string = ''
+
 @description('Budget start; must be the first day of a month.')
 param budgetStartDate string = utcNow('yyyy-MM-01')
 
@@ -43,6 +46,7 @@ module service 'service.bicep' = {
     tags: tags
     ntaApiKey: ntaApiKey
     maximumInstanceCount: maximumInstanceCount
+    mcpAllowedOrigins: mcpAllowedOrigins
   }
 }
 
