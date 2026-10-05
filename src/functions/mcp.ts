@@ -1,7 +1,7 @@
 import { app, type HttpRequest, type HttpResponseInit } from "@azure/functions";
 import { createContext } from "../gateway/context.js";
 import { handleMcpHttp } from "../gateway/httpHandler.js";
-import { RateLimiter } from "../gateway/rateLimit.js";
+import { limitFromEnv, RateLimiter } from "../gateway/rateLimit.js";
 import { tableStoreFromEnv } from "../gateway/tableStore.js";
 import { consoleSink } from "../gateway/telemetry.js";
 import { createAppServer } from "../registry.js";
@@ -10,7 +10,7 @@ const MAX_BODY_BYTES = 256 * 1024;
 
 const store = tableStoreFromEnv();
 const context = createContext(store ? { store } : {});
-const rateLimiter = new RateLimiter(Number(process.env.RATE_LIMIT_PER_MINUTE ?? "60"));
+const rateLimiter = new RateLimiter(limitFromEnv(process.env.RATE_LIMIT_PER_MINUTE));
 
 export async function mcpHandler(request: HttpRequest): Promise<HttpResponseInit> {
   const declared = Number(request.headers.get("content-length") ?? "0");

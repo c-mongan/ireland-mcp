@@ -7,14 +7,14 @@ import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createContext } from "../dist/src/gateway/context.js";
 import { handleMcpHttp } from "../dist/src/gateway/httpHandler.js";
-import { RateLimiter } from "../dist/src/gateway/rateLimit.js";
+import { limitFromEnv, RateLimiter } from "../dist/src/gateway/rateLimit.js";
 import { consoleSink } from "../dist/src/gateway/telemetry.js";
 import { createAppServer } from "../dist/src/registry.js";
 import { healthHandler } from "../dist/src/functions/healthz.js";
 
 const port = Number(process.env.PORT ?? 7071);
 const context = createContext();
-const rateLimiter = new RateLimiter(Number(process.env.RATE_LIMIT_PER_MINUTE ?? "60"));
+const rateLimiter = new RateLimiter(limitFromEnv(process.env.RATE_LIMIT_PER_MINUTE));
 const webRoot = fileURLToPath(new URL("../web/", import.meta.url));
 const types = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml", ".json": "application/json" };
 

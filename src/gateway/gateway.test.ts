@@ -7,7 +7,7 @@ import { ToolError, toToolError } from "./errors.js";
 import { HttpClient } from "./http.js";
 import { handleMcpHttp } from "./httpHandler.js";
 import { defineTool, type SourceModule } from "./module.js";
-import { clientKey, RateLimiter } from "./rateLimit.js";
+import { clientKey, limitFromEnv, RateLimiter } from "./rateLimit.js";
 import { buildServer, runTool } from "./server.js";
 import { fakeFetch, parseToolText } from "../../test/helpers/fakeFetch.js";
 
@@ -179,9 +179,16 @@ describe("RateLimiter", () => {
   });
 
   it("derives the client key from forwarding headers", () => {
-    expect(clientKey(new Headers({ "x-forwarded-for": "1.2.3.4:5678, 10.0.0.1" }))).toBe("1.2.3.4");
+    // Only the right-most hop is appended by Azure's front end; earlier entries are client-supplied.
+    expect(clientKey(new Headers({ "x-forwarded-for": "6.6.6.6, 1.2.3.4:5678" }))).toBe("1.2.3.4");
+    expect(clientKey(new Headers({ "x-forwarded-for": "2001:db8::1" }))).toBe("2001:db8::1");
+    expect(clientKey(new Headers({ "x-forwarded-for": "[2001:db8::1]:443" }))).toBe("2001:db8::1");
     expect(clientKey(new Headers({ "x-real-ip": "5.6.7.8" }))).toBe("5.6.7.8");
     expect(clientKey(new Headers())).toBe("unknown");
+    expect(limitFromEnv(undefined)).toBe(60);
+    expect(limitFromEnv("120")).toBe(120);
+    expect(limitFromEnv("lots")).toBe(60);
+    expect(limitFromEnv("0")).toBe(60);
   });
 });
 
