@@ -1,0 +1,51 @@
+name: Live smoke
+
+# One real call per upstream source, nightly. Upstream outages open (or update) a single tracking issue.
+on:
+  schedule:
+    - cron: "30 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: live-smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Live sanity
+        id: sanity
+        env:
+          NTA_API_KEY: ${{ secrets.NTA_API_KEY }}
+        run: |
+          set -o pipefail
+          npm run -s live:sanity | tee sanity.md
+      - name: Summary
+        if: always()
+        run: cat sanity.md >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Open or update the tracking issue
+        if: failure() && steps.sanity.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Live smoke failing"
+          body="$(printf 'Run: %s/%s/actions/runs/%s\n\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"; cat sanity.md)"
+          existing="$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number')"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi

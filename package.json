@@ -43,7 +43,7 @@
     "inspector:check": "node scripts/inspector-check.mjs",
     "live:sanity": "node scripts/live-sanity.mjs",
     "ppr:build": "node dist/src/sources/ppr/buildIndexCli.js",
-    "eval": "promptfoo eval -c evals/promptfooconfig.yaml",
+    "eval": "node scripts/eval.mjs",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {

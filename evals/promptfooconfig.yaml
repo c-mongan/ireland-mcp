@@ -1,0 +1,220 @@
+# Ireland MCP eval: does a model pick the right tools for Irish questions?
+# Run locally only:  npm run build && OPENAI_API_KEY=... npm run eval
+# scripts/eval.mjs skips (exit 0) when no OPENAI_API_KEY is set, so CI never runs it.
+description: Ireland MCP tool selection
+prompts:
+  - "You answer questions about Ireland using only the tools provided. Cite the source and licence. Question: {{question}}"
+providers:
+  - id: openai:chat:gpt-4.1-mini
+    config:
+      temperature: 0
+      mcp:
+        enabled: true
+        timeout: 60000
+        server:
+          command: node
+          args: ["dist/src/cli.js"]
+defaultTest:
+  options:
+    provider: openai:chat:gpt-4.1-mini
+tests:
+  - vars:
+      question: "What was the population of County Galway in the last census?"
+    assert:
+      - type: icontains-any
+        value: [cso_area_profile, ireland_snapshot, cso_get_data]
+  - vars:
+      question: "Find CSO tables about rents."
+    assert:
+      - type: icontains-any
+        value: [cso_search_tables, search]
+  - vars:
+      question: "What dimensions does CSO table F1001 have?"
+    assert:
+      - type: icontains-any
+        value: [cso_get_table_metadata]
+  - vars:
+      question: "How many people lived in Cork county in 2016 according to the census?"
+    assert:
+      - type: icontains-any
+        value: [cso_area_profile, cso_get_data]
+  - vars:
+      question: "Search Irish statistics for unemployment tables."
+    assert:
+      - type: icontains-any
+        value: [cso_search_tables, search]
+  - vars:
+      question: "Which TDs are members for Dublin Bay South?"
+    assert:
+      - type: icontains-any
+        value: [oireachtas_search_members]
+  - vars:
+      question: "Find bills before the Oireachtas about housing."
+    assert:
+      - type: icontains-any
+        value: [oireachtas_search_bills, search]
+  - vars:
+      question: "What was debated in the Dáil most recently?"
+    assert:
+      - type: icontains-any
+        value: [oireachtas_get_debates]
+  - vars:
+      question: "Find recent parliamentary questions about hospital waiting lists."
+    assert:
+      - type: icontains-any
+        value: [oireachtas_search_questions]
+  - vars:
+      question: "How did the most recent Dáil divisions go?"
+    assert:
+      - type: icontains-any
+        value: [oireachtas_get_votes]
+  - vars:
+      question: "Which enacted bills from 2024 mention climate?"
+    assert:
+      - type: icontains-any
+        value: [oireachtas_search_bills]
+  - vars:
+      question: "Which county and electoral division contain 53.27, -9.05?"
+    assert:
+      - type: icontains-any
+        value: [geohive_boundaries_at_point, nearby]
+  - vars:
+      question: "List the GeoHive layers you can query."
+    assert:
+      - type: icontains-any
+        value: [geohive_list_layers]
+  - vars:
+      question: "Which local electoral area is the Spire in Dublin (53.3498, -6.2603) in?"
+    assert:
+      - type: icontains-any
+        value: [geohive_boundaries_at_point, nearby]
+  - vars:
+      question: "Find datasets on data.gov.ie about air quality."
+    assert:
+      - type: icontains-any
+        value: [datagov_search_datasets, search]
+  - vars:
+      question: "Show the details of a data.gov.ie dataset about population."
+    assert:
+      - type: icontains-any
+        value: [datagov_search_datasets, datagov_get_dataset]
+  - vars:
+      question: "What open data does Smart Dublin publish about bikes?"
+    assert:
+      - type: icontains-any
+        value: [smartdublin_search_datasets, search]
+  - vars:
+      question: "Find Smart Dublin datasets on footfall."
+    assert:
+      - type: icontains-any
+        value: [smartdublin_search_datasets]
+  - vars:
+      question: "What's the weather forecast for Galway for the next 6 hours?"
+    assert:
+      - type: icontains-any
+        value: [met_get_forecast, nearby, ireland_snapshot]
+  - vars:
+      question: "Are there any Met Éireann weather warnings in force?"
+    assert:
+      - type: icontains-any
+        value: [met_get_warnings]
+  - vars:
+      question: "What's the latest observed temperature at Dublin Airport?"
+    assert:
+      - type: icontains-any
+        value: [met_get_observations]
+  - vars:
+      question: "Will it rain in Cork this afternoon?"
+    assert:
+      - type: icontains-any
+        value: [met_get_forecast, nearby, ireland_snapshot]
+  - vars:
+      question: "Is Dublin Bus running on time right now?"
+    assert:
+      - type: icontains-any
+        value: [nta_get_realtime_summary, nta_get_trip_updates]
+  - vars:
+      question: "Are there any cancelled public transport trips right now in Ireland?"
+    assert:
+      - type: icontains-any
+        value: [nta_get_realtime_summary, nta_get_trip_updates]
+  - vars:
+      question: "Which Acts were enacted in Ireland in 2018?"
+    assert:
+      - type: icontains-any
+        value: [legislation_list_acts]
+  - vars:
+      question: "What does section 2 of the Data Protection Act 2018 say?"
+    assert:
+      - type: icontains-any
+        value: [legislation_get_section, legislation_get_act, fetch]
+  - vars:
+      question: "Show the table of sections of Act number 7 of 2018."
+    assert:
+      - type: icontains-any
+        value: [legislation_get_act]
+  - vars:
+      question: "Find Irish legislation about data protection."
+    assert:
+      - type: icontains-any
+        value: [legislation_list_acts, search]
+  - vars:
+      question: "What is the median house sale price in County Galway?"
+    assert:
+      - type: icontains-any
+        value: [ppr_price_stats]
+  - vars:
+      question: "Find recent property sales on Main Street in Mallow, Co. Cork."
+    assert:
+      - type: icontains-any
+        value: [ppr_search_sales]
+  - vars:
+      question: "What were the most expensive homes sold in Dublin this year?"
+    assert:
+      - type: icontains-any
+        value: [ppr_search_sales]
+  - vars:
+      question: "How many new homes were sold in Kildare in the last year, and at what median price?"
+    assert:
+      - type: icontains-any
+        value: [ppr_price_stats]
+  - vars:
+      question: "Give me a snapshot of Athlone."
+    assert:
+      - type: icontains-any
+        value: [ireland_snapshot]
+  - vars:
+      question: "What's around 51.8985, -8.4756 (boundaries, weather station)?"
+    assert:
+      - type: icontains-any
+        value: [nearby, ireland_snapshot]
+  - vars:
+      question: "What Irish public data sources can you access?"
+    assert:
+      - type: icontains-any
+        value: [list_sources]
+  - vars:
+      question: "Search all Irish sources for 'broadband'."
+    assert:
+      - type: icontains-any
+        value: [search]
+  - vars:
+      question: "Search everything for 'cycling' and then open the first result."
+    assert:
+      - type: icontains-any
+        value: [search, fetch]
+  - vars:
+      question: "Tell me about Sligo: population, weather and administrative boundaries."
+    assert:
+      - type: icontains-any
+        value: [ireland_snapshot]
+  - vars:
+      question: "Compare the population of Mayo and Donegal."
+    assert:
+      - type: icontains-any
+        value: [cso_area_profile, ireland_snapshot, cso_get_data]
+  - vars:
+      question: "Which county is the town of Ennis in, and what's its forecast?"
+    assert:
+      - type: icontains-any
+        value: [ireland_snapshot, nearby, met_get_forecast]
