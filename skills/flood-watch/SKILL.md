@@ -10,23 +10,30 @@ Describe what the gauges and forecasts show now. Do not issue warnings.
 
 ## Calling the tools
 
-Each step names a **source** and an **op** as `source.op`. With the default lean surface, call
-`ireland_call` with `source`, `op` and `args`, and run `ireland_describe(source, op)` first if you
-are unsure of the arguments. If typed toolsets are enabled (`?toolsets=...`, or a server that
-lists typed tools), call the op name directly as a tool with the same arguments.
+Steps name each operation as source/operation (e.g. `ppr/ppr_price_stats`), using the typed tool name as the operation. On the
+default surface, run it with `ireland_call`, for example:
+
+```json
+{ "source": "opw-water", "operation": "water_find_stations", "args": { "query": "Athlone" } }
+```
+
+If an argument shape is unclear, call `ireland_describe` with `{ "source", "operation" }` first;
+it returns the schema and an example. `search`, `fetch` and `nearby` are top-level tools. If the
+server was added with `?toolsets=<ids>` or `?toolsets=all`, the typed tool (e.g. `water_find_stations`) can
+be called directly with the same `args`.
 
 
 ## Steps
 
-1. **Find gauges.** Call `opw-water.water_find_stations` with `{ "query": "Athlone" }` (a town,
+1. **Find gauges.** Call `opw-water/water_find_stations` with `{ "query": "Athlone" }` (a town,
    river or 5-digit station ref). Pick 1–3 relevant stations.
-2. **Read levels.** Call `opw-water.water_get_level` with `{ "station": "<name or ref>", "hours": 36 }`.
+2. **Read levels.** Call `opw-water/water_get_level` with `{ "station": "<name or ref>", "hours": 36 }`.
    Report the latest level, the change over the window and its direction (rising, falling, steady).
-3. **Warnings.** Call `met-eireann.met_get_warnings` with `{}` and keep rain, wind and coastal
+3. **Warnings.** Call `met-eireann/met_get_warnings` with `{}` and keep rain, wind and coastal
    warnings for the area's counties.
-4. **Rain ahead.** Call `met-eireann.met_get_forecast` with the station's `lat`/`lon` and `"hours": 24`;
+4. **Rain ahead.** Call `met-eireann/met_get_forecast` with the station's `lat`/`lon` and `"hours": 24`;
    total the forecast rainfall.
-5. **Coast** (optional): call `marine.marine_get_buoys` (or `{ "buoy": "M2" }`) for wave height and wind.
+5. **Coast** (optional): call `marine/marine_get_buoys` (or `{ "buoy": "M2" }`) for wave height and wind.
 6. Combine into a short factual summary.
 
 ## Output format

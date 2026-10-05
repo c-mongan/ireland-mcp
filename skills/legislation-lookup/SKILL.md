@@ -10,21 +10,28 @@ Find and quote Irish legislation accurately.
 
 ## Calling the tools
 
-Each step names a **source** and an **op** as `source.op`. With the default lean surface, call
-`ireland_call` with `source`, `op` and `args`, and run `ireland_describe(source, op)` first if you
-are unsure of the arguments. If typed toolsets are enabled (`?toolsets=...`, or a server that
-lists typed tools), call the op name directly as a tool with the same arguments.
+Steps name each operation as source/operation (e.g. `ppr/ppr_price_stats`), using the typed tool name as the operation. On the
+default surface, run it with `ireland_call`, for example:
+
+```json
+{ "source": "legislation", "operation": "legislation_list_acts", "args": { "query": "data protection" } }
+```
+
+If an argument shape is unclear, call `ireland_describe` with `{ "source", "operation" }` first;
+it returns the schema and an example. `search`, `fetch` and `nearby` are top-level tools. If the
+server was added with `?toolsets=<ids>` or `?toolsets=all`, the typed tool (e.g. `legislation_list_acts`) can
+be called directly with the same `args`.
 
 
 ## Steps
 
-1. **Find the Act.** Call `legislation.legislation_list_acts` with `{ "query": "residential tenancies", "limit": 10 }`.
+1. **Find the Act.** Call `legislation/legislation_list_acts` with `{ "query": "residential tenancies", "limit": 10 }`.
    Pick by title and year; if several fit, list them and ask.
-2. **Get the Act.** Call `legislation.legislation_get_act` with the Act `year` and `number` from
+2. **Get the Act.** Call `legislation/legislation_get_act` with the Act `year` and `number` from
    step 1, e.g. `{ "year": 2018, "number": 7 }` (Data Protection Act 2018). Show the section list.
-3. **Get a section.** Call `legislation.legislation_get_section` with `year`, `number` and
+3. **Get a section.** Call `legislation/legislation_get_section` with `year`, `number` and
    `section` (a string such as "2" or "19A") and quote it verbatim.
-4. **Bill history** (optional): call `oireachtas.oireachtas_search_bills` with the Act's short title
+4. **Bill history** (optional): call `oireachtas/oireachtas_search_bills` with the Act's short title
    and `year` to show how it passed through the Oireachtas.
 
 ## Output format

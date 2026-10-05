@@ -10,23 +10,30 @@ Summarise what homes actually sold for, using the Residential Property Price Reg
 
 ## Calling the tools
 
-Each step names a **source** and an **op** as `source.op`. With the default lean surface, call
-`ireland_call` with `source`, `op` and `args`, and run `ireland_describe(source, op)` first if you
-are unsure of the arguments. If typed toolsets are enabled (`?toolsets=...`, or a server that
-lists typed tools), call the op name directly as a tool with the same arguments.
+Steps name each operation as source/operation (e.g. `ppr/ppr_price_stats`), using the typed tool name as the operation. On the
+default surface, run it with `ireland_call`, for example:
+
+```json
+{ "source": "ppr", "operation": "ppr_price_stats", "args": { "county": "Galway", "address": "oranmore" } }
+```
+
+If an argument shape is unclear, call `ireland_describe` with `{ "source", "operation" }` first;
+it returns the schema and an example. `search`, `fetch` and `nearby` are top-level tools. If the
+server was added with `?toolsets=<ids>` or `?toolsets=all`, the typed tool (e.g. `ppr_price_stats`) can
+be called directly with the same `args`.
 
 
 ## Steps
 
 1. **Pin the area.** Need a `county` (e.g. "Galway", "Dublin"). Narrow with `address` words
    ("oranmore", "dublin 8") or an `eircode` routing key ("H91", "D08"). If the user gives only a
-   town, find its county first (e.g. `cross.ireland_snapshot` with `{ "place": "Athlone" }`).
+   town, find its county first (e.g. `cross/ireland_snapshot` with `{ "place": "Athlone" }`).
 2. **Pick the window.** Default to the last 12 months (`from`/`to` as YYYY-MM-DD). Keep each query
    within 3 calendar years; for longer trends run one query per year.
-3. **Get the stats.** Call `ppr.ppr_price_stats`, for example
+3. **Get the stats.** Call `ppr/ppr_price_stats`, for example
    `{ "county": "Galway", "address": "oranmore", "from": "2025-10-01", "to": "2026-09-30" }`.
    Use `property`: `new` or `second-hand` to split them; default is `any`.
-4. **Show examples.** Call `ppr.ppr_search_sales` with the same filters, `"sort": "date_desc"`,
+4. **Show examples.** Call `ppr/ppr_search_sales` with the same filters, `"sort": "date_desc"`,
    `"limit": 10`. Use `price_desc`/`price_asc` for the extremes.
 5. **Compare** (optional): repeat step 3 per area or per year and put them side by side.
 6. Leave `include_non_market` false unless the user asks; say non-market sales were excluded.

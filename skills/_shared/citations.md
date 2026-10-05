@@ -15,7 +15,7 @@ retrieved_at, and sometimes `stale`). Use it. These rules apply to every skill i
 - If a response has `stale: true` or `cached: true`, write "as of DATE" using `retrieved_at`.
 - The Property Price Register is served from a periodically rebuilt index. Always write
   "PPR data as of DATE" using the newest sale date or the index date the tool reports.
-- Search results (`ireland_search`) are a pointer, not evidence. Fetch the record before quoting it.
+- Search results (`search`) are a pointer, not evidence. Fetch the record before quoting it.
 
 ## 3. Licences and attribution lines
 

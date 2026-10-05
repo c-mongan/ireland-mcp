@@ -31,9 +31,15 @@ above in **two files only**: [`.mcp.json`](../.mcp.json) (Claude Code) and [`mcp
 | `open-data-finder` | Find and preview open datasets | data.gov.ie, Smart Dublin |
 
 All skills share the attribution rules in [`skills/_shared/citations.md`](../skills/_shared/citations.md).
-Skills name each step as `source` + `op`. On the lean meta-tool surface the agent calls
-`ireland_call` and can run `ireland_describe(source, op)` to see arguments. When typed toolsets are
-enabled (`?toolsets=...`), the op name is also a tool name.
+The server's default surface lists only the meta tools (`ireland_catalogue`, `ireland_describe`,
+`ireland_call`, `ireland_about`, `search`, `fetch`, `nearby`). Skills name each step as a source and
+operation (e.g. `ppr/ppr_price_stats`) and run it with
+`ireland_call { "source": "ppr", "operation": "ppr_price_stats", "args": { ... } }`, calling
+`ireland_describe { "source", "operation" }` first when the argument shape is unclear.
+
+To also list every typed tool (about 10.8k tokens of tool definitions instead of the lean default),
+append `?toolsets=all` to the URL, or a comma list such as `?toolsets=ppr,cso`. The skills work
+either way.
 
 ## Claude Code
 

@@ -19,5 +19,5 @@
 - Returns count, median, mean and quartiles. Quote the count with the median.
 
 ## geohive.geohive_query_layer
-- Input: `service` (from `geohive.geohive_list_layers`), `where` (ArcGIS SQL, default `1=1`),
+- Input: `service` (from `geohive/geohive_list_layers`), `where` (ArcGIS SQL, default `1=1`),
   `out_fields`, `order_by`, `limit`.

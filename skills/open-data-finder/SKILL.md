@@ -10,24 +10,31 @@ Locate the right public dataset and preview it with its licence.
 
 ## Calling the tools
 
-Each step names a **source** and an **op** as `source.op`. With the default lean surface, call
-`ireland_call` with `source`, `op` and `args`, and run `ireland_describe(source, op)` first if you
-are unsure of the arguments. If typed toolsets are enabled (`?toolsets=...`, or a server that
-lists typed tools), call the op name directly as a tool with the same arguments.
+Steps name each operation as source/operation (e.g. `ppr/ppr_price_stats`), using the typed tool name as the operation. On the
+default surface, run it with `ireland_call`, for example:
+
+```json
+{ "source": "data-gov-ie", "operation": "datagov_search_datasets", "args": { "query": "bike counts" } }
+```
+
+If an argument shape is unclear, call `ireland_describe` with `{ "source", "operation" }` first;
+it returns the schema and an example. `search`, `fetch` and `nearby` are top-level tools. If the
+server was added with `?toolsets=<ids>` or `?toolsets=all`, the typed tool (e.g. `datagov_search_datasets`) can
+be called directly with the same `args`.
 
 
 ## Steps
 
 1. **Search broadly.** Call `ireland_search` with the topic to see hits across all sources, then
-   use `ireland_fetch` on a promising id. With typed tools, `cross.search` and `cross.fetch` do the same.
-2. **Search the portals.** Call `data-gov-ie.datagov_search_datasets` (national) and, for Dublin topics,
-   `smart-dublin.smartdublin_search_datasets` with the topic words.
-3. **Inspect.** Call `data-gov-ie.datagov_get_dataset` (or `smart-dublin.smartdublin_get_dataset`) for the
+   use `ireland_fetch` on a promising id. With typed tools, `search` and `fetch` do the same.
+2. **Search the portals.** Call `data-gov-ie/datagov_search_datasets` (national) and, for Dublin topics,
+   `smart-dublin/smartdublin_search_datasets` with the topic words.
+3. **Inspect.** Call `data-gov-ie/datagov_get_dataset` (or `smart-dublin/smartdublin_get_dataset`) for the
    chosen dataset: publisher, licence, last modified date and resources (CSV, API, etc.).
-4. **Preview rows.** If a resource is in the datastore, call `data-gov-ie.datagov_query_datastore`
-   (or `smart-dublin.smartdublin_query_datastore`) with the resource id and a small limit.
+4. **Preview rows.** If a resource is in the datastore, call `data-gov-ie/datagov_query_datastore`
+   (or `smart-dublin/smartdublin_query_datastore`) with the resource id and a small limit.
 5. If a dedicated source covers the topic (CSO, PPR, Met Éireann, OPW, etc.), suggest that source's
-   ops instead, because they are cleaner than raw portal files. `cross.list_sources` lists them.
+   ops instead, because they are cleaner than raw portal files. `cross/list_sources` lists them.
 
 ## Output format
 

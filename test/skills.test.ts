@@ -2,16 +2,16 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { crossSourceTools } from "../src/cross/index.js";
-import { sourceModules } from "../src/registry.js";
+import { appModules } from "../src/registry.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const skillsDir = join(root, "skills");
 
+// ireland_call dispatches to these (source -> operation) pairs; "cross" holds nearby, ireland_snapshot, list_sources.
 const ops = new Map<string, Set<string>>();
-for (const mod of sourceModules) ops.set(mod.info.id, new Set(mod.tools.map((tool) => tool.name)));
-ops.set("cross", new Set(crossSourceTools(sourceModules).map((tool) => tool.name)));
+for (const mod of appModules().modules) ops.set(mod.info.id, new Set(mod.tools.map((tool) => tool.name)));
 const allOps = new Set([...ops.values()].flatMap((set) => [...set]));
+const META_TOOLS = ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about", "search", "fetch", "nearby"];
 
 function skillFolders(): string[] {
   if (!existsSync(skillsDir)) return [];
@@ -42,24 +42,30 @@ function markdownFiles(dir: string): string[] {
 
 interface OpRef { source: string; op: string; file: string }
 
+/** `source/operation` shorthand and ireland_call `"source": "x", "operation": "y"` arguments. */
 function extractOpRefs(text: string, file: string): OpRef[] {
   const refs: OpRef[] = [];
-  for (const m of text.matchAll(/`([a-z][a-z-]*)\.([a-z][a-z0-9_]*)`/g)) {
+  for (const m of text.matchAll(/`([a-z][a-z-]*)\/([a-z][a-z0-9_]*)`/g)) {
     refs.push({ source: m[1] ?? "", op: m[2] ?? "", file });
   }
-  for (const m of text.matchAll(/source:\s*"([a-z][a-z-]*)"\s*,\s*op:\s*"([a-z][a-z0-9_]*)"/g)) {
+  for (const m of text.matchAll(/"?source"?:\s*"([a-z][a-z-]*)"\s*,\s*"?operation"?:\s*"([a-z][a-z0-9_]*)"/g)) {
     refs.push({ source: m[1] ?? "", op: m[2] ?? "", file });
   }
   return refs;
 }
 
+/** Pre-lean-surface forms: dotted `source.op` refs and an `op` key (ireland_call takes `operation`). */
+function legacyRefs(text: string): string[] {
+  const dotted = [...text.matchAll(/`([a-z][a-z-]*)\.([a-z][a-z0-9_]*)`/g)]
+    .filter((m) => ops.has(m[1] ?? "") || allOps.has(m[2] ?? ""))
+    .map((m) => m[0]);
+  const opKey = [...text.matchAll(/"?\bop"?:\s*"[a-z][a-z0-9_]*"/g)].map((m) => m[0]);
+  return [...dotted, ...opKey];
+}
+
 function checkRef(ref: OpRef): void {
-  const known = ops.get(ref.source);
-  if (known) {
-    expect(known.has(ref.op), `${ref.file}: unknown op ${ref.source}.${ref.op}`).toBe(true);
-  } else {
-    expect(ref.op.includes("_") || allOps.has(ref.op), `${ref.file}: unknown source ${ref.source}.${ref.op}`).toBe(false);
-  }
+  expect(ops.has(ref.source), `${ref.file}: unknown source "${ref.source}" (op ${ref.op})`).toBe(true);
+  expect(ops.get(ref.source)?.has(ref.op), `${ref.file}: source "${ref.source}" has no operation "${ref.op}"`).toBe(true);
 }
 
 describe("skills pack", () => {
@@ -88,8 +94,24 @@ describe("skills pack", () => {
   it.each(folders.map((name) => [name]))("%s only references real sources and ops", (name) => {
     const dir = join(skillsDir, name);
     const refs = markdownFiles(dir).flatMap((file) => extractOpRefs(readFileSync(file, "utf8"), file));
-    expect(refs.length, "skill should reference at least one source.op").toBeGreaterThan(0);
+    expect(refs.length, "skill should reference at least one source/operation").toBeGreaterThan(0);
     refs.forEach(checkRef);
+  });
+
+  it.each(folders.map((name) => [name]))("%s calls ops through ireland_call on the lean surface", (name) => {
+    const text = markdownFiles(join(skillsDir, name)).map((file) => readFileSync(file, "utf8")).join("\n");
+    expect(text).toContain("ireland_call");
+    expect(text).toContain("ireland_describe");
+    expect(/"source":\s*"[a-z-]+",\s*"operation":/.test(text), "needs a full ireland_call argument example").toBe(true);
+    expect(legacyRefs(text), "legacy source.op / op: references").toEqual([]);
+  });
+
+  it.each(folders.map((name) => [name]))("%s only uses top-level tools that the default surface lists", (name) => {
+    const text = readFileSync(join(skillsDir, name, "SKILL.md"), "utf8");
+    const typed = [...allOps].filter((op) => !META_TOOLS.includes(op));
+    for (const m of text.matchAll(/`([a-z][a-z0-9_]*)\s*[({]/g)) {
+      expect(typed, `${name}: call typed tool ${m[1]} via ireland_call`).not.toContain(m[1]);
+    }
   });
 
   it("shared references only name real ops", () => {
@@ -99,12 +121,15 @@ describe("skills pack", () => {
   });
 
   it("op extractor catches bad references", () => {
-    const refs = extractOpRefs('Use `ppr.ppr_nope` and ireland_call(source: "cso", op: "cso_get_data")', "x");
+    const refs = extractOpRefs('Use `ppr/ppr_nope` and ireland_call { "source": "nope", "operation": "cso_get_data" }', "x");
     expect(refs).toEqual([
       { source: "ppr", op: "ppr_nope", file: "x" },
-      { source: "cso", op: "cso_get_data", file: "x" }
+      { source: "nope", op: "cso_get_data", file: "x" }
     ]);
     expect(ops.get("ppr")?.has("ppr_nope")).toBe(false);
+    expect(ops.has("nope")).toBe(false);
+    expect(legacyRefs('`ppr.ppr_price_stats` and { source: "cso", op: "cso_get_data" }')).toHaveLength(2);
+    expect(ops.get("cross")?.has("ireland_snapshot")).toBe(true);
   });
 });
 

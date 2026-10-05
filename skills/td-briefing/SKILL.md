@@ -10,28 +10,35 @@ Build a neutral, sourced briefing on one member of the Dáil or Seanad.
 
 ## Calling the tools
 
-Each step names a **source** and an **op** as `source.op`. With the default lean surface, call
-`ireland_call` with `source`, `op` and `args`, and run `ireland_describe(source, op)` first if you
-are unsure of the arguments. If typed toolsets are enabled (`?toolsets=...`, or a server that
-lists typed tools), call the op name directly as a tool with the same arguments.
+Steps name each operation as source/operation (e.g. `ppr/ppr_price_stats`), using the typed tool name as the operation. On the
+default surface, run it with `ireland_call`, for example:
+
+```json
+{ "source": "oireachtas", "operation": "oireachtas_search_members", "args": { "name": "Harris" } }
+```
+
+If an argument shape is unclear, call `ireland_describe` with `{ "source", "operation" }` first;
+it returns the schema and an example. `search`, `fetch` and `nearby` are top-level tools. If the
+server was added with `?toolsets=<ids>` or `?toolsets=all`, the typed tool (e.g. `oireachtas_search_members`) can
+be called directly with the same `args`.
 
 
 ## Steps
 
-1. **Find the member.** Call `oireachtas.oireachtas_search_members` with `{ "name": "Harris" }`,
+1. **Find the member.** Call `oireachtas/oireachtas_search_members` with `{ "name": "Harris" }`,
    or `{ "constituency": "Wicklow" }` to list local TDs. Add `chamber` ("dail" or "seanad") and
    `house_no` if needed. Confirm the right person if several match. Keep the `member_code`
    (e.g. `Simon-Harris.D.2011-03-09`).
-2. **Questions.** Call `oireachtas.oireachtas_search_questions` with `member_code`, a date range
+2. **Questions.** Call `oireachtas/oireachtas_search_questions` with `member_code`, a date range
    (`date_from`, `date_to`, default the last 3 months) and optionally `type` ("oral" or "written").
    Group the questions by topic and count them.
-3. **Votes.** Call `oireachtas.oireachtas_get_votes` for the same window and `chamber`. Report how the
+3. **Votes.** Call `oireachtas/oireachtas_get_votes` for the same window and `chamber`. Report how the
    member's party voted on the main divisions if the member is not listed individually; say which.
-4. **Debates.** Call `oireachtas.oireachtas_get_debates` for notable dates; quote headings only.
-5. **Bills.** Call `oireachtas.oireachtas_search_bills` with a `query` (member surname or topic) and
+4. **Debates.** Call `oireachtas/oireachtas_get_debates` for notable dates; quote headings only.
+5. **Bills.** Call `oireachtas/oireachtas_search_bills` with a `query` (member surname or topic) and
    `year` to find bills they sponsored.
 6. If the user gave a location instead of a name, find the constituency with
-   `geohive.geohive_boundaries_at_point`, then go to step 1.
+   `geohive/geohive_boundaries_at_point`, then go to step 1.
 
 ## Output format
 

@@ -10,23 +10,30 @@ Answer "how is my journey looking right now?" with live, timestamped data.
 
 ## Calling the tools
 
-Each step names a **source** and an **op** as `source.op`. With the default lean surface, call
-`ireland_call` with `source`, `op` and `args`, and run `ireland_describe(source, op)` first if you
-are unsure of the arguments. If typed toolsets are enabled (`?toolsets=...`, or a server that
-lists typed tools), call the op name directly as a tool with the same arguments.
+Steps name each operation as source/operation (e.g. `ppr/ppr_price_stats`), using the typed tool name as the operation. On the
+default surface, run it with `ireland_call`, for example:
+
+```json
+{ "source": "irish-rail", "operation": "rail_get_departures", "args": { "station": "Bray", "minutes": 60 } }
+```
+
+If an argument shape is unclear, call `ireland_describe` with `{ "source", "operation" }` first;
+it returns the schema and an example. `search`, `fetch` and `nearby` are top-level tools. If the
+server was added with `?toolsets=<ids>` or `?toolsets=all`, the typed tool (e.g. `rail_get_departures`) can
+be called directly with the same `args`.
 
 
 ## Steps
 
 1. **Ask for or infer** the start stop/station, mode and rough time. Default to "now".
-2. **Train (DART, commuter, intercity).** Call `irish-rail.rail_find_station` with `{ "query": "Bray" }`
-   to get the exact name, then `irish-rail.rail_get_departures` with `{ "station": "Bray", "minutes": 60 }`.
-3. **Luas.** If unsure of the stop, call `luas.luas_list_stops` with `{ "line": "Green" }`, then
-   `luas.luas_get_forecast` with `{ "stop": "Ranelagh" }`.
-4. **Bus and other NTA services.** Call `nta.nta_get_trip_updates` with a `route_id` or `stop_id` if
-   known, or `nta.nta_get_realtime_summary` for a network-wide view of delays and cancellations.
-5. **Weather.** Call `met-eireann.met_get_forecast` with the start point `lat`/`lon` and `hours`
-   (e.g. 3), and `met-eireann.met_get_warnings` with `{}`. Mention only warnings covering the route's counties.
+2. **Train (DART, commuter, intercity).** Call `irish-rail/rail_find_station` with `{ "query": "Bray" }`
+   to get the exact name, then `irish-rail/rail_get_departures` with `{ "station": "Bray", "minutes": 60 }`.
+3. **Luas.** If unsure of the stop, call `luas/luas_list_stops` with `{ "line": "Green" }`, then
+   `luas/luas_get_forecast` with `{ "stop": "Ranelagh" }`.
+4. **Bus and other NTA services.** Call `nta/nta_get_trip_updates` with a `route_id` or `stop_id` if
+   known, or `nta/nta_get_realtime_summary` for a network-wide view of delays and cancellations.
+5. **Weather.** Call `met-eireann/met_get_forecast` with the start point `lat`/`lon` and `hours`
+   (e.g. 3), and `met-eireann/met_get_warnings` with `{}`. Mention only warnings covering the route's counties.
 6. Summarise in one line first, then the detail.
 
 ## Output format
