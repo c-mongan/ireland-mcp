@@ -11,21 +11,32 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <canvas id="text-rain" class="text-rain-canvas" aria-hidden="true" hidden></canvas>
+  <div class="video-background" aria-hidden="true">
+    <video id="hero-video" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback preload="metadata">
+      <source src="hero-bg.mp4" type="video/mp4">
+    </video>
+  </div>
+
   <header class="hero">
     <div class="glow" aria-hidden="true"></div>
     <div class="wrap center">
-      <p class="eyebrow">
+      <p class="eyebrow fade-in-up">
         <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1L10 5.5H14.5L11 8.5L12.5 13L8 10.5L3.5 13L5 8.5L1.5 5.5H6L8 1Z" fill="currentColor"/></svg>
         Model Context Protocol
       </p>
-      <h1>Ireland<br><span class="accent">MCP</span></h1>
-      <p class="lede">One read-only server that lets Claude, ChatGPT, Copilot and other AI assistants query Irish public data — with the source, licence and retrieval time attached to every answer.</p>
-      <div class="stats" id="stats">
+      <h1 class="fade-in-up d1 glow-heading">Ireland<br><span class="accent">MCP</span></h1>
+      <div class="fade-in-up d1 scanner-wrap" aria-hidden="true"><div class="scanner-line"></div></div>
+      <p class="lede fade-in-up d2">One read-only server that lets Claude, ChatGPT, Copilot and other AI assistants query Irish public data — with the source, licence and retrieval time attached to every answer.</p>
+      <div class="fade-in-up d3 pill-wrap">
+        <span class="proof-pill" id="live-pill"><span class="pulse"></span><span id="live-text">Hosted endpoint — no sign-up</span></span>
+      </div>
+      <div class="stats fade-in-up d3" id="stats">
         <span><strong>9</strong> sources</span><span class="dot">·</span>
         <span><strong>33</strong> tools</span><span class="dot">·</span>
         <span><strong>0</strong> sign-ups</span>
       </div>
-      <nav class="cta">
+      <nav class="cta fade-in-up d4">
         <a class="btn primary" href="#connect">Connect a client</a>
         <a class="btn" href="#try">Try it</a>
         <a class="btn" href="https://github.com/c-mongan/ireland-mcp">GitHub</a>
@@ -120,6 +131,7 @@ Authentication: none</code></pre>
 
   <footer class="wrap small muted">
     <p>Open source under the MIT licence. Data remains under each publisher's licence — mostly CC BY 4.0; see <a href="https://github.com/c-mongan/ireland-mcp/blob/main/NOTICE">NOTICE</a>. Met Éireann data is © Met Éireann, used under CC BY 4.0. Not affiliated with any Irish government body.</p>
+    <p>Background video is an AI-generated (Google Veo) city timelapse, decorative only; it does not depict a real Irish location.</p>
   </footer>
 
   <script src="app.js" defer></script>

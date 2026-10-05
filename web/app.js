@@ -95,3 +95,72 @@ $("try-form").addEventListener("submit", async (e) => {
     show(String(error.message ?? error), true);
   }
 });
+
+// Background motion, ported from the Search Ireland site. Skipped for reduced motion, data saver, touch and small or low-power devices.
+const WORDS = [
+  "Dáil", "Seanad", "Éireann", "Oireachtas", "Taoiseach", "census", "CSO", "PxStat", "Met Éireann", "forecast",
+  "Luas", "DART", "GTFS", "county", "constituency", "townland", "Bunreacht", "statute", "Act", "section",
+  "housing", "planning", "climate", "budget", "population", "rainfall", "Gaeltacht", "electoral", "division",
+  "property", "price", "data.gov.ie", "GeoHive", "Smart Dublin", "licence", "CC BY 4.0", "Corcaigh", "Gaillimh"
+];
+
+const motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
+const video = $("hero-video");
+if (motionQuery.matches && video) video.pause();
+
+function canAnimate() {
+  const lowPower = (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory ?? 8) <= 4;
+  return !motionQuery.matches && !navigator.connection?.saveData && !lowPower
+    && innerWidth >= 768 && !matchMedia("(pointer: coarse)").matches;
+}
+
+function startTextRain() {
+  const canvas = $("text-rain");
+  const ctx = canvas?.getContext("2d");
+  if (!ctx || !canAnimate()) return;
+  canvas.hidden = false;
+  const size = 13;
+  let width = 0, height = 0, drops = [], frame = 0;
+  const pick = () => WORDS[Math.floor(Math.random() * WORDS.length)];
+  const init = () => {
+    width = canvas.width = innerWidth;
+    height = canvas.height = innerHeight;
+    const columns = Math.max(8, Math.min(24, Math.ceil(width / (size * 8))));
+    drops = Array.from({ length: columns }, () => ({ y: Math.random() * -60, speed: 0.35 + Math.random() * 0.9, word: pick() }));
+  };
+  const draw = () => {
+    ctx.fillStyle = "rgba(10, 15, 26, 0.1)";
+    ctx.fillRect(0, 0, width, height);
+    ctx.font = `${size}px ui-monospace, monospace`;
+    drops.forEach((d, i) => {
+      ctx.fillStyle = Math.random() > 0.9992 ? "#fff" : d.speed > 1.2 ? "#22d3ee" : d.speed > 0.8 ? "#06b6d4" : "rgba(45, 212, 191, 0.45)";
+      ctx.fillText(d.word, i * size * 6 + size, d.y * size);
+      if (d.y * size > height && Math.random() > 0.975) Object.assign(d, { y: 0, speed: 0.5 + Math.random() * 1.5, word: pick() });
+      d.y += d.speed;
+    });
+  };
+  addEventListener("resize", init);
+  init();
+  const loop = () => {
+    if (!document.hidden && ++frame % 4 === 0) draw();
+    requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
+}
+startTextRain();
+
+// Live status pill: reads /healthz next to the configured MCP endpoint.
+(async () => {
+  const pill = $("live-pill"), text = $("live-text");
+  const endpoint = $("endpoint").value;
+  if (!pill || !endpoint) return;
+  try {
+    const res = await fetch(endpoint.replace(/\/mcp\/?$/, "/healthz"), { signal: AbortSignal.timeout(8000) });
+    const body = await res.json();
+    if (!res.ok || body.status !== "ok") throw new Error(String(res.status));
+    text.textContent = `Live now · ${body.sources?.length ?? 0} sources · no sign-up`;
+  } catch {
+    pill.classList.add("down");
+    text.textContent = "Hosted endpoint unreachable right now — run locally with npx";
+  }
+})();
