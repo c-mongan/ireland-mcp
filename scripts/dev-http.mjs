@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Local Streamable HTTP server without Azure Functions Core Tools: POST /mcp, GET /healthz, and web/ as static files.
-// Usage: npm run build && npm run dev:http   (PORT defaults to 7071)
+// Usage: npm run build && npm run dev:http   (PORT defaults to 7071; HOST to 127.0.0.1)
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
@@ -13,6 +13,7 @@ import { createAppServer } from "../dist/src/registry.js";
 import { healthHandler } from "../dist/src/functions/healthz.js";
 
 const port = Number(process.env.PORT ?? 7071);
+const host = process.env.HOST ?? "127.0.0.1";
 const context = createContext();
 const rateLimiter = new RateLimiter(limitFromEnv(process.env.RATE_LIMIT_PER_MINUTE));
 const webRoot = fileURLToPath(new URL("../web/", import.meta.url));
@@ -51,4 +52,4 @@ createServer(async (req, res) => {
     res.writeHead(error?.code === "ENOENT" ? 404 : 500, { "content-type": "text/plain" });
     res.end(error?.code === "ENOENT" ? "Not found" : "Server error");
   }
-}).listen(port, () => console.log(`Ireland MCP dev server: http://localhost:${port}/ (MCP at /mcp)`));
+}).listen(port, host, () => console.log(`Ireland MCP dev server: http://localhost:${port}/ (MCP at /mcp)`));
