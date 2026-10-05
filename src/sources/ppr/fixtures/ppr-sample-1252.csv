@@ -1,0 +1,7 @@
+Date of Sale (dd/mm/yyyy),Address,County,Eircode,Price (€),Not Full Market Price,VAT Exclusive,Description of Property,Property Size Description
+"05/01/2026","1 FICTIONAL TERRACE, ORANMORE, GALWAY","Galway","H91X001","€200,000.00","No","No","Second-Hand Dwelling house /Apartment",""
+"12/02/2026","2 EXAMPLE AVENUE, SALTHILL, GALWAY","Galway","H91X002","€450,000.00","No","No","Second-Hand Dwelling house /Apartment",""
+"20/03/2026","APT 3, SAMPLE QUAY, GALWAY","Galway","","€300,000.00","No","Yes","New Dwelling house /Apartment","less than 38 sq metres"
+"02/04/2026","4 TEST ROAD, ORANMORE, GALWAY","Galway","H91X004","€95,000.00","Yes","No","Second-Hand Dwelling house /Apartment",""
+"15/12/2025","5 DEMO LANE, CLONTARF, DUBLIN 3","Dublin","D03X005","€725,500.00","No","No","Second-Hand Dwelling house /Apartment",""
+"28/11/2025","6 PLACEHOLDER PARK, BÓTHAR NA TRÁ, DUBLIN 3","Dublin","D03X006","€610,000.00","No","No","Second-Hand Dwelling house /Apartment",""
