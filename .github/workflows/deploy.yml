@@ -41,7 +41,14 @@ jobs:
       - name: Provision and deploy
         run: |
           azd env new "$AZURE_ENV_NAME" --subscription "$AZURE_SUBSCRIPTION_ID" --location "$AZURE_LOCATION" --no-prompt || azd env select "$AZURE_ENV_NAME"
-          azd up --no-prompt
+          azd provision --no-prompt
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Deploy prebuilt package
+        run: npm run deploy:zip
       - name: Smoke test the deployed endpoint
         run: |
           endpoint="$(azd env get-value MCP_ENDPOINT)"

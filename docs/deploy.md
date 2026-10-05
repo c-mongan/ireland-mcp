@@ -32,7 +32,10 @@ Cost controls:
 3. Optional: `azd env set NTA_API_KEY <key>`. Get a key from https://developer.nationaltransport.ie/.
 4. Optional: `azd env set BUDGET_CONTACT_EMAIL you@example.com`
 5. `azd provision --preview` to review the changes.
-6. `azd up`
+6. `azd provision`, then `npm run deploy:zip` (needs `az login`).
+   Don't use `azd up` or `azd deploy` for the code: they request a remote Oryx build on Flex Consumption,
+   which fails for this project. `scripts/deploy-zip.sh` builds locally, ships `dist/` with production
+   dependencies, and turns the remote build off.
 7. Check it: `curl "$(azd env get-value MCP_ENDPOINT | sed 's#/mcp$##')/healthz"`
 8. Build the first PPR index. Either wait for the 03:15 UTC timer, or run `npm run build && AzureWebJobsStorage__accountName=<storage> npm run ppr:build`
    locally after `az login` (needs Storage Blob Data Contributor for your user).
