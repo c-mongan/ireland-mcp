@@ -21,6 +21,8 @@ import { planningModule } from "./sources/planning/index.js";
 import { censusAreasModule } from "./sources/census-areas/index.js";
 import { heritageModule } from "./sources/heritage/index.js";
 import { environmentSitesModule } from "./sources/environment-sites/index.js";
+import { tedModule } from "./sources/ted/index.js";
+import { bikesModule } from "./sources/bikes/index.js";
 
 export const sourceModules: SourceModule[] = [
   csoModule,
@@ -40,7 +42,9 @@ export const sourceModules: SourceModule[] = [
   planningModule,
   censusAreasModule,
   heritageModule,
-  environmentSitesModule
+  environmentSitesModule,
+  tedModule,
+  bikesModule
 ];
 
 /**

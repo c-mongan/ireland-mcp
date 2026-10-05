@@ -30,6 +30,8 @@ const CASES = [
   ["census-areas", "census_small_area_at", { lat: 53.3498, lon: -6.2603 }, (d) => d.area?.small_area?.population > 0],
   ["heritage", "heritage_monuments_near", { lat: 53.3498, lon: -6.2603, radius_m: 1000, limit: 2 }, (d) => d.count > 0],
   ["environment-sites", "protected_sites_near", { lat: 53.33, lon: -6.16, radius_m: 5000, limit: 4 }, (d) => d.count > 0],
+  ["ted", "ted_search_tenders", { text: "bicycle", limit: 3 }, (d) => d.tenders?.length > 0 && d.tenders.every((t) => t.id)],
+  ["bikes", "bikes_stations_near", { lat: 53.3498, lon: -6.2603, radius: 1000, network: "dublinbikes" }, (d) => d.stations?.length > 0],
   ["cross", "search", { query: "population" }, (d) => d.results?.length > 0, { raw: true }],
   ["cross", "ireland_snapshot", { place: "Galway" }, (d) => d.population?.area && d.boundaries?.county]
 ];

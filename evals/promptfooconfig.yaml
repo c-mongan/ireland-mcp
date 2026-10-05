@@ -297,3 +297,23 @@ tests:
     assert:
       - type: icontains-any
         value: [water_find_stations]
+  - vars:
+      question: "Search EU TED for Irish public tenders about bicycles."
+    assert:
+      - type: icontains-any
+        value: [ted_search_tenders]
+  - vars:
+      question: "Get details for TED notice 646747-2026."
+    assert:
+      - type: icontains-any
+        value: [ted_get_notice]
+  - vars:
+      question: "Which bike-share stations near O'Connell Street Dublin have bikes available?"
+    assert:
+      - type: icontains-any
+        value: [bikes_stations_near]
+  - vars:
+      question: "List the Irish bike share networks available."
+    assert:
+      - type: icontains-any
+        value: [bikes_networks]

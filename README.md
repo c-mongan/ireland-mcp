@@ -9,10 +9,11 @@ Irish public data. Ask "What's the population of Galway?", "Any weather warnings
 today?" or "What did houses sell for in Ennis last year?" and the assistant gets
 real figures, with the source, licence and retrieval time attached.
 
-- **18 sources, 47 tools.** CSO, Oireachtas, GeoHive, data.gov.ie, Smart Dublin,
+- **20 sources, 51 tools.** CSO, Oireachtas, GeoHive, data.gov.ie, Smart Dublin,
   Met Éireann, NTA, the Irish Statute Book, the Property Price Register, Irish Rail,
   Luas, EirGrid, Marine Institute weather buoys, OPW river levels, planning,
-  Census 2022 small areas, National Monuments and NPWS protected sites.
+  Census 2022 small areas, National Monuments, NPWS protected sites, EU TED
+  tenders and Irish bike-share availability.
 - **Two ways to run it.** A hosted Streamable HTTP endpoint (`/mcp`), or locally
   over stdio with `npx -y ireland-mcp`.
 - **No accounts.** Nothing to sign up for. Nothing is written anywhere.
@@ -26,14 +27,14 @@ real figures, with the source, licence and retrieval time attached.
 ## Tool surface: lean by default
 
 By default `tools/list` is small: **7 tools, about 5,100 chars (≈1.3k tokens)**,
-down from 47 typed tools at about 48,400 chars (≈12.1k tokens). That keeps clients
+down from the full 55-tool surface at about 52,200 chars (≈13.0k tokens). That keeps clients
 such as Cursor well under their ~40-tool limit and saves context. A CI test fails
 if the default list grows past 16,000 chars (≈4k tokens); `npm run measure:tools`
 prints the current figure.
 
 | Tool | Purpose |
 | --- | --- |
-| `ireland_catalogue(domain?)` | Sources grouped by domain (stats, transport, environment, energy, law/politics, places/property), each with its operations |
+| `ireland_catalogue(domain?)` | Sources grouped by domain (stats, transport, environment, energy, economy, law/politics, places/property), each with its operations |
 | `ireland_describe(source, operation)` | The operation's JSON schema, description and a working example |
 | `ireland_call(source, operation, args, max_tokens?)` | Validates `args` server-side and runs the operation. Bad args return the schema and an example |
 | `ireland_about` | Licence, attribution, status URL, and how to enable typed toolsets |
@@ -51,14 +52,15 @@ client works better with them:
 | --- | --- |
 | HTTP query | `/mcp?toolsets=cso,irish-rail` (comma list of source ids) |
 | HTTP path | `/mcp/x/irish-rail` (one source) |
-| Everything | `/mcp?toolsets=all` (all 47 typed tools plus the meta tools) |
+| Everything | `/mcp?toolsets=all` (all 51 typed tools plus the meta tools) |
 | stdio | `npx -y ireland-mcp --toolsets=cso,irish-rail`, or `IRELAND_MCP_TOOLSETS=all` |
 
 Source ids: `cso`, `oireachtas`, `geohive`, `data-gov-ie`, `smart-dublin`,
 `met-eireann`, `nta`, `legislation`, `ppr`, `irish-rail`, `luas`, `eirgrid`,
 `marine`, `opw-water`, `planning`, `census-areas`, `heritage`,
-`environment-sites`, `cross`. An unknown id is a clear error (HTTP 400 with the
-valid list, or exit code 1 on stdio).
+`marine`, `opw-water`, `planning`, `census-areas`, `heritage`,
+`environment-sites`, `ted`, `bikes`, `cross`. An unknown id is a clear error
+(HTTP 400 with the valid list, or exit code 1 on stdio).
 
 **Response budget.** Each result is capped at about 2,000 tokens (chars ÷ 4).
 Pass `max_tokens` (100–8,000) to change it. When a large list is cut, the result
@@ -91,6 +93,8 @@ Results also come back as `structuredContent`.
 | Census areas | `census_small_area_at` | Census 2022 Small Area / ED / county at a point, with population where available |
 | Heritage | `heritage_monuments_near` | National Monuments Service Sites and Monuments Record near a point |
 | Environment sites | `protected_sites_at`, `protected_sites_near` | NPWS SPA, SAC, NHA and proposed NHA protected sites |
+| EU TED | `ted_search_tenders`, `ted_get_notice` | Irish-buyer EU public procurement notices, values, deadlines and links |
+| CityBikes / GBFS | `bikes_networks`, `bikes_stations_near` | Irish bike-share networks and nearby station availability |
 | Cross-source | `search`, `fetch`, `list_sources`, `ireland_snapshot`, `nearby` | Search everything, fetch by id, place summaries |
 
 All of these are reachable on the default surface through `ireland_call`; they
@@ -245,7 +249,7 @@ npx @modelcontextprotocol/inspector node dist/src/cli.js   # browse the tools
 | `npm run typecheck && npm run lint` | TypeScript and ESLint |
 | `npm run inspector:check` | MCP conformance through the Inspector CLI (also in CI) |
 | `npm run live:sanity` | One real call per source through `ireland_call`; `EVAL_TOOLSETS=all` calls the typed tools instead. Results in [docs/live-sanity.md](docs/live-sanity.md) |
-| `npm run eval` | 40 Irish questions through promptfoo. Uses `OPENAI_API_KEY`, or Azure OpenAI with `AZURE_API_KEY`, `AZURE_API_HOST` and `AZURE_DEPLOYMENT`; skips without a key. Runs on the default surface; `EVAL_TOOLSETS=all` runs on the full one. A call via `ireland_call` with `operation: X` counts as calling `X` |
+| `npm run eval` | 54 Irish questions through promptfoo. Uses `OPENAI_API_KEY`, or Azure OpenAI with `AZURE_API_KEY`, `AZURE_API_HOST` and `AZURE_DEPLOYMENT`; skips without a key. Runs on the default surface; `EVAL_TOOLSETS=all` runs on the full one. A call via `ireland_call` with `operation: X` counts as calling `X` |
 | `npm run measure:tools [-- all]` | Size of `tools/list` in chars and estimated tokens (after `npm run build`) |
 | `npm run ppr:build` | Build the Property Price Register index locally |
 
