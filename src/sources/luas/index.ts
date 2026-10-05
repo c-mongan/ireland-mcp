@@ -69,7 +69,7 @@ const trams = (body: string) =>
   [...body.matchAll(/<tram\b([^>]*)\/>/g)]
     .map(([, tag = ""]) => {
       const due = attr(tag, "dueMins");
-      return { destination: attr(tag, "destination") ?? "", due_in_min: due === "DUE" ? 0 : Number(due) };
+      return { destination: attr(tag, "destination") ?? "", due_in_min: due === "DUE" ? 0 : due?.trim() ? Number(due) : Number.NaN };
     })
     .filter((t) => t.destination && Number.isFinite(t.due_in_min) && !/no trams/i.test(t.destination));
 

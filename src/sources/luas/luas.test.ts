@@ -6,7 +6,8 @@ import { luasModule as mod } from "./index.js";
 const f = (name: string) => fixturePath(import.meta.url, name);
 const routes: Route[] = [
   { match: /get\.ashx\?action=stops&encrypt=false$/, file: f("stops.xml") },
-  { match: /get\.ashx\?action=forecast&stop=STS&encrypt=false$/, file: f("forecast-sts.xml") }
+  { match: /get\.ashx\?action=forecast&stop=STS&encrypt=false$/, file: f("forecast-sts.xml") },
+  { match: /get\.ashx\?action=forecast&stop=TPT&encrypt=false$/, file: f("forecast-tpt.xml") }
 ];
 
 describe("Luas module", () => {
@@ -19,6 +20,12 @@ describe("Luas module", () => {
     expect(body.data.inbound[1]).toEqual({ destination: "Broombridge", due_in_min: 3 });
     expect(body.data.outbound[0]).toEqual({ destination: "Brides Glen", due_in_min: 1 });
     expect(body.attribution).toContain("Transport Infrastructure Ireland");
+  });
+
+  it("drops trams with no due time instead of reporting them as due now", async () => {
+    const { body } = await callTool(mod, "luas_get_forecast", { stop: "TPT" }, fakeFetch(routes));
+    expect(body.data.inbound).toEqual([]);
+    expect(body.data.outbound).toEqual([{ destination: "Saggart", due_in_min: 12 }]);
   });
 
   it("lists stops filtered by line", async () => {
