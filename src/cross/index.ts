@@ -2,9 +2,9 @@ import { z } from "zod";
 import { DEFAULT_LIMIT, envelope, type SourceInfo } from "../gateway/envelope.js";
 import { ToolError, toToolError } from "../gateway/errors.js";
 import { defineTool, type AnyTool, type SearchHit, type SourceModule, type ToolContext } from "../gateway/module.js";
-import { boundariesAt, geohiveInfo } from "../sources/geohive/index.js";
+import { boundariesAt, geohiveInfo, locatePlace } from "../sources/geohive/index.js";
 import { activeWarnings, forecastAt, metInfo, nearestStation } from "../sources/met-eireann/index.js";
-import { findPlace, PLACES } from "./places.js";
+import { findPlace } from "./places.js";
 
 export const crossInfo: SourceInfo = {
   id: "cross",
@@ -173,7 +173,7 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
     example: { place: "Galway" },
     title: "Snapshot of an Irish place",
     description:
-      "One-call overview of an Irish county or large town: census population (CSO F1001), boundaries (GeoHive), weather forecast and national weather warnings (Met Éireann). Use the source tools for detail.",
+      "One-call overview of an Irish county, town or townland: census population (CSO F1001), boundaries (GeoHive), weather forecast and national weather warnings (Met Éireann). Use the source tools for detail.",
     inputSchema: {
       place: z.string().min(2).max(60).optional().describe("County or town, e.g. 'Galway', 'Co. Kerry', 'Athlone'."),
       lat: z.number().min(-90).max(90).optional(),
@@ -183,12 +183,18 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
       let where: { name: string; county: string | null; lat: number; lon: number };
       if (place) {
         const p = findPlace(place);
-        if (!p) {
-          throw new ToolError("NOT_FOUND", `"${place}" is not in the built-in place list.`, {
-            hint: `Give lat and lon instead, or one of: ${PLACES.map((x) => x.name).join(", ")}.`
-          });
+        if (p) {
+          where = { name: p.name, county: p.county, lat: p.lat, lon: p.lon };
+        } else {
+          const hit = await locatePlace(ctx, place.replace(/^(co\.?|county)\s+/i, ""), 1).catch(() => null);
+          const g = hit?.places[0];
+          if (!g) {
+            throw new ToolError("NOT_FOUND", `"${place}" was not found in the built-in place list or the Tailte Éireann gazetteer.`, {
+              hint: "Check the spelling or try the Irish name, or give lat and lon."
+            });
+          }
+          where = { name: g.name ?? place, county: g.county, lat: g.lat, lon: g.lon };
         }
-        where = { name: p.name, county: p.county, lat: p.lat, lon: p.lon };
       } else if (lat !== undefined && lon !== undefined) {
         where = { name: `${lat.toFixed(4)}, ${lon.toFixed(4)}`, county: null, lat, lon };
       } else {

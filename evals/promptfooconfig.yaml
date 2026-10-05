@@ -128,6 +128,11 @@ tests:
       - type: icontains-any
         value: [geohive_boundaries_at_point, nearby]
   - vars:
+      question: "What are the coordinates of the townland of Glendalough?"
+    assert:
+      - type: icontains-any
+        value: [geohive_locate]
+  - vars:
       question: "List the GeoHive layers you can query."
     assert:
       - type: icontains-any

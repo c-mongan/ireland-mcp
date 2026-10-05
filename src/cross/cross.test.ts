@@ -80,6 +80,17 @@ describe("cross-source tools", () => {
     expect(body.data.sources.map((s: { source: string }) => s.source)).toHaveLength(3);
   });
 
+  it("ireland_snapshot finds places outside the built-in list through the Tailte Éireann gazetteer", async () => {
+    const gazetteer = JSON.stringify({
+      features: [{ attributes: { English_Na: "Ballymun", Irish_Name: "Baile Munna", County: "DUBLIN", Classifica: "CoP" }, geometry: { x: -6.2603, y: 53.3498 } }]
+    });
+    const withGazetteer: Route[] = [{ match: (url) => url.includes("Placenames_Gazetteer") && url.includes("BALLYMUN"), body: gazetteer }, ...routes];
+    const { ok, body } = await call(crossSourceTools(sourceModules), "ireland_snapshot", { place: "Ballymun" }, createContext({ fetch: fakeFetch(withGazetteer) }));
+    expect(ok).toBe(true);
+    expect(body.data).toMatchObject({ place: "Ballymun", county: "Dublin", lat: 53.3498, lon: -6.2603 });
+    expect(body.data.population.area).toBe("Dublin");
+  });
+
   it("ireland_snapshot reports unknown places and partial upstream failures", async () => {
     const tools = crossSourceTools(sourceModules);
     const unknown = await call(tools, "ireland_snapshot", { place: "Atlantis" }, ctx);
