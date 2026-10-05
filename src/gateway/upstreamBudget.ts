@@ -207,7 +207,9 @@ const HOST_SOURCES: Record<string, string> = {
   "luasforecasts.rpa.ie": "luas",
   "www.smartgriddashboard.com": "eirgrid",
   "erddap.marine.ie": "marine",
-  "waterlevel.ie": "opw-water"
+  "waterlevel.ie": "opw-water",
+  "api.ted.europa.eu": "ted",
+  "api.citybik.es": "bikes"
 };
 
 /** Maps an upstream URL to its source id; unknown hosts fall back to the hostname (never the path or query). */

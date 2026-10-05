@@ -6,18 +6,37 @@ Each call is a real MCP client round trip. By default it goes through
 `ireland_call` on the lean surface; `EVAL_TOOLSETS=all npm run live:sanity` calls
 the typed tools directly instead.
 
-## 2026-10-05, ArcGIS sources (`feat/sources-arcgis-planning-census`), local run
+## 2026-10-05, combined ArcGIS + TED + bikes (`feat/sources-ted-bikes`), local run
 
-Default surface (7 tools listed, every case through `ireland_call`): 21 PASS,
+Default surface (7 tools listed, every case through `ireland_call`): 23 PASS,
 1 SKIP (`nta_get_realtime_summary`, `NTA_API_KEY` not set), 0 FAIL.
 
 | Source | Tool | Result | ms | Note |
 |---|---|---|---|---|
-| planning | planning_search | PASS | 261 | NPAD ArcGIS keyless, CC BY 4.0 |
-| planning | planning_get | PASS | 798 | NPAD ArcGIS keyless, CC BY 4.0 |
-| census-areas | census_small_area_at | PASS | 457 | CSO/Tailte Éireann ArcGIS keyless, CC BY 4.0 |
-| heritage | heritage_monuments_near | PASS | 406 | NMS SMR ArcGIS keyless, CC BY 4.0 |
-| environment-sites | protected_sites_near | PASS | 433 | NPWS designated areas ArcGIS keyless, CC BY 4.0 |
+| cso | cso_area_profile | PASS | 1062 | |
+| oireachtas | oireachtas_search_bills | PASS | 224 | |
+| geohive | geohive_boundaries_at_point | PASS | 147 | |
+| data-gov-ie | datagov_search_datasets | PASS | 175 | |
+| smart-dublin | smartdublin_search_datasets | PASS | 214 | |
+| met-eireann | met_get_forecast | PASS | 247 | |
+| met-eireann | met_get_warnings | PASS | 59 | |
+| nta | nta_get_realtime_summary | SKIP | 0 | `NTA_API_KEY` not set locally |
+| legislation | legislation_list_acts | PASS | 82 | |
+| ppr | ppr_price_stats | PASS | 608 | |
+| irish-rail | rail_get_departures | PASS | 175 | |
+| luas | luas_get_forecast | PASS | 236 | |
+| eirgrid | grid_get_status | PASS | 316 | |
+| marine | marine_get_buoys | PASS | 302 | |
+| opw-water | water_get_level | PASS | 522 | |
+| planning | planning_search | PASS | 263 | NPAD ArcGIS keyless, CC BY 4.0 |
+| planning | planning_get | PASS | 742 | NPAD ArcGIS keyless, CC BY 4.0 |
+| census-areas | census_small_area_at | PASS | 289 | CSO/Tailte Éireann ArcGIS keyless, CC BY 4.0 |
+| heritage | heritage_monuments_near | PASS | 459 | NMS SMR ArcGIS keyless, CC BY 4.0 |
+| environment-sites | protected_sites_near | PASS | 387 | NPWS designated areas ArcGIS keyless, CC BY 4.0 |
+| ted | ted_search_tenders | PASS | 166 | New source |
+| bikes | bikes_stations_near | PASS | 235 | New source |
+| cross | search | PASS | 360 | |
+| cross | ireland_snapshot | PASS | 252 | |
 
 ## 2026-10-05, lean surface (`feat/lean-surface`), local run
 

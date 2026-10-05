@@ -1,0 +1,111 @@
+{
+  "network": {
+    "stations": [
+      {
+        "id": "00fdf0f8415ac09af8709303f5dd419d",
+        "name": "WESTERN WAY",
+        "latitude": 53.354929,
+        "longitude": -6.269425,
+        "timestamp": "2026-10-05T20:30:52.311753+00:00Z",
+        "free_bikes": 14,
+        "empty_slots": 26,
+        "extra": {
+          "uid": "102",
+          "renting": true,
+          "returning": true,
+          "last_updated": "2026-10-05T02:02:53",
+          "address": "Western Way",
+          "slots": 40,
+          "normal_bikes": 12,
+          "ebikes": 2,
+          "has_ebikes": true,
+          "virtual": false
+        }
+      },
+      {
+        "id": "01908efd6badf1c9cf37f1fb62160bbd",
+        "name": "PRINCES STREET / O'CONNELL STREET",
+        "latitude": 53.349013,
+        "longitude": -6.260311,
+        "timestamp": "2026-10-05T20:30:52.311472+00:00Z",
+        "free_bikes": 21,
+        "empty_slots": 2,
+        "extra": {
+          "uid": "33",
+          "renting": true,
+          "returning": true,
+          "last_updated": "2026-10-05T02:02:59",
+          "address": "Princes Street / O'Connell Street",
+          "slots": 23,
+          "normal_bikes": 10,
+          "ebikes": 11,
+          "has_ebikes": true,
+          "virtual": false
+        }
+      },
+      {
+        "id": "03a129962208387e736a8305ff928dfe",
+        "name": "FITZWILLIAM SQUARE WEST",
+        "latitude": 53.336074,
+        "longitude": -6.252825,
+        "timestamp": "2026-10-05T20:30:52.311495+00:00Z",
+        "free_bikes": 5,
+        "empty_slots": 25,
+        "extra": {
+          "uid": "13",
+          "renting": true,
+          "returning": true,
+          "last_updated": "2026-10-05T02:02:49",
+          "address": "Fitzwilliam Square West",
+          "slots": 30,
+          "normal_bikes": 3,
+          "ebikes": 2,
+          "has_ebikes": true,
+          "virtual": false
+        }
+      },
+      {
+        "id": "05280ab89efb0433301353fd0b73b054",
+        "name": "BOLTON STREET",
+        "latitude": 53.351182,
+        "longitude": -6.269859,
+        "timestamp": "2026-10-05T20:30:52.312018+00:00Z",
+        "free_bikes": 14,
+        "empty_slots": 6,
+        "extra": {
+          "uid": "3",
+          "renting": true,
+          "returning": true,
+          "last_updated": "2026-10-05T02:02:59",
+          "address": "Bolton Street",
+          "slots": 20,
+          "normal_bikes": 7,
+          "ebikes": 7,
+          "has_ebikes": true,
+          "virtual": false
+        }
+      },
+      {
+        "id": "09db22de8548b15120cdb7a4b18a0937",
+        "name": "GRANGEGORMAN LOWER (SOUTH)",
+        "latitude": 53.354663,
+        "longitude": -6.278681,
+        "timestamp": "2026-10-05T20:30:52.312100+00:00Z",
+        "free_bikes": 13,
+        "empty_slots": 27,
+        "extra": {
+          "uid": "103",
+          "renting": true,
+          "returning": true,
+          "last_updated": "2026-10-05T02:02:56",
+          "address": "Grangegorman Lower (South)",
+          "slots": 40,
+          "normal_bikes": 9,
+          "ebikes": 4,
+          "has_ebikes": true,
+          "virtual": false
+        }
+      }
+    ]
+  }
+}

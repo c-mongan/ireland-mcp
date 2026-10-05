@@ -65,7 +65,9 @@ export function defaultProbes(env: Record<string, string | undefined>): Probe[] 
     { source: "planning", url: `${ARCGIS_LAYERS.planningPoints}?f=json` },
     { source: "census-areas", url: `${ARCGIS_LAYERS.censusSmallAreas}?f=json` },
     { source: "heritage", url: `${ARCGIS_LAYERS.smr}?f=json` },
-    { source: "environment-sites", url: `${ARCGIS_LAYERS.npwsSac}?f=json` }
+    { source: "environment-sites", url: `${ARCGIS_LAYERS.npwsSac}?f=json` },
+    { source: "ted", url: "https://api.ted.europa.eu/swagger-ui/index.html" },
+    { source: "bikes", url: "https://api.citybik.es/v2/networks?fields=id" }
   ];
 }
 

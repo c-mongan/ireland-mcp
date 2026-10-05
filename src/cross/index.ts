@@ -85,7 +85,6 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
           sources: modules.map((m) => ({
             id: m.info.id,
             name: m.info.name,
-            summary: m.summary,
             licence: m.info.licence,
             attribution: m.info.attribution,
             tools: m.tools.map((t) => t.name)

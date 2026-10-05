@@ -62,7 +62,7 @@ export interface FetchedDocument {
 }
 
 /** Catalogue domains, in display order. */
-export const DOMAINS = ["stats", "transport", "environment", "energy", "law/politics", "places/property"] as const;
+export const DOMAINS = ["stats", "transport", "environment", "energy", "economy", "law/politics", "places/property"] as const;
 export type Domain = (typeof DOMAINS)[number];
 
 export interface SourceModule {

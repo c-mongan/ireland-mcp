@@ -1,0 +1,85 @@
+{
+  "networks": [
+    {
+      "id": "cork",
+      "name": "TFI Bikes",
+      "location": {
+        "latitude": 51.893604,
+        "longitude": -8.494174,
+        "city": "Cork",
+        "country": "IE"
+      },
+      "href": "/v2/networks/cork",
+      "company": [
+        "The National Transport Authority"
+      ],
+      "system": "TFI Bikes"
+    },
+    {
+      "id": "dublinbikes",
+      "name": "dublinbikes",
+      "location": {
+        "latitude": 53.3498053,
+        "longitude": -6.2603097,
+        "city": "Dublin",
+        "country": "IE"
+      },
+      "href": "/v2/networks/dublinbikes",
+      "company": [
+        "JCDecaux"
+      ],
+      "system": "Cyclocity",
+      "license": {
+        "name": "Open Licence",
+        "url": "https://developer.jcdecaux.com/#/opendata/licence"
+      },
+      "source": "https://developer.jcdecaux.com",
+      "gbfs_href": "https://api.cyclocity.fr/contracts/dublin/gbfs/gbfs.json"
+    },
+    {
+      "id": "galway",
+      "name": "TFI Bikes",
+      "location": {
+        "latitude": 53.2783491544,
+        "longitude": -9.05069143207,
+        "city": "Galway",
+        "country": "IE"
+      },
+      "href": "/v2/networks/galway",
+      "company": [
+        "The National Transport Authority"
+      ],
+      "system": "TFI Bikes"
+    },
+    {
+      "id": "limerick",
+      "name": "TFI Bikes",
+      "location": {
+        "latitude": 52.668746,
+        "longitude": -8.627809,
+        "city": "Limerick",
+        "country": "IE"
+      },
+      "href": "/v2/networks/limerick",
+      "company": [
+        "The National Transport Authority"
+      ],
+      "system": "TFI Bikes"
+    },
+    {
+      "id": "waterford",
+      "name": "TFI Bikes",
+      "location": {
+        "latitude": 52.2475049,
+        "longitude": -7.1130299,
+        "city": "Waterford",
+        "country": "IE"
+      },
+      "href": "/v2/networks/waterford",
+      "company": [
+        "The National Transport Authority"
+      ],
+      "system": "TFI Bikes"
+    }
+  ]
+}
