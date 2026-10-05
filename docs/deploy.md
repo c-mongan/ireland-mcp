@@ -34,8 +34,7 @@ Cost controls:
 5. `azd provision --preview` to review the changes.
 6. `azd up`
 7. Check it: `curl "$(azd env get-value MCP_ENDPOINT | sed 's#/mcp$##')/healthz"`
-8. Build the first PPR index: `az functionapp function invoke` is not available on Flex.
-   Wait for the 03:15 UTC timer, or run `npm run build && AzureWebJobsStorage__accountName=<storage> npm run ppr:build`
+8. Build the first PPR index. Either wait for the 03:15 UTC timer, or run `npm run build && AzureWebJobsStorage__accountName=<storage> npm run ppr:build`
    locally after `az login` (needs Storage Blob Data Contributor for your user).
    Until then, `ppr_*` tools use the live per-county CSV fallback.
 
