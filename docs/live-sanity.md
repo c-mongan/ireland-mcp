@@ -44,6 +44,13 @@ Default surface (7 tools listed, every case through `ireland_call`): 16 PASS,
 1 SKIP (`nta_get_realtime_summary`, `NTA_API_KEY` not set), 0 FAIL.
 `EVAL_TOOLSETS=all` (45 tools listed, typed tools called directly): same result.
 
+## 2026-10-05, `feat/sources-eurostat-ecb-wikidata` rebased on main, local run
+
+Default surface (7 tools listed, every case through `ireland_call`): 26 PASS,
+1 SKIP (`nta_get_realtime_summary`, `NTA_API_KEY` not set), 0 FAIL.
+New source checks passed: `eurostat_get_data`, `ecb_exchange_rate`,
+`wikidata_entity`.
+
 ## 2026-10-05, local run (Node 22, Dublin)
 
 | Source | Tool | Result | ms | Note |

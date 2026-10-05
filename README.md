@@ -9,11 +9,12 @@ Irish public data. Ask "What's the population of Galway?", "Any weather warnings
 today?" or "What did houses sell for in Ennis last year?" and the assistant gets
 real figures, with the source, licence and retrieval time attached.
 
-- **20 sources, 51 tools.** CSO, Oireachtas, GeoHive, data.gov.ie, Smart Dublin,
-  Met Éireann, NTA, the Irish Statute Book, the Property Price Register, Irish Rail,
-  Luas, EirGrid, Marine Institute weather buoys, OPW river levels, planning,
-  Census 2022 small areas, National Monuments, NPWS protected sites, EU TED
-  tenders and Irish bike-share availability.
+- **23 sources, 59 tools.** CSO, Eurostat, ECB, Oireachtas, GeoHive, Wikidata,
+  data.gov.ie, Smart Dublin, Met Éireann, NTA, the Irish Statute Book, the
+  Property Price Register, Irish Rail, Luas, EirGrid, Marine Institute weather
+  buoys, OPW river levels, planning, Census 2022 small areas, National
+  Monuments, NPWS protected sites, EU TED tenders and Irish bike-share
+  availability.
 - **Two ways to run it.** A hosted Streamable HTTP endpoint (`/mcp`), or locally
   over stdio with `npx -y ireland-mcp`.
 - **No accounts.** Nothing to sign up for. Nothing is written anywhere.
@@ -27,7 +28,7 @@ real figures, with the source, licence and retrieval time attached.
 ## Tool surface: lean by default
 
 By default `tools/list` is small: **7 tools, about 5,100 chars (≈1.3k tokens)**,
-down from the full 55-tool surface at about 52,200 chars (≈13.0k tokens). That keeps clients
+down from the full typed-tool surface. That keeps clients
 such as Cursor well under their ~40-tool limit and saves context. A CI test fails
 if the default list grows past 16,000 chars (≈4k tokens); `npm run measure:tools`
 prints the current figure.
@@ -52,15 +53,15 @@ client works better with them:
 | --- | --- |
 | HTTP query | `/mcp?toolsets=cso,irish-rail` (comma list of source ids) |
 | HTTP path | `/mcp/x/irish-rail` (one source) |
-| Everything | `/mcp?toolsets=all` (all 51 typed tools plus the meta tools) |
+| Everything | `/mcp?toolsets=all` (all 59 typed tools plus the meta tools) |
 | stdio | `npx -y ireland-mcp --toolsets=cso,irish-rail`, or `IRELAND_MCP_TOOLSETS=all` |
 
-Source ids: `cso`, `oireachtas`, `geohive`, `data-gov-ie`, `smart-dublin`,
-`met-eireann`, `nta`, `legislation`, `ppr`, `irish-rail`, `luas`, `eirgrid`,
-`marine`, `opw-water`, `planning`, `census-areas`, `heritage`,
-`marine`, `opw-water`, `planning`, `census-areas`, `heritage`,
-`environment-sites`, `ted`, `bikes`, `cross`. An unknown id is a clear error
-(HTTP 400 with the valid list, or exit code 1 on stdio).
+Source ids: `cso`, `eurostat`, `ecb`, `oireachtas`, `geohive`, `wikidata`,
+`data-gov-ie`, `smart-dublin`, `met-eireann`, `nta`, `legislation`, `ppr`,
+`irish-rail`, `luas`, `eirgrid`, `marine`, `opw-water`, `planning`,
+`census-areas`, `heritage`, `environment-sites`, `ted`, `bikes`, `cross`. An
+unknown id is a clear error (HTTP 400 with the valid list, or exit code 1 on
+stdio).
 
 **Response budget.** Each result is capped at about 2,000 tokens (chars ÷ 4).
 Pass `max_tokens` (100–8,000) to change it. When a large list is cut, the result
@@ -76,8 +77,11 @@ Results also come back as `structuredContent`.
 | Source | Tools | Data |
 | --- | --- | --- |
 | CSO PxStat | `cso_search_tables`, `cso_get_table_metadata`, `cso_get_data`, `cso_area_profile` | National statistics: census, prices, labour, housing |
+| Eurostat | `eurostat_search_datasets`, `eurostat_get_data`, `eurostat_compare_ie_eu` | EU statistical datasets for Ireland and EU aggregate comparisons |
+| ECB Data Portal | `ecb_get_series`, `ecb_interest_rates`, `ecb_exchange_rate` | ECB SDMX financial series, euro rates, FX rates, selected Irish MIR/BSI series where exposed through ECB |
 | Oireachtas | `oireachtas_search_members`, `oireachtas_search_bills`, `oireachtas_get_debates`, `oireachtas_search_questions`, `oireachtas_get_votes` | TDs and Senators, bills, debates, PQs, divisions |
 | GeoHive | `geohive_boundaries_at_point`, `geohive_list_layers`, `geohive_query_layer` | County, constituency, LEA, electoral division, small area |
+| Wikidata | `wikidata_place`, `wikidata_entity` | Safe CC0 Irish-place and entity summaries; no arbitrary SPARQL exposed |
 | data.gov.ie | `datagov_search_datasets`, `datagov_get_dataset`, `datagov_query_datastore` | National open data catalogue |
 | Smart Dublin | `smartdublin_search_datasets`, `smartdublin_get_dataset`, `smartdublin_query_datastore` | Dublin local authority datasets |
 | Met Éireann | `met_get_forecast`, `met_get_observations`, `met_get_warnings` | Point forecasts, station observations, warnings |
@@ -99,6 +103,11 @@ Results also come back as `structuredContent`.
 
 All of these are reachable on the default surface through `ireland_call`; they
 are listed as tools only when their toolset is enabled (see above).
+
+Central Bank of Ireland direct Open Data Portal was checked. It has a keyless
+SDMX endpoint (`https://web.opendata.centralbank.ie/statistics/sdmx/v1.0/`) and
+is a good future source; this release keeps the requested source set to ECB while
+noting that Irish MIR/BSI banking series are available through ECB where exposed.
 
 `search` and `fetch` follow the ChatGPT deep research contract. `search` returns
 `[{id, title, url}]` with ids such as `cso:FY003A`, `oireachtas:bill/2024/12` or

@@ -44,8 +44,11 @@ export function defaultProbes(env: Record<string, string | undefined>): Probe[] 
   const ntaKey = env.NTA_API_KEY;
   return [
     { source: "cso", url: `${CSO_REST}/PxStat.Data.Cube_API.ReadMetadata/F1001/JSON-stat/2.0/en` },
+    { source: "eurostat", url: "https://ec.europa.eu/eurostat/api/dissemination/catalogue/toc/txt?lang=en" },
+    { source: "ecb", url: "https://data-api.ecb.europa.eu/service/data/EXR/D.USD.EUR.SP00.A?format=jsondata&lastNObservations=1" },
     { source: "oireachtas", url: `${OIREACHTAS_API}/legislation?limit=1` },
     { source: "geohive", url: `${ARCGIS_BASE}?f=json` },
+    { source: "wikidata", url: "https://query.wikidata.org/sparql?query=ASK%20%7B%20wd%3AQ27%20wdt%3AP31%20%3Ftype%20%7D&format=json" },
     { source: "data-gov-ie", url: "https://data.gov.ie/api/3/action/status_show" },
     { source: "smart-dublin", url: "https://data.smartdublin.ie/api/3/action/status_show" },
     { source: "met-eireann", url: WARNINGS_URL },

@@ -28,6 +28,17 @@ Central Statistics Office (CSO) PxStat — https://data.cso.ie
   Licence: CC BY 4.0
   Attribution: Source: Central Statistics Office, Ireland (www.cso.ie).
 
+Eurostat Statistics API — https://ec.europa.eu/eurostat
+  Licence: Eurostat reuse policy (CC BY 4.0 equivalent)
+  Attribution: Source: Eurostat, European Commission.
+
+European Central Bank Data Portal — https://data.ecb.europa.eu
+  Licence: ECB Data Portal terms of use (free reuse with attribution)
+  Attribution: Source: European Central Bank Data Portal.
+  Notes: The direct Central Bank of Ireland Open Data Portal has a keyless SDMX
+  endpoint and is a candidate for a future first-party CBI source; this release
+  uses ECB for the requested ECB and ECB-exposed Irish banking series.
+
 Houses of the Oireachtas Open Data API — https://api.oireachtas.ie
   Licence: Oireachtas (Open Data) PSI Licence
   Attribution: Contains Oireachtas information licensed under the
@@ -36,6 +47,10 @@ Houses of the Oireachtas Open Data API — https://api.oireachtas.ie
 GeoHive / Tailte Éireann boundary services — https://www.geohive.ie
   Licence: CC BY 4.0
   Attribution: © Tailte Éireann. Census geographies © CSO.
+
+Wikidata Query Service — https://query.wikidata.org
+  Licence: CC0 1.0 Public Domain Dedication
+  Attribution: Source: Wikidata contributors, CC0.
 
 data.gov.ie (CKAN) — https://data.gov.ie
   Licence: per dataset, mostly CC BY 4.0. Check each dataset's licence field.

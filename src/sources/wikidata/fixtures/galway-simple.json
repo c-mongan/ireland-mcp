@@ -1,0 +1,43 @@
+{
+  "head" : {
+    "vars" : [ "place", "placeLabel", "population" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "place" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q129610"
+      },
+      "population" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#decimal",
+        "type" : "literal",
+        "value" : "83456"
+      },
+      "placeLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Galway"
+      }
+    }, {
+      "place" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q5519462"
+      },
+      "placeLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Galway"
+      }
+    }, {
+      "place" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q18163573"
+      },
+      "placeLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Galway"
+      }
+    } ]
+  }
+}
