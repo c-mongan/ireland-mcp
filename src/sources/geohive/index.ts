@@ -221,10 +221,71 @@ const queryLayerTool = defineTool({
   }
 });
 
+const GAZETTEER = [
+  { kind: "town", service: "Centres_of_Population___OSi_National_Placenames_Gazetteer" },
+  { kind: "townland", service: "Townlands___OSi_National_Placenames_Gazetteer" }
+] as const;
+const round5 = (n: number) => Math.round(n * 1e5) / 1e5;
+
+/** Gazetteer lookup: towns first, then townlands; exact English or Irish name. */
+export async function locatePlace(ctx: ToolContext, name: string, limit = 5) {
+  const upper = name.trim().toUpperCase().replace(/'/g, "''");
+  const where = `UPPER(English_Na) = '${upper}' OR UPPER(Irish_Name) = '${upper}'`;
+  for (const layer of GAZETTEER) {
+    const query = new URLSearchParams({
+      where,
+      outFields: "English_Na,Irish_Name,County,Classifica",
+      outSR: "4326",
+      returnGeometry: "true",
+      resultRecordCount: String(limit),
+      f: "json"
+    });
+    const url = `${ARCGIS_BASE}/${layer.service}/FeatureServer/0/query?${query.toString()}`;
+    const result = await ctx.cachedJson<{ features?: Array<{ attributes: Record<string, unknown>; geometry?: { x: number; y: number } }> }>(
+      url,
+      TTL,
+      { label: "GeoHive gazetteer", validate: assertArcGisOk }
+    );
+    const places = (result.value.features ?? [])
+      .filter((f) => f.geometry)
+      .map((f) => ({
+        name: title(f.attributes.English_Na),
+        irish: str(f.attributes.Irish_Name),
+        county: title(f.attributes.County),
+        kind: layer.kind,
+        lat: round5(f.geometry!.y),
+        lon: round5(f.geometry!.x)
+      }));
+    if (places.length) return { places, url, cached: result.cached, stale: result.stale };
+  }
+  return null;
+}
+
+const locateTool = defineTool({
+  name: "geohive_locate",
+  example: { name: "Dingle" },
+  title: "Locate an Irish place name",
+  description:
+    "Find coordinates for an Irish town, village or townland by English or Irish name (Tailte Éireann gazetteer). Use the lat/lon with nearby or other point tools.",
+  inputSchema: {
+    name: z.string().min(2).max(80).describe("Exact place name, English or Irish, e.g. 'Dingle' or 'An Daingean'."),
+    limit: z.number().int().min(1).max(20).default(5)
+  },
+  handler: async ({ name, limit }, ctx) => {
+    const found = await locatePlace(ctx, name, limit);
+    if (!found) {
+      throw new ToolError("NOT_FOUND", `No town or townland named "${name}" in the gazetteer.`, {
+        hint: "Check spelling, drop 'Co.' or suffixes like 'town', or try the Irish name."
+      });
+    }
+    return envelope(geohiveInfo, { data: { count: found.places.length, places: found.places }, url: found.url, cached: found.cached, stale: found.stale });
+  }
+});
+
 export const geohiveModule: SourceModule = {
   info: geohiveInfo,
   summary: "Boundaries and geography: which county, constituency, electoral division or small area a point is in; GeoHive layers.",
   domain: "places/property",
   coverage: "Republic of Ireland statutory boundaries: counties, local authorities, constituencies, electoral divisions, small areas and settlements.",
-  tools: [boundariesTool, listLayersTool, queryLayerTool]
+  tools: [boundariesTool, locateTool, listLayersTool, queryLayerTool]
 };
