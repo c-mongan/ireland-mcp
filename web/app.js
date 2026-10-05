@@ -106,7 +106,13 @@ const WORDS = [
 
 const motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
 const video = $("hero-video");
-if (motionQuery.matches && video) video.pause();
+const syncVideo = () => {
+  if (!video) return;
+  if (motionQuery.matches) video.pause();
+  else video.play().catch(() => {});
+};
+syncVideo();
+motionQuery.addEventListener("change", syncVideo);
 
 function canAnimate() {
   const lowPower = (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory ?? 8) <= 4;
@@ -117,10 +123,9 @@ function canAnimate() {
 function startTextRain() {
   const canvas = $("text-rain");
   const ctx = canvas?.getContext("2d");
-  if (!ctx || !canAnimate()) return;
-  canvas.hidden = false;
+  if (!ctx) return;
   const size = 13;
-  let width = 0, height = 0, drops = [], frame = 0;
+  let width = 0, height = 0, drops = [], frame = 0, running = false;
   const pick = () => WORDS[Math.floor(Math.random() * WORDS.length)];
   const init = () => {
     width = canvas.width = innerWidth;
@@ -139,23 +144,34 @@ function startTextRain() {
       d.y += d.speed;
     });
   };
-  addEventListener("resize", init);
-  init();
   const loop = () => {
+    if (!running) return;
     if (!document.hidden && ++frame % 4 === 0) draw();
     requestAnimationFrame(loop);
   };
-  requestAnimationFrame(loop);
+  // Re-check eligibility whenever the viewport or motion preference changes; stop drawing entirely when not eligible.
+  const update = () => {
+    const ok = canAnimate();
+    canvas.hidden = !ok;
+    if (ok) init();
+    if (ok && !running) { running = true; requestAnimationFrame(loop); }
+    if (!ok) running = false;
+  };
+  addEventListener("resize", update);
+  motionQuery.addEventListener("change", update);
+  update();
 }
 startTextRain();
 
-// Live status pill: reads /healthz next to the configured MCP endpoint.
+// Live status pill: checks the hosted endpoint from the page's meta tag, not the user-editable Try It field.
 (async () => {
   const pill = $("live-pill"), text = $("live-text");
-  const endpoint = $("endpoint").value;
+  const endpoint = meta || (local ? `${location.origin}/mcp` : "");
   if (!pill || !endpoint) return;
   try {
-    const res = await fetch(endpoint.replace(/\/mcp\/?$/, "/healthz"), { signal: AbortSignal.timeout(8000) });
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(endpoint.replace(/\/mcp\/?$/, "/healthz"), { signal: controller.signal });
     const body = await res.json();
     if (!res.ok || body.status !== "ok") throw new Error(String(res.status));
     text.textContent = `Live now · ${body.sources?.length ?? 0} sources · no sign-up`;
