@@ -1,5 +1,6 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { AnyTool, SourceModule, ToolContext } from "./gateway/module.js";
+import type { SourceModule, ToolContext } from "./gateway/module.js";
+import { crossSourceTools } from "./cross/index.js";
 import { buildServer } from "./gateway/server.js";
 import type { TelemetrySink } from "./gateway/telemetry.js";
 import { csoModule } from "./sources/cso/index.js";
@@ -14,10 +15,6 @@ import { smartDublinModule } from "./sources/smart-dublin/index.js";
 
 export const sourceModules: SourceModule[] = [csoModule, oireachtasModule, geohiveModule, dataGovIeModule, smartDublinModule, metModule, ntaModule, legislationModule, pprModule];
 
-export function crossSourceTools(_modules: SourceModule[]): AnyTool[] {
-  return [];
-}
-
 export function createAppServer(context: ToolContext, telemetry?: TelemetrySink): McpServer {
   return buildServer({
     modules: sourceModules,
@@ -26,3 +23,4 @@ export function createAppServer(context: ToolContext, telemetry?: TelemetrySink)
     ...(telemetry ? { telemetry } : {})
   });
 }
+
