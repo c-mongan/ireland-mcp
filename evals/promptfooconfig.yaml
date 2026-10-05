@@ -219,3 +219,53 @@ tests:
     assert:
       - type: icontains-any
         value: [ireland_snapshot, nearby, met_get_forecast]
+  - vars:
+      question: "When is the next DART from Dublin Pearse?"
+    assert:
+      - type: icontains-any
+        value: [rail_get_departures, rail_find_station]
+  - vars:
+      question: "What's the station code for Galway Ceannt on Irish Rail?"
+    assert:
+      - type: icontains-any
+        value: [rail_find_station]
+  - vars:
+      question: "When is the next Luas from St. Stephen's Green?"
+    assert:
+      - type: icontains-any
+        value: [luas_get_forecast]
+  - vars:
+      question: "List the stops on the Luas Green line."
+    assert:
+      - type: icontains-any
+        value: [luas_list_stops]
+  - vars:
+      question: "How much of Ireland's electricity is coming from wind right now?"
+    assert:
+      - type: icontains-any
+        value: [grid_get_status]
+  - vars:
+      question: "What's the carbon intensity of the Irish grid at the moment?"
+    assert:
+      - type: icontains-any
+        value: [grid_get_status]
+  - vars:
+      question: "How big are the waves off the west coast of Ireland right now?"
+    assert:
+      - type: icontains-any
+        value: [marine_get_buoys]
+  - vars:
+      question: "What's the sea temperature in the Irish Sea today?"
+    assert:
+      - type: icontains-any
+        value: [marine_get_buoys]
+  - vars:
+      question: "Is the River Shannon high at Athlone right now?"
+    assert:
+      - type: icontains-any
+        value: [water_get_level, water_find_stations]
+  - vars:
+      question: "Find river level gauges near Ballinasloe."
+    assert:
+      - type: icontains-any
+        value: [water_find_stations]

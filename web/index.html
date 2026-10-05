@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ireland MCP — Irish public data for AI assistants</title>
-  <meta name="description" content="A free, read-only Model Context Protocol server for Irish public data: CSO, Oireachtas, GeoHive, data.gov.ie, Smart Dublin, Met Éireann, NTA, Irish Statute Book and the Property Price Register.">
+  <meta name="description" content="A free, read-only Model Context Protocol server for Irish public data: CSO, Oireachtas, GeoHive, data.gov.ie, Smart Dublin, Met Éireann, NTA, Irish Statute Book, Property Price Register, Irish Rail, Luas, EirGrid, Marine Institute buoys and OPW river levels.">
   <!-- Set this after deploying: the public Function App MCP URL. Local dev uses same-origin /mcp. -->
   <meta name="mcp-endpoint" content="https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1L10 5.5H14.5L11 8.5L12.5 13L8 10.5L3.5 13L5 8.5L1.5 5.5H6L8 1Z' fill='%2334c08a'/%3E%3C/svg%3E">
@@ -32,8 +32,8 @@
         <span class="proof-pill" id="live-pill"><span class="pulse"></span><span id="live-text">Hosted endpoint — no sign-up</span></span>
       </div>
       <div class="stats fade-in-up d3" id="stats">
-        <span><strong>9</strong> sources</span><span class="dot">·</span>
-        <span><strong>33</strong> tools</span><span class="dot">·</span>
+        <span><strong>14</strong> sources</span><span class="dot">·</span>
+        <span><strong>41</strong> tools</span><span class="dot">·</span>
         <span><strong>0</strong> sign-ups</span>
       </div>
       <nav class="cta fade-in-up d4">
@@ -57,6 +57,11 @@
         <li class="card"><h3>NTA</h3><p>Live GTFS-R delays and cancellations for public transport.</p><code>nta_*</code></li>
         <li class="card"><h3>Irish Statute Book</h3><p>Acts by year and section text through ELI identifiers.</p><code>legislation_*</code></li>
         <li class="card"><h3>Property Price Register</h3><p>Residential sale prices and area statistics since 2010.</p><code>ppr_*</code></li>
+        <li class="card"><h3>Irish Rail</h3><p>Live train departures and station codes across the network.</p><code>rail_*</code></li>
+        <li class="card"><h3>Luas</h3><p>Live tram arrivals and service messages on the Red and Green lines.</p><code>luas_*</code></li>
+        <li class="card"><h3>EirGrid</h3><p>Live electricity demand, wind share and carbon intensity.</p><code>grid_*</code></li>
+        <li class="card"><h3>Marine Institute</h3><p>Wind, waves and sea temperature from the offshore weather buoys.</p><code>marine_*</code></li>
+        <li class="card"><h3>OPW river levels</h3><p>Water levels at about 460 river and lake gauges.</p><code>water_*</code></li>
       </ul>
       <p class="muted small">Plus cross-source tools: <code>search</code>, <code>fetch</code>, <code>list_sources</code>, <code>ireland_snapshot</code> and <code>nearby</code>.</p>
     </section>

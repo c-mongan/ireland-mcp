@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfObjStationData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://api.irishrail.ie/realtime/">
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>E934 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Greystones</Origin>
+    <Destination>Howth</Destination>
+    <Origintime>16:01</Origintime>
+    <Destinationtime>17:29</Destinationtime>
+    <Status>En Route</Status>
+    <Lastlocation>Departed Sandymount</Lastlocation>
+    <Duein>7</Duein>
+    <Late>1</Late>
+    <Exparrival>16:57</Exparrival>
+    <Expdepart>16:58</Expdepart>
+    <Scharrival>16:56</Scharrival>
+    <Schdepart>16:57</Schdepart>
+    <Direction>Northbound</Direction>
+    <Traintype>DART</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>E832 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Bray</Origin>
+    <Destination>Malahide</Destination>
+    <Origintime>16:25</Origintime>
+    <Destinationtime>17:40</Destinationtime>
+    <Status>En Route</Status>
+    <Lastlocation>Arrived Seapoint</Lastlocation>
+    <Duein>17</Duein>
+    <Late>1</Late>
+    <Exparrival>17:07</Exparrival>
+    <Expdepart>17:08</Expdepart>
+    <Scharrival>17:06</Scharrival>
+    <Schdepart>17:07</Schdepart>
+    <Direction>Northbound</Direction>
+    <Traintype>DART</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>E935 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Bray</Origin>
+    <Destination>Howth</Destination>
+    <Origintime>16:32</Origintime>
+    <Destinationtime>17:49</Destinationtime>
+    <Status>En Route</Status>
+    <Lastlocation>Arrived Sandycove</Lastlocation>
+    <Duein>25</Duein>
+    <Late>-1</Late>
+    <Exparrival>17:15</Exparrival>
+    <Expdepart>17:16</Expdepart>
+    <Scharrival>17:16</Scharrival>
+    <Schdepart>17:17</Schdepart>
+    <Direction>Northbound</Direction>
+    <Traintype>DART</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>P414 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Hazelhatch</Origin>
+    <Destination>Grand Canal Dock</Destination>
+    <Origintime>16:38</Origintime>
+    <Destinationtime>17:23</Destinationtime>
+    <Status>En Route</Status>
+    <Lastlocation>Departed Park West and Cherry Orchard</Lastlocation>
+    <Duein>29</Duein>
+    <Late>0</Late>
+    <Exparrival>17:19</Exparrival>
+    <Expdepart>17:20</Expdepart>
+    <Scharrival>17:19</Scharrival>
+    <Schdepart>17:20</Schdepart>
+    <Direction>Northbound</Direction>
+    <Traintype>Train</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>D826 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Bray</Origin>
+    <Destination>Drogheda</Destination>
+    <Origintime>16:40</Origintime>
+    <Destinationtime>18:24</Destinationtime>
+    <Status>En Route</Status>
+    <Lastlocation>Arrived Dalkey</Lastlocation>
+    <Duein>30</Duein>
+    <Late>0</Late>
+    <Exparrival>17:20</Exparrival>
+    <Expdepart>17:21</Expdepart>
+    <Scharrival>17:20</Scharrival>
+    <Schdepart>17:21</Schdepart>
+    <Direction>Northbound</Direction>
+    <Traintype>Train</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>E833 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Greystones</Origin>
+    <Destination>Malahide</Destination>
+    <Origintime>16:31</Origintime>
+    <Destinationtime>17:59</Destinationtime>
+    <Status>En Route</Status>
+    <Lastlocation>Departed Shankill</Lastlocation>
+    <Duein>36</Duein>
+    <Late>1</Late>
+    <Exparrival>17:26</Exparrival>
+    <Expdepart>17:27</Expdepart>
+    <Scharrival>17:25</Scharrival>
+    <Schdepart>17:26</Schdepart>
+    <Direction>Northbound</Direction>
+    <Traintype>DART</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>E936 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Bray</Origin>
+    <Destination>Howth</Destination>
+    <Origintime>16:55</Origintime>
+    <Destinationtime>18:09</Destinationtime>
+    <Status>No Information</Status>
+    <Lastlocation />
+    <Duein>46</Duein>
+    <Late>0</Late>
+    <Exparrival>17:36</Exparrival>
+    <Expdepart>17:37</Expdepart>
+    <Scharrival>17:36</Scharrival>
+    <Schdepart>17:37</Schdepart>
+    <Direction>Northbound</Direction>
+    <Traintype>DART</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>E834 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Bray</Origin>
+    <Destination>Malahide</Destination>
+    <Origintime>17:02</Origintime>
+    <Destinationtime>18:21</Destinationtime>
+    <Status>No Information</Status>
+    <Lastlocation />
+    <Duein>56</Duein>
+    <Late>0</Late>
+    <Exparrival>17:46</Exparrival>
+    <Expdepart>17:47</Expdepart>
+    <Scharrival>17:46</Scharrival>
+    <Schdepart>17:47</Schdepart>
+    <Direction>Northbound</Direction>
+    <Traintype>DART</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>E122 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Malahide</Origin>
+    <Destination>Greystones</Destination>
+    <Origintime>16:24</Origintime>
+    <Destinationtime>17:54</Destinationtime>
+    <Status>En Route</Status>
+    <Lastlocation>Arrived Dublin Connolly</Lastlocation>
+    <Duein>3</Duein>
+    <Late>-3</Late>
+    <Exparrival>16:53</Exparrival>
+    <Expdepart>16:54</Expdepart>
+    <Scharrival>16:56</Scharrival>
+    <Schdepart>16:57</Schdepart>
+    <Direction>Southbound</Direction>
+    <Traintype>DART</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>E244 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Howth</Origin>
+    <Destination>Bray</Destination>
+    <Origintime>16:35</Origintime>
+    <Destinationtime>17:50</Destinationtime>
+    <Status>En Route</Status>
+    <Lastlocation>Departed Harmonstown</Lastlocation>
+    <Duein>15</Duein>
+    <Late>0</Late>
+    <Exparrival>17:05</Exparrival>
+    <Expdepart>17:06</Expdepart>
+    <Scharrival>17:05</Scharrival>
+    <Schdepart>17:06</Schdepart>
+    <Direction>Southbound</Direction>
+    <Traintype>DART</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>E245 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Malahide</Origin>
+    <Destination>Bray</Destination>
+    <Origintime>16:44</Origintime>
+    <Destinationtime>18:03</Destinationtime>
+    <Status>En Route</Status>
+    <Lastlocation>Arrived Clongriffin</Lastlocation>
+    <Duein>25</Duein>
+    <Late>0</Late>
+    <Exparrival>17:15</Exparrival>
+    <Expdepart>17:16</Expdepart>
+    <Scharrival>17:15</Scharrival>
+    <Schdepart>17:16</Schdepart>
+    <Direction>Southbound</Direction>
+    <Traintype>DART</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>E123 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Howth</Origin>
+    <Destination>Greystones</Destination>
+    <Origintime>16:55</Origintime>
+    <Destinationtime>18:24</Destinationtime>
+    <Status>No Information</Status>
+    <Lastlocation />
+    <Duein>35</Duein>
+    <Late>0</Late>
+    <Exparrival>17:25</Exparrival>
+    <Expdepart>17:26</Expdepart>
+    <Scharrival>17:25</Scharrival>
+    <Schdepart>17:26</Schdepart>
+    <Direction>Southbound</Direction>
+    <Traintype>DART</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>D417 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Grand Canal Dock</Origin>
+    <Destination>Newbridge</Destination>
+    <Origintime>17:29</Origintime>
+    <Destinationtime>18:34</Destinationtime>
+    <Status>No Information</Status>
+    <Lastlocation />
+    <Duein>41</Duein>
+    <Late>0</Late>
+    <Exparrival>17:31</Exparrival>
+    <Expdepart>17:32</Expdepart>
+    <Scharrival>17:31</Scharrival>
+    <Schdepart>17:32</Schdepart>
+    <Direction>Southbound</Direction>
+    <Traintype>Train</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>A612 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Dublin Connolly</Origin>
+    <Destination>Rosslare Europort</Destination>
+    <Origintime>17:28</Origintime>
+    <Destinationtime>20:39</Destinationtime>
+    <Status>No Information</Status>
+    <Lastlocation />
+    <Duein>42</Duein>
+    <Late>0</Late>
+    <Exparrival>17:32</Exparrival>
+    <Expdepart>17:33</Expdepart>
+    <Scharrival>17:32</Scharrival>
+    <Schdepart>17:33</Schdepart>
+    <Direction>Southbound</Direction>
+    <Traintype>Train</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>P665 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Maynooth</Origin>
+    <Destination>Grand Canal Dock</Destination>
+    <Origintime>16:39</Origintime>
+    <Destinationtime>17:34</Destinationtime>
+    <Status>En Route</Status>
+    <Lastlocation>Departed Leixlip (Louisa Bridge)</Lastlocation>
+    <Duein>43</Duein>
+    <Late>4</Late>
+    <Exparrival>17:34</Exparrival>
+    <Expdepart>17:34</Expdepart>
+    <Scharrival>17:29</Scharrival>
+    <Schdepart>17:30</Schdepart>
+    <Direction>Southbound</Direction>
+    <Traintype>Train</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>E246 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Malahide</Origin>
+    <Destination>Bray</Destination>
+    <Origintime>17:04</Origintime>
+    <Destinationtime>18:20</Destinationtime>
+    <Status>No Information</Status>
+    <Lastlocation />
+    <Duein>45</Duein>
+    <Late>0</Late>
+    <Exparrival>17:35</Exparrival>
+    <Expdepart>17:36</Expdepart>
+    <Scharrival>17:35</Scharrival>
+    <Schdepart>17:36</Schdepart>
+    <Direction>Southbound</Direction>
+    <Traintype>DART</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>E247 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Howth</Origin>
+    <Destination>Bray</Destination>
+    <Origintime>17:15</Origintime>
+    <Destinationtime>18:33</Destinationtime>
+    <Status>No Information</Status>
+    <Lastlocation />
+    <Duein>55</Duein>
+    <Late>0</Late>
+    <Exparrival>17:45</Exparrival>
+    <Expdepart>17:46</Expdepart>
+    <Scharrival>17:45</Scharrival>
+    <Schdepart>17:46</Schdepart>
+    <Direction>Southbound</Direction>
+    <Traintype>DART</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>D825 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Dun Laoghaire</Origin>
+    <Destination>Dundalk</Destination>
+    <Origintime>16:40</Origintime>
+    <Destinationtime>18:35</Destinationtime>
+    <Status>En Route</Status>
+    <Lastlocation>Arrived Sydney Parade</Lastlocation>
+    <Duein>10</Duein>
+    <Late>0</Late>
+    <Exparrival>17:00</Exparrival>
+    <Expdepart>17:01</Expdepart>
+    <Scharrival>17:00</Scharrival>
+    <Schdepart>17:01</Schdepart>
+    <Direction>To Dundalk</Direction>
+    <Traintype>Train</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>P617 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Drogheda</Origin>
+    <Destination>Grand Canal Dock</Destination>
+    <Origintime>16:43</Origintime>
+    <Destinationtime>17:52</Destinationtime>
+    <Status>En Route</Status>
+    <Lastlocation>Arrived Laytown</Lastlocation>
+    <Duein>58</Duein>
+    <Late>-1</Late>
+    <Exparrival>17:48</Exparrival>
+    <Expdepart>17:49</Expdepart>
+    <Scharrival>17:49</Scharrival>
+    <Schdepart>17:50</Schdepart>
+    <Direction>To Grand Canal Dock</Direction>
+    <Traintype>Train</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>D925 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Grand Canal Dock</Origin>
+    <Destination>Longford</Destination>
+    <Origintime>17:09</Origintime>
+    <Destinationtime>19:40</Destinationtime>
+    <Status>No Information</Status>
+    <Lastlocation />
+    <Duein>21</Duein>
+    <Late>0</Late>
+    <Exparrival>17:10</Exparrival>
+    <Expdepart>17:12</Expdepart>
+    <Scharrival>17:10</Scharrival>
+    <Schdepart>17:12</Schdepart>
+    <Direction>To Longford</Direction>
+    <Traintype>Train</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+  <objStationData>
+    <Servertime>2026-10-05T16:51:20.787</Servertime>
+    <Traincode>D927 </Traincode>
+    <Stationfullname>Dublin Pearse</Stationfullname>
+    <Stationcode>PERSE</Stationcode>
+    <Querytime>16:51:20</Querytime>
+    <Traindate>05 Oct 2026</Traindate>
+    <Origin>Grand Canal Dock</Origin>
+    <Destination>Maynooth</Destination>
+    <Origintime>17:39</Origintime>
+    <Destinationtime>18:36</Destinationtime>
+    <Status>No Information</Status>
+    <Lastlocation />
+    <Duein>50</Duein>
+    <Late>0</Late>
+    <Exparrival>17:40</Exparrival>
+    <Expdepart>17:41</Expdepart>
+    <Scharrival>17:40</Scharrival>
+    <Schdepart>17:41</Schdepart>
+    <Direction>To Maynooth</Direction>
+    <Traintype>Train</Traintype>
+    <Locationtype>S</Locationtype>
+  </objStationData>
+</ArrayOfObjStationData>

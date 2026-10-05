@@ -66,3 +66,27 @@ Residential Property Price Register — https://www.propertypriceregister.ie
   Attribution: Property Services Regulatory Authority, Residential Property
   Price Register. The register reflects declared sale prices and is not a
   valuation.
+
+Iarnród Éireann (Irish Rail) Realtime API — https://api.irishrail.ie/realtime/
+  Licence: open public data; attribution required
+  Attribution: Contains Iarnród Éireann realtime data. Times are estimates.
+
+Luas Forecasting API — https://data.gov.ie/dataset/luas-forecasting-api
+  Licence: CC BY 4.0
+  Attribution: Transport Infrastructure Ireland, Luas Forecasting API.
+
+EirGrid Smart Grid Dashboard — https://www.smartgriddashboard.com
+  Licence: public information, attribution required
+  Attribution: Source: EirGrid. Real-time data is provisional and provided as
+  is for information only, under EirGrid's disclaimer.
+
+Marine Institute Irish Weather Buoy Network — https://erddap.marine.ie
+  Licence: CC BY 4.0
+  Attribution: Marine Institute, Irish Weather Buoy Network.
+
+OPW Hydrometric Network — https://waterlevel.ie
+  Licence: CC BY 4.0
+  Attribution: Contains Irish Public Sector Information licensed under a
+  Creative Commons Attribution 4.0 International (CC BY 4.0) licence (source
+  waterlevel.ie, provided by the Office of Public Works). Provisional data;
+  see the waterlevel.ie disclaimer.
