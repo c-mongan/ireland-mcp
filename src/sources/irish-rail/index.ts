@@ -2,6 +2,7 @@ import { z } from "zod";
 import { DAY, MINUTE } from "../../gateway/context.js";
 import { bound, envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
+import { decodeXml } from "../../gateway/xml.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
 
 export const irishRailInfo: SourceInfo = {
@@ -17,7 +18,7 @@ export const RAIL_BASE = "https://api.irishrail.ie/realtime/realtime.asmx";
 const blocks = (xml: string, tag: string) => [...xml.matchAll(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`, "g"))].map((m) => m[1] ?? "");
 const text = (block: string, tag: string) => {
   const v = block.match(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`))?.[1]?.trim();
-  return v ? v.replace(/&amp;/g, "&").replace(/&apos;/g, "'") : null;
+  return v ? decodeXml(v) : null;
 };
 const int = (v: string | null) => (v === null || !/^-?\d+$/.test(v) ? null : Number(v));
 const fold = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f'’.-]/g, "").replace(/\s+/g, " ").trim().toLowerCase();

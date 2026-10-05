@@ -2,6 +2,7 @@ import { z } from "zod";
 import { DAY, MINUTE } from "../../gateway/context.js";
 import { envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
+import { decodeXml as decode } from "../../gateway/xml.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
 
 export const luasInfo: SourceInfo = {
@@ -14,7 +15,6 @@ export const luasInfo: SourceInfo = {
 
 export const LUAS_BASE = "https://luasforecasts.rpa.ie/xml/get.ashx";
 
-const decode = (s: string) => s.replace(/&amp;/g, "&").replace(/&apos;|&#39;/g, "'").replace(/&quot;/g, '"');
 const attr = (tag: string, name: string) => {
   const v = tag.match(new RegExp(`\\b${name}="([^"]*)"`))?.[1];
   return v === undefined ? null : decode(v);
