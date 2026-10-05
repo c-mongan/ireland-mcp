@@ -21,6 +21,10 @@ export interface CacheResult<T> {
 
 export interface CacheOptions {
   maxEntries?: number;
+  /** Approximate in-memory budget in characters across all entries. */
+  maxBytes?: number;
+  /** Entries estimated above this size are served but not kept in memory. */
+  maxEntryBytes?: number;
   store?: PersistentStore;
   now?: () => number;
 }
@@ -37,7 +41,12 @@ export class TieredCache {
   private readonly inflight = new Map<string, Promise<unknown>>();
 
   constructor(options: CacheOptions = {}) {
-    this.memory = new LRUCache({ max: options.maxEntries ?? 500 });
+    this.memory = new LRUCache<string, CacheEntry>({
+      max: options.maxEntries ?? 500,
+      maxSize: options.maxBytes ?? 100_000_000,
+      maxEntrySize: options.maxEntryBytes ?? 40_000_000,
+      sizeCalculation: (entry) => estimateSize(entry.value)
+    });
     if (options.store) this.store = options.store;
     this.now = options.now ?? Date.now;
   }
@@ -82,5 +91,22 @@ export class TieredCache {
     const persisted = await this.store.get(key).catch(() => undefined);
     if (persisted) this.memory.set(key, persisted);
     return persisted;
+  }
+}
+
+/**
+ * Rough size in characters. Large arrays are sampled so estimating a big index stays cheap.
+ * Always at least 1, as lru-cache requires.
+ */
+export function estimateSize(value: unknown): number {
+  if (typeof value === "string") return Math.max(1, value.length);
+  try {
+    if (Array.isArray(value) && value.length > 200) {
+      const sample = JSON.stringify(value.slice(0, 200)).length;
+      return Math.max(1, Math.ceil((sample / 200) * value.length));
+    }
+    return Math.max(1, JSON.stringify(value)?.length ?? 1);
+  } catch {
+    return 1024;
   }
 }

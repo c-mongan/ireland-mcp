@@ -8,7 +8,8 @@ export class RateLimiter {
     private readonly now: () => number = Date.now
   ) {}
 
-  check(key: string): { allowed: boolean; retryAfterSeconds: number; remaining: number } {
+  /** Charges `cost` requests (e.g. the size of a JSON-RPC batch) against the key's window. */
+  check(key: string, cost = 1): { allowed: boolean; retryAfterSeconds: number; remaining: number } {
     const now = this.now();
     let window = this.windows.get(key);
     if (!window || now - window.start >= this.windowMs) {
@@ -16,7 +17,7 @@ export class RateLimiter {
       this.windows.set(key, window);
       if (this.windows.size > 10_000) this.prune(now);
     }
-    window.count += 1;
+    window.count += Math.max(1, cost);
     const retryAfterSeconds = Math.max(1, Math.ceil((window.start + this.windowMs - now) / 1000));
     return {
       allowed: window.count <= this.limitPerWindow,

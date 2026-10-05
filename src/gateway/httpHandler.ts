@@ -7,6 +7,19 @@ export interface McpHttpOptions {
   rateLimiter?: RateLimiter;
 }
 
+const MAX_BODY_CHARS = 1_000_000;
+const MAX_BATCH = 20;
+
+/** Every message in a JSON-RPC batch is charged against the rate limit. Invalid JSON costs 1. */
+function countMessages(bodyText: string): number {
+  try {
+    const parsed: unknown = JSON.parse(bodyText);
+    return Array.isArray(parsed) ? Math.max(1, parsed.length) : 1;
+  } catch {
+    return 1;
+  }
+}
+
 const CORS_HEADERS: Record<string, string> = {
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "POST, OPTIONS",
@@ -26,8 +39,15 @@ export async function handleMcpHttp(request: Request, options: McpHttpOptions): 
     });
   }
 
+  const bodyText = await request.text();
+  if (bodyText.length > MAX_BODY_CHARS) return jsonRpcError(413, -32600, "Request body too large.");
+  const messageCount = countMessages(bodyText);
+  if (messageCount > MAX_BATCH) {
+    return jsonRpcError(400, -32600, `Batches are limited to ${MAX_BATCH} messages.`);
+  }
+
   if (options.rateLimiter) {
-    const verdict = options.rateLimiter.check(clientKey(request.headers));
+    const verdict = options.rateLimiter.check(clientKey(request.headers), messageCount);
     if (!verdict.allowed) {
       return jsonRpcError(429, -32029, "RATE_LIMITED: too many requests from this address.", {
         "retry-after": String(verdict.retryAfterSeconds)
@@ -42,7 +62,9 @@ export async function handleMcpHttp(request: Request, options: McpHttpOptions): 
   });
   try {
     await server.connect(transport);
-    const response = await transport.handleRequest(request);
+    const response = await transport.handleRequest(
+      new Request(request.url, { method: "POST", headers: request.headers, body: bodyText })
+    );
     const headers = new Headers(response.headers);
     for (const [key, value] of Object.entries(CORS_HEADERS)) headers.set(key, value);
     const body = response.body ? await response.text() : null;

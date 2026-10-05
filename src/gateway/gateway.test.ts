@@ -57,6 +57,19 @@ describe("errors", () => {
 });
 
 describe("TieredCache", () => {
+  it("bounds memory by estimated size and skips oversized entries", async () => {
+    const cache = new TieredCache({ maxBytes: 100, maxEntryBytes: 50 });
+    let loads = 0;
+    const big = async () => (loads += 1, "x".repeat(80));
+    await cache.getOrLoad("big", 60_000, big);
+    expect((await cache.getOrLoad("big", 60_000, big)).cached).toBe(false);
+    expect(loads).toBe(2);
+    await cache.getOrLoad("a", 60_000, async () => "y".repeat(40));
+    await cache.getOrLoad("b", 60_000, async () => "y".repeat(40));
+    await cache.getOrLoad("c", 60_000, async () => "y".repeat(40));
+    expect((await cache.getOrLoad("a", 60_000, async () => "reloaded")).value).toBe("reloaded");
+  });
+
   it("serves fresh hits, then stale data when the loader fails", async () => {
     let now = 0;
     const cache = new TieredCache({ now: () => now });
@@ -279,6 +292,18 @@ describe("handleMcpHttp", () => {
     expect(limited.headers.get("retry-after")).toBe("60");
   });
 
+  it("charges every message in a JSON-RPC batch against the limit", async () => {
+    const rateLimiter = new RateLimiter(2);
+    const one = { jsonrpc: "2.0", method: "tools/list" };
+    const batch = [1, 2, 3].map((id) => ({ ...one, id }));
+    const limited = await handleMcpHttp(post(batch, { "x-forwarded-for": "8.8.8.8" }), { createServer, rateLimiter });
+    expect(limited.status).toBe(429);
+    const ok = await handleMcpHttp(post({ ...one, id: 4 }, { "x-forwarded-for": "7.7.7.7" }), { createServer, rateLimiter });
+    expect(ok.status).toBe(200);
+    const huge = Array.from({ length: 21 }, (_, id) => ({ ...one, id }));
+    expect((await handleMcpHttp(post(huge), { createServer })).status).toBe(400);
+  });
+
   it("answers CORS preflight and rejects GET", async () => {
     expect((await handleMcpHttp(new Request("https://fn/mcp", { method: "OPTIONS" }), { createServer })).status).toBe(204);
     expect((await handleMcpHttp(new Request("https://fn/mcp"), { createServer })).status).toBe(405);
@@ -286,6 +311,27 @@ describe("handleMcpHttp", () => {
 });
 
 describe("createContext", () => {
+  it("never caches responses rejected by validate, and falls back to the last good copy", async () => {
+    let now = 0;
+    let body = '{"ok":true}';
+    const fetch = fakeFetch([{ match: () => true, body: "" }]);
+    const fetchImpl = Object.assign(async (url: string, init?: RequestInit) => {
+      await fetch(url, init);
+      return new Response(body);
+    }, { calls: fetch.calls });
+    const ctx = createContext({ fetch: fetchImpl, now: () => new Date(now) });
+    const validate = (v: { ok?: boolean }) => {
+      if (!v.ok) throw new ToolError("UPSTREAM_DOWN", "upstream error body");
+    };
+    expect((await ctx.cachedJson("https://x.ie/v", 1000, { validate })).value).toEqual({ ok: true });
+    now = 5000;
+    body = '{"error":"busy"}';
+    expect(await ctx.cachedJson("https://x.ie/v", 1000, { validate })).toMatchObject({ value: { ok: true }, stale: true });
+    await expect(ctx.cachedJson("https://x.ie/other", 1000, { validate })).rejects.toThrow("upstream error body");
+    await expect(ctx.cachedJson("https://x.ie/other", 1000, { validate })).rejects.toThrow("upstream error body");
+    expect(fetch.calls.filter((c) => c.url.endsWith("other"))).toHaveLength(2);
+  });
+
   it("caches JSON and text by URL", async () => {
     const fetch = fakeFetch([
       { match: /json/, body: '{"n":1}' },

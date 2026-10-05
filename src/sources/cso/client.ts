@@ -37,20 +37,36 @@ export interface CsoSearchResult {
   classification?: Array<{ ClsCode: string; ClsValue: string }>;
 }
 
+interface RpcResponse<T> {
+  result?: T;
+  error?: { code?: number; message?: string };
+}
+
+const CLIENT_RPC_ERRORS = new Set([-32600, -32601, -32602]);
+
+/** Runs before caching so JSON-RPC errors are never cached. Only request errors blame the caller. */
+function assertRpcOk(response: RpcResponse<unknown>): void {
+  if (response.error) {
+    if (CLIENT_RPC_ERRORS.has(response.error.code ?? 0)) {
+      throw new ToolError("BAD_ARGS", "CSO PxStat rejected the query.", {
+        hint: "Check the table code and dimension codes with cso_get_table_metadata."
+      });
+    }
+    throw new ToolError("UPSTREAM_DOWN", "CSO PxStat returned an error.");
+  }
+  if (response.result === undefined) throw new ToolError("UPSTREAM_DOWN", "CSO PxStat returned no result.");
+}
+
 async function rpc<T>(ctx: ToolContext, method: string, params: unknown): Promise<{ value: T; cached: boolean; stale: boolean }> {
   const body = JSON.stringify({ jsonrpc: "2.0", method, params, id: 1 });
-  const result = await ctx.cachedJson<{ result?: T; error?: { message?: string } }>(CSO_RPC, CSO_TTL, {
+  const result = await ctx.cachedJson<RpcResponse<T>>(CSO_RPC, CSO_TTL, {
     method: "POST",
     body,
     headers: { "content-type": "application/json" },
-    label: "CSO PxStat"
+    label: "CSO PxStat",
+    validate: assertRpcOk
   });
-  if (result.value.error || result.value.result === undefined) {
-    throw new ToolError("BAD_ARGS", "CSO PxStat rejected the query.", {
-      hint: "Check the table code and dimension codes with cso_get_table_metadata."
-    });
-  }
-  return { value: result.value.result, cached: result.cached, stale: result.stale };
+  return { value: result.value.result as T, cached: result.cached, stale: result.stale };
 }
 
 export function searchTables(ctx: ToolContext, query: string) {
@@ -61,8 +77,11 @@ export function searchTables(ctx: ToolContext, query: string) {
 }
 
 export async function readMetadata(ctx: ToolContext, code: string) {
-  const result = await ctx.cachedJson<unknown>(metadataUrl(code), CSO_TTL, { label: "CSO PxStat" });
-  return { ...result, value: assertJsonStat(result.value) };
+  const result = await ctx.cachedJson<unknown>(metadataUrl(code), CSO_TTL, {
+    label: "CSO PxStat",
+    validate: (value) => void assertJsonStat(value)
+  });
+  return { ...result, value: result.value as JsonStat };
 }
 
 export async function readDataset(ctx: ToolContext, code: string, filters: Record<string, string[]>) {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { createContext } from "../../gateway/context.js";
 import { fakeFetch, type Route } from "../../../test/helpers/fakeFetch.js";
 import { callTool, fixturePath } from "../../../test/helpers/callTool.js";
 import { BOUNDARY_LAYERS, geohiveModule as mod } from "./index.js";
@@ -71,5 +72,14 @@ describe("GeoHive module", () => {
     expect(bad.body.error.code).toBe("BAD_ARGS");
     const injection = await callTool(mod, "geohive_query_layer", { service: "../../evil", where: "1=1" }, fetch);
     expect(injection.body.error.code).toBe("BAD_ARGS");
+  });
+
+  it("does not cache transient ArcGIS error bodies", async () => {
+    const fetch = fakeFetch([{ match: /where=busy/, body: '{"error":{"code":500,"message":"Service busy"}}' }]);
+    const ctx = createContext({ fetch });
+    const args = { service: "Counties___OSi_National_Statutory_Boundaries", where: "busy" };
+    expect((await callTool(mod, "geohive_query_layer", args, ctx)).body.error.code).toBe("UPSTREAM_DOWN");
+    expect((await callTool(mod, "geohive_query_layer", args, ctx)).body.error.code).toBe("UPSTREAM_DOWN");
+    expect(fetch.calls).toHaveLength(2);
   });
 });

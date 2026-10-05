@@ -1,6 +1,6 @@
 import { TieredCache, type PersistentStore } from "./cache.js";
 import { HttpClient, type FetchLike, type HttpOptions } from "./http.js";
-import type { ToolContext } from "./module.js";
+import type { CachedJsonOptions, ToolContext } from "./module.js";
 
 export interface ContextOptions {
   fetch?: FetchLike;
@@ -26,8 +26,14 @@ export function createContext(options: ContextOptions = {}): ToolContext {
     cache,
     env,
     now,
-    cachedJson: <T>(url: string, ttlMs: number, opts?: HttpOptions & { cacheKey?: string }) =>
-      cache.getOrLoad<T>(keyFor(url, opts), ttlMs, () => http.json<T>(url, opts)),
+    cachedJson: <T>(url: string, ttlMs: number, opts?: CachedJsonOptions<T>) => {
+      const { validate, ...httpOpts } = opts ?? {};
+      return cache.getOrLoad<T>(keyFor(url, opts), ttlMs, async () => {
+        const value = await http.json<T>(url, httpOpts);
+        validate?.(value);
+        return value;
+      });
+    },
     cachedText: (url: string, ttlMs: number, opts?: HttpOptions & { cacheKey?: string }) =>
       cache.getOrLoad<string>(keyFor(url, opts), ttlMs, () => http.text(url, opts))
   };

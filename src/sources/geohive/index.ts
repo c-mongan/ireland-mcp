@@ -106,18 +106,21 @@ interface ArcGisResponse {
   error?: { code?: number; message?: string; details?: string[] };
 }
 
+/** ArcGIS reports errors in a 200 body; throwing here keeps them out of the cache. */
+function assertArcGisOk(body: ArcGisResponse): void {
+  if (!body.error) return;
+  const detail = [body.error.message, ...(body.error.details ?? [])].filter(Boolean).join(" ");
+  throw body.error.code === 400 || body.error.code === 404
+    ? new ToolError(body.error.code === 404 ? "NOT_FOUND" : "BAD_ARGS", `GeoHive rejected the query: ${detail}`.slice(0, 300), {
+        hint: "Check the service name with geohive_list_layers and use ArcGIS SQL in 'where', e.g. PROVINCE='Munster'."
+      })
+    : new ToolError("UPSTREAM_DOWN", "GeoHive ArcGIS returned an error.");
+}
+
 async function arcgisQuery(ctx: ToolContext, service: string, params: Record<string, string>) {
   const query = new URLSearchParams({ returnGeometry: "false", f: "json", ...params });
   const url = `${ARCGIS_BASE}/${encodeURIComponent(service)}/FeatureServer/0/query?${query.toString()}`;
-  const result = await ctx.cachedJson<ArcGisResponse>(url, TTL, { label: "GeoHive ArcGIS" });
-  if (result.value.error) {
-    const detail = [result.value.error.message, ...(result.value.error.details ?? [])].filter(Boolean).join(" ");
-    throw result.value.error.code === 400 || result.value.error.code === 404
-      ? new ToolError(result.value.error.code === 404 ? "NOT_FOUND" : "BAD_ARGS", `GeoHive rejected the query: ${detail}`.slice(0, 300), {
-          hint: "Check the service name with geohive_list_layers and use ArcGIS SQL in 'where', e.g. PROVINCE='Munster'."
-        })
-      : new ToolError("UPSTREAM_DOWN", "GeoHive ArcGIS returned an error.");
-  }
+  const result = await ctx.cachedJson<ArcGisResponse>(url, TTL, { label: "GeoHive ArcGIS", validate: assertArcGisOk });
   return { url, features: result.value.features ?? [], exceeded: Boolean(result.value.exceededTransferLimit), cached: result.cached, stale: result.stale };
 }
 

@@ -3,13 +3,21 @@ import type { TieredCache, CacheResult } from "./cache.js";
 import type { Envelope, SourceInfo } from "./envelope.js";
 import type { HttpClient, HttpOptions } from "./http.js";
 
+export interface CachedJsonOptions<T> extends HttpOptions {
+  cacheKey?: string;
+  validate?: (value: T) => void;
+}
+
 export interface ToolContext {
   http: HttpClient;
   cache: TieredCache;
   env: Record<string, string | undefined>;
   now: () => Date;
-  /** Fetches JSON through the cache with stale fallback. */
-  cachedJson<T>(url: string, ttlMs: number, options?: HttpOptions & { cacheKey?: string }): Promise<CacheResult<T>>;
+  /**
+   * Fetches JSON through the cache with stale fallback. `validate` runs before caching and
+   * should throw a ToolError for error bodies sent with HTTP 200, so they are never cached.
+   */
+  cachedJson<T>(url: string, ttlMs: number, options?: CachedJsonOptions<T>): Promise<CacheResult<T>>;
   /** Fetches text through the cache with stale fallback. */
   cachedText(url: string, ttlMs: number, options?: HttpOptions & { cacheKey?: string }): Promise<CacheResult<string>>;
 }

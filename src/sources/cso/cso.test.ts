@@ -103,4 +103,17 @@ describe("CSO module", () => {
     expect(doc.text).toContain("County [C02779V03348]");
     expect(doc.metadata.licence).toBe("CC BY 4.0");
   });
+
+  it("maps PxStat JSON-RPC errors by code and never caches them", async () => {
+    const rpcError = (code: number) => `{"jsonrpc":"2.0","error":{"code":${code},"message":"x"},"id":1}`;
+    const fetch = fakeFetch([
+      { match: (_u, init) => String(init?.body).includes("badparams"), body: rpcError(-32602) },
+      { match: (_u, init) => String(init?.body).includes("serverfault"), body: rpcError(-32603) }
+    ]);
+    const ctx = createContext({ fetch });
+    expect((await callTool(csoModule, "cso_search_tables", { query: "badparams" }, ctx)).body.error.code).toBe("BAD_ARGS");
+    expect((await callTool(csoModule, "cso_search_tables", { query: "serverfault" }, ctx)).body.error.code).toBe("UPSTREAM_DOWN");
+    expect((await callTool(csoModule, "cso_search_tables", { query: "serverfault" }, ctx)).body.error.code).toBe("UPSTREAM_DOWN");
+    expect(fetch.calls).toHaveLength(3);
+  });
 });
