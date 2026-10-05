@@ -17,9 +17,9 @@ real figures, with the source, licence and retrieval time attached.
 
 ![Architecture](docs/architecture/ireland-mcp-arch-v4.png)
 
-> **Status:** v1 is ready but not yet deployed or published. Until then, run it
-> from source (see [Run from source](#run-from-source)). The hosted URL below is
-> a placeholder: `https://YOUR-APP.azurewebsites.net/mcp`.
+> **Hosted endpoint:** `https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp`
+> (Streamable HTTP, no key needed). The npm package is not published yet; until it is,
+> run the stdio server from source (see [Run from source](#run-from-source)).
 
 ## Tools
 
@@ -61,8 +61,8 @@ each with a hint the model can act on. Lists default to 50 items, max 500.
 
 ## Connect a client
 
-Replace `https://YOUR-APP.azurewebsites.net/mcp` with the hosted URL once it is
-deployed.
+The hosted URL is `https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp`.
+If you deploy your own copy, use your own function app URL instead.
 
 ### Claude Desktop (local, stdio)
 
@@ -96,7 +96,7 @@ and the EEA for your account before relying on it.
 ```json
 {
   "servers": {
-    "ireland": { "type": "http", "url": "https://YOUR-APP.azurewebsites.net/mcp" }
+    "ireland": { "type": "http", "url": "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp" }
   }
 }
 ```
@@ -110,7 +110,7 @@ Local alternative: `{ "type": "stdio", "command": "npx", "args": ["-y", "ireland
 ```json
 {
   "mcpServers": {
-    "ireland": { "type": "http", "url": "https://YOUR-APP.azurewebsites.net/mcp", "tools": ["*"] }
+    "ireland": { "type": "http", "url": "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp", "tools": ["*"] }
   }
 }
 ```
@@ -147,7 +147,7 @@ npx @modelcontextprotocol/inspector node dist/src/cli.js   # browse the tools
 | `npm run typecheck && npm run lint` | TypeScript and ESLint |
 | `npm run inspector:check` | MCP conformance through the Inspector CLI (also in CI) |
 | `npm run live:sanity` | One real call per source; results in [docs/live-sanity.md](docs/live-sanity.md) |
-| `npm run eval` | 40 Irish questions through promptfoo; skips without `OPENAI_API_KEY` |
+| `npm run eval` | 40 Irish questions through promptfoo. Uses `OPENAI_API_KEY`, or Azure OpenAI with `AZURE_API_KEY`, `AZURE_API_HOST` and `AZURE_DEPLOYMENT`; skips without a key |
 | `npm run ppr:build` | Build the Property Price Register index locally |
 
 CI runs lint, typecheck, tests, Inspector conformance and CodeQL. A nightly

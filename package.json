@@ -1,7 +1,7 @@
 {
   "name": "ireland-mcp",
   "version": "1.0.0",
-  "description": "Read-only Model Context Protocol server for Irish public data: CSO, Oireachtas, GeoHive, data.gov.ie, Smart Dublin, Met \u00c9ireann, NTA, Irish Statute Book and the Property Price Register.",
+  "description": "Read-only Model Context Protocol server for Irish public data: CSO, Oireachtas, GeoHive, data.gov.ie, Smart Dublin, Met Éireann, NTA, Irish Statute Book and the Property Price Register.",
   "license": "MIT",
   "author": "Conor Mongan",
   "type": "module",
@@ -34,6 +34,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json && node scripts/copy-assets.mjs",
+    "deploy:zip": "bash scripts/deploy-zip.sh",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint .",
     "test": "vitest run",

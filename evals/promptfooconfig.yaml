@@ -1,5 +1,6 @@
 # Ireland MCP eval: does a model pick the right tools for Irish questions?
 # Run locally only:  npm run build && OPENAI_API_KEY=... npm run eval
+# Azure OpenAI:      AZURE_API_KEY=... AZURE_API_HOST=... AZURE_DEPLOYMENT=... npm run eval
 # scripts/eval.mjs skips (exit 0) when no OPENAI_API_KEY is set, so CI never runs it.
 description: Ireland MCP tool selection
 prompts:

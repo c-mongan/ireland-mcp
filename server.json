@@ -16,7 +16,9 @@
       "identifier": "ireland-mcp",
       "version": "1.0.0",
       "runtimeHint": "npx",
-      "transport": { "type": "stdio" },
+      "transport": {
+        "type": "stdio"
+      },
       "environmentVariables": [
         {
           "name": "NTA_API_KEY",
@@ -30,6 +32,12 @@
           "isRequired": false
         }
       ]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp"
     }
   ]
 }

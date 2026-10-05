@@ -153,6 +153,10 @@ resource app 'Microsoft.Web/sites@2024-04-01' = {
     siteConfig: {
       minTlsVersion: '1.2'
       ftpsState: 'Disabled'
+      // The platform answers CORS preflights itself, so the app's own OPTIONS handler never runs.
+      cors: {
+        allowedOrigins: ['*']
+      }
       appSettings: concat(baseSettings, ntaSettings)
     }
   }
