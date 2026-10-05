@@ -14,8 +14,10 @@ export const REPO_URL = "https://github.com/c-mongan/ireland-mcp";
 
 export const INSTRUCTIONS = [
   "Read-only Irish public data (CSO, Oireachtas, Met Éireann, transport, property, energy and more).",
-  "Workflow: call ireland_catalogue to find a source and operation, then ireland_describe for its argument schema and an example, then ireland_call with {source, operation, args}.",
-  "Use search/fetch for keyword discovery and nearby for a lat/lon.",
+  "Workflow: ireland_call's description indexes every source and operation; when one fits, call ireland_call with {source, operation, args} directly (bad args return the schema and an example).",
+  "Otherwise use ireland_catalogue to browse, and ireland_describe for an operation's argument schema.",
+  "search/fetch is keyword discovery (CSO tables, bills, acts, datasets, tenders). nearby covers boundaries, small area code, forecast, monuments and protected sites at a lat/lon only.",
+  "Use ireland_call for live readings (weather observations, river levels, buoys, bikes), populations (cso_area_profile, census_small_area_at) and place names (geohive_locate).",
   "Cite `source`, `url`, `licence` and `attribution` from each result.",
   "If `stale` is true the cached copy was served; say so.",
   "If `truncated` is true, narrow the request or pass max_tokens (up to 8000).",
@@ -63,6 +65,13 @@ function ok(value: unknown): ToolResult {
 
 function fail(body: unknown): ToolResult {
   return { isError: true, content: [{ type: "text", text: JSON.stringify(body) }] };
+}
+
+/** Compact "source: op, op; source: op" index of every operation, for the ireland_call description. */
+function operationIndex(operations: readonly Operation[]): string {
+  const bySource = new Map<string, string[]>();
+  for (const { source, tool } of operations) bySource.set(source, [...(bySource.get(source) ?? []), tool.name]);
+  return [...bySource].map(([source, names]) => `${source}: ${names.join(", ")}`).join("; ");
 }
 
 /** Names the dispatched operation in an ireland_call result, so transcripts and evals can attribute the call. */
@@ -210,7 +219,7 @@ function registerMetaTools(
     "ireland_call",
     {
       title: "Call an operation",
-      description: "Run a source operation with args. Bad args return the expected schema and an example.",
+      description: `Run a source operation with args. Bad args return the expected schema and an example. Operations by source: ${operationIndex(operations)}.`,
       inputSchema: {
         source: z.string().describe("Source id."),
         operation: z.string().describe("Operation name."),

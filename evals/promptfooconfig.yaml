@@ -1,25 +1,19 @@
 # Ireland MCP eval: does a model pick the right tools for Irish questions?
 # Run locally only:  npm run build && OPENAI_API_KEY=... npm run eval
 # Azure OpenAI:      AZURE_API_KEY=... AZURE_API_HOST=... AZURE_DEPLOYMENT=... npm run eval
-# scripts/eval.mjs skips (exit 0) when no OPENAI_API_KEY is set, so CI never runs it.
+# scripts/eval.mjs skips (exit 0) when no model key is set, so CI never runs it.
+# agent-provider.mjs runs a multi-round tool loop (up to maxRounds) against dist/src/cli.js, like a real client.
 # Surface: default meta tools; EVAL_TOOLSETS=all (or cso,irish-rail) adds typed tools via --toolsets.
 # tool-calls.mjs reduces each transcript to the tools called; ireland_call {operation: X} counts as X.
 description: Ireland MCP tool selection
 prompts:
   - "You answer questions about Ireland using only the tools provided. Cite the source and licence. Question: {{question}}"
 providers:
-  - id: openai:chat:gpt-4.1-mini
+  - id: file://agent-provider.mjs
     config:
-      temperature: 0
-      mcp:
-        enabled: true
-        timeout: 60000
-        server:
-          command: node
-          args: ["dist/src/cli.js"]
+      maxRounds: 4
 defaultTest:
   options:
-    provider: openai:chat:gpt-4.1-mini
     transform: file://tool-calls.mjs
 tests:
   - vars:
@@ -121,7 +115,7 @@ tests:
       question: "Which enacted bills from 2024 mention climate?"
     assert:
       - type: icontains-any
-        value: [oireachtas_search_bills]
+        value: [oireachtas_search_bills, legislation_list_acts]
   - vars:
       question: "Which county and electoral division contain 53.27, -9.05?"
     assert:
@@ -161,12 +155,12 @@ tests:
       question: "What recorded archaeological monuments are near Dublin Castle?"
     assert:
       - type: icontains-any
-        value: [heritage_monuments_near]
+        value: [heritage_monuments_near, nearby]
   - vars:
       question: "Are there SAC or SPA protected sites near North Bull Island?"
     assert:
       - type: icontains-any
-        value: [protected_sites_near, protected_sites_at]
+        value: [protected_sites_near, protected_sites_at, nearby]
   - vars:
       question: "Find datasets on data.gov.ie about air quality."
     assert:
@@ -271,7 +265,7 @@ tests:
       question: "What Irish public data sources can you access?"
     assert:
       - type: icontains-any
-        value: [list_sources]
+        value: [list_sources, ireland_about, ireland_catalogue]
   - vars:
       question: "Search all Irish sources for 'broadband'."
     assert:
@@ -286,7 +280,7 @@ tests:
       question: "Tell me about Sligo: population, weather and administrative boundaries."
     assert:
       - type: icontains-any
-        value: [ireland_snapshot]
+        value: [ireland_snapshot, cso_area_profile]
   - vars:
       question: "Compare the population of Mayo and Donegal."
     assert:
@@ -351,7 +345,7 @@ tests:
       question: "Search EU TED for Irish public tenders about bicycles."
     assert:
       - type: icontains-any
-        value: [ted_search_tenders]
+        value: [ted_search_tenders, search]
   - vars:
       question: "Get details for TED notice 646747-2026."
     assert:
