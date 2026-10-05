@@ -1,0 +1,73 @@
+{
+ "help": "https://data.gov.ie/api/3/action/help_show?name=package_show",
+ "success": true,
+ "result": {
+  "id": "177e32de-cb85-4c1c-bb12-7188c6c49aa1",
+  "name": "moby-bikes",
+  "title": "Moby Bikes API",
+  "notes": "Moby is a licensed dockless bike-share scheme within the Dublin region. This page includes an API developed according to the General Bikeshare Feed Specification (GBFS) (e.g.) information about vehicles, stations, pricing, etc. The current location of the vehicles is updated every five minutes. In addition, this page includes historical files of bike location data.  \r\n\r\nDisclaimer - Please note that some of the historical files are empty due to historical data issues. ",
+  "license_title": "Creative Commons Attribution 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "metadata_modified": "2026-09-22T08:33:45.696631",
+  "organization": {
+   "name": "dublin-city-council",
+   "title": "Dublin City Council"
+  },
+  "resources": [
+   {
+    "id": "2593c73a-9598-4d40-b0c7-3b4d6a04deac",
+    "name": "MobyBikes Current Bike GeoJSON",
+    "format": "GeoJSON",
+    "url": "https://data.smartdublin.ie/mobybikes-api/bikes/mobymoby_dublin/current/bikes.geojson",
+    "datastore_active": false,
+    "description": "Current information from MobyBikes free_bike_status, in geojson format.\r\n\r\n",
+    "last_modified": null
+   },
+   {
+    "id": "c6eec8aa-635b-4742-a57c-555ff34a1b32",
+    "name": "MobyBikes GBFS API",
+    "format": "API",
+    "url": "https://moby-move.rideatom.com/gbfs/v3_0/en/gbfs?id=2023",
+    "datastore_active": false,
+    "description": "The MobyBikes General Bikeshare Feed Specification (GBFS) api root. This endpoint returns a list of GBFS endpoints, currently conforming to version 2.3 of the GBFS Spec: https://github.com/MobilityDat",
+    "last_modified": null
+   },
+   {
+    "id": "5c0424c9-7043-42f0-9bb4-1e09b9cda325",
+    "name": "Smart Dublin Bike API OpenAPI Definition",
+    "format": "openapi-json",
+    "url": "https://data.smartdublin.ie/mobybikes-api/bikes/openapi.json",
+    "datastore_active": false,
+    "description": "OpenAPI Definition for the derived SmartDublin bikes data, including historical rollups and current GeoJson.\r\n\r\n",
+    "last_modified": null
+   },
+   {
+    "id": "b9da1626-798c-4e71-913f-0076fcc18030",
+    "name": "Geofence",
+    "format": "GeoJSON",
+    "url": "https://data.smartdublin.ie/dataset/177e32de-cb85-4c1c-bb12-7188c6c49aa1/resource/b9da1626-798c-4e71-913f-0076fcc18030/download/mobybikes_map.geojson",
+    "datastore_active": false,
+    "description": " Geofence + Virtual Stations\r\n",
+    "last_modified": "2020-10-16T09:09:16.569063"
+   }
+  ],
+  "tags": [
+   {
+    "name": "Transport and Infrastructure"
+   },
+   {
+    "name": "api"
+   },
+   {
+    "name": "bikes"
+   },
+   {
+    "name": "bikeshare"
+   },
+   {
+    "name": "citybikes"
+   }
+  ],
+  "url": "https://data.smartdublin.ie/dataset/moby-bikes"
+ }
+}

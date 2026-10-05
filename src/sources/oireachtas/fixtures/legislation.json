@@ -1,0 +1,578 @@
+{
+ "head": {
+  "counts": {
+   "billCount": 6047,
+   "resultCount": 6047
+  }
+ },
+ "results": [
+  {
+   "bill": {
+    "act": null,
+    "amendmentLists": [],
+    "billNo": "94",
+    "billType": "Public",
+    "billTypeURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-type/public",
+    "billYear": "2026",
+    "debates": [],
+    "events": [],
+    "lastUpdated": "2026-10-02T11:02:39.120000+00:00",
+    "longTitleEn": "<p>Bill entitled an Act to amend the law relating to the control of horse-drawn carriages and other horse-drawn vehicles within the former Dublin Metropolitan Police District, as provided for by the Dublin Carriage Act 1853, the Dublin Amended Carriage Act 1854 and the Dublin Amended Carriage Act 1855, that equates to most of the administrative area of Dublin City Council and parts of the administrative areas of Dun Laoghaire-Rathdown County Council and South Dublin County Council and, for that purpose, to repeal those Acts so as to enable the making by any of those Councils of bye-laws under the Local Government Act 2001 in respect of horse-drawn carriages or other horse drawn vehicles, to amend section 199 of that Act; and to provide for related matters.</p>",
+    "longTitleGa": "",
+    "method": "Introduced",
+    "methodURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-method/introduced",
+    "mostRecentStage": {
+     "event": {
+      "chamber": {
+       "chamberCode": "dail",
+       "showAs": "Dáil Éireann",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail"
+      },
+      "dates": [
+       {
+        "date": "2026-10-01"
+       }
+      ],
+      "house": {
+       "chamberCode": "dail",
+       "chamberType": "house",
+       "houseCode": "dail",
+       "houseNo": "34",
+       "showAs": "34th Dáil",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34"
+      },
+      "progressStage": 2,
+      "showAs": "Second Stage",
+      "stageCompleted": false,
+      "stageOutcome": "Current",
+      "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/2",
+      "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/94/stage/dail/2"
+     }
+    },
+    "originHouse": {
+     "showAs": "Dáil Éireann",
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail"
+    },
+    "originHouseURI": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail",
+    "relatedDocs": [],
+    "shortTitleEn": "Local Government (Control of Horse-Drawn Carriages) Bill 2026",
+    "shortTitleGa": "An Bille Rialtais Áitiúil (Carráistí Eachtharraingthe a Rialú), 2026",
+    "source": "Private Member",
+    "sourceURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-source/private-member",
+    "sponsors": [
+     {
+      "sponsor": {
+       "isPrimary": true,
+       "as": {
+        "showAs": null,
+        "uri": null
+       },
+       "by": {
+        "showAs": "Máire Devine",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Máire-Devine.S.2016-04-25"
+       }
+      }
+     },
+     {
+      "sponsor": {
+       "isPrimary": false,
+       "as": {
+        "showAs": null,
+        "uri": null
+       },
+       "by": {
+        "showAs": "Mark Ward",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Mark-Ward.D.2019-11-29"
+       }
+      }
+     }
+    ],
+    "stages": [],
+    "status": "Current",
+    "statusURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-status/published",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/94",
+    "versions": []
+   },
+   "contextDate": "2026-10-01",
+   "billSort": {
+    "actNoSort": null,
+    "actShortTitleEnSort": null,
+    "actShortTitleGaSort": null,
+    "actYearSort": null,
+    "billNoSort": 94,
+    "billShortTitleEnSort": "local-government-control-of-horse-drawn-carriages-bill-2026",
+    "billShortTitleGaSort": "an-bille-rialtais-aitiuil-carraisti-eachtharraingthe-a-rialu-2026",
+    "billYearSort": 2026
+   }
+  },
+  {
+   "bill": {
+    "act": null,
+    "amendmentLists": [],
+    "billNo": "93",
+    "billType": "Public",
+    "billTypeURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-type/public",
+    "billYear": "2026",
+    "debates": [],
+    "events": [],
+    "lastUpdated": "2026-09-30T09:26:12.240000+00:00",
+    "longTitleEn": "<p>Bill entitled an Act to prohibit the making available of certain artificial intelligence companion services to children, to provide for age-assurance measures and to confer functions on Coimisiún na Meán; to amend the Online Safety and Media Regulation Act 2022; and to provide for related matters.</p>",
+    "longTitleGa": "",
+    "method": "Introduced",
+    "methodURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-method/introduced",
+    "mostRecentStage": {
+     "event": {
+      "chamber": {
+       "chamberCode": "dail",
+       "showAs": "Dáil Éireann",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail"
+      },
+      "dates": [
+       {
+        "date": "2026-09-29"
+       }
+      ],
+      "house": {
+       "chamberCode": "dail",
+       "chamberType": "house",
+       "houseCode": "dail",
+       "houseNo": "34",
+       "showAs": "34th Dáil",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34"
+      },
+      "progressStage": 2,
+      "showAs": "Second Stage",
+      "stageCompleted": false,
+      "stageOutcome": "Current",
+      "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/2",
+      "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/93/stage/dail/2"
+     }
+    },
+    "originHouse": {
+     "showAs": "Dáil Éireann",
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail"
+    },
+    "originHouseURI": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail",
+    "relatedDocs": [],
+    "shortTitleEn": "Artificial Intelligence Companion Services (Protection of Children) Bill 2026",
+    "shortTitleGa": "An Bille um Sheirbhísí Comrádaíochta Intleachta Saorga (Cosaint Leanaí), 2026",
+    "source": "Private Member",
+    "sourceURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-source/private-member",
+    "sponsors": [
+     {
+      "sponsor": {
+       "isPrimary": true,
+       "as": {
+        "showAs": null,
+        "uri": null
+       },
+       "by": {
+        "showAs": "Malcolm Byrne",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Malcolm-Byrne.D.2019-11-29"
+       }
+      }
+     }
+    ],
+    "stages": [],
+    "status": "Current",
+    "statusURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-status/published",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/93",
+    "versions": []
+   },
+   "contextDate": "2026-09-29",
+   "billSort": {
+    "actNoSort": null,
+    "actShortTitleEnSort": null,
+    "actShortTitleGaSort": null,
+    "actYearSort": null,
+    "billNoSort": 93,
+    "billShortTitleEnSort": "artificial-intelligence-companion-services-protection-of-children-bill-2026",
+    "billShortTitleGaSort": "an-bille-um-sheirbhisi-comradaiochta-intleachta-saorga-cosaint-leanai-2026",
+    "billYearSort": 2026
+   }
+  },
+  {
+   "bill": {
+    "act": null,
+    "amendmentLists": [],
+    "billNo": "92",
+    "billType": "Public",
+    "billTypeURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-type/public",
+    "billYear": "2026",
+    "debates": [],
+    "events": [],
+    "lastUpdated": "2026-09-25T11:39:19.500000+00:00",
+    "longTitleEn": "<p>Bill entitled an Act to provide for the recognition of a non-binary gender and for those born intersex; to amend the Gender Recognition Act 2015 to recognise a non-binary gender; to amend the Interpretation Act 2005 to include a non-binary gender; to amend the Civil Registration Act 2004 to allow qualified informants to record an X on Registers for Births, Stillbirths, Adoptions, and Death; to amend the Equal Status Act 2000 and the Employment Equality Act 1998 to outlaw discrimination based on sexual characteristics.</p>",
+    "longTitleGa": "",
+    "method": "Introduced",
+    "methodURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-method/introduced",
+    "mostRecentStage": {
+     "event": {
+      "chamber": {
+       "chamberCode": "dail",
+       "showAs": "Dáil Éireann",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail"
+      },
+      "dates": [
+       {
+        "date": "2026-09-24"
+       }
+      ],
+      "house": {
+       "chamberCode": "dail",
+       "chamberType": "house",
+       "houseCode": "dail",
+       "houseNo": "34",
+       "showAs": "34th Dáil",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34"
+      },
+      "progressStage": 2,
+      "showAs": "Second Stage",
+      "stageCompleted": false,
+      "stageOutcome": "Current",
+      "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/2",
+      "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/92/stage/dail/2"
+     }
+    },
+    "originHouse": {
+     "showAs": "Dáil Éireann",
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail"
+    },
+    "originHouseURI": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail",
+    "relatedDocs": [],
+    "shortTitleEn": "Non-Binary and Intersex Recognition Bill 2026 ",
+    "shortTitleGa": "An Bille um Inscne Neamhdhénártha agus Daoine Idirghnéasacha a Aithint, 2026",
+    "source": "Private Member",
+    "sourceURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-source/private-member",
+    "sponsors": [
+     {
+      "sponsor": {
+       "isPrimary": true,
+       "as": {
+        "showAs": null,
+        "uri": null
+       },
+       "by": {
+        "showAs": "Ruth Coppinger",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Ruth-Coppinger.D.2014-05-23"
+       }
+      }
+     },
+     {
+      "sponsor": {
+       "isPrimary": false,
+       "as": {
+        "showAs": null,
+        "uri": null
+       },
+       "by": {
+        "showAs": "Richard Boyd Barrett",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Richard-Boyd-Barrett.D.2011-03-09"
+       }
+      }
+     },
+     {
+      "sponsor": {
+       "isPrimary": false,
+       "as": {
+        "showAs": null,
+        "uri": null
+       },
+       "by": {
+        "showAs": "Paul Murphy",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Paul-Murphy.D.2014-10-10"
+       }
+      }
+     }
+    ],
+    "stages": [],
+    "status": "Current",
+    "statusURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-status/published",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/92",
+    "versions": []
+   },
+   "contextDate": "2026-09-24",
+   "billSort": {
+    "actNoSort": null,
+    "actShortTitleEnSort": null,
+    "actShortTitleGaSort": null,
+    "actYearSort": null,
+    "billNoSort": 92,
+    "billShortTitleEnSort": "non-binary-and-intersex-recognition-bill-2026",
+    "billShortTitleGaSort": "an-bille-um-inscne-neamhdhenartha-agus-daoine-idirghneasacha-a-aithint-2026",
+    "billYearSort": 2026
+   }
+  },
+  {
+   "bill": {
+    "act": null,
+    "amendmentLists": [],
+    "billNo": "91",
+    "billType": "Public",
+    "billTypeURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-type/public",
+    "billYear": "2026",
+    "debates": [],
+    "events": [],
+    "lastUpdated": "2026-09-25T11:25:26.290000+00:00",
+    "longTitleEn": "<p>Bill entitled an Act to provide for the withdrawal of the State from European Union legislative measures comprised in the Migration and Asylum Pact of the European Union; and to provide for related matters.</p>",
+    "longTitleGa": "",
+    "method": "Introduced",
+    "methodURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-method/introduced",
+    "mostRecentStage": {
+     "event": {
+      "chamber": {
+       "chamberCode": "dail",
+       "showAs": "Dáil Éireann",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail"
+      },
+      "dates": [
+       {
+        "date": "2026-09-23"
+       }
+      ],
+      "house": {
+       "chamberCode": "dail",
+       "chamberType": "house",
+       "houseCode": "dail",
+       "houseNo": "34",
+       "showAs": "34th Dáil",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34"
+      },
+      "progressStage": 2,
+      "showAs": "Second Stage",
+      "stageCompleted": false,
+      "stageOutcome": "Current",
+      "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/2",
+      "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/91/stage/dail/2"
+     }
+    },
+    "originHouse": {
+     "showAs": "Dáil Éireann",
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail"
+    },
+    "originHouseURI": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail",
+    "relatedDocs": [],
+    "shortTitleEn": "Withdrawal of the State from the Migration and Asylum Pact of the European Union Bill 2026",
+    "shortTitleGa": "An Bille um Tharraingt Siar an Stáit as Comhshocrú an Aontais Eorpaigh maidir le hImirce agus Tearmann, 2026",
+    "source": "Private Member",
+    "sourceURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-source/private-member",
+    "sponsors": [
+     {
+      "sponsor": {
+       "isPrimary": true,
+       "as": {
+        "showAs": null,
+        "uri": null
+       },
+       "by": {
+        "showAs": "Peadar Tóibín",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Peadar-Tóibín.D.2011-03-09"
+       }
+      }
+     },
+     {
+      "sponsor": {
+       "isPrimary": false,
+       "as": {
+        "showAs": null,
+        "uri": null
+       },
+       "by": {
+        "showAs": "Paul Lawless",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Paul-Lawless.D.2024-11-29"
+       }
+      }
+     }
+    ],
+    "stages": [],
+    "status": "Current",
+    "statusURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-status/published",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/91",
+    "versions": []
+   },
+   "contextDate": "2026-09-23",
+   "billSort": {
+    "actNoSort": null,
+    "actShortTitleEnSort": null,
+    "actShortTitleGaSort": null,
+    "actYearSort": null,
+    "billNoSort": 91,
+    "billShortTitleEnSort": "withdrawal-of-the-state-from-the-migration-and-asylum-pact-of-the-european-union-bill-2026",
+    "billShortTitleGaSort": "an-bille-um-tharraingt-siar-an-stait-as-comhshocru-an-aontais-eorpaigh-maidir-le-himirce-agus-tearmann-2026",
+    "billYearSort": 2026
+   }
+  },
+  {
+   "bill": {
+    "act": null,
+    "amendmentLists": [],
+    "billNo": "90",
+    "billType": "Public",
+    "billTypeURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-type/public",
+    "billYear": "2026",
+    "debates": [],
+    "events": [],
+    "lastUpdated": "2026-09-23T11:05:24.300000+00:00",
+    "longTitleEn": "<p style=\"text-align:justify;\">Bill entitled an Act to enable each Dublin local authority to adopt a scheme imposing a visitor accommodation levy on overnight stays in tourist accommodation within its functional area; to provide for the rate, collection, remittance and ring-fencing of revenue from such a levy; to provide for public consultation prior to the adoption of any such scheme; to provide for a register of accommodation providers, for the appointment of authorised officers and for compliance and enforcement; to provide for co-operation between Dublin local authorities and with digital accommodation platforms; to amend the Local Government Act 2001; and to provide for related matters.</p>",
+    "longTitleGa": "",
+    "method": "Introduced",
+    "methodURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-method/introduced",
+    "mostRecentStage": {
+     "event": {
+      "chamber": {
+       "chamberCode": "dail",
+       "showAs": "Dáil Éireann",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail"
+      },
+      "dates": [
+       {
+        "date": "2026-09-22"
+       }
+      ],
+      "house": {
+       "chamberCode": "dail",
+       "chamberType": "house",
+       "houseCode": "dail",
+       "houseNo": "34",
+       "showAs": "34th Dáil",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34"
+      },
+      "progressStage": 2,
+      "showAs": "Second Stage",
+      "stageCompleted": false,
+      "stageOutcome": "Current",
+      "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/2",
+      "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/90/stage/dail/2"
+     }
+    },
+    "originHouse": {
+     "showAs": "Dáil Éireann",
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail"
+    },
+    "originHouseURI": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail",
+    "relatedDocs": [],
+    "shortTitleEn": "Dublin Local Authorities (Visitor Accommodation Levy) Bill 2026",
+    "shortTitleGa": "An Bille um Údaráis Áitiúla Bhaile Átha Cliath (Tobhach ar Chóiríocht do Chuairteoirí), 2026",
+    "source": "Private Member",
+    "sourceURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-source/private-member",
+    "sponsors": [
+     {
+      "sponsor": {
+       "isPrimary": true,
+       "as": {
+        "showAs": null,
+        "uri": null
+       },
+       "by": {
+        "showAs": "Paul McAuliffe",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Paul-McAuliffe.D.2020-02-08"
+       }
+      }
+     }
+    ],
+    "stages": [],
+    "status": "Current",
+    "statusURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-status/published",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/90",
+    "versions": []
+   },
+   "contextDate": "2026-09-22",
+   "billSort": {
+    "actNoSort": null,
+    "actShortTitleEnSort": null,
+    "actShortTitleGaSort": null,
+    "actYearSort": null,
+    "billNoSort": 90,
+    "billShortTitleEnSort": "dublin-local-authorities-visitor-accommodation-levy-bill-2026",
+    "billShortTitleGaSort": "an-bille-um-udarais-aitiula-bhaile-atha-cliath-tobhach-ar-choiriocht-do-chuairteoiri-2026",
+    "billYearSort": 2026
+   }
+  },
+  {
+   "bill": {
+    "act": null,
+    "amendmentLists": [],
+    "billNo": "89",
+    "billType": "Public",
+    "billTypeURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-type/public",
+    "billYear": "2026",
+    "debates": [],
+    "events": [],
+    "lastUpdated": "2026-09-23T10:45:38.420000+00:00",
+    "longTitleEn": "<p style=\"text-align:justify;\">Bill entitled an Act to amend the Public Health (Tobacco) Acts 2002 to 2024 to prohibit the sale and supply of tobacco products, nicotine products and nicotine inhalation products to persons born on or after 1 January 2009; to provide for related offences, enforcement and penalties; and to provide for related matters.</p>",
+    "longTitleGa": "",
+    "method": "Introduced",
+    "methodURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-method/introduced",
+    "mostRecentStage": {
+     "event": {
+      "chamber": {
+       "chamberCode": "dail",
+       "showAs": "Dáil Éireann",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail"
+      },
+      "dates": [
+       {
+        "date": "2026-09-22"
+       }
+      ],
+      "house": {
+       "chamberCode": "dail",
+       "chamberType": "house",
+       "houseCode": "dail",
+       "houseNo": "34",
+       "showAs": "34th Dáil",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34"
+      },
+      "progressStage": 2,
+      "showAs": "Second Stage",
+      "stageCompleted": false,
+      "stageOutcome": "Current",
+      "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/2",
+      "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/89/stage/dail/2"
+     }
+    },
+    "originHouse": {
+     "showAs": "Dáil Éireann",
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail"
+    },
+    "originHouseURI": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail",
+    "relatedDocs": [],
+    "shortTitleEn": "Public Health (Tobacco) (Amendment) (Smokefree Generation) Bill 2026",
+    "shortTitleGa": "An Bille Sláinte Poiblí (Tobac) (Leasú) (Glúin Saor ó Chaitheamh), 2026",
+    "source": "Private Member",
+    "sourceURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-source/private-member",
+    "sponsors": [
+     {
+      "sponsor": {
+       "isPrimary": true,
+       "as": {
+        "showAs": null,
+        "uri": null
+       },
+       "by": {
+        "showAs": "Malcolm Byrne",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Malcolm-Byrne.D.2019-11-29"
+       }
+      }
+     }
+    ],
+    "stages": [],
+    "status": "Current",
+    "statusURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-status/published",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/89",
+    "versions": []
+   },
+   "contextDate": "2026-09-22",
+   "billSort": {
+    "actNoSort": null,
+    "actShortTitleEnSort": null,
+    "actShortTitleGaSort": null,
+    "actYearSort": null,
+    "billNoSort": 89,
+    "billShortTitleEnSort": "public-health-tobacco-amendment-smokefree-generation-bill-2026",
+    "billShortTitleGaSort": "an-bille-slainte-poibli-tobac-leasu-gluin-saor-o-chaitheamh-2026",
+    "billYearSort": 2026
+   }
+  }
+ ]
+}

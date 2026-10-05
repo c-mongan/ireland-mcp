@@ -1,0 +1,51 @@
+name: Deploy (Azure)
+
+# Manual only. Needs repository variables AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID,
+# AZURE_ENV_NAME (and optionally BUDGET_CONTACT_EMAIL) plus an optional NTA_API_KEY secret.
+# The client ID must be an Entra app/managed identity with a federated credential for this repo's
+# "production" environment. See docs/deploy.md. Add a `push: branches: [main]` trigger once it works.
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
+      AZURE_LOCATION: northeurope
+      BUDGET_CONTACT_EMAIL: ${{ vars.BUDGET_CONTACT_EMAIL }}
+      NTA_API_KEY: ${{ secrets.NTA_API_KEY }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint && npm run typecheck && npm test
+      - uses: Azure/setup-azd@v2
+      - name: azd login (OIDC)
+        run: azd auth login --client-id "$AZURE_CLIENT_ID" --federated-credential-provider github --tenant-id "$AZURE_TENANT_ID"
+      - name: Provision and deploy
+        run: |
+          azd env new "$AZURE_ENV_NAME" --subscription "$AZURE_SUBSCRIPTION_ID" --location "$AZURE_LOCATION" --no-prompt || azd env select "$AZURE_ENV_NAME"
+          azd up --no-prompt
+      - name: Smoke test the deployed endpoint
+        run: |
+          endpoint="$(azd env get-value MCP_ENDPOINT)"
+          base="${endpoint%/mcp}"
+          curl -fsS "$base/healthz"
+          npx -y @modelcontextprotocol/inspector@2.9.0 --cli "$endpoint" --transport http --method tools/list > tools.json
+          node -e 'const t=require("./tools.json").tools; if (t.length < 20) process.exit(1); console.log(t.length + " tools")'

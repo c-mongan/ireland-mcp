@@ -1,0 +1,68 @@
+Ireland MCP
+Copyright (c) 2026 Conor Mongan
+Licensed under the MIT Licence (see LICENSE).
+
+This product includes ideas and code ported from:
+
+  ireland-open-data-mcp — https://github.com/c-mongan/ireland-open-data-mcp
+  Copyright (c) Conor Mongan. MIT Licence.
+
+  ie-eli-mcp — https://github.com/matematicsolutions/ie-eli-mcp
+  Licensed under the Apache License, Version 2.0.
+  The legislation module's approach (address Acts by their ELI URI and read
+  the eISB rendering) is adapted from this project. No source files were
+  copied verbatim. A copy of the licence is available at
+  https://www.apache.org/licenses/LICENSE-2.0
+
+-------------------------------------------------------------------------------
+DATA SOURCES
+-------------------------------------------------------------------------------
+
+The software licence above covers this code only. Data returned by the tools
+belongs to its publishers and stays under their licences. Every tool response
+carries the source, licence and attribution text; keep that attribution when
+you reuse the data. This project is not affiliated with or endorsed by any of
+the publishers below.
+
+Central Statistics Office (CSO) PxStat — https://data.cso.ie
+  Licence: CC BY 4.0
+  Attribution: Source: Central Statistics Office, Ireland (www.cso.ie).
+
+Houses of the Oireachtas Open Data API — https://api.oireachtas.ie
+  Licence: Oireachtas (Open Data) PSI Licence
+  Attribution: Contains Oireachtas information licensed under the
+  Oireachtas (Open Data) PSI Licence.
+
+GeoHive / Tailte Éireann boundary services — https://www.geohive.ie
+  Licence: CC BY 4.0
+  Attribution: © Tailte Éireann. Census geographies © CSO.
+
+data.gov.ie (CKAN) — https://data.gov.ie
+  Licence: per dataset, mostly CC BY 4.0. Check each dataset's licence field.
+  Catalogue run by the Department of Public Expenditure, NDP Delivery and Reform.
+
+Smart Dublin (CKAN) — https://data.smartdublin.ie
+  Licence: per dataset, mostly CC BY 4.0. Check each dataset's licence field.
+  Data from the four Dublin local authorities.
+
+Met Éireann — https://www.met.ie
+  Licence: CC BY 4.0
+  Attribution: Copyright Met Éireann. Source: www.met.ie. Met Éireann does not
+  accept liability for errors or omissions in the data.
+
+National Transport Authority (Transport for Ireland) GTFS-Realtime —
+https://developer.nationaltransport.ie
+  Licence: CC BY 4.0
+  Attribution: Contains data from the National Transport Authority.
+  Requires an API key held by the server operator.
+
+Irish Statute Book (eISB) — https://www.irishstatutebook.ie
+  Licence: re-use under the PSI General Licence / CC BY 4.0
+  Attribution: Contains Irish Statute Book data © Office of the Attorney
+  General. Not an official version of the legislation.
+
+Residential Property Price Register — https://www.propertypriceregister.ie
+  Licence: PSI General Licence / CC BY 4.0
+  Attribution: Property Services Regulatory Authority, Residential Property
+  Price Register. The register reflects declared sale prices and is not a
+  valuation.

@@ -1,0 +1,32 @@
+{
+ "objectIdFieldName": "OBJECTID_12",
+ "uniqueIdField": {
+  "name": "OBJECTID_12",
+  "isSystemMaintained": true
+ },
+ "globalIdFieldName": "",
+ "geometryProperties": {
+  "shapeAreaFieldName": "Shape__Area",
+  "shapeLengthFieldName": "Shape__Length",
+  "units": "esriMeters"
+ },
+ "geometryType": "esriGeometryPolygon",
+ "spatialReference": {
+  "wkid": 2157,
+  "latestWkid": 2157
+ },
+ "features": [
+  {
+   "attributes": {
+    "OBJECTID_12": 574,
+    "SETTLEMENT": "35001",
+    "SETTL_NAME": "Dublin city and suburbs",
+    "EAST": 715063.868385,
+    "NORTH": 732869.556852,
+    "GUID": "EED4C2E4-43BA-428E-96FC-1C65CC0A4340",
+    "Shape__Area": 319016621.3204956,
+    "Shape__Length": 232351.98601316634
+   }
+  }
+ ]
+}

@@ -1,0 +1,90 @@
+{
+ "head": {
+  "counts": {
+   "questionCount": 10000,
+   "resultCount": 10000
+  }
+ },
+ "results": [
+  {
+   "question": {
+    "by": {
+     "showAs": "Donnchadh Ó Laoghaire",
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Donnchadh-Ó-Laoghaire.D.2016-10-03",
+     "memberCode": "Donnchadh-Ó-Laoghaire.D.2016-10-03"
+    },
+    "to": {
+     "showAs": "Foreign",
+     "uri": null,
+     "roleType": null,
+     "roleCode": null
+    },
+    "debateSection": {
+     "showAs": "Diaspora Issues",
+     "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-10-01/debate/dbsect_3",
+     "debateSectionId": "dbsect_3",
+     "formats": {
+      "xml": {
+       "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-10-01/debate/mul@/dbsect_3.xml"
+      },
+      "pdf": null
+     }
+    },
+    "questionType": "oral",
+    "questionNumber": 1,
+    "showAs": " 1. Deputy Donnchadh Ó Laoghaire asked the Minister for Foreign Affairs and Trade to report on the implementation of Ireland's Diaspora Strategy 2026-2030.  [69242/26] ",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/question/2026-10-01/pq_1",
+    "date": "2026-10-01",
+    "house": {
+     "showAs": "34th Dáil",
+     "committeeCode": "",
+     "houseCode": "dail",
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34",
+     "chamberType": "house",
+     "houseNo": "34"
+    }
+   },
+   "contextDate": "2026-10-01"
+  },
+  {
+   "question": {
+    "by": {
+     "showAs": "Richard Boyd Barrett",
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Richard-Boyd-Barrett.D.2011-03-09",
+     "memberCode": "Richard-Boyd-Barrett.D.2011-03-09"
+    },
+    "to": {
+     "showAs": "Foreign",
+     "uri": null,
+     "roleType": null,
+     "roleCode": null
+    },
+    "debateSection": {
+     "showAs": "Irish Prisoners Abroad",
+     "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-10-01/debate/dbsect_4",
+     "debateSectionId": "dbsect_4",
+     "formats": {
+      "xml": {
+       "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-10-01/debate/mul@/dbsect_4.xml"
+      },
+      "pdf": null
+     }
+    },
+    "questionType": "oral",
+    "questionNumber": 2,
+    "showAs": " 2. Deputy Richard Boyd Barrett asked the Minister for Foreign Affairs and Trade further to reports from a recent cross-party delegation of seven Oireachtas Members to the trial of an Irish citizen in Germany, where delegates observed serious procedural issues, and further to her personal assurances that she would be monitoring, keeping a very close eye and providing direct and fair oversight and full sight of the trial, the exact way in which she can provide this without consular observers attending the trial, given the absence of a neutral court transcript, and given that trial observation does not constitute an intervention under the Vienna Convention.  [69687/26] ",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/question/2026-10-01/pq_2",
+    "date": "2026-10-01",
+    "house": {
+     "showAs": "34th Dáil",
+     "committeeCode": "",
+     "houseCode": "dail",
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34",
+     "chamberType": "house",
+     "houseNo": "34"
+    }
+   },
+   "contextDate": "2026-10-01"
+  }
+ ]
+}

@@ -1,0 +1,350 @@
+{
+ "head": {
+  "counts": {
+   "debateCount": 8918,
+   "resultCount": 8918
+  }
+ },
+ "results": [
+  {
+   "debateRecord": {
+    "house": {
+     "showAs": "34th Dáil",
+     "committeeCode": "",
+     "houseCode": "dail",
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34",
+     "chamberType": "house",
+     "houseNo": "34"
+    },
+    "chamber": {
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail",
+     "showAs": "Dáil Éireann"
+    },
+    "lastUpdated": "2026-10-05T12:31:27+00:00",
+    "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-10-01/debate/main",
+    "formats": {
+     "xml": {
+      "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-10-01/debate/mul@/main.xml"
+     },
+     "pdf": null
+    },
+    "date": "2026-10-01",
+    "counts": {
+     "contributorCount": 123,
+     "divisionCount": 0,
+     "debateSectionCount": 40,
+     "questionCount": 25,
+     "billCount": 5
+    },
+    "debateType": "debate",
+    "debateSections": [
+     {
+      "debateSection": {
+       "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-10-01/debate/dbsect_2",
+       "debateType": "questions",
+       "bill": null,
+       "showAs": "Ceisteanna ar Sonraíodh Uain Dóibh - Priority Questions",
+       "counts": {
+        "speechCount": 0,
+        "speakerCount": 0
+       },
+       "parentDebateSection": null,
+       "containsDebate": false,
+       "debateSectionId": "dbsect_2",
+       "speakers": [],
+       "formats": {
+        "xml": null,
+        "pdf": null
+       },
+       "text": []
+      }
+     },
+     {
+      "debateSection": {
+       "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-10-01/debate/dbsect_3",
+       "debateType": "question",
+       "bill": null,
+       "showAs": "Diaspora Issues",
+       "counts": {
+        "speechCount": 7,
+        "speakerCount": 3
+       },
+       "parentDebateSection": {
+        "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-10-01/debate/dbsect_2",
+        "formats": {
+         "pdf": null,
+         "xml": null
+        },
+        "debateSectionId": "dbsect_2",
+        "showAs": "Ceisteanna ar Sonraíodh Uain Dóibh - Priority Questions"
+       },
+       "containsDebate": true,
+       "debateSectionId": "dbsect_3",
+       "speakers": [
+        {
+         "speaker": {
+          "showAs": "Cathy Bennett",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Cathy-Bennett.D.2024-11-29",
+          "memberCode": "Cathy-Bennett.D.2024-11-29",
+          "role": null
+         }
+        }
+       ],
+       "formats": {
+        "xml": {
+         "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-10-01/debate/mul@/dbsect_3.xml"
+        },
+        "pdf": null
+       },
+       "text": []
+      }
+     },
+     {
+      "debateSection": {
+       "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-10-01/debate/dbsect_4",
+       "debateType": "question",
+       "bill": null,
+       "showAs": "Irish Prisoners Abroad",
+       "counts": {
+        "speechCount": 6,
+        "speakerCount": 2
+       },
+       "parentDebateSection": {
+        "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-10-01/debate/dbsect_2",
+        "formats": {
+         "pdf": null,
+         "xml": null
+        },
+        "debateSectionId": "dbsect_2",
+        "showAs": "Ceisteanna ar Sonraíodh Uain Dóibh - Priority Questions"
+       },
+       "containsDebate": true,
+       "debateSectionId": "dbsect_4",
+       "speakers": [
+        {
+         "speaker": {
+          "showAs": "Richard Boyd Barrett",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Richard-Boyd-Barrett.D.2011-03-09",
+          "memberCode": "Richard-Boyd-Barrett.D.2011-03-09",
+          "role": null
+         }
+        }
+       ],
+       "formats": {
+        "xml": {
+         "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-10-01/debate/mul@/dbsect_4.xml"
+        },
+        "pdf": null
+       },
+       "text": []
+      }
+     },
+     {
+      "debateSection": {
+       "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-10-01/debate/dbsect_5",
+       "debateType": "question",
+       "bill": null,
+       "showAs": "Middle East",
+       "counts": {
+        "speechCount": 6,
+        "speakerCount": 2
+       },
+       "parentDebateSection": {
+        "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-10-01/debate/dbsect_2",
+        "formats": {
+         "pdf": null,
+         "xml": null
+        },
+        "debateSectionId": "dbsect_2",
+        "showAs": "Ceisteanna ar Sonraíodh Uain Dóibh - Priority Questions"
+       },
+       "containsDebate": true,
+       "debateSectionId": "dbsect_5",
+       "speakers": [
+        {
+         "speaker": {
+          "showAs": "Cathy Bennett",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Cathy-Bennett.D.2024-11-29",
+          "memberCode": "Cathy-Bennett.D.2024-11-29",
+          "role": null
+         }
+        }
+       ],
+       "formats": {
+        "xml": {
+         "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-10-01/debate/mul@/dbsect_5.xml"
+        },
+        "pdf": null
+       },
+       "text": []
+      }
+     }
+    ]
+   },
+   "contextDate": "2026-10-01"
+  },
+  {
+   "debateRecord": {
+    "house": {
+     "showAs": "34th Dáil",
+     "committeeCode": "",
+     "houseCode": "dail",
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34",
+     "chamberType": "house",
+     "houseNo": "34"
+    },
+    "chamber": {
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail",
+     "showAs": "Dáil Éireann"
+    },
+    "lastUpdated": "2026-10-03T02:17:09+00:00",
+    "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-09-30/debate/main",
+    "formats": {
+     "xml": {
+      "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-09-30/debate/mul@/main.xml"
+     },
+     "pdf": null
+    },
+    "date": "2026-09-30",
+    "counts": {
+     "contributorCount": 166,
+     "divisionCount": 8,
+     "debateSectionCount": 18,
+     "questionCount": 0,
+     "billCount": 4
+    },
+    "debateType": "debate",
+    "debateSections": [
+     {
+      "debateSection": {
+       "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-09-30/debate/dbsect_2",
+       "debateType": "topical",
+       "bill": null,
+       "showAs": "Ábhair Shaincheisteanna Tráthúla - Topical Issue Matters",
+       "counts": {
+        "speechCount": 1,
+        "speakerCount": 1
+       },
+       "parentDebateSection": null,
+       "containsDebate": true,
+       "debateSectionId": "dbsect_2",
+       "speakers": [
+        {
+         "speaker": {
+          "showAs": "Aindrias Moynihan",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Aindrias-Moynihan.D.2016-10-03",
+          "memberCode": "Aindrias-Moynihan.D.2016-10-03",
+          "role": null
+         }
+        }
+       ],
+       "formats": {
+        "xml": null,
+        "pdf": null
+       },
+       "text": []
+      }
+     },
+     {
+      "debateSection": {
+       "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-09-30/debate/dbsect_3",
+       "debateType": "topical",
+       "bill": null,
+       "showAs": "Saincheisteanna Tráthúla - Topical Issue Debate",
+       "counts": {
+        "speechCount": 0,
+        "speakerCount": 0
+       },
+       "parentDebateSection": null,
+       "containsDebate": false,
+       "debateSectionId": "dbsect_3",
+       "speakers": [],
+       "formats": {
+        "xml": null,
+        "pdf": null
+       },
+       "text": []
+      }
+     },
+     {
+      "debateSection": {
+       "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-09-30/debate/dbsect_4",
+       "debateType": "debate",
+       "bill": null,
+       "showAs": "Motor Fuels",
+       "counts": {
+        "speechCount": 4,
+        "speakerCount": 2
+       },
+       "parentDebateSection": {
+        "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-09-30/debate/dbsect_3",
+        "formats": {
+         "pdf": null,
+         "xml": null
+        },
+        "debateSectionId": "dbsect_3",
+        "showAs": "Saincheisteanna Tráthúla - Topical Issue Debate"
+       },
+       "containsDebate": true,
+       "debateSectionId": "dbsect_4",
+       "speakers": [
+        {
+         "speaker": {
+          "showAs": "Barry Ward",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Barry-Ward.S.2020-03-30",
+          "memberCode": "Barry-Ward.S.2020-03-30",
+          "role": null
+         }
+        }
+       ],
+       "formats": {
+        "xml": null,
+        "pdf": null
+       },
+       "text": []
+      }
+     },
+     {
+      "debateSection": {
+       "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-09-30/debate/dbsect_5",
+       "debateType": "debate",
+       "bill": null,
+       "showAs": "Health Services",
+       "counts": {
+        "speechCount": 4,
+        "speakerCount": 2
+       },
+       "parentDebateSection": {
+        "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-09-30/debate/dbsect_3",
+        "formats": {
+         "pdf": null,
+         "xml": null
+        },
+        "debateSectionId": "dbsect_3",
+        "showAs": "Saincheisteanna Tráthúla - Topical Issue Debate"
+       },
+       "containsDebate": true,
+       "debateSectionId": "dbsect_5",
+       "speakers": [
+        {
+         "speaker": {
+          "showAs": "Thomas Gould",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Thomas-Gould.D.2020-02-08",
+          "memberCode": "Thomas-Gould.D.2020-02-08",
+          "role": null
+         }
+        }
+       ],
+       "formats": {
+        "xml": null,
+        "pdf": null
+       },
+       "text": []
+      }
+     }
+    ]
+   },
+   "contextDate": "2026-09-30"
+  }
+ ]
+}

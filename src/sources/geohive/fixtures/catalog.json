@@ -1,0 +1,205 @@
+{
+ "currentVersion": 12,
+ "services": [
+  {
+   "name": "Admin_Areas___OSi_National_1m_Map_Of_Ireland",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Admin_Areas___OSi_National_1m_Map_Of_Ireland/FeatureServer"
+  },
+  {
+   "name": "Admin_Boundaries___OSi_National_250K_Map_Of_Ireland",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Admin_Boundaries___OSi_National_250K_Map_Of_Ireland/FeatureServer"
+  },
+  {
+   "name": "Admin_Boundary_Areas___OSi_National_250K_Map_Of_Ireland",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Admin_Boundary_Areas___OSi_National_250K_Map_Of_Ireland/FeatureServer"
+  },
+  {
+   "name": "Administrative_Areas___OSi_National_Statutory_Boundaries",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Administrative_Areas___OSi_National_Statutory_Boundaries/FeatureServer"
+  },
+  {
+   "name": "Administrative_Areas___OSi_National_Statutory_Boundaries___Generalised_20m",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Administrative_Areas___OSi_National_Statutory_Boundaries___Generalised_20m/FeatureServer"
+  },
+  {
+   "name": "Administrative_Areas_Generalised_100m",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Administrative_Areas_Generalised_100m/FeatureServer"
+  },
+  {
+   "name": "Administrative_Areas_Generalised_20m",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Administrative_Areas_Generalised_20m/FeatureServer"
+  },
+  {
+   "name": "Administrative_Areas_Generalised_50m",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Administrative_Areas_Generalised_50m/FeatureServer"
+  },
+  {
+   "name": "Administrative_Areas_Ungeneralised",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Administrative_Areas_Ungeneralised/FeatureServer"
+  },
+  {
+   "name": "Airfield_Area___OSi_National_250K_Map_Of_Ireland",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Airfield_Area___OSi_National_250K_Map_Of_Ireland/FeatureServer"
+  },
+  {
+   "name": "Airports___OSi_National_250K_Map_Of_Ireland",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Airports___OSi_National_250K_Map_Of_Ireland/FeatureServer"
+  },
+  {
+   "name": "Baronies___OSi_National_Placenames_Gazetteer",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Baronies___OSi_National_Placenames_Gazetteer/FeatureServer"
+  },
+  {
+   "name": "Baronies___OSi_National_Statutory_Boundaries",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Baronies___OSi_National_Statutory_Boundaries/FeatureServer"
+  },
+  {
+   "name": "Baronies___OSi_National_Statutory_Boundaries___Generalised_20m",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Baronies___OSi_National_Statutory_Boundaries___Generalised_20m/FeatureServer"
+  },
+  {
+   "name": "Border_Exits___Entrances___OSi_National_1m_Map_Of_Ireland",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Border_Exits___Entrances___OSi_National_1m_Map_Of_Ireland/FeatureServer"
+  },
+  {
+   "name": "Boundaries_Seawater_Area___OSi_National_250K_Map_Of_Ireland",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Boundaries_Seawater_Area___OSi_National_250K_Map_Of_Ireland/FeatureServer"
+  },
+  {
+   "name": "Boundaries_Seawater_Line___OSi_National_1m_Map_Of_Ireland",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Boundaries_Seawater_Line___OSi_National_1m_Map_Of_Ireland/FeatureServer"
+  },
+  {
+   "name": "Built_Up_Areas___OSi_National_1m_Map_Of_Ireland",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Built_Up_Areas___OSi_National_1m_Map_Of_Ireland/FeatureServer"
+  },
+  {
+   "name": "Built_Up_Areas___OSi_National_250k_Map_Of_Ireland",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Built_Up_Areas___OSi_National_250k_Map_Of_Ireland/FeatureServer"
+  },
+  {
+   "name": "Built_Up_Areas_Points___OSi_National_250k_Map_of_Ireland_1",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Built_Up_Areas_Points___OSi_National_250k_Map_of_Ireland_1/FeatureServer"
+  },
+  {
+   "name": "Centres_of_Population___OSi_National_Placenames_Gazetteer",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Centres_of_Population___OSi_National_Placenames_Gazetteer/FeatureServer"
+  },
+  {
+   "name": "Civil_Parishes___OSi_National_Placenames_Gazetteer",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Civil_Parishes___OSi_National_Placenames_Gazetteer/FeatureServer"
+  },
+  {
+   "name": "Civil_parishes___OSi_National_Statutory_Boundaries",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Civil_parishes___OSi_National_Statutory_Boundaries/FeatureServer"
+  },
+  {
+   "name": "Civil_parishes___OSi_National_Statutory_Boundaries___Generalised_20m",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Civil_parishes___OSi_National_Statutory_Boundaries___Generalised_20m/FeatureServer"
+  },
+  {
+   "name": "Coast___OSi_National_250k_Map_Of_Ireland",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Coast___OSi_National_250k_Map_Of_Ireland/FeatureServer"
+  },
+  {
+   "name": "Constituency_Boundaries___Generalised_20m",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Constituency_Boundaries___Generalised_20m/FeatureServer"
+  },
+  {
+   "name": "Constituency_Boundaries_100m_OSi_National_Electoral_Boundaries_2017",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Constituency_Boundaries_100m_OSi_National_Electoral_Boundaries_2017/FeatureServer"
+  },
+  {
+   "name": "Constituency_Boundaries_Generalised_20m",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Constituency_Boundaries_Generalised_20m/FeatureServer"
+  },
+  {
+   "name": "Constituency_Boundaries_Generalised_50m",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Constituency_Boundaries_Generalised_50m/FeatureServer"
+  },
+  {
+   "name": "Constituency_Boundaries_Ungeneralised",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Constituency_Boundaries_Ungeneralised/FeatureServer"
+  },
+  {
+   "name": "Constituency_Boundaries_Ungeneralised_2017",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Constituency_Boundaries_Ungeneralised_2017/FeatureServer"
+  },
+  {
+   "name": "Counties___OSi_National_Placenames_Gazetteer",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Counties___OSi_National_Placenames_Gazetteer/FeatureServer"
+  },
+  {
+   "name": "Counties___OSi_National_Statutory_Boundaries___Generalised_20m",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Counties___OSi_National_Statutory_Boundaries___Generalised_20m/FeatureServer"
+  },
+  {
+   "name": "CSO_Electoral_Divisions_Generalised_100m",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/CSO_Electoral_Divisions_Generalised_100m/FeatureServer"
+  },
+  {
+   "name": "CSO_Electoral_Divisions_Generalised_20m",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/CSO_Electoral_Divisions_Generalised_20m/FeatureServer"
+  },
+  {
+   "name": "CSO_Electoral_Divisions_Generalised_50m",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/CSO_Electoral_Divisions_Generalised_50m/FeatureServer"
+  },
+  {
+   "name": "CSO_Electoral_Divisions_Ungeneralised",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/CSO_Electoral_Divisions_Ungeneralised/FeatureServer"
+  },
+  {
+   "name": "Electoral_Districts___OSi_National_Placenames_Gazetteer",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Electoral_Districts___OSi_National_Placenames_Gazetteer/FeatureServer"
+  },
+  {
+   "name": "Electoral_Divisions___OSi_National_Statutory_Boundaries",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Electoral_Divisions___OSi_National_Statutory_Boundaries/FeatureServer"
+  },
+  {
+   "name": "Electoral_Divisions___OSi_National_Statutory_Boundaries___Generalised_20m",
+   "type": "FeatureServer",
+   "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/ArcGIS/rest/services/Electoral_Divisions___OSi_National_Statutory_Boundaries___Generalised_20m/FeatureServer"
+  }
+ ]
+}

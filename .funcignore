@@ -1,0 +1,14 @@
+.git*
+.github/
+.vscode/
+coverage/
+docs/
+evals/
+infra/
+test/
+web/
+src/
+scripts/
+*.ts
+!dist/**
+local.settings.json

@@ -1,0 +1,58 @@
+#!/usr/bin/env node
+// Live sanity check: one real upstream call per source. Not run in unit tests; used locally and by the nightly live-smoke workflow.
+// Usage: npm run build && npm run live:sanity [-- --json]
+import { createContext } from "../dist/src/gateway/context.js";
+import { runTool } from "../dist/src/gateway/server.js";
+import { crossSourceTools } from "../dist/src/cross/index.js";
+import { sourceModules } from "../dist/src/registry.js";
+
+const year = new Date().getUTCFullYear();
+const CASES = [
+  ["cso", "cso_area_profile", { area: "Galway" }, (d) => d.census?.length > 0],
+  ["oireachtas", "oireachtas_search_bills", { query: "housing", limit: 3 }, (d) => JSON.stringify(d).length > 50],
+  ["geohive", "geohive_boundaries_at_point", { lat: 53.3498, lon: -6.2603 }, (d) => d.county?.name],
+  ["data-gov-ie", "datagov_search_datasets", { query: "population", limit: 3 }, (d) => d.total > 0],
+  ["smart-dublin", "smartdublin_search_datasets", { query: "bike", limit: 3 }, (d) => d.total > 0],
+  ["met-eireann", "met_get_forecast", { lat: 53.3498, lon: -6.2603, hours: 3 }, (d) => d.forecast?.length === 3],
+  ["met-eireann", "met_get_warnings", {}, (d) => Array.isArray(d.warnings)],
+  ["nta", "nta_get_realtime_summary", { limit: 3 }, (d) => d.entities > 0 || d.trip_updates > 0, { needsEnv: "NTA_API_KEY" }],
+  ["legislation", "legislation_list_acts", { year: year - 1, limit: 3 }, (d) => JSON.stringify(d).includes("title")],
+  ["ppr", "ppr_price_stats", { county: "Galway" }, (d) => d.count > 0],
+  ["cross", "search", { query: "population" }, (d) => d.results?.length > 0, { raw: true }],
+  ["cross", "ireland_snapshot", { place: "Galway" }, (d) => d.population?.area && d.boundaries?.county]
+];
+
+const ctx = createContext();
+const cross = crossSourceTools(sourceModules);
+const findTool = (name) => sourceModules.flatMap((m) => m.tools).find((t) => t.name === name) ?? cross.find((t) => t.name === name);
+const results = [];
+
+for (const [source, name, args, ok, opts = {}] of CASES) {
+  if (opts.needsEnv && !process.env[opts.needsEnv]) {
+    results.push({ source, tool: name, status: "SKIP", ms: 0, note: `${opts.needsEnv} not set` });
+    continue;
+  }
+  const started = Date.now();
+  try {
+    const r = await runTool(findTool(name), source, args, ctx);
+    const body = JSON.parse(r.content[0].text);
+    const data = opts.raw ? body : body.data;
+    const pass = !r.isError && Boolean(ok(data ?? {}));
+    results.push({
+      source,
+      tool: name,
+      status: pass ? "PASS" : "FAIL",
+      ms: Date.now() - started,
+      note: r.isError ? `${body.error?.code}: ${body.error?.message}` : body.stale ? "served stale" : ""
+    });
+  } catch (error) {
+    results.push({ source, tool: name, status: "FAIL", ms: Date.now() - started, note: String(error?.message ?? error) });
+  }
+}
+
+if (process.argv.includes("--json")) console.log(JSON.stringify(results, null, 2));
+else {
+  console.log(`| Source | Tool | Result | ms | Note |\n|---|---|---|---|---|`);
+  for (const r of results) console.log(`| ${r.source} | ${r.tool} | ${r.status} | ${r.ms} | ${r.note.replace(/\|/g, "/").slice(0, 120)} |`);
+}
+process.exit(results.some((r) => r.status === "FAIL") ? 1 : 0);
