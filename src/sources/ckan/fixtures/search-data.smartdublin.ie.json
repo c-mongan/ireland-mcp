@@ -1,0 +1,145 @@
+{
+ "help": "https://data.smartdublin.ie/api/3/action/help_show?name=package_search",
+ "success": true,
+ "result": {
+  "count": 27,
+  "results": [
+   {
+    "id": "d26ce6c0-2e1c-4b72-8fbd-cb9f9cbbc118",
+    "name": "dublin-city-centre-cycle-counts",
+    "title": "Cycle Counts DCC",
+    "notes": "Bicycle traffic volumes from cycle counters in Dublin city. Bike counter include one Totem counter (Grove Road) and Eco-Multi counters using Zelt Diamond loop in a number of other locations. Locations include: Drumcondra, Charleville Mall, North Strand Rd, Guild Street, Richmond Street and Grove Road. Passing cyclists are counted and logged every hour, 24 hours per day, 7 days per week. Data provided by Dublin City Council and the NTA.\r\n\r\nP.S. Please note that due to ongoing roadworks at Charleville Mall, the repaired counter cannot be reinstalled at present. Reinstallation is expected once th",
+    "license_title": "Creative Commons Attribution",
+    "license_url": "http://www.opendefinition.org/licenses/cc-by",
+    "metadata_modified": "2026-09-07T15:06:25.191036",
+    "organization": {
+     "name": "dublin-city-council",
+     "title": "Dublin City Council"
+    },
+    "resources": [
+     {
+      "id": "eddc184e-5c63-4e17-9514-f58e93d18246",
+      "name": "Cycle Counts 1 Jan - 2 Sep 2026",
+      "format": "xls",
+      "url": "https://data.smartdublin.ie/dataset/d26ce6c0-2e1c-4b72-8fbd-cb9f9cbbc118/resource/eddc184e-5c63-4e17-9514-f58e93d18246/download/cycle-counts-1-jan-2-sep-2026.xlsx",
+      "datastore_active": true,
+      "description": "Cycle Counts 1 Jan - 2 Sep 2026",
+      "last_modified": "2026-09-07T07:47:01.876032"
+     },
+     {
+      "id": "330d9b75-0e85-4c95-b948-58b86acaa577",
+      "name": "Cycle Counts 1 Jan - 2 Sep 2026",
+      "format": "csv",
+      "url": "https://data.smartdublin.ie/dataset/d26ce6c0-2e1c-4b72-8fbd-cb9f9cbbc118/resource/330d9b75-0e85-4c95-b948-58b86acaa577/download/cycle-counts-1-jan-2-sep-2026.csv",
+      "datastore_active": true,
+      "description": "Cycle Counts 1 Jan - 2 Sep 2026",
+      "last_modified": "2026-09-07T15:06:12.279331"
+     },
+     {
+      "id": "d8a82e5b-1cd5-4f90-8007-036c92386797",
+      "name": "2026 Cycle Counts Dublin City",
+      "format": "xlsx",
+      "url": "https://data.smartdublin.ie/dataset/d26ce6c0-2e1c-4b72-8fbd-cb9f9cbbc118/resource/d8a82e5b-1cd5-4f90-8007-036c92386797/download/cycle-counts-1-jan-2-jun-2026.xlsx",
+      "datastore_active": false,
+      "description": "Cycle Counts  Dublin City 1 Jan - 2 Jun 2026",
+      "last_modified": "2026-06-04T08:37:10.407778"
+     },
+     {
+      "id": "5c0d00e0-3b6a-470e-ac6a-d52d84af7f6f",
+      "name": "2026 Cycle Counts Dublin City",
+      "format": "csv",
+      "url": "https://data.smartdublin.ie/dataset/d26ce6c0-2e1c-4b72-8fbd-cb9f9cbbc118/resource/5c0d00e0-3b6a-470e-ac6a-d52d84af7f6f/download/cycle-counts-1-jan-2-jun-2026.csv",
+      "datastore_active": false,
+      "description": "Cycle Counts Dublin City 1 Jan - 2 Jun 2026",
+      "last_modified": "2026-06-04T08:51:11.599674"
+     }
+    ],
+    "tags": [
+     {
+      "name": "city centre"
+     },
+     {
+      "name": "mobility"
+     },
+     {
+      "name": "traffic-counts"
+     },
+     {
+      "name": "traffic-management"
+     }
+    ],
+    "url": ""
+   },
+   {
+    "id": "33ec9fe2-4957-4e9a-ab55-c5e917c7a9ab",
+    "name": "dublinbikes-api",
+    "title": "Dublinbikes API DCC",
+    "notes": "Dublin Bikes is a docked bike-share scheme in Dublin City. This page includes an API developed according to the General Bikeshare Feed Specification (GBFS) (e.g.) information about vehicles, stations, pricing, etc. The current location of the vehicles is updated every minute. In addition, this page includes historical files of bike location data.\r\n\r\nDisclaimer - Please note that some of the historical files are empty due to historical data issues. ",
+    "license_title": "Creative Commons Attribution",
+    "license_url": "http://www.opendefinition.org/licenses/cc-by",
+    "metadata_modified": "2026-07-08T11:48:12.614987",
+    "organization": {
+     "name": "dublin-city-council",
+     "title": "Dublin City Council"
+    },
+    "resources": [
+     {
+      "id": "18df84de-b8af-4647-9f04-ad76c9cbcefd",
+      "name": "Dublinbikes Current Station Geojson",
+      "format": "GeoJSON",
+      "url": "https://data.smartdublin.ie/dublinbikes-api/bikes/dublin_bikes/current/stations.geojson",
+      "datastore_active": false,
+      "description": "Current information from DublinBikes stations, in geojson format. \r\n\r\nIncludes the number of available bikes, available docks, and the location of the station. ",
+      "last_modified": null
+     },
+     {
+      "id": "2eeac03a-06d2-4ce0-827f-839754904156",
+      "name": "Dublinbikes GBFS API - JCDecaux",
+      "format": "api",
+      "url": "https://api.cyclocity.fr/contracts/dublin/gbfs/station_status.json",
+      "datastore_active": false,
+      "description": "Dublinbikes General Bikeshare Feed Specification (GBFS) api. \r\n\r\nLink to JCDecaux developer webpage - https://developer.jcdecaux.com/#/gbfs?page=usage\r\n\r\nLink to GBFS API -  https://api.cyclocity.fr/c",
+      "last_modified": null
+     },
+     {
+      "id": "9a0b87ea-eb4e-489b-9dab-05411ffaf6c1",
+      "name": "Dublinbikes API - JCDecaux",
+      "format": "API",
+      "url": "https://developer.jcdecaux.com/#/opendata/vls?page=getstarted",
+      "datastore_active": false,
+      "description": "This API provides real time information on the Dublin bikes. \r\nDublin Bikes real time and static data Two kinds of data are delivered by the platform: Static data provides stable information like stat",
+      "last_modified": null
+     },
+     {
+      "id": "6b2e97bd-3221-40a0-bb76-54c473a91b11",
+      "name": "Dublinbikes historical API",
+      "format": "openapi-json",
+      "url": "https://data.smartdublin.ie/dublinbikes-api/bikes/openapi.json",
+      "datastore_active": false,
+      "description": "Dublinbikes historical API \r\nThis API provides near real time and historic station data.\r\n\r\nLink is to OpenAPI Definition for the derived Dublinbikes data, including historical rollups and current Geo",
+      "last_modified": null
+     }
+    ],
+    "tags": [
+     {
+      "name": "Derilinx"
+     },
+     {
+      "name": "Dublinbikes"
+     },
+     {
+      "name": "api"
+     },
+     {
+      "name": "bicycle"
+     },
+     {
+      "name": "bike"
+     }
+    ],
+    "url": "https://dublinbikes.staging.derilinx.com/api/v1/resources/ui/"
+   }
+  ],
+  "sort": "featured desc,updated desc"
+ }
+}

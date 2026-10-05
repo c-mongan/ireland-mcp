@@ -1,0 +1,148 @@
+{
+ "help": "https://data.gov.ie/api/3/action/help_show?name=package_search",
+ "success": true,
+ "result": {
+  "count": 29,
+  "results": [
+   {
+    "id": "177e32de-cb85-4c1c-bb12-7188c6c49aa1",
+    "name": "moby-bikes",
+    "title": "Moby Bikes API",
+    "notes": "Moby is a licensed dockless bike-share scheme within the Dublin region. This page includes an API developed according to the General Bikeshare Feed Specification (GBFS) (e.g.) information about vehicles, stations, pricing, etc. The current location of the vehicles is updated every five minutes. In addition, this page includes historical files of bike location data.  \r\n\r\nDisclaimer - Please note that some of the historical files are empty due to historical data issues. ",
+    "license_title": "Creative Commons Attribution 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "metadata_modified": "2026-09-22T08:33:45.696631",
+    "organization": {
+     "name": "dublin-city-council",
+     "title": "Dublin City Council"
+    },
+    "resources": [
+     {
+      "id": "2593c73a-9598-4d40-b0c7-3b4d6a04deac",
+      "name": "MobyBikes Current Bike GeoJSON",
+      "format": "GeoJSON",
+      "url": "https://data.smartdublin.ie/mobybikes-api/bikes/mobymoby_dublin/current/bikes.geojson",
+      "datastore_active": false,
+      "description": "Current information from MobyBikes free_bike_status, in geojson format.\r\n\r\n",
+      "last_modified": null
+     },
+     {
+      "id": "c6eec8aa-635b-4742-a57c-555ff34a1b32",
+      "name": "MobyBikes GBFS API",
+      "format": "API",
+      "url": "https://moby-move.rideatom.com/gbfs/v3_0/en/gbfs?id=2023",
+      "datastore_active": false,
+      "description": "The MobyBikes General Bikeshare Feed Specification (GBFS) api root. This endpoint returns a list of GBFS endpoints, currently conforming to version 2.3 of the GBFS Spec: https://github.com/MobilityDat",
+      "last_modified": null
+     },
+     {
+      "id": "5c0424c9-7043-42f0-9bb4-1e09b9cda325",
+      "name": "Smart Dublin Bike API OpenAPI Definition",
+      "format": "openapi-json",
+      "url": "https://data.smartdublin.ie/mobybikes-api/bikes/openapi.json",
+      "datastore_active": false,
+      "description": "OpenAPI Definition for the derived SmartDublin bikes data, including historical rollups and current GeoJson.\r\n\r\n",
+      "last_modified": null
+     },
+     {
+      "id": "b9da1626-798c-4e71-913f-0076fcc18030",
+      "name": "Geofence",
+      "format": "GeoJSON",
+      "url": "https://data.smartdublin.ie/dataset/177e32de-cb85-4c1c-bb12-7188c6c49aa1/resource/b9da1626-798c-4e71-913f-0076fcc18030/download/mobybikes_map.geojson",
+      "datastore_active": false,
+      "description": " Geofence + Virtual Stations\r\n",
+      "last_modified": "2020-10-16T09:09:16.569063"
+     }
+    ],
+    "tags": [
+     {
+      "name": "Transport and Infrastructure"
+     },
+     {
+      "name": "api"
+     },
+     {
+      "name": "bikes"
+     },
+     {
+      "name": "bikeshare"
+     },
+     {
+      "name": "citybikes"
+     }
+    ],
+    "url": "https://data.smartdublin.ie/dataset/moby-bikes"
+   },
+   {
+    "id": "3d3f8721-3b1f-450e-a273-ee750b80dd4c",
+    "name": "bike-parking-stands-dcc",
+    "title": "Bike Parking Stands DCC",
+    "notes": "This dataset provides annual updates on Bike Parking Stands in Dublin region; encompassing columns such as type_stands , Location_stand, No_stands, physical_condition,  oocupancy, expanded_capacity, security_safetyrating, lighting, protection_weather, large_development, ease_access,  proximity_cyclenetwork, commercial, rentail, residential, transportation, education, recreational, entertainment, restaurants, expanded_stands, Batch No, X & Y Coordinates ",
+    "license_title": "Creative Commons Attribution 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "metadata_modified": "2026-09-22T08:19:13.926814",
+    "organization": {
+     "name": "dublin-city-council",
+     "title": "Dublin City Council"
+    },
+    "resources": [
+     {
+      "id": "aee9e89a-e868-417c-b341-7305945702b6",
+      "name": "Dublin Bike Parking DCC",
+      "format": "CSV",
+      "url": "https://data.smartdublin.ie/dataset/3d3f8721-3b1f-450e-a273-ee750b80dd4c/resource/aee9e89a-e868-417c-b341-7305945702b6/download/dublin-bike-parking.csv",
+      "datastore_active": true,
+      "description": "Dublin Bike Parking DCC",
+      "last_modified": "2026-01-29T14:24:46.989382"
+     },
+     {
+      "id": "2499b415-a75c-4e55-97a1-2ddbaf51107b",
+      "name": "bike-parking-stands-dcc_removed_missing_lat_longs",
+      "format": "CSV",
+      "url": "https://data.smartdublin.ie/dataset/3d3f8721-3b1f-450e-a273-ee750b80dd4c/resource/2499b415-a75c-4e55-97a1-2ddbaf51107b/download/dublin_bike_parking-updated_copy_delete_blank_lat_longs.csv",
+      "datastore_active": true,
+      "description": "",
+      "last_modified": "2025-12-18T17:07:15.932554"
+     },
+     {
+      "id": "7db84bbf-7b42-4a34-b3cf-d4a183158c2a",
+      "name": "bike-parking-stands-dcc",
+      "format": "GeoJSON",
+      "url": "https://data.smartdublin.ie/dataset/3d3f8721-3b1f-450e-a273-ee750b80dd4c/resource/7db84bbf-7b42-4a34-b3cf-d4a183158c2a/download/dublin-bike-parking.geojson",
+      "datastore_active": false,
+      "description": "",
+      "last_modified": "2026-01-29T14:25:28.048844"
+     },
+     {
+      "id": "a174b885-7855-4840-8dfd-6a5b93e0c20f",
+      "name": "bike-parking-stands-dcc_removed_missing_lat_longs",
+      "format": "GeoJSON",
+      "url": "https://data.smartdublin.ie/dataset/3d3f8721-3b1f-450e-a273-ee750b80dd4c/resource/a174b885-7855-4840-8dfd-6a5b93e0c20f/download/dublin_bike_parking-updated_copy_delete_blank_lat_longs.geojson",
+      "datastore_active": false,
+      "description": "",
+      "last_modified": "2025-12-18T17:13:51.099054"
+     }
+    ],
+    "tags": [
+     {
+      "name": "ActiveTravel"
+     },
+     {
+      "name": "Bike"
+     },
+     {
+      "name": "Bike Hire"
+     },
+     {
+      "name": "Bike Maintenance Stands"
+     },
+     {
+      "name": "Bike Racks"
+     }
+    ],
+    "url": "https://data.smartdublin.ie/dataset/bike-parking-stands-dcc"
+   }
+  ],
+  "sort": "featured desc,score desc,metadata_created desc"
+ }
+}

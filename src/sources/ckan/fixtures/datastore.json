@@ -1,0 +1,104 @@
+{
+ "help": "https://data.smartdublin.ie/api/3/action/help_show?name=datastore_search",
+ "success": true,
+ "result": {
+  "include_total": true,
+  "limit": 3,
+  "records_format": "objects",
+  "resource_id": "330d9b75-0e85-4c95-b948-58b86acaa577",
+  "total_estimation_threshold": null,
+  "records": [
+   {
+    "_id": 1,
+    "Time": "2026-01-01T00:00:00",
+    "Charleville Mall": null,
+    "Charleville Mall North Cyclist": null,
+    "Charleville Mall South Cyclist": null,
+    "Clontarf - James Larkin Rd": 2,
+    "Clontarf - James Larkin Rd Cyclist West": 2,
+    "Clontarf - James Larkin Rd Cyclist East": 0
+   },
+   {
+    "_id": 2,
+    "Time": "2026-01-01T01:00:00",
+    "Charleville Mall": null,
+    "Charleville Mall North Cyclist": null,
+    "Charleville Mall South Cyclist": null,
+    "Clontarf - James Larkin Rd": 2,
+    "Clontarf - James Larkin Rd Cyclist West": 2,
+    "Clontarf - James Larkin Rd Cyclist East": 0
+   },
+   {
+    "_id": 3,
+    "Time": "2026-01-01T02:00:00",
+    "Charleville Mall": null,
+    "Charleville Mall North Cyclist": null,
+    "Charleville Mall South Cyclist": null,
+    "Clontarf - James Larkin Rd": 0,
+    "Clontarf - James Larkin Rd Cyclist West": 0,
+    "Clontarf - James Larkin Rd Cyclist East": 0
+   }
+  ],
+  "fields": [
+   {
+    "id": "_id",
+    "type": "int"
+   },
+   {
+    "id": "Time",
+    "type": "timestamp",
+    "info": {
+     "label": "Time"
+    }
+   },
+   {
+    "id": "Charleville Mall",
+    "type": "text",
+    "info": {
+     "label": "Charleville Mall"
+    }
+   },
+   {
+    "id": "Charleville Mall North Cyclist",
+    "type": "text",
+    "info": {
+     "label": "Charleville Mall North Cyclist"
+    }
+   },
+   {
+    "id": "Charleville Mall South Cyclist",
+    "type": "text",
+    "info": {
+     "label": "Charleville Mall South Cyclist"
+    }
+   },
+   {
+    "id": "Clontarf - James Larkin Rd",
+    "type": "numeric",
+    "info": {
+     "label": "Clontarf - James Larkin Rd"
+    }
+   },
+   {
+    "id": "Clontarf - James Larkin Rd Cyclist West",
+    "type": "numeric",
+    "info": {
+     "label": "Clontarf - James Larkin Rd Cyclist West"
+    }
+   },
+   {
+    "id": "Clontarf - James Larkin Rd Cyclist East",
+    "type": "numeric",
+    "info": {
+     "label": "Clontarf - James Larkin Rd Cyclist East"
+    }
+   }
+  ],
+  "_links": {
+   "start": "/api/3/action/datastore_search?resource_id=330d9b75-0e85-4c95-b948-58b86acaa577&limit=3",
+   "next": "/api/3/action/datastore_search?resource_id=330d9b75-0e85-4c95-b948-58b86acaa577&limit=3&offset=3"
+  },
+  "total": 5880,
+  "total_was_estimated": false
+ }
+}

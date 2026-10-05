@@ -3,10 +3,12 @@ import type { AnyTool, SourceModule, ToolContext } from "./gateway/module.js";
 import { buildServer } from "./gateway/server.js";
 import type { TelemetrySink } from "./gateway/telemetry.js";
 import { csoModule } from "./sources/cso/index.js";
+import { dataGovIeModule } from "./sources/data-gov-ie/index.js";
 import { geohiveModule } from "./sources/geohive/index.js";
 import { oireachtasModule } from "./sources/oireachtas/index.js";
+import { smartDublinModule } from "./sources/smart-dublin/index.js";
 
-export const sourceModules: SourceModule[] = [csoModule, oireachtasModule, geohiveModule];
+export const sourceModules: SourceModule[] = [csoModule, oireachtasModule, geohiveModule, dataGovIeModule, smartDublinModule];
 
 export function crossSourceTools(_modules: SourceModule[]): AnyTool[] {
   return [];
