@@ -28,7 +28,7 @@ jobs:
       HEALTH_URL: ${{ vars.STATUS_HEALTH_URL || 'https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/healthz?deep=1' }}
     steps:
       - name: Check out the status script from the default branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           path: app
           sparse-checkout: src/status/history.ts
