@@ -55,7 +55,7 @@ assistant ── tools/list ──> 7 meta tools
    │
    ├─ ireland_catalogue(domain?)  -> compact operation index by source
    ├─ ireland_describe(source, operation) -> schema + example
-   └─ ireland_call(source, operation, args, fields?, limit?, cursor?, max_tokens?)
+   └─ ireland_call(source, operation, args?, max_tokens?)
         └─ dispatches to the real typed operation and returns source/licence/retrieval metadata
 ```
 
