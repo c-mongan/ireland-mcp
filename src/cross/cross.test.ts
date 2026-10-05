@@ -98,8 +98,29 @@ describe("cross-source tools", () => {
     const { body } = await call(tools, "nearby", { lat: 53.3498, lon: -6.2603, hours: 3 }, createContext({ fetch: fakeFetch(routes) }));
     expect(body.data.boundaries.local_authority).toBeTruthy();
     expect(body.data.forecast.hours).toHaveLength(3);
+    expect(body.data.monuments.error).toBeTruthy();
     const far = await call(tools, "nearby", { lat: 48.85, lon: 2.35 }, ctx);
     expect(far.body.data.boundaries.error.code).toBe("BAD_ARGS");
+  });
+
+  it("nearby adds monuments within 500 m and the protected sites at the point, with citations", async () => {
+    const features = (rows: Record<string, unknown>[]) => JSON.stringify({ features: rows.map((attributes) => ({ attributes })) });
+    const withMaps: Route[] = [
+      ...routes,
+      {
+        match: (url: string) => url.includes("SMROpenData") && url.includes("distance=500"),
+        body: features([{ SMRS: "DU018-020", COUNTY: "DUBLIN", TOWNLAND: "Dublin North City", MONUMENT_CLASS: "Historic town", WEBSITE_LINK: "https://example.ie/DU018-020" }])
+      },
+      { match: (url: string) => url.includes("NPWSDesignatedAreas/FeatureServer/3/query"), body: features([{ SITECODE: "000210", SITE_NAME: "South Dublin Bay SAC" }]) },
+      { match: (url: string) => url.includes("NPWSDesignatedAreas/FeatureServer/"), body: features([]) }
+    ];
+    const tools = crossSourceTools(sourceModules);
+    const { ok, body } = await call(tools, "nearby", { lat: 53.3498, lon: -6.2603, hours: 3 }, createContext({ fetch: fakeFetch(withMaps) }));
+    expect(ok).toBe(true);
+    expect(body.data.monuments).toMatchObject({ radius_m: 500, count: 1, items: [{ smr: "DU018-020", class: "Historic town" }] });
+    expect(body.data.protected_sites).toMatchObject({ count: 1, items: [{ code: "000210", name: "South Dublin Bay SAC" }] });
+    const cited = body.data.sources.map((s: { source: string }) => s.source);
+    expect(cited).toEqual(expect.arrayContaining(["National Monuments Service SMR", "NPWS designated protected sites"]));
   });
 
   it("finds places by county, alias and Irish name", () => {
