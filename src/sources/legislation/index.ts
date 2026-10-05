@@ -34,24 +34,25 @@ export function toText(fragment: string): string {
 
 /** Strips until stable so crafted input like "<<b>script>" cannot leave a tag behind, then drops stray brackets. */
 function stripTags(fragment: string): string {
-  let text = untilStable(fragment, (t) => t.replace(/<fn>[\s\S]*?<\/fn>/g, ""))
+  let text = fragment;
+  let before: string;
+  do {
+    before = text;
+    text = text.replace(/<fn>[\s\S]*?<\/fn>/g, "");
+  } while (text !== before);
+  text = text
     .replace(/<odq\/>/g, "“")
     .replace(/<cdq\/>/g, "”")
     .replace(/<osq\/>/g, "‘")
     .replace(/<csq\/>/g, "’")
     .replace(/<(emdash|endash)\/>/g, (_m, t: string) => (t === "emdash" ? "—" : "–"))
     .replace(/<\/p>/g, "\n");
-  text = untilStable(text, (t) => t.replace(/<[^>]*>/g, ""));
+  let previous: string;
+  do {
+    previous = text;
+    text = text.replace(/<[^>]*>/g, "");
+  } while (text !== previous);
   return text.replace(/[<>]/g, "");
-}
-
-function untilStable(text: string, step: (t: string) => string): string {
-  for (let i = 0; i < 20; i += 1) {
-    const next = step(text);
-    if (next === text) return next;
-    text = next;
-  }
-  return text;
 }
 
 /** Decodes entities after tag stripping; out-of-range numeric entities are left as written. */
