@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fakeFetch, type Route } from "../../../test/helpers/fakeFetch.js";
 import { callTool, fixturePath } from "../../../test/helpers/callTool.js";
 import { createContext } from "../../gateway/context.js";
-import { legislationModule as mod } from "./index.js";
+import { legislationModule as mod, toText } from "./index.js";
 
 const f = (n: string) => fixturePath(import.meta.url, n);
 const routes: Route[] = [
@@ -57,5 +57,12 @@ describe("legislation module", () => {
     const doc = await mod.fetchById!("2018/7/s2", ctx);
     expect(doc.title).toBe("Data Protection Act 2018, section 2");
     expect(doc.url).toContain("/section/2/");
+  });
+
+  it("toText leaves no tag fragments behind and tolerates invalid entities", () => {
+    expect(toText("<<b>script>alert(1)<</b>/script>")).toBe("scriptalert(1)/script");
+    expect(toText("a <fn>x<fn>y</fn>z</fn> b")).not.toMatch(/[<>]/);
+    expect(toText("<p>Section&#160;1 &lt;b&gt; &#x2014; ok</p>")).toBe("Section\u00a01 <b> — ok");
+    expect(toText("bad &#99999999; and &#xFFFFFFF; stay")).toBe("bad &#99999999; and &#xFFFFFFF; stay");
   });
 });

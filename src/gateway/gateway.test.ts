@@ -161,6 +161,53 @@ describe("HttpClient", () => {
     await expect(declared.text("https://x.ie/", { maxBytes: 10, retries: 0 })).rejects.toThrow("bound");
   });
 
+  it("stops streaming chunked oversized bodies without content-length and does not retry", async () => {
+    let calls = 0;
+    let pulled = 0;
+    let cancelled = false;
+    const client = new HttpClient(async () => {
+      calls += 1;
+      const stream = new ReadableStream<Uint8Array>({
+        pull(controller) {
+          pulled += 1;
+          controller.enqueue(new Uint8Array(4));
+        },
+        cancel() {
+          cancelled = true;
+        }
+      });
+      return new Response(stream);
+    });
+    await expect(client.bytes("https://x.ie/", { maxBytes: 10 })).rejects.toThrow("bound");
+    expect(calls).toBe(1);
+    expect(pulled).toBeLessThan(10);
+    expect(cancelled).toBe(true);
+  });
+
+  it("applies the timeout while reading a slow body and wraps body errors", async () => {
+    const slow = new HttpClient(async () => {
+      const stream = new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(new Uint8Array(1));
+        }
+      });
+      return new Response(stream);
+    });
+    await expect(slow.text("https://x.ie/", { timeoutMs: 20, retries: 0 })).rejects.toMatchObject({
+      code: "UPSTREAM_DOWN",
+      message: expect.stringContaining("did not respond")
+    });
+    const broken = new HttpClient(async () => {
+      const stream = new ReadableStream<Uint8Array>({
+        pull(controller) {
+          controller.error(new Error("socket hang up"));
+        }
+      });
+      return new Response(stream);
+    });
+    await expect(broken.text("https://x.ie/", { retries: 0 })).rejects.toMatchObject({ code: "UPSTREAM_DOWN" });
+  });
+
   it("rejects invalid JSON", async () => {
     const client = new HttpClient(async () => new Response("<html>"));
     await expect(client.json("https://x.ie/")).rejects.toThrow("not valid JSON");

@@ -25,24 +25,42 @@ const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"'
 
 /** Converts eISB act XML or listing HTML fragments into readable plain text. */
 export function toText(fragment: string): string {
-  return fragment
-    .replace(/<fn>[\s\S]*?<\/fn>/g, "")
+  return decodeEntities(stripTags(fragment))
+    .replace(/[ \t]+/g, " ")
+    .replace(/ *\n */g, "\n")
+    .replace(/\n{2,}/g, "\n")
+    .trim();
+}
+
+/** Strips until stable so crafted input like "<<b>script>" cannot leave a tag behind, then drops stray brackets. */
+function stripTags(fragment: string): string {
+  let text = untilStable(fragment, (t) => t.replace(/<fn>[\s\S]*?<\/fn>/g, ""))
     .replace(/<odq\/>/g, "“")
     .replace(/<cdq\/>/g, "”")
     .replace(/<osq\/>/g, "‘")
     .replace(/<csq\/>/g, "’")
     .replace(/<(emdash|endash)\/>/g, (_m, t: string) => (t === "emdash" ? "—" : "–"))
-    .replace(/<\/p>/g, "\n")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (m, e: string) => {
-      if (e.startsWith("#x") || e.startsWith("#X")) return String.fromCodePoint(parseInt(e.slice(2), 16));
-      if (e.startsWith("#")) return String.fromCodePoint(Number(e.slice(1)));
-      return ENTITIES[e.toLowerCase()] ?? m;
-    })
-    .replace(/[ \t]+/g, " ")
-    .replace(/ *\n */g, "\n")
-    .replace(/\n{2,}/g, "\n")
-    .trim();
+    .replace(/<\/p>/g, "\n");
+  text = untilStable(text, (t) => t.replace(/<[^>]*>/g, ""));
+  return text.replace(/[<>]/g, "");
+}
+
+function untilStable(text: string, step: (t: string) => string): string {
+  for (let i = 0; i < 20; i += 1) {
+    const next = step(text);
+    if (next === text) return next;
+    text = next;
+  }
+  return text;
+}
+
+/** Decodes entities after tag stripping; out-of-range numeric entities are left as written. */
+function decodeEntities(text: string): string {
+  return text.replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (m, e: string) => {
+    if (e[0] !== "#") return ENTITIES[e.toLowerCase()] ?? m;
+    const code = e[1] === "x" || e[1] === "X" ? parseInt(e.slice(2), 16) : Number(e.slice(1));
+    return Number.isInteger(code) && code >= 0 && code <= 0x10ffff ? String.fromCodePoint(code) : m;
+  });
 }
 
 export interface Act {
