@@ -1,0 +1,68 @@
+{
+  "name": "ireland-mcp",
+  "version": "1.0.0",
+  "description": "Read-only Model Context Protocol server for Irish public data: CSO, Oireachtas, GeoHive, data.gov.ie, Smart Dublin, Met \u00c9ireann, NTA, Irish Statute Book and the Property Price Register.",
+  "license": "MIT",
+  "author": "Conor Mongan",
+  "type": "module",
+  "main": "dist/src/functions/*.js",
+  "bin": {
+    "ireland-mcp": "dist/src/cli.js"
+  },
+  "files": [
+    "dist/src",
+    "!dist/src/**/*.test.js",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/c-mongan/ireland-mcp.git"
+  },
+  "mcpName": "io.github.c-mongan/ireland-mcp",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ireland",
+    "open-data",
+    "cso",
+    "oireachtas"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node scripts/copy-assets.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "start": "func start",
+    "stdio": "node dist/src/cli.js",
+    "inspector:check": "node scripts/inspector-check.mjs",
+    "live:sanity": "node scripts/live-sanity.mjs",
+    "ppr:build": "node dist/src/sources/ppr/buildIndexCli.js",
+    "eval": "promptfoo eval -c evals/promptfooconfig.yaml",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@azure/data-tables": "^13.3.2",
+    "@azure/functions": "^4.16.5",
+    "@azure/identity": "^4.13.3",
+    "@azure/storage-blob": "^12.34.0",
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "fast-xml-parser": "^5.11.2",
+    "lru-cache": "^11.5.3",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.19.0",
+    "@vitest/coverage-v8": "^5.0.3",
+    "eslint": "^10.12.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.71.0",
+    "vitest": "^5.0.3"
+  }
+}

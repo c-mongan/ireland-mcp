@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+local.settings.json
+.azure/
+*.log
+.DS_Store
+.ppr-cache/
+promptfoo-output/
+__azurite_*
+__blobstorage__/
+__queuestorage__/
