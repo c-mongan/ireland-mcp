@@ -75,7 +75,9 @@ export default class AgentLoopProvider {
       ];
       const maxRounds = this.config.maxRounds ?? 4;
       for (let round = 0; round < maxRounds; round++) {
-        const out = await chat(endpoint, { messages, tools: fnTools, temperature: 0 });
+        // Reasoning models (gpt-5.x) reject temperature 0; EVAL_TEMPERATURE=default omits it.
+        const temp = process.env.EVAL_TEMPERATURE === "default" ? {} : { temperature: 0 };
+        const out = await chat(endpoint, { messages, tools: fnTools, ...temp });
         const msg = out.choices?.[0]?.message;
         if (!msg) break;
         messages.push(msg);

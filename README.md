@@ -154,6 +154,18 @@ npm run dev:http     # local HTTP dev server, MCP at /mcp
 | `npm run live:sanity` | One real call per source through `ireland_call`; writes [docs/live-sanity.md](docs/live-sanity.md). |
 | `npm run eval` | Promptfoo evaluation; default surface unless `EVAL_TOOLSETS=all`. |
 
+### Eval results
+
+69 routing questions, run through a multi-round agent loop that sends the server instructions as the system prompt (2026-10-05, Azure OpenAI):
+
+| Model | Default surface (7 tools) | `all` surface (64 tools) |
+| --- | --- | --- |
+| gpt-5.6-luna | **100%** | **100%** |
+| gpt-5.4-mini | 91% | 97% |
+| gpt-4.1-nano (worst-case floor) | 84% | 90% |
+
+gpt-5.x models reject `temperature: 0`. For them, set `EVAL_TEMPERATURE=default`, for example: `AZURE_DEPLOYMENT=gpt-56-luna EVAL_TEMPERATURE=default npm run eval`.
+
 ## Contributing: add a source
 
 1. Create `src/sources/<id>/index.ts` exporting a `SourceModule` with `info`, `summary`, `domain`, `coverage`, tools, optional `search()` and `fetchById()`.
