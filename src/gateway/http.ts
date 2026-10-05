@@ -60,7 +60,7 @@ export class HttpClient {
         signal: controller.signal
       });
     } catch {
-      throw new ToolError("UPSTREAM_DOWN", `${label} did not respond in time.`);
+      throw new ToolError("UPSTREAM_DOWN", `${label} could not be reached or did not respond in time.`);
     } finally {
       clearTimeout(timer);
     }

@@ -1,0 +1,207 @@
+{
+ "jsonrpc": "2.0",
+ "id": 1,
+ "result": [
+  {
+   "MtrCode": "HRD35",
+   "MtrTitle": "Proportion of adults accessing disability services per 1,000 of the general population aged 18 years and over on NASS",
+   "ThmValue": "Other Public Sector Bodies",
+   "SbjValue": "Health Research Board",
+   "CprValue": "Health Research Board",
+   "RlsLiveDatetimeFrom": "2026-09-02T11:00:00",
+   "classification": [
+    {
+     "ClsCode": "C03867V04617",
+     "ClsValue": "County of residence"
+    }
+   ],
+   "period": [
+    "2025"
+   ]
+  },
+  {
+   "MtrCode": "PEA08",
+   "MtrTitle": "Estimated Population (Persons in April)",
+   "ThmValue": "People and Society",
+   "SbjValue": "Population Estimates",
+   "CprValue": "Central Statistics Office, Ireland",
+   "RlsLiveDatetimeFrom": "2026-08-24T11:00:00",
+   "classification": [
+    {
+     "ClsCode": "C02076V02508",
+     "ClsValue": "Age Group"
+    },
+    {
+     "ClsCode": "C02199V02655",
+     "ClsValue": "Sex"
+    },
+    {
+     "ClsCode": "C03788V04538",
+     "ClsValue": "County"
+    }
+   ],
+   "period": [
+    "2017",
+    "2018",
+    "2019",
+    "2020",
+    "2021",
+    "2022",
+    "2023",
+    "2024",
+    "2025",
+    "2026"
+   ]
+  },
+  {
+   "MtrCode": "VSD49",
+   "MtrTitle": "Deaths Registered",
+   "ThmValue": "People and Society",
+   "SbjValue": "Births, Deaths & Marriages",
+   "CprValue": "Central Statistics Office, Ireland",
+   "RlsLiveDatetimeFrom": "2026-08-21T11:00:00",
+   "classification": [
+    {
+     "ClsCode": "C03789V04537",
+     "ClsValue": "County of Residence of Deceased"
+    },
+    {
+     "ClsCode": "C02199V02655",
+     "ClsValue": "Sex"
+    }
+   ],
+   "period": [
+    "2022Q1",
+    "2022Q2",
+    "2022Q3",
+    "2022Q4",
+    "2023Q1",
+    "2023Q2",
+    "2023Q3",
+    "2023Q4",
+    "2024Q1",
+    "2024Q2",
+    "2024Q3",
+    "2024Q4",
+    "2025Q1",
+    "2025Q2",
+    "2025Q3",
+    "2025Q4",
+    "2026Q1"
+   ]
+  },
+  {
+   "MtrCode": "MDSI07",
+   "MtrTitle": "Average distance to the nearest service for individuals and households by Towns",
+   "ThmValue": "Themed Publications",
+   "SbjValue": "Life in Ireland",
+   "CprValue": "Central Statistics Office, Ireland",
+   "RlsLiveDatetimeFrom": "2026-07-21T11:00:00",
+   "classification": [
+    {
+     "ClsCode": "C04652V05437",
+     "ClsValue": "Type of Service"
+    },
+    {
+     "ClsCode": "C04160V04929",
+     "ClsValue": "Towns"
+    }
+   ],
+   "period": [
+    "2026"
+   ]
+  },
+  {
+   "MtrCode": "MDSI17",
+   "MtrTitle": "Distance to nearest regional service for individuals and households by Town",
+   "ThmValue": "Themed Publications",
+   "SbjValue": "Life in Ireland",
+   "CprValue": "Central Statistics Office, Ireland",
+   "RlsLiveDatetimeFrom": "2026-07-21T11:00:00",
+   "classification": [
+    {
+     "ClsCode": "C03574V04311",
+     "ClsValue": "Distance to Service"
+    },
+    {
+     "ClsCode": "C04652V05437",
+     "ClsValue": "Type of Service"
+    },
+    {
+     "ClsCode": "C04160V04929",
+     "ClsValue": "Towns"
+    }
+   ],
+   "period": [
+    "2026"
+   ]
+  },
+  {
+   "MtrCode": "MDSI18",
+   "MtrTitle": "Distance to nearest regional service for individuals and households by Urban or Rural Area",
+   "ThmValue": "Themed Publications",
+   "SbjValue": "Life in Ireland",
+   "CprValue": "Central Statistics Office, Ireland",
+   "RlsLiveDatetimeFrom": "2026-07-21T11:00:00",
+   "classification": [
+    {
+     "ClsCode": "C03574V04311",
+     "ClsValue": "Distance to Service"
+    },
+    {
+     "ClsCode": "C04652V05437",
+     "ClsValue": "Type of Service"
+    },
+    {
+     "ClsCode": "C03583V04323",
+     "ClsValue": "Type of Urban or Rural Area"
+    }
+   ],
+   "period": [
+    "2026"
+   ]
+  },
+  {
+   "MtrCode": "MDSI27",
+   "MtrTitle": "Distance to nearest local service for individuals and households by Town",
+   "ThmValue": "Themed Publications",
+   "SbjValue": "Life in Ireland",
+   "CprValue": "Central Statistics Office, Ireland",
+   "RlsLiveDatetimeFrom": "2026-07-21T11:00:00",
+   "classification": [
+    {
+     "ClsCode": "C03574V04311",
+     "ClsValue": "Distance to Service"
+    },
+    {
+     "ClsCode": "C04652V05437",
+     "ClsValue": "Type of Service"
+    },
+    {
+     "ClsCode": "C04160V04929",
+     "ClsValue": "Towns"
+    }
+   ],
+   "period": [
+    "2026"
+   ]
+  },
+  {
+   "MtrCode": "FY108",
+   "MtrTitle": "Population",
+   "ThmValue": "Census",
+   "SbjValue": "Census 2022",
+   "CprValue": "Central Statistics Office, Ireland",
+   "RlsLiveDatetimeFrom": "2026-07-15T11:00:00",
+   "classification": [
+    {
+     "ClsCode": "C03877V04628",
+     "ClsValue": "Local Electoral Areas 2019"
+    }
+   ],
+   "period": [
+    "2022"
+   ]
+  }
+ ]
+}

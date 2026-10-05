@@ -1,0 +1,249 @@
+{
+  "class": "dataset",
+  "dimension": {
+    "STATISTIC": {
+      "category": {
+        "index": [
+          "F1001C01"
+        ],
+        "label": {
+          "F1001C01": "Population at Each Census"
+        },
+        "unit": {
+          "F1001C01": {
+            "decimals": 0,
+            "label": "Number",
+            "position": "end"
+          }
+        }
+      },
+      "label": "Statistic"
+    },
+    "TLIST(A1)": {
+      "category": {
+        "index": [
+          "1841",
+          "1851",
+          "1861",
+          "1871",
+          "1881",
+          "1891",
+          "1901",
+          "1911",
+          "1926",
+          "1936",
+          "1946",
+          "1951",
+          "1956",
+          "1961",
+          "1966",
+          "1971",
+          "1979",
+          "1981",
+          "1986",
+          "1991",
+          "1996",
+          "2002",
+          "2006",
+          "2011",
+          "2016",
+          "2022"
+        ],
+        "label": {
+          "1841": "1841",
+          "1851": "1851",
+          "1861": "1861",
+          "1871": "1871",
+          "1881": "1881",
+          "1891": "1891",
+          "1901": "1901",
+          "1911": "1911",
+          "1926": "1926",
+          "1936": "1936",
+          "1946": "1946",
+          "1951": "1951",
+          "1956": "1956",
+          "1961": "1961",
+          "1966": "1966",
+          "1971": "1971",
+          "1979": "1979",
+          "1981": "1981",
+          "1986": "1986",
+          "1991": "1991",
+          "1996": "1996",
+          "2002": "2002",
+          "2006": "2006",
+          "2011": "2011",
+          "2016": "2016",
+          "2022": "2022"
+        }
+      },
+      "label": "CensusYear"
+    },
+    "C02779V03348": {
+      "category": {
+        "index": [
+          "-",
+          "01",
+          "02",
+          "03",
+          "04",
+          "05",
+          "06",
+          "07",
+          "08",
+          "09",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+          "16",
+          "17",
+          "18",
+          "19",
+          "20",
+          "21",
+          "22",
+          "23",
+          "24",
+          "25",
+          "26"
+        ],
+        "label": {
+          "-": "State",
+          "01": "Carlow",
+          "02": "Dublin",
+          "03": "Kildare",
+          "04": "Kilkenny",
+          "05": "Laois",
+          "06": "Longford",
+          "07": "Louth",
+          "08": "Meath",
+          "09": "Offaly",
+          "10": "Westmeath",
+          "11": "Wexford",
+          "12": "Wicklow",
+          "13": "Clare",
+          "14": "Cork",
+          "15": "Kerry",
+          "16": "Limerick",
+          "17": "Tipperary",
+          "18": "Waterford",
+          "19": "Galway",
+          "20": "Leitrim",
+          "21": "Mayo",
+          "22": "Roscommon",
+          "23": "Sligo",
+          "24": "Cavan",
+          "25": "Donegal",
+          "26": "Monaghan"
+        }
+      },
+      "label": "County"
+    },
+    "C02199V02655": {
+      "category": {
+        "index": [
+          "-",
+          "1",
+          "2"
+        ],
+        "label": {
+          "-": "Both sexes",
+          "1": "Male",
+          "2": "Female"
+        }
+      },
+      "label": "Sex"
+    }
+  },
+  "extension": {
+    "matrix": "F1001",
+    "reasons": [
+      "Planned release"
+    ],
+    "language": {
+      "code": "en",
+      "name": "English"
+    },
+    "elimination": {
+      "C02779V03348": "-",
+      "C02199V02655": "-"
+    },
+    "contact": {
+      "name": "Bernie Casey",
+      "email": "census@cso.ie",
+      "phone": "(+353) 1 895 1460"
+    },
+    "subject": {
+      "code": 76,
+      "value": "Census 2022"
+    },
+    "product": {
+      "code": "C2022P1",
+      "value": "Profile 1 - Population Distribution and Movement"
+    },
+    "official": true,
+    "copyright": {
+      "name": "Central Statistics Office, Ireland",
+      "code": "CSO",
+      "href": "https://www.cso.ie/"
+    },
+    "exceptional": false,
+    "reservation": false,
+    "archive": false,
+    "experimental": false,
+    "analytical": false
+  },
+  "href": "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/F1001/JSON-stat/2.0/en",
+  "id": [
+    "STATISTIC",
+    "TLIST(A1)",
+    "C02779V03348",
+    "C02199V02655"
+  ],
+  "label": "Population at Each Census",
+  "link": {
+    "alternate": [
+      {
+        "type": "text/csv",
+        "href": "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/F1001/CSV/1.0/en"
+      },
+      {
+        "type": "application/json",
+        "href": "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/F1001/JSON-stat/1.0/en"
+      },
+      {
+        "type": "application/octet-stream",
+        "href": "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/F1001/PX/2013/en"
+      },
+      {
+        "type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "href": "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/F1001/XLSX/2007/en"
+      }
+    ]
+  },
+  "note": [
+    "",
+    "For more information, please go to the [url=https://www.cso.ie/en/statistics/population/censusofpopulation2022/]statistical release page[/url] on our website."
+  ],
+  "role": {
+    "metric": [
+      "STATISTIC"
+    ],
+    "time": [
+      "TLIST(A1)"
+    ]
+  },
+  "size": [
+    1,
+    26,
+    27,
+    3
+  ],
+  "updated": "2023-06-29T11:00:00Z",
+  "value": [],
+  "version": "2.0"
+}
