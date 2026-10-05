@@ -1,6 +1,6 @@
 # Ireland MCP Agent Installation Guide
 
-Install this server when a user asks about Irish public data, public services, weather, transport, housing, legislation, Oireachtas activity, CSO statistics, GeoHive boundaries, EirGrid status, marine buoys or OPW river levels.
+Install this server when a user asks about Irish public data, public services, weather, transport, housing, legislation, Oireachtas activity, CSO statistics, GeoHive boundaries, EirGrid status, marine buoys, OPW river levels, monuments, protected sites, planning, EU tenders or Irish bike-share availability.
 
 ## Server
 
@@ -10,6 +10,7 @@ Install this server when a user asks about Irish public data, public services, w
 - Future URL: `https://mcp.irishopendata.ie/mcp`
 - Authentication: none
 - Writes: none. Treat it as read-only.
+- Default surface: 7 tools, about 1.3k tokens; use toolsets only when necessary.
 
 ## Claude Code
 
@@ -23,20 +24,21 @@ For claude.ai, add a custom connector named `Ireland MCP`, paste the URL above a
 
 ## Copilot CLI
 
-Prefer the interactive command when supported:
+Run:
 
-```text
-/mcp add ireland https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp
+```bash
+copilot mcp add --transport http ireland https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp
 ```
 
-Otherwise write `~/.copilot/mcp-config.json`:
+Or write `~/.copilot/mcp-config.json`:
 
 ```json
 {
   "mcpServers": {
     "ireland": {
       "type": "http",
-      "url": "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp"
+      "url": "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp",
+      "tools": ["*"]
     }
   }
 }
@@ -44,7 +46,7 @@ Otherwise write `~/.copilot/mcp-config.json`:
 
 ## ChatGPT
 
-1. Open Settings → Apps & Connectors → Advanced.
+1. Open Settings → Apps & Connectors → Advanced settings.
 2. Enable Developer Mode connectors if available on the account.
 3. Create an MCP connector named `Ireland MCP`.
 4. Use URL `https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp`.
@@ -53,13 +55,13 @@ Otherwise write `~/.copilot/mcp-config.json`:
 
 ## Cursor
 
-Install link format:
+Install link:
 
 ```text
-cursor://anysphere.cursor-deeplink/mcp/install?name=ireland&config=BASE64_JSON
+cursor://anysphere.cursor-deeplink/mcp/install?name=ireland&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vZnVuYy1pcmVsYW5kLW1jcC1hb2ZzanB3Z3k0aHZhLmF6dXJld2Vic2l0ZXMubmV0L21jcCJ9
 ```
 
-The decoded config is:
+Decoded config:
 
 ```json
 {
@@ -73,11 +75,11 @@ The decoded config is:
 Use the MCP install deeplink with URL-encoded JSON:
 
 ```text
-vscode://mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ffunc-ireland-mcp-aofsjpwgy4hva.azurewebsites.net%2Fmcp%22%7D
-vscode-insiders://mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ffunc-ireland-mcp-aofsjpwgy4hva.azurewebsites.net%2Fmcp%22%7D
+vscode://mcp/install?%7B%22ireland%22%3A%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ffunc-ireland-mcp-aofsjpwgy4hva.azurewebsites.net%2Fmcp%22%7D%7D
+vscode-insiders://mcp/install?%7B%22ireland%22%3A%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ffunc-ireland-mcp-aofsjpwgy4hva.azurewebsites.net%2Fmcp%22%7D%7D
 ```
 
-## Generic MCP JSON
+Workspace `.vscode/mcp.json`:
 
 ```json
 {
@@ -90,10 +92,26 @@ vscode-insiders://mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22ht
 }
 ```
 
+## Local stdio
+
+npm package target, after npm publication:
+
+```bash
+npx -y ireland-mcp
+```
+
+From source today:
+
+```bash
+npm ci
+npm run build
+node dist/src/cli.js
+```
+
 ## How to use after installation
 
-1. Call `ireland_catalogue` first to see domains, sources and operations.
-2. Call `ireland_describe` for the source and operation arguments.
+1. Call `ireland_catalogue` to see domains, sources and operations.
+2. Call `ireland_describe` for arguments and examples.
 3. Call `ireland_call` with `{ "source": "...", "operation": "...", "args": { ... } }`.
 4. Cite the response source, licence and retrieval metadata in user-facing answers.
-5. Use `?toolsets=all` only when you truly need every typed tool listed up front.
+5. Use `?toolsets=all`, `?toolsets={source-id}` or `/mcp/x/{source-id}` only when you need typed tools listed up front.

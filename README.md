@@ -2,281 +2,190 @@
 
 [![CI](https://github.com/c-mongan/ireland-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/c-mongan/ireland-mcp/actions/workflows/ci.yml)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-34c08a.svg)](LICENSE)
+[![MCP](https://img.shields.io/badge/MCP-Streamable%20HTTP-6f42c1.svg)](https://modelcontextprotocol.io)
+[![Token budget](https://img.shields.io/badge/default%20surface-7%20tools%20%7C%20~1.3k%20tokens-0a7.svg)](#why-its-lean)
 
-**TL;DR:** one free, read-only [Model Context Protocol](https://modelcontextprotocol.io)
-server that lets Claude, ChatGPT, GitHub Copilot and other AI assistants look up
-Irish public data. Ask "What's the population of Galway?", "Any weather warnings
-today?" or "What did houses sell for in Ennis last year?" and the assistant gets
-real figures, with the source, licence and retrieval time attached.
+**Ireland MCP is a free, read-only MCP server that lets AI assistants answer questions with live Irish public data and citations.**
 
-- **23 sources, 59 tools.** CSO, Eurostat, ECB, Oireachtas, GeoHive, Wikidata,
-  data.gov.ie, Smart Dublin, Met Éireann, NTA, the Irish Statute Book, the
-  Property Price Register, Irish Rail, Luas, EirGrid, Marine Institute weather
-  buoys, OPW river levels, planning, Census 2022 small areas, National
-  Monuments, NPWS protected sites, EU TED tenders and Irish bike-share
-  availability.
-- **Two ways to run it.** A hosted Streamable HTTP endpoint (`/mcp`), or locally
-  over stdio with `npx -y ireland-mcp`.
-- **No accounts.** Nothing to sign up for. Nothing is written anywhere.
+Hosted endpoint: `https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp`
+Transport: Streamable HTTP. Auth: none. Writes: none.
 
-![Architecture](docs/architecture/ireland-mcp-arch-v4.png)
+## Try asking
 
-> **Hosted endpoint:** `https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp`
-> (Streamable HTTP, no key needed). The npm package is not published yet; until it is,
-> run the stdio server from source (see [Run from source](#run-from-source)).
+- “What is the latest population profile for Galway city or County Cork?”
+- “Are there Met Éireann weather warnings near Dublin today?”
+- “What did houses sell for in Ennis last year?”
+- “When is the next train from Heuston, and are there disruptions?”
+- “Who are the current TDs for my constituency, and what bills are active?”
+- “What protected habitats, monuments, planning applications or census areas are near this point?”
 
-## Tool surface: lean by default
+## Install
 
-By default `tools/list` is small: **7 tools, about 5,100 chars (≈1.3k tokens)**,
-down from the full typed-tool surface. That keeps clients
-such as Cursor well under their ~40-tool limit and saves context. A CI test fails
-if the default list grows past 16,000 chars (≈4k tokens); `npm run measure:tools`
-prints the current figure.
-
-| Tool | Purpose |
+| Client | Current setup |
 | --- | --- |
-| `ireland_catalogue(domain?)` | Sources grouped by domain (stats, transport, environment, energy, economy, law/politics, places/property), each with its operations |
-| `ireland_describe(source, operation)` | The operation's JSON schema, description and a working example |
-| `ireland_call(source, operation, args, max_tokens?)` | Validates `args` server-side and runs the operation. Bad args return the schema and an example |
-| `ireland_about` | Licence, attribution, status URL, and how to enable typed toolsets |
-| `search`, `fetch` | Cross-source search and fetch (ChatGPT deep research contract) |
-| `nearby` | Kept top level because it is small (<300 tokens) |
+| Claude custom connector | Settings → Connectors → **Add custom connector** → URL `https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp` → no auth. |
+| ChatGPT developer mode connector | Settings → Apps & Connectors → Advanced settings → enable **Developer mode** → create MCP connector → URL above → no auth. The remote endpoint supports Streamable HTTP; `search`/`fetch` are included for deep-research style clients. |
+| VS Code | Deeplink: [`vscode://mcp/install?...`](vscode://mcp/install?%7B%22ireland%22%3A%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ffunc-ireland-mcp-aofsjpwgy4hva.azurewebsites.net%2Fmcp%22%7D%7D). Or add `.vscode/mcp.json`: `{ "servers": { "ireland": { "type": "http", "url": "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp" } } }`. |
+| VS Code Insiders | Deeplink: [`vscode-insiders://mcp/install?...`](vscode-insiders://mcp/install?%7B%22ireland%22%3A%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ffunc-ireland-mcp-aofsjpwgy4hva.azurewebsites.net%2Fmcp%22%7D%7D). |
+| Cursor | Deeplink: [`cursor://anysphere.cursor-deeplink/mcp/install?name=ireland&config=...`](cursor://anysphere.cursor-deeplink/mcp/install?name=ireland&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vZnVuYy1pcmVsYW5kLW1jcC1hb2ZzanB3Z3k0aHZhLmF6dXJld2Vic2l0ZXMubmV0L21jcCJ9). Decoded config: `{ "type": "http", "url": "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp" }`. |
+| GitHub Copilot CLI | `copilot mcp add --transport http ireland https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp` or put the JSON below in `~/.copilot/mcp-config.json`. |
+| Claude Code | `claude mcp add --transport http ireland https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp` |
+| Local stdio | npm package target: `npx -y ireland-mcp` after npm publication. Today, run from source: `npm ci && npm run build && node dist/src/cli.js`. Add `--toolsets=cso,irish-rail` or `IRELAND_MCP_TOOLSETS=all` if you want typed tools listed locally. |
 
-Every typed tool below is an **operation** of its source, with the same name, so
-`ireland_call {source: "irish-rail", operation: "rail_get_departures", args: {station: "Heuston"}}`
-does the same thing as calling `rail_get_departures` directly.
-
-**Typed toolsets on demand.** Add a source's typed tools to `tools/list` when a
-client works better with them:
-
-| Where | How |
-| --- | --- |
-| HTTP query | `/mcp?toolsets=cso,irish-rail` (comma list of source ids) |
-| HTTP path | `/mcp/x/irish-rail` (one source) |
-| Everything | `/mcp?toolsets=all` (all 59 typed tools plus the meta tools) |
-| stdio | `npx -y ireland-mcp --toolsets=cso,irish-rail`, or `IRELAND_MCP_TOOLSETS=all` |
-
-Source ids: `cso`, `eurostat`, `ecb`, `oireachtas`, `geohive`, `wikidata`,
-`data-gov-ie`, `smart-dublin`, `met-eireann`, `nta`, `legislation`, `ppr`,
-`irish-rail`, `luas`, `eirgrid`, `marine`, `opw-water`, `planning`,
-`census-areas`, `heritage`, `environment-sites`, `ted`, `bikes`, `cross`. An
-unknown id is a clear error (HTTP 400 with the valid list, or exit code 1 on
-stdio).
-
-**Response budget.** Each result is capped at about 2,000 tokens (chars ÷ 4).
-Pass `max_tokens` (100–8,000) to change it. When a large list is cut, the result
-carries `truncated: true`, `returned`, `total` and a hint to narrow the request.
-Results also come back as `structuredContent`.
-
-**Resources and prompts.** Each source is a resource, `ireland://sources/{id}`
-(licence, attribution, coverage, operations). Three prompts are included:
-`area_profile(place)`, `commute_check(station)` and `compare_counties(metric, counties)`.
-
-## Tools
-
-| Source | Tools | Data |
-| --- | --- | --- |
-| CSO PxStat | `cso_search_tables`, `cso_get_table_metadata`, `cso_get_data`, `cso_area_profile` | National statistics: census, prices, labour, housing |
-| Eurostat | `eurostat_search_datasets`, `eurostat_get_data`, `eurostat_compare_ie_eu` | EU statistical datasets for Ireland and EU aggregate comparisons |
-| ECB Data Portal | `ecb_get_series`, `ecb_interest_rates`, `ecb_exchange_rate` | ECB SDMX financial series, euro rates, FX rates, selected Irish MIR/BSI series where exposed through ECB |
-| Oireachtas | `oireachtas_search_members`, `oireachtas_search_bills`, `oireachtas_get_debates`, `oireachtas_search_questions`, `oireachtas_get_votes` | TDs and Senators, bills, debates, PQs, divisions |
-| GeoHive | `geohive_boundaries_at_point`, `geohive_list_layers`, `geohive_query_layer` | County, constituency, LEA, electoral division, small area |
-| Wikidata | `wikidata_place`, `wikidata_entity` | Safe CC0 Irish-place and entity summaries; no arbitrary SPARQL exposed |
-| data.gov.ie | `datagov_search_datasets`, `datagov_get_dataset`, `datagov_query_datastore` | National open data catalogue |
-| Smart Dublin | `smartdublin_search_datasets`, `smartdublin_get_dataset`, `smartdublin_query_datastore` | Dublin local authority datasets |
-| Met Éireann | `met_get_forecast`, `met_get_observations`, `met_get_warnings` | Point forecasts, station observations, warnings |
-| NTA | `nta_get_realtime_summary`, `nta_get_trip_updates` | Live GTFS-R delays and cancellations (operator key) |
-| Irish Statute Book | `legislation_list_acts`, `legislation_get_act`, `legislation_get_section` | Acts by year, Act and section text via ELI |
-| Property Price Register | `ppr_search_sales`, `ppr_price_stats` | Residential sales since 2010, area statistics |
-| Irish Rail | `rail_find_station`, `rail_get_departures` | Live train departures for every station |
-| Luas (TII) | `luas_get_forecast`, `luas_list_stops` | Live tram arrivals, stop list, service messages |
-| EirGrid | `grid_get_status` | Live demand, wind generation and carbon intensity |
-| Marine Institute | `marine_get_buoys` | Offshore wind, waves, air and sea temperature |
-| OPW (waterlevel.ie) | `water_find_stations`, `water_get_level` | River and lake levels at ~460 gauges, last 36 hours |
-| Planning (NPAD) | `planning_search`, `planning_get` | National planning applications by location, council, text, date or reference |
-| Census areas | `census_small_area_at` | Census 2022 Small Area / ED / county at a point, with population where available |
-| Heritage | `heritage_monuments_near` | National Monuments Service Sites and Monuments Record near a point |
-| Environment sites | `protected_sites_at`, `protected_sites_near` | NPWS SPA, SAC, NHA and proposed NHA protected sites |
-| EU TED | `ted_search_tenders`, `ted_get_notice` | Irish-buyer EU public procurement notices, values, deadlines and links |
-| CityBikes / GBFS | `bikes_networks`, `bikes_stations_near` | Irish bike-share networks and nearby station availability |
-| Cross-source | `search`, `fetch`, `list_sources`, `ireland_snapshot`, `nearby` | Search everything, fetch by id, place summaries |
-
-All of these are reachable on the default surface through `ireland_call`; they
-are listed as tools only when their toolset is enabled (see above).
-
-Central Bank of Ireland direct Open Data Portal was checked. It has a keyless
-SDMX endpoint (`https://web.opendata.centralbank.ie/statistics/sdmx/v1.0/`) and
-is a good future source; this release keeps the requested source set to ECB while
-noting that Irish MIR/BSI banking series are available through ECB where exposed.
-
-`search` and `fetch` follow the ChatGPT deep research contract. `search` returns
-`[{id, title, url}]` with ids such as `cso:FY003A`, `oireachtas:bill/2024/12` or
-`legislation:2024/1`; `fetch(id)` returns `{id, title, text, url, metadata}`.
-
-Every other tool returns an **evidence envelope**:
-
-```json
-{
-  "data": { "...": "..." },
-  "source": "Met Éireann",
-  "url": "https://www.met.ie/Open_Data/json/warning_IRELAND.json",
-  "licence": "CC BY 4.0",
-  "attribution": "Copyright Met Éireann. Source: www.met.ie. ...",
-  "retrieved_at": "2026-10-05T12:00:00.000Z",
-  "cached": false,
-  "truncated": false
-}
-```
-
-`stale: true` means the source was down and you are seeing the last good copy.
-Failures are typed: `BAD_ARGS`, `NOT_FOUND`, `UPSTREAM_DOWN`, `RATE_LIMITED`,
-each with a hint the model can act on. Lists default to 50 items, max 500.
-
-## Connect a client
-
-The hosted URL is `https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp`.
-If you deploy your own copy, use your own function app URL instead.
-
-Any URL below can take `?toolsets=...` or the `/mcp/x/{source}` form, for example
-`https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp?toolsets=irish-rail,luas`.
-For stdio, add `"--toolsets=cso"` to `args`.
-
-### Claude Desktop (local, stdio)
-
-`claude_desktop_config.json`:
+Portable Copilot / MCP JSON:
 
 ```json
 {
   "mcpServers": {
-    "ireland": { "command": "npx", "args": ["-y", "ireland-mcp"] }
+    "ireland": {
+      "type": "http",
+      "url": "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp",
+      "tools": ["*"]
+    }
   }
 }
 ```
 
-### Claude (remote connector)
+## Why it is lean
 
-Settings → Connectors → **Add custom connector**, then paste the hosted `/mcp`
-URL. No authentication is needed.
+Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **7 tools, 5,241 characters, about 1,310 tokens** on this branch (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
 
-### ChatGPT (developer mode)
-
-Settings → Apps & Connectors → Advanced settings → turn on **Developer mode**.
-Create a connector with the hosted `/mcp` URL and **No authentication**. Deep
-research uses `search` and `fetch`; chat can use every tool. Developer mode
-availability depends on your plan and region — check it is offered in Ireland
-and the EEA for your account before relying on it.
-
-### VS Code
-
-`.vscode/mcp.json` (the top-level key is `servers`):
-
-```json
-{
-  "servers": {
-    "ireland": { "type": "http", "url": "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp" }
-  }
-}
+```
+assistant ── tools/list ──> 7 meta tools
+   │
+   ├─ ireland_catalogue(domain?)  -> compact operation index by source
+   ├─ ireland_describe(source, operation) -> schema + example
+   └─ ireland_call(source, operation, args?, max_tokens?)
+        └─ dispatches to the real typed operation and returns source/licence/retrieval metadata
 ```
 
-Local alternative: `{ "type": "stdio", "command": "npx", "args": ["-y", "ireland-mcp"] }`.
+Need typed tools anyway?
 
-### GitHub Copilot CLI
+| Surface | Use |
+| --- | --- |
+| Default HTTP | `/mcp` lists only `ireland_catalogue`, `ireland_describe`, `ireland_call`, `ireland_about`, `search`, `fetch`, `nearby`. |
+| Source toolsets | `/mcp?toolsets=cso,irish-rail` lists selected typed tools too. |
+| One source path | `/mcp/x/{source}` lists that source's typed tools, for example `/mcp/x/met-eireann`. |
+| Everything | `/mcp?toolsets=all` lists all 64 tools and is useful for debugging, not routine chat. |
+| Local stdio | `npx -y ireland-mcp --toolsets=cso` or `IRELAND_MCP_TOOLSETS=all`. |
 
-`.mcp.json` in a repo, or `~/.copilot/mcp-config.json` (the top-level key is `mcpServers`):
+`max_tokens` defaults to about 2,000 output tokens and can be set from 100 to 8,000. Large results return `truncated`, counts and narrowing hints instead of flooding the context.
 
-```json
-{
-  "mcpServers": {
-    "ireland": { "type": "http", "url": "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp", "tools": ["*"] }
-  }
-}
-```
+## Sources
 
-### Environment variables (local stdio)
+Generated from `src/registry.ts` and the 23 source modules. The default `nearby`, `search` and `fetch` shortcuts sit above these sources.
 
-| Variable | Needed for | Default |
-| --- | --- | --- |
-| `NTA_API_KEY` | `nta_*` tools. Free key from [developer.nationaltransport.ie](https://developer.nationaltransport.ie) | unset: NTA tools return a clear error |
-| `PPR_INDEX_PATH` | Faster PPR lookups from a prebuilt index (`npm run ppr:build`) | `.ppr-cache/index-v1.json.gz`; falls back to live county CSVs |
-| `IRELAND_MCP_TELEMETRY` | Set to `off` to silence the one-line JSON tool logs on stderr | on |
-| `IRELAND_MCP_TOOLSETS` | Typed toolsets to list, e.g. `cso,irish-rail` or `all` (same as `--toolsets=`) | unset: meta tools only |
+| Domain | Source id | Publisher / source | Operations | Licence |
+| --- | --- | --- | ---: | --- |
+| stats | `cso` | [Central Statistics Office (CSO) PxStat](https://data.cso.ie) | 4 | CC BY 4.0 |
+| stats | `eurostat` | [Eurostat Statistics API](https://ec.europa.eu/eurostat) | 3 | Eurostat reuse policy (CC BY 4.0 equivalent) |
+| stats | `ecb` | [ECB Data Portal](https://data.ecb.europa.eu) | 3 | ECB terms, free reuse with attribution |
+| stats | `data-gov-ie` | [data.gov.ie](https://data.gov.ie) | 3 | Per dataset, mostly CC BY 4.0 |
+| stats | `smart-dublin` | [Smart Dublin open data](https://data.smartdublin.ie) | 3 | Per dataset, mostly CC BY 4.0 |
+| stats | `census-areas` | [CSO Census 2022 small areas / Tailte Éireann](https://data-osi.opendata.arcgis.com/datasets/osi::cso-small-areas-national-statistical-boundaries-2022-generalised-20m) | 1 | CC BY 4.0 |
+| law/politics | `oireachtas` | [Houses of the Oireachtas Open Data API](https://api.oireachtas.ie) | 5 | Oireachtas Open Data PSI Licence |
+| law/politics | `legislation` | [Irish Statute Book](https://www.irishstatutebook.ie) | 3 | PSI General Licence / CC BY 4.0 |
+| places/property | `geohive` | [Tailte Éireann GeoHive boundaries](https://www.geohive.ie) | 4 | CC BY 4.0 |
+| places/property | `wikidata` | [Wikidata](https://www.wikidata.org) | 2 | CC0 1.0 |
+| places/property | `ppr` | [Residential Property Price Register](https://www.propertypriceregister.ie) | 2 | PSI General Licence / CC BY 4.0 |
+| places/property | `planning` | [National Planning Application Database](https://data-housinggovie.opendata.arcgis.com/maps/housinggovie::irishplanningapplications) | 2 | CC BY 4.0 |
+| places/property | `heritage` | [National Monuments Service SMR](https://maps.archaeology.ie/historicenvironment) | 1 | CC BY 4.0 |
+| environment | `met-eireann` | [Met Éireann](https://www.met.ie) | 3 | CC BY 4.0 |
+| environment | `marine` | [Marine Institute weather buoys](https://data.gov.ie/dataset/weather-buoy-network) | 1 | CC BY 4.0 |
+| environment | `opw-water` | [OPW waterlevel.ie](https://waterlevel.ie/) | 2 | CC BY 4.0 |
+| environment | `environment-sites` | [NPWS designated protected sites](https://experience.arcgis.com/experience/edf34d92e28040fd87d3d14f55d8d95f/) | 2 | CC BY 4.0 |
+| transport | `nta` | [National Transport Authority GTFS-Realtime](https://developer.nationaltransport.ie) | 2 | CC BY 4.0 |
+| transport | `irish-rail` | [Iarnród Éireann realtime API](https://api.irishrail.ie/realtime/) | 2 | Public open data; attribution required |
+| transport | `luas` | [Luas Forecasting API / TII](https://data.gov.ie/dataset/luas-forecasting-api) | 2 | CC BY 4.0 |
+| transport | `bikes` | [CityBikes / GBFS](https://api.citybik.es/v2/) | 2 | CityBikes attribution/link; underlying operator terms |
+| energy | `eirgrid` | [EirGrid Smart Grid Dashboard](https://www.smartgriddashboard.com/) | 1 | Public information; attribution required |
+| economy | `ted` | [EU TED](https://ted.europa.eu/) | 2 | EU reuse policy / CC BY 4.0 |
 
-The hosted app also reads `RATE_LIMIT_PER_MINUTE` (default 60 per IP),
-`AzureWebJobsStorage__accountName`, `CACHE_TABLE_NAME` and `PPR_CONTAINER`, plus:
+## Licence and attribution
 
-| Variable | Purpose | Default |
-| --- | --- | --- |
-| `MCP_ALLOWED_ORIGINS` | Comma-separated `Origin` allowlist for `/mcp`; other browser origins get 403. Requests without `Origin` are allowed. `*` matches one host label or any port; a leading `+` extends the default list; `*` alone allows all | claude.ai, chatgpt.com, `vscode-webview://*`, localhost, 127.0.0.1, the landing page SWA, irishopendata.ie, www.irishopendata.ie |
-| `UPSTREAM_CONCURRENCY` / `UPSTREAM_MAX_QUEUE` | Concurrent calls per source, and how many may wait before `UPSTREAM_DOWN` | 8 / 32 |
-| `UPSTREAM_TIMEOUT_MS` | Per-call upstream timeout | 10000 |
-| `UPSTREAM_BREAKER_FAILURES` / `UPSTREAM_BREAKER_COOLDOWN_SECONDS` | Circuit breaker opens after N consecutive failures for M seconds; while open, calls return `UPSTREAM_DOWN` with `retryAfterSeconds`, or stale cache if any | 5 / 30 |
-| `APPLICATIONINSIGHTS_CONNECTION_STRING` | Enables OpenTelemetry export through the Azure Monitor distro | unset: no-op |
-| `IRELAND_MCP_OTEL` / `IRELAND_MCP_OTEL_SAMPLING_RATIO` / `OTEL_SERVICE_NAME` | `off` disables export; trace sampling ratio; service name | on / 1 / `ireland-mcp` |
+| Layer | Licence / attribution |
+| --- | --- |
+| Code | [MIT](LICENSE), copyright Conor Mongan. |
+| Source metadata and returned data | Stays under each publisher licence. Every normal tool response includes `source`, `url`, `licence`, `attribution`, `retrieved_at`, cache and truncation metadata. |
+| CSO / Eurostat / ECB / Wikidata | Cite CSO, Eurostat, ECB Data Portal and Wikidata contributors respectively; Wikidata is CC0. |
+| Oireachtas / legislation / PSI sources | Cite Oireachtas Open Data, eISB / Office of the Attorney General, PSRA, OPW and other named PSI publishers as shown in responses. |
+| Weather, transport, environment and maps | Cite Met Éireann, NTA, Iarnród Éireann, TII/Luas, EirGrid, Marine Institute, Tailte Éireann, NMS, NPWS, EPA-derived datasets where present, TED and JCDecaux/CityBikes/GBFS as applicable. |
+| Full notice | See [NOTICE](NOTICE). Not affiliated with any government body, data publisher or transport operator. |
 
-Telemetry follows the OpenTelemetry MCP semantic conventions (spans named
-`tools/call <tool>`, metric `mcp.server.operation.duration`) and records no argument
-values or IPs. See [PRIVACY.md](PRIVACY.md).
+## Observability and privacy
 
-### Health and status
+- `GET /healthz` is fast liveness; `GET /healthz?deep=1` performs one cheap check per source.
+- A status workflow publishes [`status/status.json`](https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json) and 7-day history.
+- OpenTelemetry can export MCP semantic-convention spans and operation-duration metrics to Azure Monitor.
+- Tool logs and telemetry avoid argument values and IP addresses. See [PRIVACY.md](PRIVACY.md).
+- Browser CORS is restricted by `MCP_ALLOWED_ORIGINS`; non-browser MCP clients are unaffected.
 
-- `GET /healthz` — fast liveness, no upstream calls.
-- `GET /healthz?deep=1` — one cheap real call per source in parallel (5 s timeout), with
-  per-source status, latency and circuit-breaker state. Cached for 60 s.
-- Every 30 minutes a GitHub Action publishes the deep report to
-  [`status/status.json`](https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json)
-  and a 7-day [`status/history.json`](https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/history.json)
-  on the `status` branch.
+## Limits
 
-## Skills & plugins
-
-This repo is also a plugin and plugin marketplace: it bundles the hosted MCP server with nine
-[Agent Skills](skills/) (area report, house prices, TD briefing, commute and weather, grid, flood watch,
-CSO charts, legislation, open-data finder).
-
-- Claude Code: `/plugin marketplace add c-mongan/ireland-mcp` then `/plugin install ireland-mcp@ireland-mcp`
-- Copilot CLI: `copilot plugin install c-mongan/ireland-mcp`
-- VS Code Agent Plugins and claude.ai skill zips (`npm run skills:package`): see [docs/plugins.md](docs/plugins.md)
+- Read-only public data only. No login-gated, paid or key-required user data.
+- NTA realtime tools need a server-side NTA operator key; other tools work without keys.
+- Upstream data can be delayed, provisional, incomplete or temporarily down. Stale cache is labelled `stale: true`.
+- Property Price Register values are declared sale prices, not valuations.
+- Legislation text is for retrieval and analysis, not legal advice.
+- Large tables are paginated or truncated. Use `fields`, `limit`, `cursor` and source filters.
 
 ## Run from source
 
 Needs Node 22.12 or later.
 
 ```bash
-git clone https://github.com/c-mongan/ireland-mcp && cd ireland-mcp
-npm install && npm run build
-node dist/src/cli.js          # stdio server — point a client's "command" here
-npm run dev:http              # http://localhost:7071 landing page, MCP at /mcp
-npx @modelcontextprotocol/inspector node dist/src/cli.js   # browse the tools
+git clone https://github.com/c-mongan/ireland-mcp
+cd ireland-mcp
+npm ci
+npm run build
+node dist/src/cli.js
+npm run dev:http     # local HTTP dev server, MCP at /mcp
 ```
 
 ## Development
 
 | Command | What it does |
 | --- | --- |
-| `npm test` | Unit tests against recorded fixtures — no network |
-| `npm run test:coverage` | Same, with a coverage report |
-| `npm run typecheck && npm run lint` | TypeScript and ESLint |
-| `npm run inspector:check` | MCP conformance through the Inspector CLI (also in CI) |
-| `npm run live:sanity` | One real call per source through `ireland_call`; `EVAL_TOOLSETS=all` calls the typed tools instead. Results in [docs/live-sanity.md](docs/live-sanity.md) |
-| `npm run eval` | 54 Irish questions through promptfoo. Uses `OPENAI_API_KEY`, or Azure OpenAI with `AZURE_API_KEY`, `AZURE_API_HOST` and `AZURE_DEPLOYMENT`; skips without a key. Runs on the default surface; `EVAL_TOOLSETS=all` runs on the full one. A call via `ireland_call` with `operation: X` counts as calling `X` |
-| `npm run measure:tools [-- all]` | Size of `tools/list` in chars and estimated tokens (after `npm run build`) |
-| `npm run ppr:build` | Build the Property Price Register index locally |
+| `npm test` | Unit tests against recorded fixtures; no network. |
+| `npm run typecheck && npm run lint` | TypeScript and ESLint. |
+| `npm run build` | Compile production JS and copy runtime assets. |
+| `npm run inspector:check` | MCP Inspector conformance. |
+| `npm run measure:tools [-- all]` | Measure default or all-tool `tools/list`. |
+| `npm run live:sanity` | One real call per source through `ireland_call`; writes [docs/live-sanity.md](docs/live-sanity.md). |
+| `npm run eval` | Promptfoo evaluation; default surface unless `EVAL_TOOLSETS=all`. |
 
-CI runs lint, typecheck, tests, Inspector conformance and CodeQL. A nightly
-workflow runs the live smoke test and opens an issue if a source breaks.
+## Contributing: add a source
 
-To add a source, see [CONTRIBUTING.md](CONTRIBUTING.md).
+1. Create `src/sources/<id>/index.ts` exporting a `SourceModule` with `info`, `summary`, `domain`, `coverage`, tools, optional `search()` and `fetchById()`.
+2. Keep every tool name source-prefixed, validate args with zod and return the evidence envelope with source URL, licence and attribution.
+3. Use `ctx.cachedJson` / `ctx.cachedText` so upstream budgets, caching, circuit breakers and stale fallback apply.
+4. Add fixtures and tests at the module seam, then add a server-level `ireland_call` test when useful.
+5. Register the module in `src/registry.ts`, update `scripts/live-sanity.mjs`, eval cases and docs.
+6. Run lint, typecheck, tests, build, inspector and live sanity before opening a PR.
 
-## Hosting
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full checklist.
 
-The hosted endpoint runs on Azure Functions Flex Consumption in North Europe,
-with a capped instance count, a Table Storage cache, and App Insights. The
-landing page in `web/` deploys to a free Azure Static Web App. See
-[docs/deploy.md](docs/deploy.md).
+## Registry and publishing
 
-## Licence and data
+`server.json` is ready for the official MCP Registry as a **remote-only Streamable HTTP** server named `io.github.c-mongan/ireland-mcp`. The future domain name is planned as `ie.irishopendata/ireland` after DNS verification. Publishing notes and directory checklists are in [docs/publishing.md](docs/publishing.md). Do not publish from a fork without changing the name and endpoint.
 
-Code: [MIT](LICENSE). Data stays under each publisher's licence — mostly
-CC BY 4.0. Keep the `attribution` text from each response when you reuse data.
-Per-source details and credits are in [NOTICE](NOTICE). Not affiliated with any
-Irish government body. Security reports: [SECURITY.md](SECURITY.md).
+## Credits and prior art
+
+Thank you to the maintainers of Irish-data and public-data MCP projects that helped shape the direction:
+
+| Project | What to look at |
+| --- | --- |
+| [keithd1998/irlcli](https://github.com/keithd1998/irlcli) | Irish open-data CLI for LLM use. |
+| [sumitsimplex/irish-mcps](https://github.com/sumitsimplex/irish-mcps) and [irishmcp.ie](https://irishmcp.ie) | Irish MCP platform and public-data UX. |
+| [faulknco/archaic-stats-mcp](https://github.com/faulknco/archaic-stats-mcp) | CSO/PxStat MCP focused on Irish statistics. |
+| [datagouv/datagouv-mcp](https://github.com/datagouv/datagouv-mcp) | National open-data catalogue MCP pattern. |
+| [brockwebb/open-census-mcp-server](https://github.com/brockwebb/open-census-mcp-server) | Census-data MCP interface and interpretation pattern. |
+| [ondata/ckan-mcp-server](https://github.com/ondata/ckan-mcp-server) | CKAN search/query server design. |
+| [cyanheads/eurostat-mcp-server](https://github.com/cyanheads/eurostat-mcp-server) | Eurostat MCP implementation. |
+| [isakskogstad/OECD-MCP](https://github.com/isakskogstad/OECD-MCP) | OECD statistical-data MCP. |
+
+Data comes from the publishers listed above, including CSO, data.gov.ie, Met Éireann, OPW, Irish Rail, Oireachtas, GeoHive/Tailte Éireann, National Monuments Service, NPWS, EPA-linked environmental datasets, Eurostat, ECB, Wikidata, TED, JCDecaux/CityBikes and others. Please cite the publisher shown in each response.
+
+## Security
+
+Security reports: [SECURITY.md](SECURITY.md). This project is read-only, but MCP servers can still retrieve untrusted web content; clients should follow their normal MCP trust and approval model.
