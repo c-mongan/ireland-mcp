@@ -44,7 +44,7 @@ const statusTool = defineTool({
   name: "grid_get_status",
   title: "Live electricity grid status",
   description:
-    "Latest electricity demand (MW), wind generation (MW), wind share of demand (%) and carbon intensity (gCO2/kWh) from EirGrid, for Ireland + Northern Ireland, ROI or NI. 15-minute resolution.",
+    "Latest electricity demand (MW), wind generation (MW), wind share of demand (%, from the latest interval both series report) and carbon intensity (gCO2/kWh) from EirGrid, for Ireland + Northern Ireland, ROI or NI. 15-minute resolution.",
   inputSchema: {
     region: z.enum(["ALL", "ROI", "NI"]).default("ALL").describe("ALL = whole island, ROI = Republic of Ireland, NI = Northern Ireland.")
   },
@@ -55,6 +55,8 @@ const statusTool = defineTool({
     const d = latest(demand.value.Rows);
     const w = latest(wind.value.Rows);
     const c = latest(co2.value.Rows);
+    const windAt = new Map((wind.value.Rows ?? []).filter((r) => typeof r.Value === "number").map((r) => [r.EffectiveTime, r.Value as number]));
+    const common = [...(demand.value.Rows ?? [])].reverse().find((r) => typeof r.Value === "number" && r.Value > 0 && windAt.has(r.EffectiveTime));
     if (!d && !w && !c) throw new ToolError("UPSTREAM_DOWN", "EirGrid returned no readings for today yet.", { hint: "Try again in a few minutes." });
     return envelope(eirgridInfo, {
       data: {
@@ -63,7 +65,8 @@ const statusTool = defineTool({
         demand_time: d?.EffectiveTime ?? null,
         wind_mw: w?.Value ?? null,
         wind_time: w?.EffectiveTime ?? null,
-        wind_share_pct: d?.Value && w?.Value != null ? Math.round((w.Value / d.Value) * 1000) / 10 : null,
+        wind_share_pct: common ? Math.round(((windAt.get(common.EffectiveTime) ?? 0) / (common.Value as number)) * 1000) / 10 : null,
+        wind_share_time: common?.EffectiveTime ?? null,
         co2_g_per_kwh: c?.Value ?? null,
         co2_time: c?.EffectiveTime ?? null
       },

@@ -92,29 +92,35 @@ const departuresTool = defineTool({
     const { stations } = await loadStations(ctx);
     const found = matchStations(stations, station)[0];
     if (!found) throw new ToolError("NOT_FOUND", `No Irish Rail station matches '${station}'.`, { hint: "Use rail_find_station to look up the station name or code." });
-    const url = `${RAIL_BASE}/getStationDataByCodeXML_WithNumMins?StationCode=${encodeURIComponent(found.code)}&NumMins=${minutes}`;
-    const r = await ctx.cachedText(url, MINUTE, { label: "Irish Rail departures" });
-    if (!r.value.includes("<ArrayOfObjStationData")) throw new ToolError("UPSTREAM_DOWN", "Irish Rail returned an unexpected departures format.");
-    const departures = blocks(r.value, "objStationData")
+    // The feed lists some stations under several internal codes (e.g. Adamstown); query them all.
+    const codes = [...new Set(stations.filter((s) => s.name === found.name).map((s) => s.code))];
+    const urlFor = (code: string) => `${RAIL_BASE}/getStationDataByCodeXML_WithNumMins?StationCode=${encodeURIComponent(code)}&NumMins=${minutes}`;
+    const url = urlFor(found.code);
+    const feeds = await Promise.all(codes.map((code) => ctx.cachedText(urlFor(code), MINUTE, { label: "Irish Rail departures" })));
+    if (feeds.some((r) => !r.value.includes("<ArrayOfObjStationData"))) throw new ToolError("UPSTREAM_DOWN", "Irish Rail returned an unexpected departures format.");
+    const seen = new Set<string>();
+    const departures = feeds
+      .flatMap((r) => blocks(r.value, "objStationData"))
       .map((b) => ({
         train_code: text(b, "Traincode") ?? "",
         type: text(b, "Traintype"),
         origin: text(b, "Origin"),
         destination: text(b, "Destination"),
         direction: text(b, "Direction"),
-        due_in_min: int(text(b, "Duein")) ?? 0,
+        due_in_min: int(text(b, "Duein")),
         late_min: int(text(b, "Late")),
         scheduled_departure: text(b, "Schdepart"),
         expected_departure: text(b, "Expdepart"),
         status: text(b, "Status"),
         last_location: text(b, "Lastlocation")
       }))
-      .sort((a, b) => a.due_in_min - b.due_in_min);
+      .filter((d) => !seen.has(d.train_code) && seen.add(d.train_code))
+      .sort((a, b) => (a.due_in_min ?? Infinity) - (b.due_in_min ?? Infinity));
     return envelope(irishRailInfo, {
-      data: { station: { name: found.name, code: found.code }, minutes, count: departures.length, departures },
+      data: { station: { name: found.name, code: found.code, codes }, minutes, count: departures.length, departures },
       url,
-      cached: r.cached,
-      stale: r.stale
+      cached: feeds.every((r) => r.cached),
+      stale: feeds.some((r) => r.stale)
     });
   }
 });
