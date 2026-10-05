@@ -39,6 +39,9 @@ export async function handleMcpHttp(request: Request, options: McpHttpOptions): 
     });
   }
 
+  if (Number(request.headers.get("content-length") ?? 0) > MAX_BODY_CHARS) {
+    return jsonRpcError(413, -32600, "Request body too large.");
+  }
   const bodyText = await request.text();
   if (bodyText.length > MAX_BODY_CHARS) return jsonRpcError(413, -32600, "Request body too large.");
   const messageCount = countMessages(bodyText);

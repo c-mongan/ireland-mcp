@@ -302,6 +302,8 @@ describe("handleMcpHttp", () => {
     expect(ok.status).toBe(200);
     const huge = Array.from({ length: 21 }, (_, id) => ({ ...one, id }));
     expect((await handleMcpHttp(post(huge), { createServer })).status).toBe(400);
+    const padded = post({ ...one, id: 9, params: { pad: "x".repeat(1_000_001) } });
+    expect((await handleMcpHttp(padded, { createServer })).status).toBe(413);
   });
 
   it("answers CORS preflight and rejects GET", async () => {
