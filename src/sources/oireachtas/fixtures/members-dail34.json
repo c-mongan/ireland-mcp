@@ -1,0 +1,444 @@
+{
+ "head": {
+  "counts": {
+   "memberCount": 176,
+   "resultCount": 176
+  }
+ },
+ "results": [
+  {
+   "member": {
+    "memberCode": "Ciarán-Ahern.D.2024-11-29",
+    "dateOfDeath": null,
+    "image": false,
+    "lastName": "Ahern",
+    "wikiTitle": null,
+    "gender": "",
+    "fullName": "Ciarán Ahern",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Ciarán-Ahern.D.2024-11-29",
+    "memberships": [
+     {
+      "membership": {
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Ciarán-Ahern.D.2024-11-29/house/dail/34",
+       "dateRange": {
+        "start": "2024-11-29",
+        "end": null
+       },
+       "house": {
+        "showAs": "34th Dáil",
+        "houseNo": "34",
+        "chamberType": "house",
+        "houseCode": "dail",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34"
+       },
+       "parties": [
+        {
+         "party": {
+          "dateRange": {
+           "end": null,
+           "start": "2024-11-29"
+          },
+          "partyCode": "Labour_Party",
+          "showAs": "Labour Party",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/party/dail/34/Labour_Party"
+         }
+        }
+       ],
+       "represents": [
+        {
+         "represent": {
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34/constituency/Dublin-South-West",
+          "representType": "constituency",
+          "representCode": "Dublin-South-West",
+          "showAs": "Dublin South-West"
+         }
+        }
+       ],
+       "offices": [],
+       "committees": []
+      }
+     }
+    ],
+    "firstName": "Ciarán",
+    "showAs": "Ciarán Ahern",
+    "pId": "CiaranAhern"
+   }
+  },
+  {
+   "member": {
+    "memberCode": "Ivana-Bacik.S.2007-07-23",
+    "dateOfDeath": null,
+    "image": false,
+    "lastName": "Bacik",
+    "wikiTitle": null,
+    "gender": "",
+    "fullName": "Ivana Bacik",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Ivana-Bacik.S.2007-07-23",
+    "memberships": [
+     {
+      "membership": {
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Ivana-Bacik.S.2007-07-23/house/dail/34",
+       "dateRange": {
+        "start": "2024-11-29",
+        "end": null
+       },
+       "house": {
+        "showAs": "34th Dáil",
+        "houseNo": "34",
+        "chamberType": "house",
+        "houseCode": "dail",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34"
+       },
+       "parties": [
+        {
+         "party": {
+          "dateRange": {
+           "end": null,
+           "start": "2024-11-29"
+          },
+          "partyCode": "Labour_Party",
+          "showAs": "Labour Party",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/party/dail/34/Labour_Party"
+         }
+        }
+       ],
+       "represents": [
+        {
+         "represent": {
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34/constituency/Dublin-Bay-South",
+          "representType": "constituency",
+          "representCode": "Dublin-Bay-South",
+          "showAs": "Dublin Bay South"
+         }
+        }
+       ],
+       "offices": [],
+       "committees": []
+      }
+     }
+    ],
+    "firstName": "Ivana",
+    "showAs": "Ivana Bacik",
+    "pId": "IvanaBacik"
+   }
+  },
+  {
+   "member": {
+    "memberCode": "Simon-Harris.D.2011-03-09",
+    "dateOfDeath": null,
+    "image": false,
+    "lastName": "Harris",
+    "wikiTitle": null,
+    "gender": "",
+    "fullName": "Simon Harris",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Simon-Harris.D.2011-03-09",
+    "memberships": [
+     {
+      "membership": {
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Simon-Harris.D.2011-03-09/house/dail/34",
+       "dateRange": {
+        "start": "2024-11-29",
+        "end": null
+       },
+       "house": {
+        "showAs": "34th Dáil",
+        "houseNo": "34",
+        "chamberType": "house",
+        "houseCode": "dail",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34"
+       },
+       "parties": [
+        {
+         "party": {
+          "dateRange": {
+           "end": null,
+           "start": "2024-11-29"
+          },
+          "partyCode": "Fine_Gael",
+          "showAs": "Fine Gael",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/party/dail/34/Fine_Gael"
+         }
+        }
+       ],
+       "represents": [
+        {
+         "represent": {
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34/constituency/Wicklow",
+          "representType": "constituency",
+          "representCode": "Wicklow",
+          "showAs": "Wicklow"
+         }
+        }
+       ],
+       "offices": [
+        {
+         "office": {
+          "dateRange": {
+           "end": "2025-01-22",
+           "start": "2024-11-29"
+          },
+          "officeName": {
+           "uri": null,
+           "showAs": "Taoiseach"
+          }
+         }
+        },
+        {
+         "office": {
+          "dateRange": {
+           "end": "2025-03-25",
+           "start": "2025-01-23"
+          },
+          "officeName": {
+           "uri": null,
+           "showAs": "Minister for Defence"
+          }
+         }
+        },
+        {
+         "office": {
+          "dateRange": {
+           "end": "2025-11-18",
+           "start": "2025-03-26"
+          },
+          "officeName": {
+           "uri": null,
+           "showAs": "Minister for Defence"
+          }
+         }
+        },
+        {
+         "office": {
+          "dateRange": {
+           "end": "2025-11-18",
+           "start": "2025-03-26"
+          },
+          "officeName": {
+           "uri": null,
+           "showAs": "Minister for Foreign Affairs and Trade"
+          }
+         }
+        },
+        {
+         "office": {
+          "dateRange": {
+           "end": "2025-03-25",
+           "start": "2025-01-23"
+          },
+          "officeName": {
+           "uri": null,
+           "showAs": "Minister for Foreign Affairs"
+          }
+         }
+        },
+        {
+         "office": {
+          "dateRange": {
+           "end": null,
+           "start": "2025-11-18"
+          },
+          "officeName": {
+           "uri": null,
+           "showAs": "Minister for Finance"
+          }
+         }
+        }
+       ],
+       "committees": []
+      }
+     }
+    ],
+    "firstName": "Simon",
+    "showAs": "Simon Harris",
+    "pId": "SimonHarris"
+   }
+  },
+  {
+   "member": {
+    "memberCode": "Micheál-Martin.D.1989-06-29",
+    "dateOfDeath": null,
+    "image": false,
+    "lastName": "Martin",
+    "wikiTitle": null,
+    "gender": "",
+    "fullName": "Micheál Martin",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Micheál-Martin.D.1989-06-29",
+    "memberships": [
+     {
+      "membership": {
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Micheál-Martin.D.1989-06-29/house/dail/34",
+       "dateRange": {
+        "start": "2024-11-29",
+        "end": null
+       },
+       "house": {
+        "showAs": "34th Dáil",
+        "houseNo": "34",
+        "chamberType": "house",
+        "houseCode": "dail",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34"
+       },
+       "parties": [
+        {
+         "party": {
+          "dateRange": {
+           "end": null,
+           "start": "2024-11-29"
+          },
+          "partyCode": "Fianna_Fáil",
+          "showAs": "Fianna Fáil",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/party/dail/34/Fianna_Fáil"
+         }
+        }
+       ],
+       "represents": [
+        {
+         "represent": {
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34/constituency/Cork-South-Central",
+          "representType": "constituency",
+          "representCode": "Cork-South-Central",
+          "showAs": "Cork South-Central"
+         }
+        }
+       ],
+       "offices": [
+        {
+         "office": {
+          "dateRange": {
+           "end": null,
+           "start": "2025-01-23"
+          },
+          "officeName": {
+           "uri": null,
+           "showAs": "Taoiseach"
+          }
+         }
+        }
+       ],
+       "committees": []
+      }
+     }
+    ],
+    "firstName": "Micheál",
+    "showAs": "Micheál Martin",
+    "pId": "MichaelMartin"
+   }
+  },
+  {
+   "member": {
+    "memberCode": "Mary-Lou-McDonald.D.2011-03-09",
+    "dateOfDeath": null,
+    "image": false,
+    "lastName": "McDonald",
+    "wikiTitle": null,
+    "gender": "",
+    "fullName": "Mary Lou McDonald",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Mary-Lou-McDonald.D.2011-03-09",
+    "memberships": [
+     {
+      "membership": {
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Mary-Lou-McDonald.D.2011-03-09/house/dail/34",
+       "dateRange": {
+        "start": "2024-11-29",
+        "end": null
+       },
+       "house": {
+        "showAs": "34th Dáil",
+        "houseNo": "34",
+        "chamberType": "house",
+        "houseCode": "dail",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34"
+       },
+       "parties": [
+        {
+         "party": {
+          "dateRange": {
+           "end": null,
+           "start": "2024-11-29"
+          },
+          "partyCode": "Sinn_Féin",
+          "showAs": "Sinn Féin",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/party/dail/34/Sinn_Féin"
+         }
+        }
+       ],
+       "represents": [
+        {
+         "represent": {
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34/constituency/Dublin-Central",
+          "representType": "constituency",
+          "representCode": "Dublin-Central",
+          "showAs": "Dublin Central"
+         }
+        }
+       ],
+       "offices": [],
+       "committees": []
+      }
+     }
+    ],
+    "firstName": "Mary Lou",
+    "showAs": "Mary Lou McDonald",
+    "pId": "MaryLouMcDonald"
+   }
+  },
+  {
+   "member": {
+    "memberCode": "Donnchadh-Ó-Laoghaire.D.2016-10-03",
+    "dateOfDeath": null,
+    "image": false,
+    "lastName": "Ó Laoghaire",
+    "wikiTitle": null,
+    "gender": "",
+    "fullName": "Donnchadh Ó Laoghaire",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Donnchadh-Ó-Laoghaire.D.2016-10-03",
+    "memberships": [
+     {
+      "membership": {
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Donnchadh-Ó-Laoghaire.D.2016-10-03/house/dail/34",
+       "dateRange": {
+        "start": "2024-11-29",
+        "end": null
+       },
+       "house": {
+        "showAs": "34th Dáil",
+        "houseNo": "34",
+        "chamberType": "house",
+        "houseCode": "dail",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34"
+       },
+       "parties": [
+        {
+         "party": {
+          "dateRange": {
+           "end": null,
+           "start": "2024-11-29"
+          },
+          "partyCode": "Sinn_Féin",
+          "showAs": "Sinn Féin",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/party/dail/34/Sinn_Féin"
+         }
+        }
+       ],
+       "represents": [
+        {
+         "represent": {
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34/constituency/Cork-South-Central",
+          "representType": "constituency",
+          "representCode": "Cork-South-Central",
+          "showAs": "Cork South-Central"
+         }
+        }
+       ],
+       "offices": [],
+       "committees": []
+      }
+     }
+    ],
+    "firstName": "Donnchadh",
+    "showAs": "Donnchadh Ó Laoghaire",
+    "pId": "DonnchadhOLaoghaire"
+   }
+  }
+ ]
+}

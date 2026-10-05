@@ -1,0 +1,186 @@
+{
+ "head": {
+  "counts": {
+   "divisionCount": 10000,
+   "resultCount": 10000
+  }
+ },
+ "results": [
+  {
+   "division": {
+    "date": "2026-09-30",
+    "category": "Division",
+    "isBill": false,
+    "house": {
+     "showAs": "34th Dáil",
+     "committeeCode": "",
+     "houseCode": "dail",
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34",
+     "chamberType": "house",
+     "houseNo": "34"
+    },
+    "chamber": {
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail",
+     "showAs": "Dáil Éireann"
+    },
+    "voteId": "vote_206",
+    "outcome": "Lost",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/division/house/dail/34/2026-09-30/vote_206",
+    "subject": {
+     "showAs": "Amendment put: ",
+     "uri": null
+    },
+    "datetime": "2026-09-30T09:00:00+01:00",
+    "tellers": "Tellers: Tá, Deputies Richard Boyd Barrett and Sinéad Gibney; Níl, Deputies Mary Butler and Emer Currie.",
+    "voteNote": "",
+    "debate": {
+     "showAs": "Industrial Development (Amendment) and Miscellaneous Provisions Bill 2026: Report Stage",
+     "debateSection": "dbsect_13",
+     "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-09-30/debate/main",
+     "formats": {
+      "xml": {
+       "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-09-30/debate/mul@/main.xml"
+      },
+      "pdf": null
+     }
+    },
+    "tallies": {
+     "taVotes": {
+      "showAs": "Tá",
+      "tally": 65,
+      "members": [
+       {
+        "member": {
+         "showAs": "Ahern, Ciarán.",
+         "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Ciarán-Ahern.D.2024-11-29",
+         "memberCode": "Ciarán-Ahern.D.2024-11-29"
+        }
+       },
+       {
+        "member": {
+         "showAs": "Bacik, Ivana.",
+         "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Ivana-Bacik.S.2007-07-23",
+         "memberCode": "Ivana-Bacik.S.2007-07-23"
+        }
+       }
+      ]
+     },
+     "nilVotes": {
+      "showAs": "Níl",
+      "tally": 78,
+      "members": [
+       {
+        "member": {
+         "showAs": "Aird, William.",
+         "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/William-Aird.D.2024-11-29",
+         "memberCode": "William-Aird.D.2024-11-29"
+        }
+       },
+       {
+        "member": {
+         "showAs": "Ardagh, Catherine.",
+         "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Catherine-Ardagh.S.2016-04-25",
+         "memberCode": "Catherine-Ardagh.S.2016-04-25"
+        }
+       }
+      ]
+     },
+     "staonVotes": {
+      "showAs": "Staon",
+      "tally": 0,
+      "members": []
+     }
+    }
+   },
+   "contextDate": "2026-09-30"
+  },
+  {
+   "division": {
+    "date": "2026-09-30",
+    "category": "Division",
+    "isBill": false,
+    "house": {
+     "showAs": "34th Dáil",
+     "committeeCode": "",
+     "houseCode": "dail",
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34",
+     "chamberType": "house",
+     "houseNo": "34"
+    },
+    "chamber": {
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail",
+     "showAs": "Dáil Éireann"
+    },
+    "voteId": "vote_207",
+    "outcome": "Lost",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/division/house/dail/34/2026-09-30/vote_207",
+    "subject": {
+     "showAs": "Amendment put: ",
+     "uri": null
+    },
+    "datetime": "2026-09-30T09:00:00+01:00",
+    "tellers": "Tellers: Tá, Deputies Richard Boyd Barrett and Sinéad Gibney; Níl, Deputies Mary Butler and Emer Currie.",
+    "voteNote": "",
+    "debate": {
+     "showAs": "Industrial Development (Amendment) and Miscellaneous Provisions Bill 2026: Report Stage (Resumed) and Final Stage",
+     "debateSection": "dbsect_19",
+     "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-09-30/debate/main",
+     "formats": {
+      "xml": {
+       "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-09-30/debate/mul@/main.xml"
+      },
+      "pdf": null
+     }
+    },
+    "tallies": {
+     "taVotes": {
+      "showAs": "Tá",
+      "tally": 65,
+      "members": [
+       {
+        "member": {
+         "showAs": "Ahern, Ciarán.",
+         "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Ciarán-Ahern.D.2024-11-29",
+         "memberCode": "Ciarán-Ahern.D.2024-11-29"
+        }
+       },
+       {
+        "member": {
+         "showAs": "Bacik, Ivana.",
+         "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Ivana-Bacik.S.2007-07-23",
+         "memberCode": "Ivana-Bacik.S.2007-07-23"
+        }
+       }
+      ]
+     },
+     "nilVotes": {
+      "showAs": "Níl",
+      "tally": 78,
+      "members": [
+       {
+        "member": {
+         "showAs": "Aird, William.",
+         "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/William-Aird.D.2024-11-29",
+         "memberCode": "William-Aird.D.2024-11-29"
+        }
+       },
+       {
+        "member": {
+         "showAs": "Ardagh, Catherine.",
+         "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Catherine-Ardagh.S.2016-04-25",
+         "memberCode": "Catherine-Ardagh.S.2016-04-25"
+        }
+       }
+      ]
+     },
+     "staonVotes": {
+      "showAs": "Staon",
+      "tally": 0,
+      "members": []
+     }
+    }
+   },
+   "contextDate": "2026-09-30"
+  }
+ ]
+}
