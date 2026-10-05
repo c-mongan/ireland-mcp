@@ -63,4 +63,21 @@ describe("CKAN modules", () => {
     expect(doc.id).toBe("data-gov-ie:moby-bikes");
     expect(doc.text).toContain("Resources:");
   });
+
+  it("handles CKAN rejections and sparse packages", async () => {
+    const sparse = { success: true, result: { count: 1, results: [{ id: "x", name: "sparse", title: "Sparse", organization: null, notes: null }] } };
+    const extra: Route[] = [
+      { match: /package_search\?q=bad/, body: '{"success":false,"error":{"__type":"Validation Error","message":"bad query"}}' },
+      { match: /package_search\?q=sparse/, body: JSON.stringify(sparse) },
+      { match: /package_show\?id=sparse/, body: JSON.stringify({ success: true, result: sparse.result.results[0] }) }
+    ];
+    const rejected = await callTool(dataGovIeModule, "datagov_search_datasets", { query: "bad" }, fakeFetch(extra));
+    expect(rejected.body.error.code).toBe("BAD_ARGS");
+    expect(rejected.body.error.message).toContain("bad query");
+    const found = await callTool(dataGovIeModule, "datagov_search_datasets", { query: "sparse" }, fakeFetch(extra));
+    expect(found.body.data.datasets[0]).toMatchObject({ publisher: null, licence: null, description: "", formats: [] });
+    expect(found.body.truncated).toBe(false);
+    const shown = await callTool(dataGovIeModule, "datagov_get_dataset", { id: "sparse" }, fakeFetch(extra));
+    expect(shown.body.data).toMatchObject({ resources: [], tags: [], licence_url: null });
+  });
 });
