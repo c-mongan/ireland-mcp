@@ -17,6 +17,11 @@ It does not run in unit tests or CI; the nightly `live-smoke` workflow runs it.
 | nta | nta_get_realtime_summary | SKIP | 0 | `NTA_API_KEY` not set locally |
 | legislation | legislation_list_acts | PASS | 57 | |
 | ppr | ppr_price_stats | PASS | 130 | No index built; used the live per-county CSV fallback |
+| irish-rail | rail_get_departures | PASS | 168 | New source; timing from a later run on the same day |
+| luas | luas_get_forecast | PASS | 290 | New source; timing from a later run on the same day |
+| eirgrid | grid_get_status | PASS | 416 | New source; timing from a later run on the same day |
+| marine | marine_get_buoys | PASS | 313 | New source; timing from a later run on the same day |
+| opw-water | water_get_level | PASS | 705 | New source; timing from a later run on the same day |
 | cross | search | PASS | 658 | |
 | cross | ireland_snapshot | PASS | 268 | |
 

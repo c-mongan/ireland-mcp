@@ -18,6 +18,11 @@ const CASES = [
   ["nta", "nta_get_realtime_summary", { limit: 3 }, (d) => d.entities > 0 || d.trip_updates > 0, { needsEnv: "NTA_API_KEY" }],
   ["legislation", "legislation_list_acts", { year: year - 1, limit: 3 }, (d) => JSON.stringify(d).includes("title")],
   ["ppr", "ppr_price_stats", { county: "Galway" }, (d) => d.count > 0],
+  ["irish-rail", "rail_get_departures", { station: "Dublin Connolly", minutes: 90 }, (d) => d.station?.code === "CNLLY"],
+  ["luas", "luas_get_forecast", { stop: "Heuston" }, (d) => d.stop?.code && Array.isArray(d.inbound)],
+  ["eirgrid", "grid_get_status", { region: "ALL" }, (d) => d.demand_mw > 0],
+  ["marine", "marine_get_buoys", {}, (d) => d.count > 0],
+  ["opw-water", "water_get_level", { station: "Athlone" }, (d) => d.station?.level_m !== null && d.history?.readings > 0],
   ["cross", "search", { query: "population" }, (d) => d.results?.length > 0, { raw: true }],
   ["cross", "ireland_snapshot", { place: "Galway" }, (d) => d.population?.area && d.boundaries?.county]
 ];

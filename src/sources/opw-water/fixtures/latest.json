@@ -1,0 +1,275 @@
+{
+ "type": "FeatureCollection",
+ "crs": {
+  "type": "name",
+  "properties": {
+   "name": "EPSG:4326"
+  }
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "id": 1458,
+   "properties": {
+    "station_ref": "0000001041",
+    "station_name": "Sandy Mills",
+    "sensor_ref": "0001",
+    "region_id": 3,
+    "datetime": "2026-10-05T15:30:00Z",
+    "value": "0.328",
+    "err_code": 99,
+    "url": "/0000001041/0001/",
+    "csv_file": "/data/month/01041_0001.csv"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -7.575758,
+     54.838318
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 896,
+   "properties": {
+    "station_ref": "0000001041",
+    "station_name": "Sandy Mills",
+    "sensor_ref": "0002",
+    "region_id": 3,
+    "datetime": "2026-10-05T15:00:00Z",
+    "value": "14.200",
+    "err_code": 99,
+    "url": "/0000001041/0002/",
+    "csv_file": "/data/month/01041_0002.csv"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -7.575758,
+     54.838318
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 1082,
+   "properties": {
+    "station_ref": "0000001041",
+    "station_name": "Sandy Mills",
+    "sensor_ref": "0003",
+    "region_id": 3,
+    "datetime": "2026-10-05T15:00:00Z",
+    "value": "14.500",
+    "err_code": 99,
+    "url": "/0000001041/0003/",
+    "csv_file": "/data/month/01041_0003.csv"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -7.575758,
+     54.838318
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 1051,
+   "properties": {
+    "station_ref": "0000001041",
+    "station_name": "Sandy Mills",
+    "sensor_ref": "OD",
+    "region_id": 3,
+    "datetime": "2026-10-05T15:30:00Z",
+    "value": "3.983",
+    "err_code": 99,
+    "url": "/0000001041/OD/",
+    "csv_file": "/data/month/01041_OD.csv"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -7.575758,
+     54.838318
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 1460,
+   "properties": {
+    "station_ref": "0000001043",
+    "station_name": "Ballybofey",
+    "sensor_ref": "0001",
+    "region_id": 3,
+    "datetime": "2026-10-05T15:30:00Z",
+    "value": "0.944",
+    "err_code": 99,
+    "url": "/0000001043/0001/",
+    "csv_file": "/data/month/01043_0001.csv"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -7.790749,
+     54.799769
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 1026,
+   "properties": {
+    "station_ref": "0000001043",
+    "station_name": "Ballybofey",
+    "sensor_ref": "0002",
+    "region_id": 3,
+    "datetime": "2026-10-05T15:00:00Z",
+    "value": "13.500",
+    "err_code": 99,
+    "url": "/0000001043/0002/",
+    "csv_file": "/data/month/01043_0002.csv"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -7.790749,
+     54.799769
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 879,
+   "properties": {
+    "station_ref": "0000001043",
+    "station_name": "Ballybofey",
+    "sensor_ref": "0003",
+    "region_id": 3,
+    "datetime": "2026-10-05T15:00:00Z",
+    "value": "14.100",
+    "err_code": 99,
+    "url": "/0000001043/0003/",
+    "csv_file": "/data/month/01043_0003.csv"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -7.790749,
+     54.799769
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 917,
+   "properties": {
+    "station_ref": "0000001043",
+    "station_name": "Ballybofey",
+    "sensor_ref": "OD",
+    "region_id": 3,
+    "datetime": "2026-10-05T15:30:00Z",
+    "value": "14.188",
+    "err_code": 99,
+    "url": "/0000001043/OD/",
+    "csv_file": "/data/month/01043_OD.csv"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -7.790749,
+     54.799769
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 49,
+   "properties": {
+    "station_ref": "0000025017",
+    "station_name": "Banagher",
+    "sensor_ref": "0001",
+    "region_id": 2,
+    "datetime": "2026-10-05T15:45:00Z",
+    "value": "2.114",
+    "err_code": 99,
+    "url": "/0000025017/0001/",
+    "csv_file": "/data/month/25017_0001.csv"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -7.993647,
+     53.193787
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 50,
+   "properties": {
+    "station_ref": "0000025017",
+    "station_name": "Banagher",
+    "sensor_ref": "0002",
+    "region_id": 2,
+    "datetime": "2026-10-05T15:00:00Z",
+    "value": "15.900",
+    "err_code": 99,
+    "url": "/0000025017/0002/",
+    "csv_file": "/data/month/25017_0002.csv"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -7.993647,
+     53.193787
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 51,
+   "properties": {
+    "station_ref": "0000025017",
+    "station_name": "Banagher",
+    "sensor_ref": "0003",
+    "region_id": 2,
+    "datetime": "2026-10-05T15:45:00Z",
+    "value": "13.890",
+    "err_code": 99,
+    "url": "/0000025017/0003/",
+    "csv_file": "/data/month/25017_0003.csv"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -7.993647,
+     53.193787
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": 377,
+   "properties": {
+    "station_ref": "0000025017",
+    "station_name": "Banagher",
+    "sensor_ref": "OD",
+    "region_id": 2,
+    "datetime": "2026-10-05T15:45:00Z",
+    "value": "32.444",
+    "err_code": 99,
+    "url": "/0000025017/OD/",
+    "csv_file": "/data/month/25017_OD.csv"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -7.993647,
+     53.193787
+    ]
+   }
+  }
+ ]
+}

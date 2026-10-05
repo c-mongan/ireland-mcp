@@ -12,8 +12,13 @@ import { ntaModule } from "./sources/nta/index.js";
 import { pprModule } from "./sources/ppr/index.js";
 import { oireachtasModule } from "./sources/oireachtas/index.js";
 import { smartDublinModule } from "./sources/smart-dublin/index.js";
+import { irishRailModule } from "./sources/irish-rail/index.js";
+import { luasModule } from "./sources/luas/index.js";
+import { eirgridModule } from "./sources/eirgrid/index.js";
+import { marineModule } from "./sources/marine/index.js";
+import { opwWaterModule } from "./sources/opw-water/index.js";
 
-export const sourceModules: SourceModule[] = [csoModule, oireachtasModule, geohiveModule, dataGovIeModule, smartDublinModule, metModule, ntaModule, legislationModule, pprModule];
+export const sourceModules: SourceModule[] = [csoModule, oireachtasModule, geohiveModule, dataGovIeModule, smartDublinModule, metModule, ntaModule, legislationModule, pprModule, irishRailModule, luasModule, eirgridModule, marineModule, opwWaterModule];
 
 export function createAppServer(context: ToolContext, telemetry?: TelemetrySink): McpServer {
   return buildServer({

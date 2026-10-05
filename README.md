@@ -9,8 +9,9 @@ Irish public data. Ask "What's the population of Galway?", "Any weather warnings
 today?" or "What did houses sell for in Ennis last year?" and the assistant gets
 real figures, with the source, licence and retrieval time attached.
 
-- **9 sources, 33 tools.** CSO, Oireachtas, GeoHive, data.gov.ie, Smart Dublin,
-  Met Éireann, NTA, the Irish Statute Book and the Property Price Register.
+- **14 sources, 41 tools.** CSO, Oireachtas, GeoHive, data.gov.ie, Smart Dublin,
+  Met Éireann, NTA, the Irish Statute Book, the Property Price Register, Irish Rail,
+  Luas, EirGrid, Marine Institute weather buoys and OPW river levels.
 - **Two ways to run it.** A hosted Streamable HTTP endpoint (`/mcp`), or locally
   over stdio with `npx -y ireland-mcp`.
 - **No accounts.** Nothing to sign up for. Nothing is written anywhere.
@@ -34,6 +35,11 @@ real figures, with the source, licence and retrieval time attached.
 | NTA | `nta_get_realtime_summary`, `nta_get_trip_updates` | Live GTFS-R delays and cancellations (operator key) |
 | Irish Statute Book | `legislation_list_acts`, `legislation_get_act`, `legislation_get_section` | Acts by year, Act and section text via ELI |
 | Property Price Register | `ppr_search_sales`, `ppr_price_stats` | Residential sales since 2010, area statistics |
+| Irish Rail | `rail_find_station`, `rail_get_departures` | Live train departures for every station |
+| Luas (TII) | `luas_get_forecast`, `luas_list_stops` | Live tram arrivals, stop list, service messages |
+| EirGrid | `grid_get_status` | Live demand, wind generation and carbon intensity |
+| Marine Institute | `marine_get_buoys` | Offshore wind, waves, air and sea temperature |
+| OPW (waterlevel.ie) | `water_find_stations`, `water_get_level` | River and lake levels at ~460 gauges, last 36 hours |
 | Cross-source | `search`, `fetch`, `list_sources`, `ireland_snapshot`, `nearby` | Search everything, fetch by id, place summaries |
 
 `search` and `fetch` follow the ChatGPT deep research contract. `search` returns

@@ -10,7 +10,12 @@ const EXAMPLES = {
   met_get_forecast: { lat: 53.35, lon: -6.26, hours: 12 },
   met_get_warnings: {},
   legislation_list_acts: { year: 2024, limit: 10 },
-  ppr_price_stats: { county: "Galway" }
+  ppr_price_stats: { county: "Galway" },
+  rail_get_departures: { station: "Dublin Connolly" },
+  luas_get_forecast: { stop: "Heuston" },
+  grid_get_status: {},
+  marine_get_buoys: {},
+  water_get_level: { station: "Athlone" }
 };
 
 const $ = (id) => document.getElementById(id);
