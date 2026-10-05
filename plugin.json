@@ -1,0 +1,11 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "ireland-mcp",
+  "version": "0.1.0",
+  "description": "Skills and a hosted read-only MCP server for Irish public data: CSO statistics, property prices, Oireachtas, Met Éireann, transport, EirGrid, OPW water levels and more.",
+  "author": { "name": "Conor Mongan", "url": "https://github.com/c-mongan" },
+  "homepage": "https://github.com/c-mongan/ireland-mcp",
+  "repository": "https://github.com/c-mongan/ireland-mcp",
+  "license": "MIT",
+  "keywords": ["ireland", "open-data", "mcp", "cso", "property-prices", "oireachtas", "met-eireann", "skills"]
+}

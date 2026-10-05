@@ -185,6 +185,16 @@ Local alternative: `{ "type": "stdio", "command": "npx", "args": ["-y", "ireland
 The hosted app also reads `RATE_LIMIT_PER_MINUTE` (default 60 per IP),
 `AzureWebJobsStorage__accountName`, `CACHE_TABLE_NAME` and `PPR_CONTAINER`.
 
+## Skills & plugins
+
+This repo is also a plugin and plugin marketplace: it bundles the hosted MCP server with nine
+[Agent Skills](skills/) (area report, house prices, TD briefing, commute and weather, grid, flood watch,
+CSO charts, legislation, open-data finder).
+
+- Claude Code: `/plugin marketplace add c-mongan/ireland-mcp` then `/plugin install ireland-mcp@ireland-mcp`
+- Copilot CLI: `copilot plugin install c-mongan/ireland-mcp`
+- VS Code Agent Plugins and claude.ai skill zips (`npm run skills:package`): see [docs/plugins.md](docs/plugins.md)
+
 ## Run from source
 
 Needs Node 22.12 or later.
