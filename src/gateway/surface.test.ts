@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { z } from "zod";
 import { connectClient } from "../../test/helpers/mcpClient.js";
 import { fakeFetch } from "../../test/helpers/fakeFetch.js";
-import { createAppServer, sourceModules } from "../registry.js";
+import { appModules, createAppServer, sourceModules } from "../registry.js";
 import { DOMAINS, listOperations, exampleArgs } from "./catalogue.js";
 import { createContext } from "./context.js";
 import { applyBudget, envelope } from "./envelope.js";
@@ -45,6 +45,13 @@ describe("default lean surface", () => {
     for (const t of tools) {
       expect(t.annotations?.readOnlyHint).toBe(true);
       expect(t.description!.length).toBeGreaterThan(15);
+    }
+  });
+
+  it("indexes every operation by source in the ireland_call description, so models can call it directly", async () => {
+    const call = (await listTools()).find((t) => t.name === "ireland_call")!;
+    for (const { source, tool } of listOperations(appModules().modules)) {
+      expect(call.description).toMatch(new RegExp(`${source}: [^;]*\\b${tool.name}\\b`));
     }
   });
 
