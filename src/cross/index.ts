@@ -96,6 +96,14 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
       })
   });
 
+  type Section = { data: Record<string, unknown>; url: string; cached?: boolean; stale?: boolean };
+  const runSourceTool = (source: string, tool: string, args: Record<string, unknown>, ctx: ToolContext): Promise<Section> => {
+    const t = byId.get(source)?.tools.find((x) => x.name === tool);
+    return t ? (t.handler(args, ctx) as Promise<Section>) : Promise.reject(new ToolError("NOT_FOUND", `${source} is not enabled.`));
+  };
+  const MONUMENT_RADIUS_M = 500;
+  const NEARBY_ITEMS = 5;
+
   async function nearbyData(ctx: ToolContext, lat: number, lon: number, hours: number) {
     const station = nearestStation(lat, lon);
     const [bounds, forecast] = await Promise.allSettled([boundariesAt(ctx, lat, lon), forecastAt(ctx, lat, lon, hours)]);
@@ -109,19 +117,39 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
     };
   }
 
+  /** Monuments and protected sites for nearby; compact, and each section fails on its own. */
+  async function placeLayers(ctx: ToolContext, lat: number, lon: number) {
+    const [smr, npws] = await Promise.allSettled([
+      runSourceTool("heritage", "heritage_monuments_near", { lat, lon, radius_m: MONUMENT_RADIUS_M, limit: NEARBY_ITEMS }, ctx),
+      runSourceTool("environment-sites", "protected_sites_at", { lat, lon, limit: NEARBY_ITEMS }, ctx)
+    ]);
+    const sources = [
+      ...(smr.status === "fulfilled" ? [cite(byId.get("heritage")!.info, smr.value.url)] : []),
+      ...(npws.status === "fulfilled" ? [cite(byId.get("environment-sites")!.info, npws.value.url)] : [])
+    ];
+    return {
+      monuments:
+        smr.status === "fulfilled"
+          ? { radius_m: MONUMENT_RADIUS_M, count: smr.value.data.count, items: smr.value.data.monuments }
+          : settledSection(smr),
+      protected_sites: npws.status === "fulfilled" ? { count: npws.value.data.count, items: npws.value.data.sites } : settledSection(npws),
+      sources
+    };
+  }
+
   const nearby = defineTool({
     name: "nearby",
     pinned: true,
     title: "What is at this location",
     description:
-      "For a WGS84 point in Ireland: county, local authority, constituency, electoral division, small area and settlement (GeoHive), the nearest Met Éireann station and the next hours of forecast.",
+      "For a WGS84 point in Ireland: county, local authority, constituency, electoral division, small area and settlement (GeoHive), the nearest Met Éireann station and forecast, recorded monuments within 500 m (SMR) and NPWS protected sites at the point.",
     inputSchema: {
       lat: z.number().min(-90).max(90).describe("Latitude, e.g. 53.3498."),
       lon: z.number().min(-180).max(180).describe("Longitude, e.g. -6.2603."),
       hours: z.number().int().min(1).max(48).default(6).describe("Forecast hours to include.")
     },
     handler: async ({ lat, lon, hours }, ctx) => {
-      const d = await nearbyData(ctx, lat, lon, hours);
+      const [d, layers] = await Promise.all([nearbyData(ctx, lat, lon, hours), placeLayers(ctx, lat, lon)]);
       return envelope(crossInfo, {
         data: {
           lat,
@@ -129,7 +157,9 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
           boundaries: d.boundaries,
           nearest_met_station: d.nearest_met_station,
           forecast: d.forecast,
-          sources: [cite(geohiveInfo, "https://www.geohive.ie/"), cite(metInfo, d.forecastUrl ?? metInfo.homepage)]
+          monuments: layers.monuments,
+          protected_sites: layers.protected_sites,
+          sources: [cite(geohiveInfo, "https://www.geohive.ie/"), cite(metInfo, d.forecastUrl ?? metInfo.homepage), ...layers.sources]
         },
         url: crossInfo.homepage,
         cached: d.cached,
