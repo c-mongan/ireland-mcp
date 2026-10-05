@@ -25,6 +25,11 @@ const CASES = [
   ["eirgrid", "grid_get_status", { region: "ALL" }, (d) => d.demand_mw > 0],
   ["marine", "marine_get_buoys", {}, (d) => d.count > 0],
   ["opw-water", "water_get_level", { station: "Athlone" }, (d) => d.station?.level_m !== null && d.history?.readings > 0],
+  ["planning", "planning_search", { lat: 53.3498, lon: -6.2603, radius_m: 1000, text: "apartments", from: "2024-01-01", limit: 2 }, (d) => d.count > 0],
+  ["planning", "planning_get", { application_ref: "WEB1741/25" }, (d) => d.count > 0],
+  ["census-areas", "census_small_area_at", { lat: 53.3498, lon: -6.2603 }, (d) => d.area?.small_area?.population > 0],
+  ["heritage", "heritage_monuments_near", { lat: 53.3498, lon: -6.2603, radius_m: 1000, limit: 2 }, (d) => d.count > 0],
+  ["environment-sites", "protected_sites_near", { lat: 53.33, lon: -6.16, radius_m: 5000, limit: 4 }, (d) => d.count > 0],
   ["cross", "search", { query: "population" }, (d) => d.results?.length > 0, { raw: true }],
   ["cross", "ireland_snapshot", { place: "Galway" }, (d) => d.population?.area && d.boundaries?.county]
 ];

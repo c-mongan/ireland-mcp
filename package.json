@@ -1,7 +1,7 @@
 {
   "name": "ireland-mcp",
   "version": "1.0.0",
-  "description": "Read-only Model Context Protocol server for Irish public data: CSO, Oireachtas, GeoHive, data.gov.ie, Smart Dublin, Met Éireann, NTA, Irish Statute Book and the Property Price Register.",
+  "description": "Read-only Model Context Protocol server for Irish public data: CSO, Oireachtas, GeoHive, data.gov.ie, Smart Dublin, Met Éireann, planning, heritage, environment and more.",
   "license": "MIT",
   "author": "Conor Mongan",
   "type": "module",

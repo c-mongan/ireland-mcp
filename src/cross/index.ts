@@ -88,9 +88,7 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
             summary: m.summary,
             licence: m.info.licence,
             attribution: m.info.attribution,
-            homepage: m.info.homepage,
-            tools: m.tools.map((t) => t.name),
-            searchable: Boolean(m.search)
+            tools: m.tools.map((t) => t.name)
           }))
         },
         url: crossInfo.homepage,
