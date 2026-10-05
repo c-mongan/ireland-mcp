@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+name: ireland-mcp
+metadata:
+  template: ireland-mcp@1.0.0
+services:
+  api:
+    project: .
+    language: ts
+    host: function
+infra:
+  provider: bicep
+  path: infra
