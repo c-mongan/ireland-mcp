@@ -47,7 +47,7 @@ Transport: Streamable HTTP. Auth: none. Writes: none.
 | Cursor | Deeplink: [`cursor://anysphere.cursor-deeplink/mcp/install?name=ireland&config=...`](cursor://anysphere.cursor-deeplink/mcp/install?name=ireland&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vZnVuYy1pcmVsYW5kLW1jcC1hb2ZzanB3Z3k0aHZhLmF6dXJld2Vic2l0ZXMubmV0L21jcCJ9). Decoded config: `{ "type": "http", "url": "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp" }`. |
 | GitHub Copilot CLI | `copilot mcp add --transport http ireland https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp` or put the JSON below in `~/.copilot/mcp-config.json`. |
 | Claude Code | `claude mcp add --transport http ireland https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp` |
-| Local stdio | npm package target: `npx -y ireland-mcp` after npm publication. Today, run from source: `npm ci && npm run build && node dist/src/cli.js`. Add `--toolsets=cso,irish-rail` or `IRELAND_MCP_TOOLSETS=all` if you want typed tools listed locally. |
+| Local stdio | npm package target: `npx -y ireland-mcp` after npm publication. Today, run from source: `npm ci && npm run build && node dist/src/cli.js`. To list typed tools locally, run `node dist/src/cli.js --toolsets=cso,irish-rail` or `IRELAND_MCP_TOOLSETS=all node dist/src/cli.js` after building. |
 
 Portable Copilot / MCP JSON:
 
@@ -81,7 +81,7 @@ Need typed tools anyway?
 | Source toolsets | `/mcp?toolsets=cso,irish-rail` lists selected typed tools too. |
 | One source path | `/mcp/x/{source}` lists that source's typed tools, for example `/mcp/x/met-eireann`. |
 | Everything | `/mcp?toolsets=all` lists all 74 tools and is useful for debugging, not routine chat. |
-| Local stdio | From source: `node dist/src/cli.js --toolsets=cso` or `IRELAND_MCP_TOOLSETS=all` (npm package not yet published). |
+| Local stdio | From source: `node dist/src/cli.js --toolsets=cso` or `IRELAND_MCP_TOOLSETS=all node dist/src/cli.js` (npm package not yet published). |
 
 `max_tokens` defaults to about 2,000 output tokens and can be set from 100 to 8,000. Large results return `truncated`, counts and narrowing hints instead of flooding the context.
 
