@@ -25,6 +25,7 @@ export const INSTRUCTIONS = [
 ].join(" ");
 
 const ANNOTATIONS = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true } as const;
+const OUTPUT_SCHEMA = z.object({}).passthrough();
 const maxTokensSchema = z
   .number()
   .int()
@@ -130,6 +131,7 @@ function registerTyped(server: McpServer, tool: AnyTool, source: string, context
       title: tool.title,
       description: tool.description,
       inputSchema: { ...tool.inputSchema, max_tokens: maxTokensSchema },
+      outputSchema: OUTPUT_SCHEMA,
       annotations: { title: tool.title, ...ANNOTATIONS }
     },
     async (args: unknown) => runTool(tool, source, args, context, sink)
@@ -199,6 +201,7 @@ function registerMetaTools(
       title: "Catalogue of Irish data sources",
       description: `List sources and their operations, grouped by domain: ${DOMAINS.join(", ")}. Start here.`,
       inputSchema: { domain: z.enum(DOMAINS).optional().describe("Only this domain.") },
+      outputSchema: OUTPUT_SCHEMA,
       annotations: { title: "Catalogue of Irish data sources", ...ANNOTATIONS }
     },
     async ({ domain }) => guarded(() => catalogueOf(modules, domain))
@@ -210,6 +213,7 @@ function registerMetaTools(
       title: "Describe an operation",
       description: "Argument JSON schema, description and an example for one source operation.",
       inputSchema: { source: z.string().describe("Source id, e.g. 'cso'."), operation: z.string().describe("Operation, e.g. 'cso_get_data'.") },
+      outputSchema: OUTPUT_SCHEMA,
       annotations: { title: "Describe an operation", ...ANNOTATIONS }
     },
     async ({ source, operation }) => guarded(() => describeOperation(findOperation(modules, source, operation)))
@@ -226,6 +230,7 @@ function registerMetaTools(
         args: z.record(z.string(), z.unknown()).optional().describe("Operation arguments."),
         max_tokens: maxTokensSchema
       },
+      outputSchema: OUTPUT_SCHEMA,
       annotations: { title: "Call an operation", ...ANNOTATIONS }
     },
     async ({ source, operation, args, max_tokens }) => {
@@ -255,6 +260,7 @@ function registerMetaTools(
       title: "About this server",
       description: "Licence, attribution, status URL and how to enable typed toolsets.",
       inputSchema: {},
+      outputSchema: OUTPUT_SCHEMA,
       annotations: { title: "About this server", ...ANNOTATIONS }
     },
     async () =>

@@ -80,8 +80,17 @@ function compactProject(p: RawProject | DetailProject) {
 }
 
 async function getJson<T>(ctx: ToolContext, url: string) {
-  const result = await ctx.cachedJson<T>(url, TTL, { label: "Kohesio" });
-  return { url, value: result.value, cached: result.cached, stale: result.stale };
+  try {
+    const result = await ctx.cachedJson<T>(url, TTL, { label: "Kohesio" });
+    return { url, value: result.value, cached: result.cached, stale: result.stale };
+  } catch (error) {
+    if (error instanceof ToolError && error.message.includes("HTTP 403")) {
+      throw new ToolError("UPSTREAM_DOWN", "Kohesio returned HTTP 403.", {
+        hint: "Kohesio blocks some cloud-hosted IPs; run Ireland MCP locally (npx/stdio) for this source."
+      });
+    }
+    throw error;
+  }
 }
 
 const searchTool = defineTool({

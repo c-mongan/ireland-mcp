@@ -3,7 +3,7 @@ import { DAY } from "../../gateway/context.js";
 import { envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js";
 import { defineTool, type FetchedDocument, type SearchHit, type SourceModule, type ToolContext } from "../../gateway/module.js";
 
-const BASE = "https://api.worldbank.org/v2";
+const BASE = "https://data360api.worldbank.org/data360/data";
 const TTL = DAY;
 const CURATED = [
   { id: "SP.POP.TOTL", name: "Population, total" },
@@ -22,13 +22,35 @@ export const worldBankInfo: SourceInfo = {
   homepage: "https://data.worldbank.org/country/ireland"
 };
 
-type IndicatorRow = { indicator?: { id?: string; value?: string }; country?: { id?: string; value?: string }; countryiso3code?: string; date?: string; value?: number | null; unit?: string; obs_status?: string; decimal?: number };
-type WbResponse = [{ page?: number; pages?: number; per_page?: number | string; total?: number; lastupdated?: string }, IndicatorRow[]];
-function rows(body: WbResponse): IndicatorRow[] { return Array.isArray(body?.[1]) ? body[1] : []; }
-function compact(r: IndicatorRow) { return { indicator: r.indicator?.id ?? null, name: r.indicator?.value ?? null, country: r.countryiso3code ?? r.country?.id ?? null, year: r.date ?? null, value: r.value ?? null }; }
+type IndicatorRow = { INDICATOR?: string; REF_AREA?: string; TIME_PERIOD?: string; OBS_VALUE?: string | number | null; UNIT_MEASURE?: string | null };
+type Data360Response = { count?: number; value?: IndicatorRow[] };
+const indicatorName = (id: string) => CURATED.find((i) => i.id === id)?.name ?? id;
+const data360Id = (id: string) => `WB_WDI_${id.replaceAll(".", "_")}`;
+const wdiId = (id: string | undefined) => id?.replace(/^WB_WDI_/, "").replaceAll("_", ".") ?? null;
+function rows(body: Data360Response, last: number): IndicatorRow[] {
+  return (body.value ?? [])
+    .filter((r) => r.OBS_VALUE !== null && r.OBS_VALUE !== undefined)
+    .sort((a, b) => Number(b.TIME_PERIOD ?? 0) - Number(a.TIME_PERIOD ?? 0))
+    .slice(0, last);
+}
+function compact(r: IndicatorRow) {
+  const indicator = wdiId(r.INDICATOR);
+  const value = typeof r.OBS_VALUE === "number" ? r.OBS_VALUE : Number(r.OBS_VALUE);
+  return {
+    indicator,
+    name: indicator ? indicatorName(indicator) : null,
+    country: r.REF_AREA ?? null,
+    year: r.TIME_PERIOD ?? null,
+    value: Number.isFinite(value) ? value : null,
+    unit: r.UNIT_MEASURE ?? null
+  };
+}
 async function indicator(ctx: ToolContext, country: string, id: string, params: Record<string, string>) {
-  const url = `${BASE}/country/${encodeURIComponent(country)}/indicator/${encodeURIComponent(id)}?${new URLSearchParams({ format: "json", ...params }).toString()}`;
-  const result = await ctx.cachedJson<WbResponse>(url, TTL, { label: "World Bank" });
+  const url = `${BASE}?${new URLSearchParams({ DATABASE_ID: "WB_WDI", INDICATOR: data360Id(id), REF_AREA: country, ...params }).toString()}`;
+  const result = await ctx.cachedJson<Data360Response>(url, TTL, {
+    label: "World Bank Data360",
+    headers: { "user-agent": "Mozilla/5.0 (compatible; ireland-mcp/1.0; +https://github.com/c-mongan/ireland-mcp)" }
+  });
   return { url, value: result.value, cached: result.cached, stale: result.stale };
 }
 
@@ -43,9 +65,8 @@ const indicatorTool = defineTool({
     last: z.number().int().min(1).max(MAX_LIMIT).default(10)
   },
   handler: async ({ indicator: id, country, last }, ctx) => {
-    const result = await indicator(ctx, country, id, { per_page: String(last), MRV: String(last) });
-    const meta = result.value[0] ?? {};
-    return envelope(worldBankInfo, { data: { total: meta.total ?? rows(result.value).length, last_updated: meta.lastupdated ?? null, observations: rows(result.value).map(compact) }, url: result.url, cached: result.cached, stale: result.stale });
+    const result = await indicator(ctx, country, id, { top: "200" });
+    return envelope(worldBankInfo, { data: { total: result.value.count ?? rows(result.value, last).length, last_updated: null, observations: rows(result.value, last).map(compact) }, url: result.url, cached: result.cached, stale: result.stale });
   }
 });
 
@@ -55,9 +76,9 @@ const profileTool = defineTool({
   description: "Fetch a compact Ireland profile from curated World Bank indicators: population, GDP, GDP per capita, unemployment, inflation and CO2 per capita.",
   inputSchema: { last: z.number().int().min(1).max(10).default(1) },
   handler: async ({ last }, ctx) => {
-    const results = await Promise.all(CURATED.map((i) => indicator(ctx, "IRL", i.id, { per_page: String(last), MRV: String(last) }).then((r) => ({ info: i, result: r }))));
+    const results = await Promise.all(CURATED.map((i) => indicator(ctx, "IRL", i.id, { top: "200" }).then((r) => ({ info: i, result: r }))));
     return envelope(worldBankInfo, {
-      data: { indicators: results.map(({ info, result }) => ({ id: info.id, name: info.name, observations: rows(result.value).map(compact) })) },
+      data: { indicators: results.map(({ info, result }) => ({ id: info.id, name: info.name, observations: rows(result.value, last).map(compact) })) },
       url: worldBankInfo.homepage,
       cached: results.every((r) => r.result.cached),
       stale: results.some((r) => r.result.stale)
@@ -76,8 +97,8 @@ export const worldBankModule: SourceModule = {
     return CURATED.filter((i) => `${i.id} ${i.name}`.toLowerCase().includes(q)).slice(0, limit).map((i) => ({ id: `${worldBankInfo.id}:${i.id}`, title: i.name, url: `${worldBankInfo.homepage}?indicator=${i.id}` }));
   },
   async fetchById(key: string, ctx: ToolContext): Promise<FetchedDocument> {
-    const result = await indicator(ctx, "IRL", key, { per_page: "10", MRV: "10" });
-    const observations = rows(result.value).map(compact);
+    const result = await indicator(ctx, "IRL", key, { top: "200" });
+    const observations = rows(result.value, 10).map(compact);
     return { id: `${worldBankInfo.id}:${key}`, title: `${key} for Ireland`, text: JSON.stringify(observations, null, 2), url: result.url, metadata: { source: worldBankInfo.id, indicator: key } };
   }
 };

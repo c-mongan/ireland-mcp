@@ -108,7 +108,7 @@ Generated from `src/registry.ts` and the 28 source modules. The default `nearby`
 | stats | `pobal` | [Pobal HP Deprivation Index 2022](https://data.gov.ie/dataset/pobal-hp-deprivation-index-scores-2022) | 1 | CC BY 4.0 |
 | stats | `data-gov-ie` | [data.gov.ie](https://data.gov.ie) | 3 | Per dataset, mostly CC BY 4.0 |
 | economy | `cro` | [Companies Registration Office open data](https://opendata.cro.ie) | 3 | CC BY 4.0 |
-| economy | `kohesio` | [European Commission Kohesio](https://kohesio.ec.europa.eu/) | 2 | EU reuse policy / CC BY 4.0 compatible |
+| economy | `kohesio` | [European Commission Kohesio](https://kohesio.ec.europa.eu/) — may block some cloud-hosted IPs; use local stdio if hosted calls return 403 | 2 | EU reuse policy / CC BY 4.0 compatible |
 | stats | `smart-dublin` | [Smart Dublin open data](https://data.smartdublin.ie) | 3 | Per dataset, mostly CC BY 4.0 |
 | stats | `census-areas` | [CSO Census 2022 small areas / Tailte Éireann](https://data-osi.opendata.arcgis.com/datasets/osi::cso-small-areas-national-statistical-boundaries-2022-generalised-20m) | 1 | CC BY 4.0 |
 | law/politics | `oireachtas` | [Houses of the Oireachtas Open Data API](https://api.oireachtas.ie) | 5 | Oireachtas Open Data PSI Licence |
@@ -181,6 +181,7 @@ npm run dev:http     # local HTTP dev server, MCP at /mcp
 | `npm run inspector:check` | MCP Inspector conformance. |
 | `npm run measure:tools [-- all]` | Measure default or all-tool `tools/list`. |
 | `npm run live:sanity` | One real call per source through `ireland_call`; writes [docs/live-sanity.md](docs/live-sanity.md). |
+| `npm run live:all [-- --url https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp]` | Real MCP client proof for every catalogue operation; writes [docs/live-all-ops.md](docs/live-all-ops.md). |
 | `npm run eval` | Promptfoo evaluation; default surface unless `EVAL_TOOLSETS=all`. |
 
 ### Eval results

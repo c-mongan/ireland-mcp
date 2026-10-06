@@ -44,7 +44,7 @@ export function defaultProbes(env: Record<string, string | undefined>): Probe[] 
   const ntaKey = env.NTA_API_KEY;
   return [
     { source: "cso", url: `${CSO_REST}/PxStat.Data.Cube_API.ReadMetadata/F1001/JSON-stat/2.0/en` },
-    { source: "world-bank", url: "https://api.worldbank.org/v2/country/IRL/indicator/SP.POP.TOTL?format=json&per_page=1" },
+    { source: "world-bank", url: "https://data360api.worldbank.org/data360/data?DATABASE_ID=WB_WDI&INDICATOR=WB_WDI_SP_POP_TOTL&REF_AREA=IRL&top=1" },
     { source: "eurostat", url: "https://ec.europa.eu/eurostat/api/dissemination/catalogue/toc/txt?lang=en" },
     { source: "ecb", url: "https://data-api.ecb.europa.eu/service/data/EXR/D.USD.EUR.SP00.A?format=jsondata&lastNObservations=1" },
     { source: "pobal", url: "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&limit=1" },
