@@ -17,7 +17,7 @@ const routes: Route[] = [
     file: fx("geohive", `point-${layer.service}.json`)
   })),
   { match: /locationforecast\?lat=53\.3498;long=-6\.2603$/, file: fx("met-eireann", "forecast-dublin.xml") },
-  { match: /warning_IRELAND\.json/, file: fx("met-eireann", "warnings-synthetic.json") },
+  { match: /prodapi\.met\.ie\/v2\/warnings\//, file: fx("met-eireann", "warnings-synthetic.json") },
   { match: /ReadMetadata\/F1001\//, file: fx("cso", "metadata-F1001.json") },
   { match: (url, init) => url.includes("api.jsonrpc") && String(init?.body).includes("ReadDataset"), file: fx("cso", "data-F1001-dublin.json") }
 ];
@@ -76,7 +76,8 @@ describe("cross-source tools", () => {
     expect(body.data.population.area).toBe("Dublin");
     expect(body.data.boundaries.county.name).toBe("Dublin");
     expect(body.data.forecast.hours.length).toBe(6);
-    expect(Array.isArray(body.data.national_warnings)).toBe(true);
+    expect(body.data.national_warnings).toHaveLength(1);
+    expect(body.data.national_warnings[0].type).toBe("Wind");
     expect(body.data.sources.map((s: { source: string }) => s.source)).toHaveLength(3);
   });
 

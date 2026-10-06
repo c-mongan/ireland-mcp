@@ -226,7 +226,7 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
           forecast: near.forecast,
           national_warnings:
             warnings.status === "fulfilled"
-              ? warnings.value.warnings.map((w) => ({ level: w.level, type: w.type, headline: w.headline, regions: w.region_codes, expiry: w.expiry }))
+              ? warnings.value.warnings.filter((w) => w.category === "national").map((w) => ({ level: w.level, type: w.type, headline: w.headline, regions: w.region_codes, expiry: w.expiry }))
               : settledSection(warnings),
           sources: [
             ...(pop && byId.get("cso") ? [cite(byId.get("cso")!.info, pop.url)] : []),

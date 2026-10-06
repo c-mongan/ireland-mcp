@@ -1,21 +1,31 @@
 /** Fixed-window per-key limiter. Good enough for one instance; the instance cap bounds the total. */
 export class RateLimiter {
+  private nextPruneAt = 0;
   private readonly windows = new Map<string, { start: number; count: number }>();
 
   constructor(
     private readonly limitPerWindow: number = 60,
     private readonly windowMs: number = 60_000,
-    private readonly now: () => number = Date.now
+    private readonly now: () => number = Date.now,
+    private readonly maxEntries: number = 10_000
   ) {}
 
   /** Charges `cost` requests (e.g. the size of a JSON-RPC batch) against the key's window. */
   check(key: string, cost = 1): { allowed: boolean; retryAfterSeconds: number; remaining: number } {
     const now = this.now();
     let window = this.windows.get(key);
+    if (!window && this.windows.size >= this.maxEntries) {
+      if (now >= this.nextPruneAt) {
+        this.prune(now);
+        this.nextPruneAt = now + Math.min(1000, this.windowMs);
+      }
+      if (this.windows.size >= this.maxEntries) {
+        return { allowed: false, retryAfterSeconds: 1, remaining: 0 };
+      }
+    }
     if (!window || now - window.start >= this.windowMs) {
       window = { start: now, count: 0 };
       this.windows.set(key, window);
-      if (this.windows.size > 10_000) this.prune(now);
     }
     window.count += Math.max(1, cost);
     const retryAfterSeconds = Math.max(1, Math.ceil((window.start + this.windowMs - now) / 1000));

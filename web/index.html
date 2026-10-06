@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ireland MCP — Every Irish Public Dataset, One Endpoint</title>
-  <meta name="description" content="Every Irish public dataset, one MCP endpoint. No keys, no login. Install Ireland MCP in Claude, ChatGPT, Copilot, Cursor, VS Code, Gemini CLI, Windsurf and other agents.">
+  <title>Ireland MCP — Irish public data, ready to query</title>
+  <meta name="description" content="Irish public data, ready to query. Install Ireland MCP in Claude, ChatGPT, Copilot, Cursor, VS Code, Gemini CLI, Windsurf and other agents.">
   <meta name="theme-color" content="#07110e">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Ireland MCP — Every Irish public dataset, one MCP endpoint">
+  <meta property="og:title" content="Ireland MCP — Irish public data, ready to query">
   <meta property="og:description" content="No keys, no login. A lean, read-only MCP endpoint for Irish public data with source, licence and retrieval time attached.">
   <meta property="og:url" content="https://irishopendata.ie/">
   <meta name="twitter:card" content="summary_large_image">
@@ -17,17 +17,15 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307110e'/%3E%3Cpath d='M32 9l6.4 15.8 17 1.4-13 11 4 16.6L32 45 17.6 53.8l4-16.6-13-11 17-1.4L32 9z' fill='%2334c08a'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net">
   <link rel="preconnect" href="https://raw.githubusercontent.com">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20261006-status">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to Content</a>
-  <canvas id="text-rain" class="text-rain-canvas" aria-hidden="true" hidden></canvas>
   <div class="video-background" aria-hidden="true">
-    <video id="hero-video" autoplay loop muted playsinline disablepictureinpicture disableremoteplayback preload="metadata">
+    <video id="hero-video" loop muted playsinline disablepictureinpicture disableremoteplayback preload="metadata">
       <source src="hero-bg.mp4" type="video/mp4">
     </video>
   </div>
-
   <header class="site-header wrap" aria-label="Primary">
     <a class="brand" href="#top" aria-label="Ireland MCP home"><span class="mark" aria-hidden="true">✦</span><span>Ireland MCP</span></a>
     <nav class="nav-links" aria-label="Sections">
@@ -40,34 +38,33 @@
 
   <main id="main">
     <section id="top" class="hero" aria-labelledby="hero-title">
-      <div class="hero-art" aria-hidden="true"><div class="radar-ring"></div><div class="radar-core">MCP</div></div>
       <div class="wrap hero-grid">
         <div class="hero-copy">
           <p class="hero-kicker">Public Irish data for agents</p>
-          <h1 id="hero-title">Every Irish public dataset, one MCP endpoint. No keys, no login.</h1>
+          <h1 id="hero-title">Irish public data, ready to query.</h1>
           <p class="lede">Point Claude, ChatGPT, Copilot, Cursor or any MCP-aware agent at a single read-only endpoint. It returns compact answers with source, licence and retrieval time attached.</p>
           <div class="hero-actions" aria-label="Primary actions">
-            <a class="btn primary" href="#install">Install in 60 Seconds</a>
-            <a class="btn secondary" href="#playground">Try a Live Query</a>
+            <a class="btn primary" href="#install">Connect your agent</a>
+            <a class="btn secondary" href="#playground">Try a live query</a>
           </div>
           <div class="agent-hint" role="note">
-            <strong>Tell your agent:</strong> install the MCP at <a href="/AGENTS.md"><code>irishopendata.ie/AGENTS.md</code></a>
+            <strong>Tell your agent:</strong> install the MCP at <a href="/AGENTS.md"><code>/AGENTS.md</code></a>
           </div>
         </div>
         <aside class="hero-panel" aria-label="Live server summary">
           <div class="live-dot"><span aria-hidden="true"></span><strong id="live-label">Checking Live Server…</strong></div>
           <dl class="hero-stats" id="stats" aria-live="polite">
             <div><dt>Sources</dt><dd id="stat-sources">28</dd></div>
-            <div><dt>Default Ops</dt><dd id="stat-ops">7</dd></div>
+            <div><dt>Default tools</dt><dd id="stat-ops">7</dd></div>
             <div><dt>Sign-Ups</dt><dd>0</dd></div>
           </dl>
           <div class="token-badge">
-            <span>Token Budget</span>
-            <strong>≈1.4k default surface</strong>
-            <small>Instead of loading every single-source tool like typical multi-server setups.</small>
+            <span>Compact by default</span>
+            <strong>Seven tools to get started</strong>
+            <small>Discover sources and call their operations as you need them.</small>
           </div>
           <code class="endpoint-line" id="endpoint-line">https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp</code>
-          <button class="btn secondary motion-toggle" type="button" id="motion-toggle" aria-pressed="false">Pause Motion</button>
+          <button class="btn secondary motion-toggle" type="button" id="motion-toggle">Pause video</button>
         </aside>
       </div>
     </section>
@@ -75,21 +72,19 @@
     <section id="install" class="section wrap" aria-labelledby="install-title">
       <div class="section-head split-head">
         <div>
-          <p class="section-label">One-click install</p>
-          <h2 id="install-title">Choose Your Agent</h2>
-          <p>All snippets use the same one-line endpoint constant in <code>app.js</code>, ready to switch to <code>https://mcp.irishopendata.ie/mcp</code> later.</p>
+          <h2 id="install-title">Connect your agent</h2>
+          <p>Choose your app and follow its setup instructions. No account is needed to connect to this public endpoint.</p>
         </div>
         <button class="btn secondary copy-endpoint" type="button" data-copy-endpoint>Copy Endpoint</button>
       </div>
       <div class="tabs install-tabs" role="tablist" aria-label="Install options"></div>
-      <div class="install-panel" id="install-panel" tabindex="0"></div>
+      <div class="install-panel" id="install-panel" role="tabpanel" tabindex="0"></div>
       <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
     </section>
 
     <section id="agent-docs" class="section wrap docs-callout" aria-labelledby="agent-docs-title">
       <div>
-        <p class="section-label">Point Your Agent Here</p>
-        <h2 id="agent-docs-title">Self-Describing for Crawlers & Agents</h2>
+        <h2 id="agent-docs-title">Documentation for agents</h2>
         <p>Agents can read the concise manifest, installation guide and current MCP server-card from the public site before touching the endpoint.</p>
       </div>
       <div class="doc-links" aria-label="Agent documents">
@@ -100,47 +95,48 @@
       </div>
     </section>
 
-    <section id="directory" class="section wrap" aria-labelledby="directory-title">
-      <div class="section-head">
-        <p class="section-label">Source directory</p>
-        <h2 id="directory-title">Grouped by Domain, Loaded from <code>ireland_catalogue</code></h2>
-        <p>Each card shows what the source is for, how many operations it exposes, licence posture and one example question.</p>
-      </div>
-      <div id="source-directory" class="source-directory" aria-live="polite"></div>
-    </section>
-
     <section id="playground" class="section wrap" aria-labelledby="playground-title">
       <div class="section-head split-head">
         <div>
-          <p class="section-label">In-browser playground</p>
-          <h2 id="playground-title">Ask One Real Question</h2>
-          <p>Uses Streamable HTTP JSON-RPC with <code>accept: application/json, text/event-stream</code>. The result below is escaped text, not HTML.</p>
+          <h2 id="playground-title">Try a query</h2>
+          <p>Choose an example and run it against the live service. Open the query settings to change the source or arguments.</p>
         </div>
         <a class="btn secondary" href="https://github.com/c-mongan/ireland-mcp/blob/main/README.md">Read the API Guide</a>
       </div>
       <form id="playground-form" class="playground-card">
         <label for="example-select">Example Question</label>
         <select id="example-select" name="example" autocomplete="off"></select>
+        <details class="query-settings">
+          <summary>Query settings</summary>
         <div class="query-grid">
           <label for="pg-source">Source <input id="pg-source" name="source" spellcheck="false" autocomplete="off"></label>
           <label for="pg-operation">Operation <input id="pg-operation" name="operation" spellcheck="false" autocomplete="off"></label>
         </div>
         <label for="pg-args">Arguments JSON</label>
         <textarea id="pg-args" name="args" rows="5" spellcheck="false" autocomplete="off"></textarea>
+        </details>
         <div class="row-actions">
           <button type="submit" class="btn primary">Run Live Query</button>
           <span id="pg-status" class="muted" role="status" aria-live="polite"></span>
         </div>
-        <pre id="pg-output" class="output" aria-live="polite">Choose an example, then run it.</pre>
+        <h3>Result</h3>
+        <pre tabindex="0" id="pg-output" class="output" aria-live="polite">Choose an example, then run it.</pre>
       </form>
+    </section>
+
+    <section id="directory" class="section wrap" aria-labelledby="directory-title">
+      <div class="section-head">
+        <h2 id="directory-title">Explore the sources</h2>
+        <p>Browse by subject. Each source includes its available operations, licence and an example question.</p>
+      </div>
+      <div id="source-directory" class="source-directory" aria-live="polite"></div>
     </section>
 
     <section id="status" class="section wrap" aria-labelledby="status-title">
       <div class="section-head split-head">
         <div>
-          <p class="section-label">Reliability feed</p>
-          <h2 id="status-title">Public Status from the <code>status</code> Branch</h2>
-          <p>The GitHub workflow probes <code>/healthz?deep=1</code> every 30 minutes and force-pushes the latest compact JSON.</p>
+          <h2 id="status-title">Service status</h2>
+          <p>Automated checks run every 30 minutes. See the last check time and the reported state of each source below.</p>
         </div>
         <div class="status-links"><a href="https://github.com/c-mongan/ireland-mcp">GitHub</a><a href="https://github.com/modelcontextprotocol/registry">MCP Registry</a></div>
       </div>
@@ -150,9 +146,9 @@
 
   <footer class="site-footer wrap">
     <p>Open source under the MIT licence. Data remains under each publisher’s licence — see <a href="https://github.com/c-mongan/ireland-mcp/blob/main/NOTICE">NOTICE</a>. Not affiliated with any Irish government body.</p>
-    <p>Background video is an AI-generated city timelapse, decorative only; it does not depict a real Irish location.</p>
+    <p>The background video is an AI-generated city timelapse. It does not depict a real Irish location.</p>
   </footer>
 
-  <script src="app.js" defer></script>
+  <script src="app.js?v=20261006-status" defer></script>
 </body>
 </html>
