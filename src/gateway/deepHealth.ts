@@ -44,12 +44,16 @@ export function defaultProbes(env: Record<string, string | undefined>): Probe[] 
   const ntaKey = env.NTA_API_KEY;
   return [
     { source: "cso", url: `${CSO_REST}/PxStat.Data.Cube_API.ReadMetadata/F1001/JSON-stat/2.0/en` },
+    { source: "world-bank", url: "https://api.worldbank.org/v2/country/IRL/indicator/SP.POP.TOTL?format=json&per_page=1" },
     { source: "eurostat", url: "https://ec.europa.eu/eurostat/api/dissemination/catalogue/toc/txt?lang=en" },
     { source: "ecb", url: "https://data-api.ecb.europa.eu/service/data/EXR/D.USD.EUR.SP00.A?format=jsondata&lastNObservations=1" },
+    { source: "pobal", url: "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&limit=1" },
     { source: "oireachtas", url: `${OIREACHTAS_API}/legislation?limit=1` },
     { source: "geohive", url: `${ARCGIS_BASE}?f=json` },
     { source: "wikidata", url: "https://query.wikidata.org/sparql?query=ASK%20%7B%20wd%3AQ27%20wdt%3AP31%20%3Ftype%20%7D&format=json" },
     { source: "data-gov-ie", url: "https://data.gov.ie/api/3/action/status_show" },
+    { source: "cro", url: "https://opendata.cro.ie/api/3/action/status_show" },
+    { source: "kohesio", url: "https://kohesio.ec.europa.eu/api/queries/countries?language=en" },
     { source: "smart-dublin", url: "https://data.smartdublin.ie/api/3/action/status_show" },
     { source: "met-eireann", url: WARNINGS_URL },
     ntaKey
@@ -67,6 +71,7 @@ export function defaultProbes(env: Record<string, string | undefined>): Probe[] 
     { source: "opw-water", url: `${OPW_BASE}/geojson/latest/` },
     { source: "planning", url: `${ARCGIS_LAYERS.planningPoints}?f=json` },
     { source: "census-areas", url: `${ARCGIS_LAYERS.censusSmallAreas}?f=json` },
+    { source: "epa", url: "https://wfdapi.edenireland.ie/api/catchment" },
     { source: "heritage", url: `${ARCGIS_LAYERS.smr}?f=json` },
     { source: "environment-sites", url: `${ARCGIS_LAYERS.npwsSac}?f=json` },
     { source: "ted", url: "https://api.ted.europa.eu/swagger-ui/index.html" },

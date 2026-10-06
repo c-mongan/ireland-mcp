@@ -29,6 +29,7 @@ export function interleave<T>(lists: T[][], limit: number): T[] {
 }
 
 const cite = (info: SourceInfo, url: string) => ({ source: info.name, url, licence: info.licence, attribution: info.attribution });
+const short = (value: string, max = 120) => (value.length > max ? `${value.slice(0, max - 1)}…` : value);
 
 function settledSection<T>(r: PromiseSettledResult<T>): T | { error: { code: string; message: string } } {
   if (r.status === "fulfilled") return r.value;
@@ -84,9 +85,9 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
         data: {
           sources: modules.map((m) => ({
             id: m.info.id,
-            name: m.info.name,
-            licence: m.info.licence,
-            attribution: m.info.attribution,
+            name: short(m.info.name, 70),
+            licence: short(m.info.licence, 70),
+            attribution: short(m.info.attribution, 70),
             tools: m.tools.map((t) => t.name),
             searchable: Boolean(m.search)
           }))

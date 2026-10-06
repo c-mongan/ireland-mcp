@@ -22,6 +22,8 @@ retrieved_at, and sometimes `stale`). Use it. These rules apply to every skill i
 | Source id | Publisher | Licence | Attribution to include |
 |---|---|---|---|
 | `cso` | Central Statistics Office | CC BY 4.0 | Source: CSO, Ireland (www.cso.ie), CC BY 4.0 |
+| `world-bank` | World Bank Open Data | CC BY 4.0 | Source: World Bank Open Data |
+| `pobal` | Pobal | CC BY 4.0 | Pobal HP Deprivation Index Scores 2022 © Pobal |
 | `geohive` | Tailte Éireann | CC BY 4.0 | © Tailte Éireann, CC BY 4.0. Census geographies © CSO |
 | `ppr` | Property Services Regulatory Authority | PSI General Licence / CC BY 4.0 | Residential Property Price Register, PSRA |
 | `met-eireann` | Met Éireann | CC BY 4.0 | Copyright Met Éireann, www.met.ie, CC BY 4.0 |
@@ -37,6 +39,9 @@ retrieved_at, and sometimes `stale`). Use it. These rules apply to every skill i
 | `census-areas` | Tailte Éireann / OSi and CSO | CC BY 4.0 | Source: Census 2022 small areas, Tailte Éireann / CSO, CC BY 4.0 |
 | `heritage` | National Monuments Service | CC BY 4.0 | Source: National Monuments Service SMR, CC BY 4.0 |
 | `environment-sites` | National Parks and Wildlife Service | CC BY 4.0 | Source: NPWS Designated Areas, CC BY 4.0 |
+| `epa` | Environmental Protection Agency Ireland | CC BY 4.0 | EPA Water Framework Directive open data |
+| `cro` | Companies Registration Office | CC BY 4.0 | Companies Registration Office open data |
+| `kohesio` | European Commission | EU reuse policy / CC BY 4.0 compatible | European Commission, Kohesio platform |
 | `data-gov-ie`, `smart-dublin` | Each dataset's publisher | Per dataset (mostly CC BY 4.0) | Name the dataset publisher and its licence field |
 
 If the tool's `source.attribution` differs from this table, the tool wins.

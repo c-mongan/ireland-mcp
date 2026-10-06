@@ -26,15 +26,24 @@ import { environmentSitesModule } from "./sources/environment-sites/index.js";
 import { tedModule } from "./sources/ted/index.js";
 import { bikesModule } from "./sources/bikes/index.js";
 import { wikidataModule } from "./sources/wikidata/index.js";
+import { croModule } from "./sources/cro/index.js";
+import { epaModule } from "./sources/epa/index.js";
+import { kohesioModule } from "./sources/kohesio/index.js";
+import { pobalModule } from "./sources/pobal/index.js";
+import { worldBankModule } from "./sources/world-bank/index.js";
 
 export const sourceModules: SourceModule[] = [
   csoModule,
+  worldBankModule,
   eurostatModule,
   ecbModule,
+  pobalModule,
   oireachtasModule,
   geohiveModule,
   wikidataModule,
   dataGovIeModule,
+  croModule,
+  kohesioModule,
   smartDublinModule,
   metModule,
   ntaModule,
@@ -47,6 +56,7 @@ export const sourceModules: SourceModule[] = [
   opwWaterModule,
   planningModule,
   censusAreasModule,
+  epaModule,
   heritageModule,
   environmentSitesModule,
   tedModule,
