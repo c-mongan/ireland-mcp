@@ -3,12 +3,18 @@
 [![CI](https://github.com/c-mongan/ireland-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/c-mongan/ireland-mcp/actions/workflows/ci.yml)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-34c08a.svg)](LICENSE)
 [![MCP](https://img.shields.io/badge/MCP-Streamable%20HTTP-6f42c1.svg)](https://modelcontextprotocol.io)
-[![Token budget](https://img.shields.io/badge/default%20surface-7%20tools%20%7C%20~1.3k%20tokens-0a7.svg)](#why-its-lean)
+[![Token budget](https://img.shields.io/badge/default%20surface-7%20tools%20%7C%20~1.8k%20tokens-0a7.svg)](#why-its-lean)
 
 **Ireland MCP is a free, read-only MCP server that lets AI assistants answer questions with live Irish public data and citations.**
 
 Hosted endpoint: `https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp`
 Transport: Streamable HTTP. Auth: none. Writes: none.
+
+<p align="center">
+  <a href="docs/architecture/ireland-mcp-arch-v5.drawio">
+    <img src="docs/architecture/ireland-mcp-arch-v5.png" alt="Ireland MCP architecture: clients, Azure Functions gateway, observability and public data sources" width="900">
+  </a>
+</p>
 
 ## Try asking
 
@@ -18,6 +24,17 @@ Transport: Streamable HTTP. Auth: none. Writes: none.
 - “When is the next train from Heuston, and are there disruptions?”
 - “Who are the current TDs for my constituency, and what bills are active?”
 - “What protected habitats, monuments, planning applications or census areas are near this point?”
+
+## See it work
+
+| Proof | Screenshot |
+| --- | --- |
+| Live landing page, desktop | <img src="docs/screenshots/landing-desktop.png" alt="Ireland MCP live landing page on desktop" width="360"> |
+| Live landing page, mobile | <img src="docs/screenshots/landing-mobile.png" alt="Ireland MCP live landing page on mobile" width="180"> |
+| Install section with one-click client setup | <img src="docs/screenshots/install-section.png" alt="One-click install section for VS Code, Cursor, Claude, ChatGPT and Copilot CLI" width="360"> |
+| Playground populated from a real live MCP call | <img src="docs/screenshots/playground-live-call.png" alt="Playground showing a real cso_search_tables result from the live MCP endpoint" width="360"> |
+| MCP Inspector connected to the live endpoint | <img src="docs/screenshots/mcp-inspector-live.png" alt="MCP Inspector showing tools/list and an ireland_call result" width="360"> |
+| Real model transcript: question → tool calls → answer | <img src="docs/screenshots/agent-transcript.png" alt="Azure OpenAI agent transcript using Ireland MCP tools" width="360"> |
 
 ## Install
 
@@ -48,16 +65,13 @@ Portable Copilot / MCP JSON:
 
 ## Why it is lean
 
-Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **7 tools, 5,241 characters, about 1,310 tokens** on this branch (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
+Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **7 tools, 7,192 characters, about 1,798 tokens** on this branch (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
 
-```
-assistant ── tools/list ──> 7 meta tools
-   │
-   ├─ ireland_catalogue(domain?)  -> compact operation index by source
-   ├─ ireland_describe(source, operation) -> schema + example
-   └─ ireland_call(source, operation, args?, max_tokens?)
-        └─ dispatches to the real typed operation and returns source/licence/retrieval metadata
-```
+<p align="center">
+  <a href="docs/architecture/ireland-mcp-lean-surface.drawio">
+    <img src="docs/architecture/ireland-mcp-lean-surface.png" alt="Token-cost comparison: 7 default tools versus all typed tools and one-server-per-source routing" width="800">
+  </a>
+</p>
 
 Need typed tools anyway?
 
@@ -66,10 +80,20 @@ Need typed tools anyway?
 | Default HTTP | `/mcp` lists only `ireland_catalogue`, `ireland_describe`, `ireland_call`, `ireland_about`, `search`, `fetch`, `nearby`. |
 | Source toolsets | `/mcp?toolsets=cso,irish-rail` lists selected typed tools too. |
 | One source path | `/mcp/x/{source}` lists that source's typed tools, for example `/mcp/x/met-eireann`. |
-| Everything | `/mcp?toolsets=all` lists all 64 tools and is useful for debugging, not routine chat. |
+| Everything | `/mcp?toolsets=all` lists all 74 tools and is useful for debugging, not routine chat. |
 | Local stdio | `npx -y ireland-mcp --toolsets=cso` or `IRELAND_MCP_TOOLSETS=all`. |
 
 `max_tokens` defaults to about 2,000 output tokens and can be set from 100 to 8,000. Large results return `truncated`, counts and narrowing hints instead of flooding the context.
+
+## Architecture
+
+The server is a stateless Azure Functions Flex app with a lean gateway in front of the source modules. The gateway owns the operation index, response budgets, cache, upstream budgets, circuit breakers and evidence envelope; every normal result includes source URL, licence, attribution and retrieval metadata.
+
+| Diagram | Editable source |
+| --- | --- |
+| <img src="docs/architecture/ireland-mcp-arch-v5.png" alt="Architecture v5" width="360"> | [`ireland-mcp-arch-v5.drawio`](docs/architecture/ireland-mcp-arch-v5.drawio) |
+| <img src="docs/architecture/ireland-mcp-request-flow.png" alt="Ballymun request flow" width="360"> | [`ireland-mcp-request-flow.drawio`](docs/architecture/ireland-mcp-request-flow.drawio) |
+| <img src="docs/architecture/ireland-mcp-lean-surface.png" alt="Lean surface comparison" width="360"> | [`ireland-mcp-lean-surface.drawio`](docs/architecture/ireland-mcp-lean-surface.drawio) |
 
 ## Sources
 
@@ -163,7 +187,7 @@ npm run dev:http     # local HTTP dev server, MCP at /mcp
 
 69 routing questions, run through a multi-round agent loop that sends the server instructions as the system prompt (2026-10-05, Azure OpenAI):
 
-| Model | Default surface (7 tools) | `all` surface (64 tools) |
+| Model | Default surface (7 tools) | `all` surface (74 tools) |
 | --- | --- | --- |
 | gpt-5.6-luna | **100%** | **100%** |
 | gpt-5.4-mini | 91% | 97% |

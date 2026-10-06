@@ -5,18 +5,31 @@ const STATUS_URL = "https://raw.githubusercontent.com/c-mongan/ireland-mcp/statu
 const SOURCE_FALLBACK = [
   { domain: "stats", sources: [
     { id: "cso", name: "Central Statistics Office (CSO) PxStat", summary: "Official statistics: census, population, prices, labour market, housing and thousands more PxStat tables.", operations: ["cso_search_tables", "cso_get_table_metadata", "cso_get_data", "cso_area_profile"] },
+    { id: "world-bank", name: "World Bank Indicators for Ireland", summary: "Comparable macro, population, climate and development indicators for Ireland.", operations: ["worldbank_get_indicator", "worldbank_ireland_profile"] },
+    { id: "eurostat", name: "Eurostat Statistics API", summary: "Ireland-vs-EU statistical comparisons across population, economy and society datasets.", operations: ["eurostat_search_datasets", "eurostat_get_data", "eurostat_compare_ie_eu"] },
+    { id: "ecb", name: "ECB Data Portal", summary: "Euro-area interest rates, exchange rates and financial time series.", operations: ["ecb_get_series", "ecb_interest_rates", "ecb_exchange_rate"] },
+    { id: "pobal", name: "Pobal HP Deprivation Index", summary: "Small-area deprivation scores and lookup for Irish places.", operations: ["pobal_deprivation_search"] },
     { id: "data-gov-ie", name: "data.gov.ie", summary: "National open-data catalogue from Irish public bodies.", operations: ["datagov_search_datasets", "datagov_get_dataset", "datagov_query_datastore"] },
-    { id: "smart-dublin", name: "Smart Dublin", summary: "Dublin city and county datasets: counters, parking, footfall, planning and environment.", operations: ["smartdublin_search_datasets", "smartdublin_get_dataset", "smartdublin_query_datastore"] }
+    { id: "smart-dublin", name: "Smart Dublin", summary: "Dublin city and county datasets: counters, parking, footfall, planning and environment.", operations: ["smartdublin_search_datasets", "smartdublin_get_dataset", "smartdublin_query_datastore"] },
+    { id: "census-areas", name: "CSO Census 2022 small areas", summary: "Small-area boundary lookup for census geography.", operations: ["census_small_area_at"] }
+  ] },
+  { domain: "economy", sources: [
+    { id: "cro", name: "Companies Registration Office open data", summary: "Irish company-register catalogue datasets and datastore queries.", operations: ["cro_search_datasets", "cro_get_dataset", "cro_query_datastore"] },
+    { id: "kohesio", name: "Kohesio EU-funded projects", summary: "EU-funded project search and project detail for Ireland.", operations: ["kohesio_search_projects", "kohesio_get_project"] },
+    { id: "ted", name: "EU Tenders Electronic Daily", summary: "Irish and EU public-procurement notices from TED.", operations: ["ted_search_tenders", "ted_get_notice"] }
   ] },
   { domain: "transport", sources: [
     { id: "nta", name: "National Transport Authority GTFS-Realtime", summary: "Live public transport cancellations and delays; server-side NTA key only.", operations: ["nta_get_realtime_summary", "nta_get_trip_updates"] },
     { id: "irish-rail", name: "Iarnród Éireann realtime API", summary: "Station lookup and live DART, Commuter and Intercity departures.", operations: ["rail_find_station", "rail_get_departures"] },
-    { id: "luas", name: "Luas Forecasting API", summary: "Live Luas arrivals and stop list for the Red and Green lines.", operations: ["luas_get_forecast", "luas_list_stops"] }
+    { id: "luas", name: "Luas Forecasting API", summary: "Live Luas arrivals and stop list for the Red and Green lines.", operations: ["luas_get_forecast", "luas_list_stops"] },
+    { id: "bikes", name: "Irish bike-share availability", summary: "City bike networks and nearby station availability.", operations: ["bikes_networks", "bikes_stations_near"] }
   ] },
   { domain: "environment", sources: [
     { id: "met-eireann", name: "Met Éireann", summary: "Point forecasts, station observations and active weather warnings.", operations: ["met_get_forecast", "met_get_observations", "met_get_warnings"] },
     { id: "marine", name: "Marine Institute Weather Buoy Network", summary: "Live wind, wave and sea-temperature readings from offshore buoys.", operations: ["marine_get_buoys"] },
-    { id: "opw-water", name: "OPW Hydrometric Network", summary: "Live water levels and temperatures from about 460 gauges.", operations: ["water_find_stations", "water_get_level"] }
+    { id: "opw-water", name: "OPW Hydrometric Network", summary: "Live water levels and temperatures from about 460 gauges.", operations: ["water_find_stations", "water_get_level"] },
+    { id: "epa", name: "EPA Ireland open data", summary: "Water Framework Directive waterbody search and detail.", operations: ["epa_wfd_search", "epa_wfd_waterbody"] },
+    { id: "environment-sites", name: "NPWS designated protected sites", summary: "Protected site lookup near coordinates or intersecting a point.", operations: ["protected_sites_at", "protected_sites_near"] }
   ] },
   { domain: "energy", sources: [
     { id: "eirgrid", name: "EirGrid Smart Grid Dashboard", summary: "Live electricity demand, wind generation and carbon intensity.", operations: ["grid_get_status"] }
@@ -26,27 +39,44 @@ const SOURCE_FALLBACK = [
     { id: "legislation", name: "Irish Statute Book via ELI", summary: "Acts of the Oireachtas by year, contents and section text.", operations: ["legislation_list_acts", "legislation_get_act", "legislation_get_section"] }
   ] },
   { domain: "places/property", sources: [
-    { id: "geohive", name: "Tailte Éireann GeoHive boundaries", summary: "County, constituency, electoral division, small-area and layer queries.", operations: ["geohive_boundaries_at_point", "geohive_list_layers", "geohive_query_layer"] },
+    { id: "geohive", name: "Tailte Éireann GeoHive boundaries", summary: "County, constituency, electoral division, small-area and layer queries.", operations: ["geohive_boundaries_at_point", "geohive_locate", "geohive_list_layers", "geohive_query_layer"] },
+    { id: "wikidata", name: "Wikidata Query Service", summary: "Irish place and entity facts from Wikidata.", operations: ["wikidata_place", "wikidata_entity"] },
     { id: "ppr", name: "Residential Property Price Register", summary: "Residential sale prices and median prices by area.", operations: ["ppr_search_sales", "ppr_price_stats"] },
+    { id: "planning", name: "National Planning Application Database", summary: "Planning application search and detail from NPAD.", operations: ["planning_search", "planning_get"] },
+    { id: "heritage", name: "National Monuments Service SMR", summary: "Recorded monuments near a coordinate.", operations: ["heritage_monuments_near"] },
     { id: "cross", name: "Ireland MCP combined sources", summary: "Cross-source source list, nearby and one-call place snapshot.", operations: ["list_sources", "ireland_snapshot", "nearby"] }
   ] }
 ];
 
 const SOURCE_DETAILS = {
   cso: { licence: "CSO reuse / PSI", example: "What was Galway’s population in Census 2022?" },
+  "world-bank": { licence: "CC BY 4.0", example: "Show Ireland’s population trend from World Bank." },
+  eurostat: { licence: "Eurostat reuse policy", example: "Compare Irish unemployment with the EU average." },
+  ecb: { licence: "ECB terms", example: "What is the latest ECB deposit rate?" },
+  pobal: { licence: "CC BY 4.0", example: "Find deprivation scores near Ballymun." },
   "data-gov-ie": { licence: "Varies, catalogue-first", example: "Find open datasets about active travel." },
   "smart-dublin": { licence: "CC BY 4.0 / publisher", example: "Which Dublin datasets mention cycle counters?" },
+  "census-areas": { licence: "CC BY 4.0", example: "Which census small area contains 53.35,-6.26?" },
+  cro: { licence: "CC BY 4.0", example: "Find CRO datasets about companies." },
+  kohesio: { licence: "EU reuse policy", example: "Find EU-funded projects in Galway." },
+  ted: { licence: "EU reuse policy", example: "Find recent Irish tenders about schools." },
   nta: { licence: "NTA API terms", example: "Summarise current GTFS-R service disruption." },
   "irish-rail": { licence: "Irish Rail open API", example: "When are the next trains from Dublin Connolly?" },
   luas: { licence: "TII open endpoint", example: "When is the next tram at Heuston?" },
+  bikes: { licence: "CityBikes attribution/link", example: "Find bike-share stations near Grand Canal Dock." },
   "met-eireann": { licence: "CC BY 4.0", example: "Will it rain in Cork in the next 12 hours?" },
   marine: { licence: "Marine Institute open data", example: "Which buoys are reporting high waves?" },
   "opw-water": { licence: "OPW waterlevel.ie", example: "What is the latest level at Athlone?" },
+  epa: { licence: "CC BY 4.0", example: "Find EPA waterbodies near the Liffey." },
+  "environment-sites": { licence: "CC BY 4.0", example: "What protected sites are near this point?" },
   eirgrid: { licence: "EirGrid dashboard data", example: "What is the current wind share on the grid?" },
   oireachtas: { licence: "Oireachtas open data", example: "Find recent bills mentioning housing." },
   legislation: { licence: "Irish Statute Book", example: "Show section 1 of a 2024 Act." },
   geohive: { licence: "Tailte Éireann / OSi", example: "Which constituency contains 53.27,-9.05?" },
+  wikidata: { licence: "CC0 1.0", example: "Tell me about Ballymun from Wikidata." },
   ppr: { licence: "PSRA public register", example: "Median Galway home price last year?" },
+  planning: { licence: "CC BY 4.0", example: "Find planning applications near Cork city." },
+  heritage: { licence: "CC BY 4.0", example: "What monuments are near Newgrange?" },
   cross: { licence: "Mixed source provenance", example: "Give me a place snapshot for Trinity College." }
 };
 
