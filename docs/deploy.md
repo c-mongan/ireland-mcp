@@ -59,13 +59,77 @@ Cost controls:
 
 ## Custom domain (irishopendata.ie)
 
-The site lives on the Static Web App (Free SKU, two custom domains: apex and `www`). The MCP endpoint and the `.com` aliases point at the Function App, where `src/functions/redirect.ts` sends allow-listed hosts to `https://irishopendata.ie` with a 301. Unknown hosts get a 404, so the redirect cannot act as an open redirect. The `azurewebsites.net` and `azurestaticapps.net` URLs keep working.
+The apex site lives on the Static Web App (Free SKU). The MCP endpoint, `www.irishopendata.ie` and the `.com` aliases point at the Function App, where `src/functions/redirect.ts` sends allow-listed site aliases (any path) and the MCP root to `https://irishopendata.ie` with a 301, preserving the query string. Other paths on the MCP host are not redirected. Unknown hosts get a 404, so the redirect cannot act as an open redirect. The `azurewebsites.net` and `azurestaticapps.net` URLs keep working.
 
 | Host | DNS records (registrar DNS) | Azure binding |
 |---|---|---|
-| `irishopendata.ie` | TXT validation token + A record to the SWA's apex IP | `az staticwebapp hostname set --hostname irishopendata.ie --validation-method dns-txt-token` |
-| `www.irishopendata.ie` | CNAME to the SWA default host | `az staticwebapp hostname set --hostname www.irishopendata.ie` |
-| `mcp.irishopendata.ie` | CNAME to `<func>.azurewebsites.net` + TXT `asuid.mcp` = the app's `customDomainVerificationId` | `az functionapp config hostname add`, then a managed certificate and an SNI binding |
-| `irishopendata.com`, `www.irishopendata.com` | A to the Function App inbound IP (apex) / CNAME (www) + `asuid` TXT | Same as `mcp`; the redirect function returns a 301 to the `.ie` site |
+| `irishopendata.ie` | TXT validation token + A record to the SWA's apex IP | Static Web App; step 2 |
+| `www.irishopendata.ie` | CNAME to the Function App default host + TXT `asuid.www` | Function App; step 3 |
+| `mcp.irishopendata.ie` | CNAME to the Function App default host + TXT `asuid.mcp` | Function App; step 3 |
+| `irishopendata.com` | A to the Function App inbound IP + TXT `asuid` | Function App; step 3 |
+| `www.irishopendata.com` | CNAME to the Function App default host + TXT `asuid.www` | Function App; step 3 |
 
-Read the verification ID and inbound IP with `az resource show --resource-type Microsoft.Web/sites -g <rg> -n <func> --query "properties.{id:customDomainVerificationId,ip:inboundIpAddress}"`. `az functionapp show` returns nulls for these fields on Flex Consumption.
+1. Use Bash and a current Azure CLI. Sign in with `az login`, then replace the resource values below (the apps may be in different resource groups):
+
+   ```bash
+   set -euo pipefail
+   SUBSCRIPTION_ID="<subscription-id>"
+   SWA_RG="<static-web-app-resource-group>"
+   SWA_NAME="<static-web-app-name>"
+   FUNC_RG="<function-app-resource-group>"
+   FUNC_NAME="<function-app-name>"
+   az account set --subscription "$SUBSCRIPTION_ID"
+   az staticwebapp show --name "$SWA_NAME" --resource-group "$SWA_RG" \
+     --query defaultHostname --output tsv
+   az resource show --resource-type Microsoft.Web/sites \
+     --name "$FUNC_NAME" --resource-group "$FUNC_RG" \
+     --query "properties.{host:defaultHostName,id:customDomainVerificationId,ip:inboundIpAddress}"
+   ```
+
+   Use the returned verification ID for every Function App `asuid` TXT record in the table, in the corresponding `.ie` or `.com` DNS zone. `az functionapp show` returns nulls for the verification ID and inbound IP on Flex Consumption.
+
+2. Request the apex SWA binding and read its validation token:
+
+   ```bash
+   az staticwebapp hostname set --name "$SWA_NAME" --resource-group "$SWA_RG" \
+     --hostname irishopendata.ie --validation-method dns-txt-token --no-wait
+   az staticwebapp hostname show --name "$SWA_NAME" --resource-group "$SWA_RG" \
+     --hostname irishopendata.ie
+   ```
+
+   Publish the returned `validationToken` as the apex TXT record (if it is not yet populated, rerun `hostname show`). Add the apex A record using the IP shown in the Static Web App portal's custom-domain wizard. Wait for DNS propagation and for `hostname show` to report `Ready`; SWA manages the apex certificate.
+
+   If `www.irishopendata.ie` was previously bound to the SWA, remove that binding before moving its DNS and binding to the Function App:
+
+   ```bash
+   az staticwebapp hostname delete --name "$SWA_NAME" --resource-group "$SWA_RG" \
+     --hostname www.irishopendata.ie --yes
+   ```
+
+3. Publish the Function App DNS records from the table and wait for propagation. Then bind each hostname, issue its managed certificate and attach it with SNI:
+
+   ```bash
+   for HOSTNAME in mcp.irishopendata.ie www.irishopendata.ie irishopendata.com www.irishopendata.com; do
+     az functionapp config hostname add --name "$FUNC_NAME" --resource-group "$FUNC_RG" \
+       --hostname "$HOSTNAME"
+     CERT_THUMBPRINT=$(az functionapp config ssl create \
+       --name "$FUNC_NAME" --resource-group "$FUNC_RG" --hostname "$HOSTNAME" \
+       --query thumbprint --output tsv)
+     if [[ -z "$CERT_THUMBPRINT" || "$CERT_THUMBPRINT" == "None" ]]; then
+       echo "Certificate issuance incomplete for $HOSTNAME; wait and retry before binding." >&2
+       exit 1
+     fi
+     az functionapp config ssl bind --name "$FUNC_NAME" --resource-group "$FUNC_RG" \
+       --hostname "$HOSTNAME" --certificate-thumbprint "$CERT_THUMBPRINT" --ssl-type SNI
+   done
+   ```
+
+4. After deploying the redirect function, check both redirects (expect 301 with the full query in `Location`) and the MCP health endpoint:
+
+   ```bash
+   curl -I 'https://mcp.irishopendata.ie/?utm_source=deployment-check'
+   curl -I 'https://www.irishopendata.ie/install?utm_source=deployment-check'
+   curl --fail-with-body 'https://mcp.irishopendata.ie/healthz'
+   ```
+
+Command references: [Static Web App hostnames](https://learn.microsoft.com/en-us/cli/azure/staticwebapp/hostname), [Function App hostnames](https://learn.microsoft.com/en-us/cli/azure/functionapp/config/hostname), [Function App certificates](https://learn.microsoft.com/en-us/cli/azure/functionapp/config/ssl).
