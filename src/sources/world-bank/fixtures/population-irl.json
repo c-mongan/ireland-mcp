@@ -1,1 +1,8 @@
-[{"page":1,"pages":14,"per_page":5,"total":66,"sourceid":"2","lastupdated":"2026-07-13"},[{"indicator":{"id":"SP.POP.TOTL","value":"Population, total"},"country":{"id":"IE","value":"Ireland"},"countryiso3code":"IRL","date":"2025","value":5484367,"unit":"","obs_status":"","decimal":0},{"indicator":{"id":"SP.POP.TOTL","value":"Population, total"},"country":{"id":"IE","value":"Ireland"},"countryiso3code":"IRL","date":"2024","value":5395790,"unit":"","obs_status":"","decimal":0},{"indicator":{"id":"SP.POP.TOTL","value":"Population, total"},"country":{"id":"IE","value":"Ireland"},"countryiso3code":"IRL","date":"2023","value":5311538,"unit":"","obs_status":"","decimal":0},{"indicator":{"id":"SP.POP.TOTL","value":"Population, total"},"country":{"id":"IE","value":"Ireland"},"countryiso3code":"IRL","date":"2022","value":5212836,"unit":"","obs_status":"","decimal":0},{"indicator":{"id":"SP.POP.TOTL","value":"Population, total"},"country":{"id":"IE","value":"Ireland"},"countryiso3code":"IRL","date":"2021","value":5110585,"unit":"","obs_status":"","decimal":0}]]
+{
+  "count": 66,
+  "value": [
+    { "OBS_VALUE": "5395790", "TIME_PERIOD": "2024", "INDICATOR": "WB_WDI_SP_POP_TOTL", "REF_AREA": "IRL", "UNIT_MEASURE": "PS" },
+    { "OBS_VALUE": "5484367", "TIME_PERIOD": "2025", "INDICATOR": "WB_WDI_SP_POP_TOTL", "REF_AREA": "IRL", "UNIT_MEASURE": "PS" },
+    { "OBS_VALUE": "5311538", "TIME_PERIOD": "2023", "INDICATOR": "WB_WDI_SP_POP_TOTL", "REF_AREA": "IRL", "UNIT_MEASURE": "PS" }
+  ]
+}

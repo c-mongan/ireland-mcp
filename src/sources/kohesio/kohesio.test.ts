@@ -23,4 +23,12 @@ describe("kohesio", () => {
     expect(result.body.data.title).toContain("anonymous social media app");
     expect(result.body.data.country).toBe("Ireland");
   });
+
+  it("explains cloud-hosted Kohesio 403 blocks", async () => {
+    const fetch = fakeFetch([{ match: /\/api\/projects\?/, status: 403, body: "Forbidden" }]);
+    const result = await callTool(kohesioModule, "kohesio_search_projects", { query: "Galway", limit: 3 }, fetch);
+    expect(result.ok).toBe(false);
+    expect(result.body.error.code).toBe("UPSTREAM_DOWN");
+    expect(result.body.error.hint).toContain("Kohesio blocks some cloud-hosted IPs");
+  });
 });

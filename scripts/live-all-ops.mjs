@@ -20,6 +20,14 @@ const SAMPLE_ARGS = {
   "oireachtas/ oireachtas_get_debates": { chamber: "dail", limit: 2, max_sections: 5 },
   "oireachtas/ oireachtas_search_questions": { type: "written", limit: 2 },
   "oireachtas/ oireachtas_get_votes": { chamber: "dail", limit: 2 },
+  "world-bank/ worldbank_get_indicator": { indicator: "SP.POP.TOTL", country: "IRL", last: 2 },
+  "world-bank/ worldbank_ireland_profile": { last: 1 },
+  "pobal/ pobal_deprivation_search": { query: "Galvone", limit: 3 },
+  "cro/ cro_search_datasets": { query: "company", limit: 3 },
+  "cro/ cro_get_dataset": { id: "companies" },
+  "cro/ cro_query_datastore": { resource_id: "3fef41bc-b8f4-4b10-8434-ce51c29b1bba", limit: 3 },
+  "kohesio/ kohesio_search_projects": { query: "Galway", limit: 3 },
+  "kohesio/ kohesio_get_project": { id: "Q232198" },
   "geohive/ geohive_boundaries_at_point": { lat: 53.3498, lon: -6.2603 },
   "geohive/ geohive_list_layers": { query: "county", limit: 5 },
   "data-gov-ie/ datagov_search_datasets": { query: "population", limit: 3 },
@@ -46,6 +54,8 @@ const SAMPLE_ARGS = {
   "ted/ ted_search_tenders": { text: "bicycle", limit: 3 },
   "bikes/ bikes_networks": {},
   "bikes/ bikes_stations_near": { lat: 53.3498, lon: -6.2603, radius: 1000, network: "dublinbikes" },
+  "epa/ epa_wfd_search": { query: "Suir", limit: 3 },
+  "epa/ epa_wfd_waterbody": { code: "IE_SE_16B020080" },
   "cross/ list_sources": {},
   "cross/ nearby": { lat: 53.3498, lon: -6.2603, hours: 3 }
 };
@@ -116,6 +126,13 @@ function statusOf(result) {
   if (!result.isError) return { status: "PASS", body };
   const code = body.error?.code ?? "ERROR";
   if (code === "NOT_CONFIGURED") return { status: "NOT_CONFIGURED", body };
+  if (
+    body.operation?.startsWith("kohesio_") &&
+    code === "UPSTREAM_DOWN" &&
+    (/HTTP 403/.test(body.error?.message ?? "") || /Kohesio blocks some cloud-hosted IPs/.test(body.error?.hint ?? ""))
+  ) {
+    return { status: "HOSTED_BLOCKED", body };
+  }
   return { status: "FAIL", body };
 }
 
@@ -256,7 +273,7 @@ async function main() {
     }
 
     for (const op of ops) {
-      const sample = examples.get(key(op.source, op.operation)) ?? SAMPLE_ARGS[key(op.source, op.operation)];
+      const sample = SAMPLE_ARGS[key(op.source, op.operation)] ?? examples.get(key(op.source, op.operation));
       opRows.push(
         await timed(`${op.source}/${op.operation}`, () =>
           callOperation(client, op, sample)
@@ -297,13 +314,16 @@ async function main() {
   });
   const pass = opRows.filter((r) => r.status === "PASS").length;
   const notConfigured = opRows.filter((r) => r.status === "NOT_CONFIGURED").length;
+  const hostedBlocked = opRows.filter((r) => r.status === "HOSTED_BLOCKED").length;
   const fail = opRows.filter((r) => r.status === "FAIL").length;
   const report = [
     "# Live all-operations report",
     "",
     `Target: ${target}`,
     `Generated: ${new Date().toISOString()}`,
-    `Operations: ${pass} PASS, ${notConfigured} NOT_CONFIGURED, ${fail} FAIL.`,
+    `Operations: ${pass} PASS, ${notConfigured} NOT_CONFIGURED, ${hostedBlocked} HOSTED_BLOCKED, ${fail} FAIL.`,
+    "",
+    "Known hosted limitation: Kohesio may return HTTP 403 from cloud-hosted IPs. If that happens, run Ireland MCP locally with npx/stdio for Kohesio.",
     "",
     "## Default tool exercise",
     "",
@@ -327,11 +347,11 @@ async function main() {
   await mkdir(new URL("../docs/", import.meta.url), { recursive: true });
   await writeFile(REPORT_PATH, report);
 
-  const summary = { target, default: defaultRows, errors, operations: opRows, counts: { pass, notConfigured, fail }, report: "docs/live-all-ops.md" };
+  const summary = { target, default: defaultRows, errors, operations: opRows, counts: { pass, notConfigured, hostedBlocked, fail }, report: "docs/live-all-ops.md" };
   if (args.json) console.log(JSON.stringify(summary, null, 2));
   else {
     console.log(`Target: ${target}`);
-    console.log(`Operations: ${pass} PASS, ${notConfigured} NOT_CONFIGURED, ${fail} FAIL.`);
+    console.log(`Operations: ${pass} PASS, ${notConfigured} NOT_CONFIGURED, ${hostedBlocked} HOSTED_BLOCKED, ${fail} FAIL.`);
     console.log(`Default tools: ${defaultRows.filter((r) => r.status === "PASS").length}/${defaultRows.length} PASS.`);
     console.log(`Error paths: ${errors.filter((r) => r.status === "PASS").length}/${errors.length} PASS.`);
     console.log(`Report: docs/live-all-ops.md`);

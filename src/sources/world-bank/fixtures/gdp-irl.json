@@ -1,1 +1,7 @@
-[{"page":1,"pages":14,"per_page":5,"total":66,"sourceid":"2","lastupdated":"2026-07-13"},[{"indicator":{"id":"NY.GDP.MKTP.CD","value":"GDP (current US$)"},"country":{"id":"IE","value":"Ireland"},"countryiso3code":"IRL","date":"2025","value":721701359046.313,"unit":"","obs_status":"","decimal":0},{"indicator":{"id":"NY.GDP.MKTP.CD","value":"GDP (current US$)"},"country":{"id":"IE","value":"Ireland"},"countryiso3code":"IRL","date":"2024","value":609157459747.205,"unit":"","obs_status":"","decimal":0},{"indicator":{"id":"NY.GDP.MKTP.CD","value":"GDP (current US$)"},"country":{"id":"IE","value":"Ireland"},"countryiso3code":"IRL","date":"2023","value":567372737459.116,"unit":"","obs_status":"","decimal":0},{"indicator":{"id":"NY.GDP.MKTP.CD","value":"GDP (current US$)"},"country":{"id":"IE","value":"Ireland"},"countryiso3code":"IRL","date":"2022","value":548341794599.09,"unit":"","obs_status":"","decimal":0},{"indicator":{"id":"NY.GDP.MKTP.CD","value":"GDP (current US$)"},"country":{"id":"IE","value":"Ireland"},"countryiso3code":"IRL","date":"2021","value":530394123829.763,"unit":"","obs_status":"","decimal":0}]]
+{
+  "count": 66,
+  "value": [
+    { "OBS_VALUE": "609157459747.205", "TIME_PERIOD": "2024", "INDICATOR": "WB_WDI_NY_GDP_MKTP_CD", "REF_AREA": "IRL", "UNIT_MEASURE": "USD" },
+    { "OBS_VALUE": "721701359046.313", "TIME_PERIOD": "2025", "INDICATOR": "WB_WDI_NY_GDP_MKTP_CD", "REF_AREA": "IRL", "UNIT_MEASURE": "USD" }
+  ]
+}

@@ -64,6 +64,7 @@ describe("DeepHealth", () => {
   it("has a probe for every registered source", () => {
     const covered = new Set(defaultProbes({}).map((p) => p.source));
     for (const module of sourceModules) expect(covered.has(module.info.id), module.info.id).toBe(true);
+    expect(defaultProbes({}).find((p) => p.source === "world-bank")?.url).toContain("data360api.worldbank.org");
     expect(defaultProbes({}).find((p) => p.source === "nta")?.skip).toBeTruthy();
     expect(defaultProbes({ NTA_API_KEY: "k" }).find((p) => p.source === "nta")?.skip).toBeUndefined();
   });
