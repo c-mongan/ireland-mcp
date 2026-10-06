@@ -24,11 +24,16 @@ describe("kohesio", () => {
     expect(result.body.data.country).toBe("Ireland");
   });
 
-  it("explains cloud-hosted Kohesio 403 blocks", async () => {
-    const fetch = fakeFetch([{ match: /\/api\/projects\?/, status: 403, body: "Forbidden" }]);
-    const result = await callTool(kohesioModule, "kohesio_search_projects", { query: "Galway", limit: 3 }, fetch);
+  it.each([
+    { operation: "kohesio_search_projects", args: { query: "Galway", limit: 3 } },
+    { operation: "kohesio_get_project", args: { id: "Q232198" } }
+  ])("explains cloud-hosted Kohesio 403 blocks for $operation", async ({ operation, args }) => {
+    const fetch = fakeFetch([{ match: /\/api\/projects[/?]/, status: 403, body: "Forbidden" }]);
+    const result = await callTool(kohesioModule, operation, args, fetch);
     expect(result.ok).toBe(false);
     expect(result.body.error.code).toBe("UPSTREAM_DOWN");
     expect(result.body.error.hint).toContain("Kohesio blocks some cloud-hosted IPs");
+    expect(result.body.error.hint).toContain("node dist/src/cli.js --toolsets=kohesio");
+    expect(result.body.error.hint).not.toContain("npx");
   });
 });

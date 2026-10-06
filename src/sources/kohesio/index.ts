@@ -86,7 +86,7 @@ async function getJson<T>(ctx: ToolContext, url: string) {
   } catch (error) {
     if (error instanceof ToolError && error.message.includes("HTTP 403")) {
       throw new ToolError("UPSTREAM_DOWN", "Kohesio returned HTTP 403.", {
-        hint: "Kohesio blocks some cloud-hosted IPs; run Ireland MCP locally (npx/stdio) for this source."
+        hint: "Kohesio blocks some cloud-hosted IPs; run Ireland MCP from a built source checkout with node dist/src/cli.js --toolsets=kohesio (stdio)."
       });
     }
     throw error;

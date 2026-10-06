@@ -4,7 +4,7 @@ Target: https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp
 Generated: 2026-10-06T00:32:45.134Z
 Operations: 64 PASS, 2 NOT_CONFIGURED, 2 HOSTED_BLOCKED, 0 FAIL.
 
-Known hosted limitation: Kohesio may return HTTP 403 from cloud-hosted IPs. If that happens, run Ireland MCP locally with npx/stdio for Kohesio.
+Known hosted limitation: Kohesio may return HTTP 403 from cloud-hosted IPs. If that happens, run Ireland MCP from a built source checkout with `node dist/src/cli.js --toolsets=kohesio` (stdio).
 
 ## Default tool exercise
 
@@ -71,8 +71,8 @@ Known hosted limitation: Kohesio may return HTTP 403 from cloud-hosted IPs. If t
 | cro | cro_search_datasets | PASS | 1387 | rows=2 | 2026-10-06 |
 | cro | cro_get_dataset | PASS | 1183 | rows=1 formats | 2026-10-06 |
 | cro | cro_query_datastore | PASS | 1331 | rows=825674; truncated | 2026-10-06 |
-| kohesio | kohesio_search_projects | HOSTED_BLOCKED | 1340 | UPSTREAM_DOWN: Kohesio returned HTTP 403. Hint: Kohesio blocks some cloud-hosted IPs; run Ireland MCP locally (npx/stdio) for this source. | 2026-10-06 |
-| kohesio | kohesio_get_project | HOSTED_BLOCKED | 1200 | UPSTREAM_DOWN: Kohesio returned HTTP 403. Hint: Kohesio blocks some cloud-hosted IPs; run Ireland MCP locally (npx/stdio) for this source. | 2026-10-06 |
+| kohesio | kohesio_search_projects | HOSTED_BLOCKED | 1340 | UPSTREAM_DOWN: Kohesio returned HTTP 403. Hint: Kohesio blocks some cloud-hosted IPs; run Ireland MCP from a built source checkout with node dist/src/cli.js --toolsets=kohesio (stdio). | 2026-10-06 |
+| kohesio | kohesio_get_project | HOSTED_BLOCKED | 1200 | UPSTREAM_DOWN: Kohesio returned HTTP 403. Hint: Kohesio blocks some cloud-hosted IPs; run Ireland MCP from a built source checkout with node dist/src/cli.js --toolsets=kohesio (stdio). | 2026-10-06 |
 | ted | ted_search_tenders | PASS | 1164 | rows=290 | 2026-10-06 |
 | ted | ted_get_notice | PASS | 1141 | notice, raw | 2026-10-06 |
 | oireachtas | oireachtas_search_members | PASS | 1130 | rows=1 | 2026-10-06 |
