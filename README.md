@@ -181,6 +181,7 @@ npm run dev:http     # local HTTP dev server, MCP at /mcp
 | `npm run inspector:check` | MCP Inspector conformance. |
 | `npm run measure:tools [-- all]` | Measure default or all-tool `tools/list`. |
 | `npm run live:sanity` | One real call per source through `ireland_call`; writes [docs/live-sanity.md](docs/live-sanity.md). |
+| `npm run live:all [-- --url https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp]` | Real MCP client proof for every catalogue operation; writes [docs/live-all-ops.md](docs/live-all-ops.md). |
 | `npm run eval` | Promptfoo evaluation; default surface unless `EVAL_TOOLSETS=all`. |
 
 ### Eval results

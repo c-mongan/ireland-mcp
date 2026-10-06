@@ -39,6 +39,7 @@ for (const t of tools) {
   check(NAME.test(t.name), `${t.name}: name matches ${NAME}`);
   check(t.description && t.description.length >= 20, `${t.name}: has a useful description`);
   check(t.inputSchema?.type === "object", `${t.name}: inputSchema is an object`);
+  check(t.outputSchema?.type === "object", `${t.name}: outputSchema is an object`);
   check(t.annotations?.readOnlyHint === true, `${t.name}: readOnlyHint`);
   check(t.annotations?.openWorldHint === true, `${t.name}: openWorldHint`);
   check(t.annotations?.destructiveHint === false, `${t.name}: not destructive`);

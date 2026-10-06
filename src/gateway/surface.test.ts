@@ -44,6 +44,7 @@ describe("default lean surface", () => {
     expect(size).toBeLessThan(TOOLS_LIST_BUDGET_CHARS);
     for (const t of tools) {
       expect(t.annotations?.readOnlyHint).toBe(true);
+      expect(t.outputSchema?.type).toBe("object");
       expect(t.description!.length).toBeGreaterThan(15);
     }
   });
@@ -55,9 +56,9 @@ describe("default lean surface", () => {
     }
   });
 
-  it("keeps nearby cheap enough to stay top level (<300 tokens)", async () => {
+  it("keeps nearby cheap enough to stay top level (<350 tokens)", async () => {
     const nearby = (await listTools()).find((t) => t.name === "nearby");
-    expect(JSON.stringify(nearby).length / 4).toBeLessThan(300);
+    expect(JSON.stringify(nearby).length / 4).toBeLessThan(350);
   });
 
   it("lists the domains statically in the catalogue description and sets short instructions", async () => {
@@ -81,6 +82,7 @@ describe("typed toolsets", () => {
     expect(names.length).toBeGreaterThanOrEqual(41 + 4);
     for (const m of sourceModules) for (const t of m.tools) expect(names).toContain(t.name);
     for (const n of ["list_sources", "ireland_snapshot", ...META]) expect(names).toContain(n);
+    expect(tools.every((t) => t.outputSchema?.type === "object")).toBe(true);
     const size = JSON.stringify({ tools }).length;
     process.stderr.write(`toolsets=all tools/list: ${tools.length} tools, ${size} chars (≈${Math.round(size / 4)} tokens)\n`);
   });
