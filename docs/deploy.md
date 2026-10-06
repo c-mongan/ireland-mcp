@@ -56,3 +56,16 @@ Cost controls:
    Add variables `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` and `AZURE_ENV_NAME`,
    plus optional `BUDGET_CONTACT_EMAIL`. Add an optional secret `NTA_API_KEY`.
 4. Run the workflow from the Actions tab.
+
+## Custom domain (irishopendata.ie)
+
+The site lives on the Static Web App (Free SKU, two custom domains: apex and `www`). The MCP endpoint and the `.com` aliases point at the Function App, where `src/functions/redirect.ts` sends allow-listed hosts to `https://irishopendata.ie` with a 301. Unknown hosts get a 404, so the redirect cannot act as an open redirect. The `azurewebsites.net` and `azurestaticapps.net` URLs keep working.
+
+| Host | DNS records (registrar DNS) | Azure binding |
+|---|---|---|
+| `irishopendata.ie` | TXT validation token + A record to the SWA's apex IP | `az staticwebapp hostname set --hostname irishopendata.ie --validation-method dns-txt-token` |
+| `www.irishopendata.ie` | CNAME to the SWA default host | `az staticwebapp hostname set --hostname www.irishopendata.ie` |
+| `mcp.irishopendata.ie` | CNAME to `<func>.azurewebsites.net` + TXT `asuid.mcp` = the app's `customDomainVerificationId` | `az functionapp config hostname add`, then a managed certificate and an SNI binding |
+| `irishopendata.com`, `www.irishopendata.com` | A to the Function App inbound IP (apex) / CNAME (www) + `asuid` TXT | Same as `mcp`; the redirect function returns a 301 to the `.ie` site |
+
+Read the verification ID and inbound IP with `az resource show --resource-type Microsoft.Web/sites -g <rg> -n <func> --query "properties.{id:customDomainVerificationId,ip:inboundIpAddress}"`. `az functionapp show` returns nulls for these fields on Flex Consumption.
