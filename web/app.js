@@ -381,6 +381,11 @@ async function initStatus() {
       return pill;
     }));
     card.append(main);
+    if (status.status === "unreachable" && typeof status.error === "string") {
+      const reason = document.createElement("p");
+      reason.textContent = status.error;
+      card.append(reason);
+    }
     if (sources.length) card.append(summary, list);
   } catch (error) {
     card.textContent = `Status feed unavailable. Check GitHub status branch. ${error instanceof Error ? error.message : ""}`;
@@ -424,12 +429,10 @@ const motionToggle = $("motion-toggle");
 const motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
 let motionPaused = motionQuery.matches;
 function syncVideo() {
-  motionToggle.setAttribute("aria-pressed", String(motionPaused));
   motionToggle.textContent = motionPaused ? "Play video" : "Pause video";
   if (motionPaused || document.hidden) video.pause();
   else video.play().catch(() => {
     motionPaused = true;
-    motionToggle.setAttribute("aria-pressed", "true");
     motionToggle.textContent = "Play video";
   });
 }

@@ -1,3 +1,4 @@
+// Local security patch, 2026-10-06: pass subprocess arguments without shell evaluation.
 /**
  * CLI entry point: prepare everything needed to enter the live variant poll loop.
  *
@@ -17,7 +18,7 @@
  *   node live.mjs --help
  */
 
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -254,11 +255,10 @@ function globToRegex(pattern) {
 
 function runScript(name, args, options = {}) {
   const scriptPath = path.join(__dirname, name);
-  const cmd = `node "${scriptPath}" ${args.map(a => `"${a}"`).join(' ')}`;
   try {
-    return execSync(cmd, { encoding: 'utf-8', cwd: options.cwd || process.cwd(), timeout: 15_000 });
+    return execFileSync(process.execPath, [scriptPath, ...args], { encoding: 'utf-8', cwd: options.cwd || process.cwd(), timeout: 15_000 });
   } catch (err) {
-    // execSync throws on non-zero exit; return stdout if any
+    // execFileSync throws on non-zero exit; return stdout if any
     return err.stdout || err.message || '';
   }
 }

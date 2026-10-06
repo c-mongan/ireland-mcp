@@ -79,7 +79,7 @@ test("video respects reduced motion and has a working pause control", async ({ p
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await expect(page.locator("#hero-video")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Play video" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "Play video" })).not.toHaveAttribute("aria-pressed");
   expect(await page.locator("#hero-video").evaluate((el) => (el as HTMLVideoElement).paused)).toBe(true);
   await page.getByRole("button", { name: "Play video" }).click();
   await expect(page.getByRole("button", { name: "Pause video" })).toBeVisible();
@@ -158,5 +158,6 @@ test("a fresh failed health request is shown as a failure, not an old report", a
   });
   await page.goto("/#status");
   await expect(page.locator("#status-card")).toContainText("Service health check failed");
+  await expect(page.locator("#status-card")).toContainText("HTTP 503");
   await expect(page.locator("#status-card")).not.toContainText("out of date");
 });
