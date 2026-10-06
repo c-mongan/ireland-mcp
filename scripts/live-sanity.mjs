@@ -11,6 +11,7 @@ import { createAppServer } from "../dist/src/registry.js";
 const year = new Date().getUTCFullYear();
 const CASES = [
   ["cso", "cso_area_profile", { area: "Galway" }, (d) => d.census?.length > 0],
+  ["world-bank", "worldbank_get_indicator", { indicator: "SP.POP.TOTL", last: 2 }, (d) => d.observations?.[0]?.value > 5_000_000],
   [
     "eurostat",
     "eurostat_get_data",
@@ -18,11 +19,14 @@ const CASES = [
     (d) => d.rows?.[0]?.value > 5_000_000
   ],
   ["ecb", "ecb_exchange_rate", { currency: "USD", lastNObservations: 3 }, (d) => d.observations?.length > 0],
+  ["pobal", "pobal_deprivation_search", { query: "Galvone", limit: 3 }, (d) => d.areas?.some((a) => a.ed_id === "128020")],
   ["oireachtas", "oireachtas_search_bills", { query: "housing", limit: 3 }, (d) => JSON.stringify(d).length > 50],
   ["geohive", "geohive_boundaries_at_point", { lat: 53.3498, lon: -6.2603 }, (d) => d.county?.name],
   ["geohive", "geohive_locate", { name: "An Daingean" }, (d) => d.places?.some((p) => p.county === "Kerry")],
   ["wikidata", "wikidata_entity", { qid: "Q27" }, (d) => d.qid === "Q27" && d.label],
   ["data-gov-ie", "datagov_search_datasets", { query: "population", limit: 3 }, (d) => d.total > 0],
+  ["cro", "cro_search_datasets", { query: "company", limit: 2 }, (d) => d.datasets?.some((x) => x.id === "companies")],
+  ["kohesio", "kohesio_search_projects", { query: "Galway", limit: 3 }, (d) => d.total > 0 && Array.isArray(d.projects)],
   ["smart-dublin", "smartdublin_search_datasets", { query: "bike", limit: 3 }, (d) => d.total > 0],
   ["met-eireann", "met_get_forecast", { lat: 53.3498, lon: -6.2603, hours: 3 }, (d) => d.forecast?.length === 3],
   ["met-eireann", "met_get_warnings", {}, (d) => Array.isArray(d.warnings)],
@@ -37,6 +41,7 @@ const CASES = [
   ["planning", "planning_search", { lat: 53.3498, lon: -6.2603, radius_m: 1000, text: "apartments", from: "2024-01-01", limit: 2 }, (d) => d.count > 0],
   ["planning", "planning_get", { application_ref: "WEB1741/25" }, (d) => d.count > 0],
   ["census-areas", "census_small_area_at", { lat: 53.3498, lon: -6.2603 }, (d) => d.area?.small_area?.population > 0],
+  ["epa", "epa_wfd_search", { query: "Suir", limit: 3 }, (d) => d.results?.length > 0],
   ["heritage", "heritage_monuments_near", { lat: 53.3498, lon: -6.2603, radius_m: 1000, limit: 2 }, (d) => d.count > 0],
   ["environment-sites", "protected_sites_near", { lat: 53.33, lon: -6.16, radius_m: 5000, limit: 4 }, (d) => d.count > 0],
   ["ted", "ted_search_tenders", { text: "bicycle", limit: 3 }, (d) => d.tenders?.length > 0 && d.tenders.every((t) => t.id)],

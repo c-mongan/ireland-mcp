@@ -28,6 +28,10 @@ Central Statistics Office (CSO) PxStat — https://data.cso.ie
   Licence: CC BY 4.0
   Attribution: Source: Central Statistics Office, Ireland (www.cso.ie).
 
+World Bank Open Data — https://data.worldbank.org/
+  Licence: CC BY 4.0
+  Attribution: Source: World Bank Open Data.
+
 Eurostat Statistics API — https://ec.europa.eu/eurostat
   Licence: Eurostat reuse policy (CC BY 4.0 equivalent)
   Attribution: Source: Eurostat, European Commission.
@@ -52,9 +56,22 @@ Wikidata Query Service — https://query.wikidata.org
   Licence: CC0 1.0 Public Domain Dedication
   Attribution: Source: Wikidata contributors, CC0.
 
+Pobal HP Deprivation Index — https://data.gov.ie/dataset/pobal-hp-deprivation-index-scores-2022
+  Licence: CC BY 4.0
+  Attribution: Pobal HP Deprivation Index Scores 2022 © Pobal.
+
 data.gov.ie (CKAN) — https://data.gov.ie
   Licence: per dataset, mostly CC BY 4.0. Check each dataset's licence field.
   Catalogue run by the Department of Public Expenditure, NDP Delivery and Reform.
+
+CRO open data — https://opendata.cro.ie
+  Licence: CC BY 4.0
+  Attribution: Company and financial-statement open data © Companies
+  Registration Office.
+
+Kohesio — https://kohesio.ec.europa.eu/
+  Licence: European Commission reuse policy / CC BY 4.0 compatible.
+  Attribution: European Commission, Kohesio platform.
 
 Smart Dublin (CKAN) — https://data.smartdublin.ie
   Licence: per dataset, mostly CC BY 4.0. Check each dataset's licence field.
@@ -105,6 +122,11 @@ OPW Hydrometric Network — https://waterlevel.ie
   Creative Commons Attribution 4.0 International (CC BY 4.0) licence (source
   waterlevel.ie, provided by the Office of Public Works). Provisional data;
   see the waterlevel.ie disclaimer.
+
+EPA Water Framework Directive open data — https://data.epa.ie/api-list/wfd-open-data/
+  Licence: CC BY 4.0
+  Attribution: Water Framework Directive open data © Environmental Protection
+  Agency Ireland.
 
 EU Tenders Electronic Daily (TED) — https://ted.europa.eu/
   Licence: EU reuse policy / Creative Commons Attribution 4.0 International

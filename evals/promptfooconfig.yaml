@@ -361,3 +361,53 @@ tests:
     assert:
       - type: icontains-any
         value: [bikes_networks]
+  - vars:
+      question: "What is Ireland's latest World Bank population estimate?"
+    assert:
+      - type: icontains-any
+        value: [worldbank_get_indicator, worldbank_ireland_profile]
+  - vars:
+      question: "Show Ireland's World Bank GDP and unemployment indicators."
+    assert:
+      - type: icontains-any
+        value: [worldbank_ireland_profile, worldbank_get_indicator]
+  - vars:
+      question: "Search the CRO open data catalogue for company records."
+    assert:
+      - type: icontains-any
+        value: [cro_search_datasets, search]
+  - vars:
+      question: "Query the CRO companies datastore for a company record."
+    assert:
+      - type: icontains-any
+        value: [cro_query_datastore, cro_get_dataset]
+  - vars:
+      question: "Find Pobal deprivation scores for Galvone."
+    assert:
+      - type: icontains-any
+        value: [pobal_deprivation_search, search]
+  - vars:
+      question: "What is the Pobal HP deprivation category for electoral division 128020?"
+    assert:
+      - type: icontains-any
+        value: [pobal_deprivation_search, fetch]
+  - vars:
+      question: "Find EU-funded Kohesio projects in Galway."
+    assert:
+      - type: icontains-any
+        value: [kohesio_search_projects, search]
+  - vars:
+      question: "Get details for Kohesio project Q232198."
+    assert:
+      - type: icontains-any
+        value: [kohesio_get_project]
+  - vars:
+      question: "Search EPA Water Framework Directive records for the Suir catchment."
+    assert:
+      - type: icontains-any
+        value: [epa_wfd_search, search]
+  - vars:
+      question: "What is the EPA WFD risk status for waterbody IE_SE_16B020080?"
+    assert:
+      - type: icontains-any
+        value: [epa_wfd_waterbody]

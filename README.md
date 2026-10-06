@@ -73,14 +73,18 @@ Need typed tools anyway?
 
 ## Sources
 
-Generated from `src/registry.ts` and the 23 source modules. The default `nearby`, `search` and `fetch` shortcuts sit above these sources.
+Generated from `src/registry.ts` and the 28 source modules. The default `nearby`, `search` and `fetch` shortcuts sit above these sources.
 
 | Domain | Source id | Publisher / source | Operations | Licence |
 | --- | --- | --- | ---: | --- |
 | stats | `cso` | [Central Statistics Office (CSO) PxStat](https://data.cso.ie) | 4 | CC BY 4.0 |
+| economy | `world-bank` | [World Bank Open Data](https://data.worldbank.org/country/ireland) | 2 | CC BY 4.0 |
 | stats | `eurostat` | [Eurostat Statistics API](https://ec.europa.eu/eurostat) | 3 | Eurostat reuse policy (CC BY 4.0 equivalent) |
 | stats | `ecb` | [ECB Data Portal](https://data.ecb.europa.eu) | 3 | ECB terms, free reuse with attribution |
+| stats | `pobal` | [Pobal HP Deprivation Index 2022](https://data.gov.ie/dataset/pobal-hp-deprivation-index-scores-2022) | 1 | CC BY 4.0 |
 | stats | `data-gov-ie` | [data.gov.ie](https://data.gov.ie) | 3 | Per dataset, mostly CC BY 4.0 |
+| economy | `cro` | [Companies Registration Office open data](https://opendata.cro.ie) | 3 | CC BY 4.0 |
+| economy | `kohesio` | [European Commission Kohesio](https://kohesio.ec.europa.eu/) | 2 | EU reuse policy / CC BY 4.0 compatible |
 | stats | `smart-dublin` | [Smart Dublin open data](https://data.smartdublin.ie) | 3 | Per dataset, mostly CC BY 4.0 |
 | stats | `census-areas` | [CSO Census 2022 small areas / Tailte Éireann](https://data-osi.opendata.arcgis.com/datasets/osi::cso-small-areas-national-statistical-boundaries-2022-generalised-20m) | 1 | CC BY 4.0 |
 | law/politics | `oireachtas` | [Houses of the Oireachtas Open Data API](https://api.oireachtas.ie) | 5 | Oireachtas Open Data PSI Licence |
@@ -94,6 +98,7 @@ Generated from `src/registry.ts` and the 23 source modules. The default `nearby`
 | environment | `marine` | [Marine Institute weather buoys](https://data.gov.ie/dataset/weather-buoy-network) | 1 | CC BY 4.0 |
 | environment | `opw-water` | [OPW waterlevel.ie](https://waterlevel.ie/) | 2 | CC BY 4.0 |
 | environment | `environment-sites` | [NPWS designated protected sites](https://experience.arcgis.com/experience/edf34d92e28040fd87d3d14f55d8d95f/) | 2 | CC BY 4.0 |
+| environment | `epa` | [EPA Water Framework Directive open data](https://data.epa.ie/api-list/wfd-open-data/) | 2 | CC BY 4.0 |
 | transport | `nta` | [National Transport Authority GTFS-Realtime](https://developer.nationaltransport.ie) | 2 | CC BY 4.0 |
 | transport | `irish-rail` | [Iarnród Éireann realtime API](https://api.irishrail.ie/realtime/) | 2 | Public open data; attribution required |
 | transport | `luas` | [Luas Forecasting API / TII](https://data.gov.ie/dataset/luas-forecasting-api) | 2 | CC BY 4.0 |
@@ -107,9 +112,9 @@ Generated from `src/registry.ts` and the 23 source modules. The default `nearby`
 | --- | --- |
 | Code | [MIT](LICENSE), copyright Conor Mongan. |
 | Source metadata and returned data | Stays under each publisher licence. Every normal tool response includes `source`, `url`, `licence`, `attribution`, `retrieved_at`, cache and truncation metadata. |
-| CSO / Eurostat / ECB / Wikidata | Cite CSO, Eurostat, ECB Data Portal and Wikidata contributors respectively; Wikidata is CC0. |
+| CSO / Eurostat / ECB / Wikidata / World Bank | Cite CSO, Eurostat, ECB Data Portal, Wikidata contributors and World Bank Open Data respectively; Wikidata is CC0. |
 | Oireachtas / legislation / PSI sources | Cite Oireachtas Open Data, eISB / Office of the Attorney General, PSRA, OPW and other named PSI publishers as shown in responses. |
-| Weather, transport, environment and maps | Cite Met Éireann, NTA, Iarnród Éireann, TII/Luas, EirGrid, Marine Institute, Tailte Éireann, NMS, NPWS, EPA-derived datasets where present, TED and JCDecaux/CityBikes/GBFS as applicable. |
+| Weather, transport, environment, business and maps | Cite Met Éireann, NTA, Iarnród Éireann, TII/Luas, EirGrid, Marine Institute, Tailte Éireann, NMS, NPWS, EPA, Pobal, CRO, Kohesio/TED and JCDecaux/CityBikes/GBFS as applicable. |
 | Full notice | See [NOTICE](NOTICE). Not affiliated with any government body, data publisher or transport operator. |
 
 ## Observability and privacy
@@ -196,7 +201,7 @@ Thank you to the maintainers of Irish-data and public-data MCP projects that hel
 | [cyanheads/eurostat-mcp-server](https://github.com/cyanheads/eurostat-mcp-server) | Eurostat MCP implementation. |
 | [isakskogstad/OECD-MCP](https://github.com/isakskogstad/OECD-MCP) | OECD statistical-data MCP. |
 
-Data comes from the publishers listed above, including CSO, data.gov.ie, Met Éireann, OPW, Irish Rail, Oireachtas, GeoHive/Tailte Éireann, National Monuments Service, NPWS, EPA-linked environmental datasets, Eurostat, ECB, Wikidata, TED, JCDecaux/CityBikes and others. Please cite the publisher shown in each response.
+Data comes from the publishers listed above, including CSO, data.gov.ie, Met Éireann, OPW, Irish Rail, Oireachtas, GeoHive/Tailte Éireann, National Monuments Service, NPWS, EPA, Pobal, CRO, World Bank, Eurostat, ECB, Wikidata, Kohesio, TED, JCDecaux/CityBikes and others. Please cite the publisher shown in each response.
 
 ## Security
 
