@@ -97,6 +97,7 @@ let rpcId = 1;
 async function rpc(method, params = {}) {
   const response = await fetch(endpoint, {
     method: "POST",
+    signal: AbortSignal.timeout(20000),
     headers: {
       "content-type": "application/json",
       accept: "application/json, text/event-stream",
@@ -135,11 +136,11 @@ const cursorLink = `cursor://anysphere.cursor-deeplink/mcp/install?name=ireland&
 
 const INSTALLERS = [
   {
-    id: "vscode", label: "VS Code", title: "VS Code & Insiders", body: "The current MCP install deeplink is a URL-encoded JSON object with name, type and url. Use either stable or Insiders.",
+    id: "vscode", label: "VS Code", title: "VS Code & Insiders", body: "Open the install link for your version of VS Code and confirm the server in the app.",
     actions: [{ text: "Install in VS Code", href: vscodeLink }, { text: "Install in Insiders", href: vscodeInsidersLink }], copy: jsonBlock(httpServerConfig), code: `${vscodeLink}\n\n${vscodeInsidersLink}`
   },
   {
-    id: "cursor", label: "Cursor", title: "Cursor One-Click Install", body: "Cursor accepts a base64-encoded MCP server config on its anysphere.cursor-deeplink URL scheme.",
+    id: "cursor", label: "Cursor", title: "Cursor One-Click Install", body: "Open the install link, then confirm Ireland MCP in Cursor.",
     actions: [{ text: "Install in Cursor", href: cursorLink }], copy: cursorLink, code: cursorLink
   },
   {
@@ -158,7 +159,7 @@ const INSTALLERS = [
   },
   {
     id: "gemini", label: "Gemini CLI", title: "Gemini CLI", body: "Add Ireland MCP to your Gemini CLI MCP servers using HTTP transport.",
-    copy: jsonBlock(copilotJson), code: jsonBlock({ mcpServers: { ireland: { httpUrl: endpoint } } })
+    copy: jsonBlock({ mcpServers: { ireland: { httpUrl: endpoint } } }), code: jsonBlock({ mcpServers: { ireland: { httpUrl: endpoint } } })
   },
   {
     id: "windsurf", label: "Windsurf", title: "Windsurf", body: "Open MCP settings, add a custom server named ireland, choose HTTP transport and paste the endpoint.",
@@ -181,12 +182,26 @@ function renderInstallers() {
     button.setAttribute("aria-controls", "install-panel");
     button.setAttribute("aria-selected", String(index === 0));
     button.textContent = item.label;
+    button.tabIndex = index === 0 ? 0 : -1;
+    button.addEventListener("keydown", (event) => {
+      const keys = ["ArrowLeft", "ArrowRight", "Home", "End"];
+      if (!keys.includes(event.key)) return;
+      event.preventDefault();
+      const next = event.key === "Home" ? 0 : event.key === "End" ? INSTALLERS.length - 1 : (index + (event.key === "ArrowRight" ? 1 : -1) + INSTALLERS.length) % INSTALLERS.length;
+      selectInstaller(INSTALLERS[next].id);
+      tabs.querySelectorAll("button")[next].focus();
+    });
     button.addEventListener("click", () => selectInstaller(item.id));
     return button;
   }));
   function selectInstaller(id) {
     const item = INSTALLERS.find((entry) => entry.id === id) || INSTALLERS[0];
-    for (const button of tabs.querySelectorAll("button")) button.setAttribute("aria-selected", String(button.id === `tab-${item.id}`));
+    for (const button of tabs.querySelectorAll("button")) {
+      const selected = button.id === `tab-${item.id}`;
+      button.setAttribute("aria-selected", String(selected));
+      button.tabIndex = selected ? 0 : -1;
+    }
+    panel.setAttribute("aria-labelledby", `tab-${item.id}`);
     panel.innerHTML = "";
     const title = document.createElement("h3");
     title.textContent = item.title;
@@ -257,7 +272,7 @@ function renderSources(domains) {
     section.setAttribute("aria-labelledby", `domain-${group.domain.replace(/[^a-z0-9]+/gi, "-")}`);
     const heading = document.createElement("h3");
     heading.id = `domain-${group.domain.replace(/[^a-z0-9]+/gi, "-")}`;
-    heading.textContent = group.domain;
+    heading.textContent = ({ stats: "Statistics", economy: "Economy", energy: "Energy", "law/politics": "Law and politics", "places/property": "Places and property", transport: "Transport", environment: "Environment", geography: "Places", government: "Government", property: "Property", cross: "Across sources" })[group.domain] || group.domain;
     const grid = document.createElement("div");
     grid.className = "source-grid";
     grid.append(...(group.sources || []).map((source) => {
@@ -271,7 +286,7 @@ function renderSources(domains) {
       const meta = document.createElement("div");
       meta.className = "source-meta";
       const ops = document.createElement("span");
-      ops.textContent = `${source.operations?.length || 0} ops`;
+      ops.textContent = `${source.operations?.length || 0} ${source.operations?.length === 1 ? "operation" : "operations"}`;
       const licence = document.createElement("span");
       licence.textContent = details.licence;
       meta.append(ops, licence);
@@ -332,30 +347,41 @@ async function initLiveStats() {
 async function initStatus() {
   const card = $("status-card");
   try {
-    const response = await fetch(STATUS_URL, { headers: { accept: "application/json" } });
+    const response = await fetch(STATUS_URL, { signal: AbortSignal.timeout(15000), headers: { accept: "application/json" } });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const status = await response.json();
-    const checked = status.checked_at ? new Intl.DateTimeFormat("en-IE", { dateStyle: "medium", timeStyle: "short" }).format(new Date(status.checked_at)) : "unknown time";
-    const ok = status.status === "ok";
+    const timestamp = status.checked_at ?? (status.status === "unreachable" ? status.fetched_at : undefined);
+    const checkedAt = Date.parse(timestamp);
+    const checked = Number.isFinite(checkedAt) ? new Intl.DateTimeFormat("en-IE", { dateStyle: "medium", timeStyle: "short" }).format(new Date(checkedAt)) : "unknown time";
+    const stale = !Number.isFinite(checkedAt) || Date.now() - checkedAt > 90 * 60 * 1000 || checkedAt > Date.now() + 5 * 60 * 1000;
+    const ok = !stale && status.status === "ok";
     const sources = Array.isArray(status.sources) ? status.sources : [];
+    const healthy = sources.filter((source) => source.status === "up").length;
+    const unavailable = sources.filter((source) => source.status === "down").length;
+    const skipped = sources.filter((source) => source.status === "skipped").length;
     card.innerHTML = "";
     const main = document.createElement("div");
     main.className = "status-main";
     const strong = document.createElement("strong");
     strong.className = ok ? "status-ok" : "status-bad";
-    strong.textContent = ok ? "All monitored sources healthy" : `Status: ${status.status || "unknown"}`;
+    strong.textContent = stale ? "Status check is out of date" : ok ? "All monitored sources healthy" : status.status === "unreachable" ? "Service health check failed" : unavailable ? `${unavailable} source${unavailable === 1 ? "" : "s"} unavailable` : `Status: ${status.status || "unknown"}`;
     const time = document.createElement("span");
     time.className = "muted";
     time.textContent = `Checked ${checked}`;
+    const summary = document.createElement("p");
+    summary.textContent = `${healthy} healthy · ${unavailable} unavailable · ${skipped} needs setup`;
     main.append(strong, time);
     const list = document.createElement("div");
     list.className = "status-sources";
-    list.append(...sources.slice(0, 18).map((source) => {
+    list.append(...sources.map((source) => {
       const pill = document.createElement("span");
-      pill.textContent = `${source.source}: ${source.status}${typeof source.latencyMs === "number" ? ` · ${source.latencyMs} ms` : ""}`;
+      const label = source.status === "down" ? "unavailable" : source.status === "skipped" ? "setup needed" : source.status;
+      const reason = source.httpStatus === 403 ? "Provider refused access (HTTP 403)" : source.error;
+      pill.textContent = `${source.source}: ${label}${reason ? ` · ${reason}` : typeof source.latencyMs === "number" ? ` · ${source.latencyMs} ms` : ""}`;
       return pill;
     }));
-    card.append(main, list);
+    card.append(main);
+    if (sources.length) card.append(summary, list);
   } catch (error) {
     card.textContent = `Status feed unavailable. Check GitHub status branch. ${error instanceof Error ? error.message : ""}`;
   }
@@ -367,6 +393,9 @@ $("playground-form").addEventListener("submit", async (event) => {
   const output = $("pg-output");
   let args;
   try { args = JSON.parse($("pg-args").value || "{}"); } catch { output.textContent = "Arguments must be valid JSON."; output.classList.add("error"); return; }
+  const submit = event.currentTarget.querySelector("button[type=submit]");
+  if (submit.disabled) return;
+  submit.disabled = true;
   status.textContent = "Running…";
   output.classList.remove("error");
   const started = performance.now();
@@ -378,78 +407,39 @@ $("playground-form").addEventListener("submit", async (event) => {
   } catch (error) {
     output.textContent = error instanceof Error ? error.message : String(error);
     output.classList.add("error");
-    status.textContent = "";
+    status.textContent = "Query failed. You can try again.";
+  } finally {
+    submit.disabled = false;
   }
 });
-
-const WORDS = ["Dáil", "Seanad", "Éireann", "Oireachtas", "census", "CSO", "PxStat", "Met Éireann", "Luas", "DART", "GTFS", "county", "constituency", "townland", "statute", "housing", "planning", "climate", "population", "rainfall", "Gaeltacht", "property", "data.gov.ie", "GeoHive", "licence", "CC BY 4.0", "Corcaigh", "Gaillimh"];
-const motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
-let motionPaused = false;
-const video = $("hero-video");
-function syncVideo() {
-  if (!video) return;
-  if (motionQuery.matches || motionPaused) video.pause();
-  else video.play().catch(() => undefined);
-}
-motionQuery.addEventListener("change", syncVideo);
-syncVideo();
-
-function canAnimate() {
-  const lowPower = (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory ?? 8) <= 4;
-  return !motionPaused && !motionQuery.matches && !navigator.connection?.saveData && !lowPower && innerWidth >= 768 && !matchMedia("(pointer: coarse)").matches;
-}
-
-function startTextRain() {
-  const canvas = $("text-rain");
-  const ctx = canvas?.getContext("2d");
-  if (!ctx) return;
-  const size = 13;
-  let width = 0, height = 0, drops = [], frame = 0, running = false;
-  const pick = () => WORDS[Math.floor(Math.random() * WORDS.length)];
-  const init = () => {
-    width = canvas.width = innerWidth;
-    height = canvas.height = innerHeight;
-    const columns = Math.max(8, Math.min(24, Math.ceil(width / (size * 8))));
-    drops = Array.from({ length: columns }, () => ({ y: Math.random() * -60, speed: 0.35 + Math.random() * 0.9, word: pick() }));
-  };
-  const draw = () => {
-    ctx.fillStyle = "rgba(7, 17, 14, 0.12)";
-    ctx.fillRect(0, 0, width, height);
-    ctx.font = `${size}px ui-monospace, monospace`;
-    drops.forEach((drop, index) => {
-      ctx.fillStyle = drop.speed > 1.1 ? "#9ef7c6" : "rgba(52, 192, 138, 0.62)";
-      ctx.fillText(drop.word, index * size * 6 + size, drop.y * size);
-      if (drop.y * size > height && Math.random() > 0.975) Object.assign(drop, { y: 0, speed: 0.5 + Math.random() * 1.5, word: pick() });
-      drop.y += drop.speed;
-    });
-  };
-  const loop = () => {
-    if (!running) return;
-    if (!document.hidden && ++frame % 4 === 0) draw();
-    requestAnimationFrame(loop);
-  };
-  const update = () => {
-    const ok = canAnimate();
-    canvas.hidden = !ok;
-    if (ok) init();
-    if (ok && !running) { running = true; requestAnimationFrame(loop); }
-    if (!ok) running = false;
-  };
-  addEventListener("resize", update);
-  motionQuery.addEventListener("change", update);
-  update();
-}
 
 renderInstallers();
 renderExamples();
 initLiveStats();
 initStatus();
-startTextRain();
+
+// Keep the original video, with an explicit pause control and reduced-motion support.
+const video = $("hero-video");
 const motionToggle = $("motion-toggle");
-motionToggle?.addEventListener("click", () => {
-  motionPaused = !motionPaused;
+const motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
+let motionPaused = motionQuery.matches;
+function syncVideo() {
   motionToggle.setAttribute("aria-pressed", String(motionPaused));
-  motionToggle.textContent = motionPaused ? "Resume Motion" : "Pause Motion";
+  motionToggle.textContent = motionPaused ? "Play video" : "Pause video";
+  if (motionPaused || document.hidden) video.pause();
+  else video.play().catch(() => {
+    motionPaused = true;
+    motionToggle.setAttribute("aria-pressed", "true");
+    motionToggle.textContent = "Play video";
+  });
+}
+motionToggle.addEventListener("click", () => {
+  motionPaused = !motionPaused;
   syncVideo();
-  motionQuery.dispatchEvent(new Event("change"));
 });
+motionQuery.addEventListener("change", () => {
+  motionPaused = motionQuery.matches;
+  syncVideo();
+});
+document.addEventListener("visibilitychange", syncVideo);
+syncVideo();

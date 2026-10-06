@@ -55,4 +55,4 @@ jobs:
           base="${endpoint%/mcp}"
           curl -fsS "$base/healthz"
           npx -y @modelcontextprotocol/inspector@2.9.0 --cli "$endpoint" --transport http --method tools/list > tools.json
-          node -e 'const t=require("./tools.json").tools; if (t.length < 20) process.exit(1); console.log(t.length + " tools")'
+          node -e 'const t=require("./tools.json").tools; const expected=["ireland_catalogue","ireland_describe","ireland_call","ireland_about","search","fetch","nearby"]; if (t.length !== expected.length || expected.some(n => !t.some(x => x.name === n))) process.exit(1); console.log(t.length + " tools")'

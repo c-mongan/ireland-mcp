@@ -263,3 +263,14 @@ describe("resources and prompts", () => {
     await client.close();
   });
 });
+
+it("enforces budgets for scalar maps, root arrays and escaped strings", () => {
+  const values = [Object.fromEntries(Array.from({ length: 2000 }, (_, i) => [`field${i}`, "value"])), Array.from({ length: 2000 }, () => 1), "\\".repeat(20000)];
+  for (const value of values) {
+    const before = JSON.stringify(value);
+    const result = applyBudget(value, 100);
+    expect(JSON.stringify(result).length).toBeLessThanOrEqual(400);
+    expect(result).toMatchObject({ truncated: true });
+    expect(JSON.stringify(value)).toBe(before);
+  }
+});

@@ -17,7 +17,7 @@ const TTL = 15 * MINUTE;
 // The point-forecast API is only served over plain HTTP (HTTPS returns 404).
 export const FORECAST_BASE = "http://openaccess.pf.api.met.ie/metno-wdb2ts/locationforecast";
 export const OBSERVATIONS_BASE = "https://prodapi.metweb.ie/observations";
-export const WARNINGS_URL = "https://www.met.ie/Open_Data/json/warning_IRELAND.json";
+export const WARNINGS_URL = "https://prodapi.met.ie/v2/warnings/";
 
 export interface Station {
   name: string;
@@ -178,23 +178,43 @@ export async function observationsAt(ctx: ToolContext, station: Station) {
   return { url, observations, cached: result.cached, stale: result.stale };
 }
 
-interface RawWarning {
-  id?: string;
-  type?: string;
-  level?: string;
-  headline?: string;
-  description?: string;
-  regions?: string[];
-  onset?: string;
-  expiry?: string;
-  severity?: string;
-  certainty?: string;
-  updated?: string;
-}
+// The same versioned HTTPS feed used by met.ie/warnings-today.html.
+const warningSchema = z.object({
+  id: z.string().optional(),
+  type: z.string(),
+  level: z.string(),
+  headline: z.string(),
+  description: z.string().optional(),
+  regions: z.array(z.string()),
+  onset: z.string().optional(),
+  expiry: z.string().optional(),
+  severity: z.string().optional(),
+  certainty: z.string().optional(),
+  updated: z.string().optional()
+});
+const warningCategories = ["national", "marine", "environmental", "northern_ireland", "advisories"] as const;
+const warningFeedSchema = z.object({
+  warnings: z.object({
+    national: z.array(warningSchema),
+    marine: z.array(warningSchema),
+    environmental: z.array(warningSchema),
+    northern_ireland: z.array(warningSchema),
+    advisories: z.array(warningSchema)
+  })
+});
+type WarningFeed = z.infer<typeof warningFeedSchema>;
 
 export async function activeWarnings(ctx: ToolContext) {
-  const result = await ctx.cachedJson<RawWarning[]>(WARNINGS_URL, 5 * MINUTE, { label: "Met Éireann warnings" });
-  const warnings = (Array.isArray(result.value) ? result.value : []).map((w) => ({
+  const result = await ctx.cachedJson<WarningFeed>(WARNINGS_URL, 5 * MINUTE, {
+    label: "Met Éireann warnings",
+    validate(value) {
+      if (!warningFeedSchema.safeParse(value).success) {
+        throw new ToolError("UPSTREAM_DOWN", "Met Éireann returned an unexpected warnings format.");
+      }
+    }
+  });
+  const warnings = warningCategories.flatMap((category) => result.value.warnings[category].map((w) => ({
+    category,
     level: w.level ?? null,
     type: w.type ?? null,
     headline: w.headline ?? null,
@@ -205,7 +225,7 @@ export async function activeWarnings(ctx: ToolContext) {
     severity: w.severity ?? null,
     certainty: w.certainty ?? null,
     updated: w.updated ?? null
-  }));
+  })));
   return { warnings, cached: result.cached, stale: result.stale };
 }
 

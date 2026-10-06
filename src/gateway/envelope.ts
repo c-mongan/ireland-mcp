@@ -105,7 +105,9 @@ function largestCut(root: Container): Cut | undefined {
 export function applyBudget(value: unknown, maxTokens?: number, options: { annotate?: boolean } = {}): unknown {
   const tokens = clampMaxTokens(maxTokens);
   const limitChars = tokens * 4;
-  if (!isContainer(value) || JSON.stringify(value).length <= limitChars) return value;
+  const encoded = JSON.stringify(value);
+  if (encoded === undefined || encoded.length <= limitChars) return value;
+  if (!isContainer(value)) return { truncated: true, hint: "Result exceeds the requested budget. Narrow the query." };
   const annotate = (options.annotate ?? true) && !Array.isArray(value);
   const root = JSON.parse(JSON.stringify(value)) as Container;
   const target = annotate ? limitChars - ANNOTATION_RESERVE_CHARS : limitChars;
@@ -147,6 +149,11 @@ export function applyBudget(value: unknown, maxTokens?: number, options: { annot
       obj.total = first.total;
     }
     obj.hint = `Result cut to fit ~${tokens} tokens. Narrow the request (filters, smaller limit) or pass max_tokens (up to ${MAX_MAX_TOKENS}).`;
+  }
+  // Some objects contain only short scalar fields, leaving nothing for largestCut.
+  // Fail closed instead of returning an oversized, misleadingly partial payload.
+  if (size() > limitChars) {
+    return { truncated: true, hint: "Result exceeds the requested budget. Narrow the query or increase max_tokens." };
   }
   return root;
 }

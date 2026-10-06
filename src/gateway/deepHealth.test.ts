@@ -28,6 +28,18 @@ describe("DeepHealth", () => {
     expect(fetch.calls).toHaveLength(2);
   });
 
+  it("keeps refused provider access degraded but excludes missing credentials", async () => {
+    const report = await new DeepHealth({ probes, fetch: fakeFetch([
+      { match: /ok/, body: "fine" }, { match: /fail/, status: 403 }
+    ]) }).check();
+    expect(report.status).toBe("degraded");
+    expect(report.sources[1]).toMatchObject({ status: "down", httpStatus: 403 });
+    const healthy = await new DeepHealth({ probes, fetch: fakeFetch([{ match: () => true }]) }).check();
+    expect(healthy.status).toBe("ok");
+    expect(healthy.sources[2]).toMatchObject({ status: "skipped" });
+    expect(defaultProbes({}).find((p) => p.source === "met-eireann")?.url).toBe("https://prodapi.met.ie/v2/warnings/");
+  });
+
   it("caches the report for 60 seconds so it cannot amplify traffic", async () => {
     let now = 0;
     const fetch = fakeFetch([{ match: () => true }]);

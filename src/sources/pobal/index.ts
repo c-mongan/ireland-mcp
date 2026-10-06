@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ToolError } from "../../gateway/errors.js";
 import { DAY } from "../../gateway/context.js";
 import { bound, envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js";
 import { defineTool, type FetchedDocument, type SearchHit, type SourceModule, type ToolContext } from "../../gateway/module.js";
@@ -17,7 +18,12 @@ export const pobalInfo: SourceInfo = {
 
 interface CkanEnvelope<T> { success: boolean; result?: T; error?: { message?: string } }
 interface DatastoreResult { total?: number; records?: Array<Record<string, unknown>> }
-function value(body: CkanEnvelope<DatastoreResult>): DatastoreResult { return body.success ? (body.result ?? {}) : {}; }
+function value(body: CkanEnvelope<DatastoreResult>): DatastoreResult {
+  if (body?.success !== true || !body.result || !Array.isArray(body.result.records)) {
+    throw new ToolError("UPSTREAM_DOWN", "Pobal HP returned an invalid or unsuccessful response.");
+  }
+  return body.result;
+}
 function n(v: unknown): number | null {
   if (typeof v === "number") return v;
   if (typeof v === "string") { const out = Number(v.replace(/,/g, "")); return Number.isFinite(out) ? out : null; }
@@ -36,7 +42,7 @@ function compact(r: Record<string, unknown>) {
 }
 async function query(ctx: ToolContext, params: URLSearchParams) {
   const url = `${API}?${params.toString()}`;
-  const result = await ctx.cachedJson<CkanEnvelope<DatastoreResult>>(url, TTL, { label: "Pobal HP" });
+  const result = await ctx.cachedJson<CkanEnvelope<DatastoreResult>>(url, TTL, { label: "Pobal HP", validate: value });
   return { url, value: value(result.value), cached: result.cached, stale: result.stale };
 }
 
@@ -73,7 +79,9 @@ export const pobalModule: SourceModule = {
   },
   async fetchById(key: string, ctx: ToolContext): Promise<FetchedDocument> {
     const result = await query(ctx, new URLSearchParams({ resource_id: RESOURCE_ID, filters: JSON.stringify({ ED_ID_STR: key }), limit: "1" }));
-    const area = compact((result.value.records ?? [])[0] ?? {});
+    const record = result.value.records?.[0];
+    if (!record) throw new ToolError("NOT_FOUND", "No Pobal electoral division matches this id.");
+    const area = compact(record);
     return { id: `${pobalInfo.id}:${key}`, title: `${area.electoral_division || key} deprivation score`, text: JSON.stringify(area, null, 2), url: result.url, metadata: { source: pobalInfo.id } };
   }
 };

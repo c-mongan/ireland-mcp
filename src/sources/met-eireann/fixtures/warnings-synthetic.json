@@ -1,18 +1,36 @@
-[
- {
-  "id": "synthetic-1",
-  "type": "Wind",
-  "level": "Yellow",
-  "headline": "Wind warning for Galway, Mayo",
-  "description": "Southwest winds will reach mean speeds of 50 to 65km/h with gusts of 90 to 110km/h.",
-  "regions": [
-   "EI07",
-   "EI16"
-  ],
-  "onset": "2026-10-06T06:00:00+01:00",
-  "expiry": "2026-10-06T18:00:00+01:00",
-  "severity": "Moderate",
-  "certainty": "Likely",
-  "updated": "2026-10-05T12:00:00+01:00"
- }
-]
+{
+  "warnings": {
+    "national": [
+      {
+        "id": "synthetic-1",
+        "type": "Wind",
+        "level": "Yellow",
+        "headline": "Wind warning for Galway, Mayo",
+        "description": "Southwest winds will reach mean speeds of 50 to 65km/h with gusts of 90 to 110km/h.",
+        "regions": [
+          "EI07",
+          "EI16"
+        ],
+        "onset": "2026-10-06T06:00:00+01:00",
+        "expiry": "2026-10-06T18:00:00+01:00",
+        "severity": "Moderate",
+        "certainty": "Likely",
+        "updated": "2026-10-05T12:00:00+01:00"
+      }
+    ],
+    "marine": [
+      {
+        "id": "synthetic-marine",
+        "level": "Yellow",
+        "type": "small-craft",
+        "headline": "Small craft warning",
+        "regions": [
+          "EI811"
+        ]
+      }
+    ],
+    "environmental": [],
+    "northern_ireland": [],
+    "advisories": []
+  }
+}

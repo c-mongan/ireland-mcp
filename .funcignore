@@ -12,3 +12,7 @@ scripts/
 *.ts
 !dist/**
 local.settings.json
+
+.agents/
+graphify-out/
+test-results/
