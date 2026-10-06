@@ -81,7 +81,7 @@ Need typed tools anyway?
 | Source toolsets | `/mcp?toolsets=cso,irish-rail` lists selected typed tools too. |
 | One source path | `/mcp/x/{source}` lists that source's typed tools, for example `/mcp/x/met-eireann`. |
 | Everything | `/mcp?toolsets=all` lists all 74 tools and is useful for debugging, not routine chat. |
-| Local stdio | `npx -y ireland-mcp --toolsets=cso` or `IRELAND_MCP_TOOLSETS=all`. |
+| Local stdio | From source: `node dist/src/cli.js --toolsets=cso` or `IRELAND_MCP_TOOLSETS=all` (npm package not yet published). |
 
 `max_tokens` defaults to about 2,000 output tokens and can be set from 100 to 8,000. Large results return `truncated`, counts and narrowing hints instead of flooding the context.
 
@@ -209,7 +209,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full checklist.
 
 ## Registry and publishing
 
-`server.json` is ready for the official MCP Registry as a **remote-only Streamable HTTP** server named `io.github.c-mongan/ireland-mcp`. The future domain name is planned as `ie.irishopendata/ireland` after DNS verification. Publishing notes and directory checklists are in [docs/publishing.md](docs/publishing.md). Do not publish from a fork without changing the name and endpoint.
+Ireland MCP is **listed on the [official MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.c-mongan/ireland-mcp)** as a remote-only Streamable HTTP server named `io.github.c-mongan/ireland-mcp` (v1.0.0). Clients that browse the registry can install it by name. The future domain name is planned as `ie.irishopendata/ireland` after DNS verification. Publishing notes and directory checklists are in [docs/publishing.md](docs/publishing.md). Do not publish from a fork without changing the name and endpoint.
 
 ## Credits and prior art
 
