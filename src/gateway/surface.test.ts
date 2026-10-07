@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { z } from "zod";
 import { connectClient } from "../../test/helpers/mcpClient.js";
 import { fakeFetch } from "../../test/helpers/fakeFetch.js";
-import { createAppServer, sourceModules } from "../registry.js";
+import { appModules, createAppServer, sourceModules } from "../registry.js";
 import { DOMAINS, listOperations, exampleArgs } from "./catalogue.js";
 import { createContext } from "./context.js";
 import { applyBudget, envelope } from "./envelope.js";
@@ -49,15 +49,11 @@ describe("default lean surface", () => {
     }
   });
 
-  it("keeps the default definition small as source operations grow", async () => {
-    const make = (count: number) => buildServer({ modules: [{ ...demoModule, tools: Array.from({ length: count }, (_, i) => ({ ...rowsTool, name: `demo_rows_${i}` })) }], context: ctx });
-    const sizes = [];
-    for (const count of [1, 200]) {
-      const client = await connectClient(make(count));
-      sizes.push(JSON.stringify(await client.listTools()).length);
-      await client.close();
+  it("indexes every operation by source in the ireland_call description, so models can call it directly", async () => {
+    const call = (await listTools()).find((t) => t.name === "ireland_call")!;
+    for (const { source, tool } of listOperations(appModules().modules)) {
+      expect(call.description).toMatch(new RegExp(`${source}: [^;]*\\b${tool.name}\\b`));
     }
-    expect(sizes[1]).toBe(sizes[0]);
   });
 
   it("keeps nearby cheap enough to stay top level (<350 tokens)", async () => {

@@ -14,8 +14,8 @@ export const REPO_URL = "https://github.com/c-mongan/ireland-mcp";
 
 export const INSTRUCTIONS = [
   "Read-only Irish public data (CSO, Oireachtas, Met Éireann, transport, property, energy and more).",
-  "Workflow: use ireland_catalogue with a query to find relevant operations, ireland_describe for arguments, then ireland_call with {source, operation, args}.",
-  "Without a query, ireland_catalogue browses sources by domain. Bad ireland_call arguments return the schema and an example.",
+  "Workflow: ireland_call's description indexes every source and operation; when one fits, call ireland_call with {source, operation, args} directly (bad args return the schema and an example).",
+  "Otherwise use ireland_catalogue to browse, and ireland_describe for an operation's argument schema.",
   "search/fetch is keyword discovery (CSO tables, bills, acts, datasets, tenders). nearby covers boundaries, small area code, forecast, monuments and protected sites at a lat/lon only.",
   "Use ireland_call for live readings (weather observations, river levels, buoys, bikes), populations (cso_area_profile, census_small_area_at) and place names (geohive_locate).",
   "Cite `source`, `url`, `licence` and `attribution` from each result.",
@@ -68,6 +68,13 @@ function fail(body: unknown): ToolResult {
   return { isError: true, content: [{ type: "text", text: JSON.stringify(body) }] };
 }
 
+/** Compact "source: op, op; source: op" index of every operation, for the ireland_call description. */
+function operationIndex(operations: readonly Operation[]): string {
+  const bySource = new Map<string, string[]>();
+  for (const { source, tool } of operations) bySource.set(source, [...(bySource.get(source) ?? []), tool.name]);
+  return [...bySource].map(([source, names]) => `${source}: ${names.join(", ")}`).join("; ");
+}
+
 /** Names the dispatched operation in an ireland_call result, so transcripts and evals can attribute the call. */
 function tagOperation(result: ToolResult, source: string, operation: string): ToolResult {
   const content = result.content.map((part, i) =>
@@ -105,7 +112,7 @@ export function buildServer(options: BuildServerOptions): McpServer {
     { name: SERVER_NAME, version: SERVER_VERSION },
     { instructions: INSTRUCTIONS, capabilities: { resources: {}, prompts: {} } }
   );
-  registerMetaTools(server, modules, context, sink);
+  registerMetaTools(server, modules, operations, context, sink);
 
   for (const tool of extraTools) registerTyped(server, tool, "cross", context, sink);
   for (const { tool, source } of operations) {
@@ -200,6 +207,7 @@ function describeOperation({ tool, source }: Operation) {
 function registerMetaTools(
   server: McpServer,
   modules: SourceModule[],
+  operations: Operation[],
   context: ToolContext,
   sink: TelemetrySink
 ) {
@@ -215,11 +223,11 @@ function registerMetaTools(
     "ireland_catalogue",
     {
       title: "Catalogue of Irish data sources",
-      description: `Find operations by keyword query, or browse sources grouped by domain: ${DOMAINS.join(", ")}. Start here.`,
+      description: `List sources and their operations, grouped by domain: ${DOMAINS.join(", ")}. Optional query narrows to matching operations when unsure which one fits.`,
       inputSchema: {
         domain: z.enum(DOMAINS).optional().describe("Only this domain."),
         source: z.string().max(100).optional().describe("Only this source id, e.g. 'cso'."),
-        query: z.string().trim().min(1).max(200).optional().describe("Find relevant operations, e.g. 'train departures'."),
+        query: z.string().trim().min(1).max(200).optional().describe("Keywords to rank operations, e.g. 'train departures'."),
         limit: z.number().int().min(1).max(20).default(5).describe("Maximum query matches; browse mode is unchanged.")
       },
       outputSchema: OUTPUT_SCHEMA,
@@ -248,7 +256,7 @@ function registerMetaTools(
     "ireland_call",
     {
       title: "Call an operation",
-      description: "Run a source operation with args. Find operations with ireland_catalogue(query), then get arguments with ireland_describe. Bad args return the expected schema and an example.",
+      description: `Run a source operation with args. Bad args return the expected schema and an example. Operations by source: ${operationIndex(operations)}.`,
       inputSchema: {
         source: z.string().describe("Source id."),
         operation: z.string().describe("Operation name."),

@@ -126,9 +126,9 @@ Need typed tools anyway?
 
 ## Architecture
 
-Use `ireland_catalogue({query: "train departures", limit: 5})` to find relevant operations without loading every argument schema. Optional `source` and `domain` filters narrow discovery. Results contain short descriptions and a truncation flag; use `ireland_describe` for the selected schema and `ireland_call` to execute it. Calling the catalogue without a query preserves grouped browsing. Discovery uses local keyword ranking and adds no service or model dependency.
+`ireland_call` still lists every operation name so models can call directly; when none obviously fits, use `ireland_catalogue({query: "train departures", limit: 5})` to find relevant operations without loading every argument schema. Optional `source` and `domain` filters narrow discovery. Results contain short descriptions and a truncation flag; use `ireland_describe` for the selected schema and `ireland_call` to execute it. Calling the catalogue without a query preserves grouped browsing. Discovery uses local keyword ranking and adds no service or model dependency.
 
-The server is a stateless Azure Functions Flex app with a lean gateway in front of the source modules. The gateway owns operation discovery, response budgets, cache, upstream budgets, circuit breakers and evidence envelope; every normal result includes source URL, licence, attribution and retrieval metadata.
+The server is a stateless Azure Functions Flex app with a lean gateway in front of the source modules. The gateway owns the operation index, keyword discovery, response budgets, cache, upstream budgets, circuit breakers and evidence envelope; every normal result includes source URL, licence, attribution and retrieval metadata.
 
 | Diagram | Editable source |
 | --- | --- |
