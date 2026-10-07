@@ -150,16 +150,77 @@ const dataTool = defineTool({
 });
 
 const F1001 = { table: "F1001", year: "TLIST(A1)", county: "C02779V03348", sex: "C02199V02655" } as const;
+const F1015 = { table: "F1015", year: "TLIST(A1)", town: "C04160V04929", sex: "C02199V02655" } as const;
+
+const fold = (text: string) =>
+  text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase().replace(/\s+/g, " ");
+
+function pickTown(towns: { code: string; label: string }[], area: string) {
+  const wanted = fold(area);
+  const name = (label: string) => fold(label.split(",")[0]!);
+  const exact = towns.filter((t) => t.code === area.trim() || fold(t.label) === wanted);
+  if (exact.length > 0) return exact;
+  const byName = towns.filter((t) => name(t.label) === wanted);
+  if (byName.length > 0) return byName;
+  return towns.filter((t) => name(t.label).startsWith(`${wanted} `));
+}
+
+async function townProfile(ctx: ToolContext, area: string, countyLabels: string[]) {
+  const meta = await readMetadata(ctx, F1015.table);
+  const dims = dimensions(meta.value);
+  const towns = dims.find((d) => d.code === F1015.town)!.categories;
+  const year = dims.find((d) => d.code === F1015.year)!.categories.at(-1)!.code;
+  const matches = pickTown(towns, area);
+  if (matches.length === 0) {
+    throw new ToolError("NOT_FOUND", `No county or Census 2022 town matches "${area}".`, {
+      hint: `Counties: ${countyLabels.join(", ")}. Towns use CSO table F1015 names, e.g. "Ennis" or "Galway city and suburbs".`
+    });
+  }
+  if (matches.length > 1) {
+    throw new ToolError("BAD_ARGS", `"${area}" matches ${matches.length} Census 2022 towns.`, {
+      hint: `Use the full name: ${matches.slice(0, 10).map((t) => t.label).join("; ")}.`
+    });
+  }
+  const town = matches[0]!;
+  const data = await readDataset(ctx, F1015.table, {
+    [F1015.year]: [year],
+    [F1015.town]: [town.code],
+    [F1015.sex]: ["-", "1", "2"]
+  });
+  const decoded = rows(data.value, 100).rows;
+  const value = (statistic: string, sex = "Both sexes") =>
+    decoded.find((r) => r.Statistic === statistic && r.Sex === sex)?.value ?? null;
+  return envelope(csoInfo, {
+    data: {
+      area: town.label,
+      level: "town",
+      code: town.code,
+      table: F1015.table,
+      census: [{ year, total: value("Population"), male: value("Population", "Male"), female: value("Population", "Female") }],
+      age: {
+        average_age: value("Average Age"),
+        percent_under_15: value("Percentage Aged Under 15"),
+        percent_15_to_64: value("Percentage Aged 15-64"),
+        percent_65_plus: value("Percentage Aged 65 years or more")
+      },
+      change: null,
+      note: `Town figures come from Census ${year} only (F1015), so no change is computed.`
+    },
+    url: tableUrl(F1015.table),
+    cached: data.cached,
+    stale: data.stale
+  });
+}
 
 const areaProfileTool = defineTool({
   name: "cso_area_profile",
   example: { area: "Galway" },
-  title: "County population profile",
+  title: "County or town population profile",
   description:
-    "Census population for a county or the State (table F1001): latest census and the previous one, by sex, with change. Accepts a county name (e.g. 'Galway'), its F1001 code ('19') or 'State'.",
+    "Census population for a county, a town or the State. Counties use table F1001 (latest census and the previous one, by sex, with change). Other names fall back to Census 2022 towns in table F1015 (population by sex, average age and age bands). Accepts a county name ('Galway'), its F1001 code, 'State', or a town ('Ennis', 'Ennis, Co Clare').",
   inputSchema: {
-    area: z.string().min(1).max(60).describe("County name, F1001 county code, or 'State' for Ireland."),
-    years: z.array(z.string().regex(/^\d{4}$/)).min(1).max(10).optional().describe("Census years; defaults to the two latest.")
+    area: z.string().min(1).max(80).describe("County name, F1001 county code, 'State', or a Census 2022 town name."),
+    years: z.array(z.string().regex(/^\d{4}$/)).min(1).max(10).optional().describe("Census years for counties; defaults to the two latest. Towns are 2022 only.")
   },
   handler: async ({ area, years }, ctx) => {
     const meta = await readMetadata(ctx, F1001.table);
@@ -170,11 +231,7 @@ const areaProfileTool = defineTool({
       counties.find((c) => c.code === area.trim()) ??
       counties.find((c) => c.label.toLowerCase() === wanted) ??
       (wanted === "ireland" ? counties.find((c) => c.code === "-") : undefined);
-    if (!county) {
-      throw new ToolError("NOT_FOUND", `No F1001 county matches "${area}".`, {
-        hint: `Valid areas: ${counties.map((c) => c.label).join(", ")}. F1001 uses Dublin as one county.`
-      });
-    }
+    if (!county) return townProfile(ctx, area, counties.map((c) => c.label));
     const available = dims.find((d) => d.code === F1001.year)!.categories.map((c) => c.code);
     const chosen = years ?? available.slice(-2);
     const missing = chosen.filter((y) => !available.includes(y));
@@ -200,7 +257,7 @@ const areaProfileTool = defineTool({
         ? { absolute: last - first, percent: Math.round(((last - first) / first) * 1000) / 10 }
         : null;
     return envelope(csoInfo, {
-      data: { area: county.label, code: county.code, table: F1001.table, census: byYear, change },
+      data: { area: county.label, level: "county", code: county.code, table: F1001.table, census: byYear, change },
       url: tableUrl(F1001.table),
       cached: data.cached,
       stale: data.stale

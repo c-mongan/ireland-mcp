@@ -15,6 +15,8 @@ const routes: Route[] = [
   rpcRoute("Navigation_API.Search", "search-population-county.json", (b) => b.includes("population")),
   { match: (url, init) => url.includes("api.jsonrpc") && String(init?.body).includes("zzqq"), body: '{"jsonrpc":"2.0","result":[],"id":1}' },
   { match: /ReadMetadata\/F1001\//, file: f("metadata-F1001.json") },
+  { match: /ReadMetadata\/F1015\//, file: f("metadata-F1015.json") },
+  rpcRoute("ReadDataset", "data-F1015-ennis.json", (b) => b.includes("b3b65574-81c9-4263-af16-048810b790f0")),
   { match: /ReadMetadata\/ZZZ99\//, status: 404, body: "NotFound" },
   rpcRoute("ReadDataset", "data-F1001-dublin.json", (b) => b.includes('"index":["02"]') && b.includes('"1"')),
   rpcRoute("ReadDataset", "data-F1001-2016-2022.json")
@@ -87,6 +89,33 @@ describe("CSO module", () => {
       { year: "2022", total: 1458154, male: 713606, female: 744548 }
     ]);
     expect(body.data.change).toEqual({ absolute: 110795, percent: 8.2 });
+  });
+
+  it("cso_area_profile falls back to Census 2022 towns (F1015)", async () => {
+    const fetch = fakeFetch(routes);
+    for (const area of ["Ennis", "ennis, co clare"]) {
+      const { body } = await callTool(csoModule, "cso_area_profile", { area }, fetch);
+      expect(body.data).toMatchObject({
+        area: "Ennis, Co Clare",
+        level: "town",
+        table: "F1015",
+        census: [{ year: "2022", total: 27923, male: 13377, female: 14546 }],
+        age: { average_age: 38.9, percent_under_15: 20.1, percent_15_to_64: 65.3, percent_65_plus: 14.6 },
+        change: null
+      });
+      expect(body.citation?.url ?? body.url).toContain("F1015");
+    }
+    const city = await callTool(csoModule, "cso_area_profile", { area: "Galway city" }, fetch);
+    expect(city.body.data?.area ?? city.body.error).toBe("Galway city and suburbs, Co Galway");
+    const county = await callTool(csoModule, "cso_area_profile", { area: "Galway", years: ["2016", "2022"] }, fetch);
+    expect(county.body.data).toMatchObject({ area: "Galway", level: "county", table: "F1001" });
+  });
+
+  it("cso_area_profile asks which town when a name is ambiguous", async () => {
+    const { body } = await callTool(csoModule, "cso_area_profile", { area: "Milltown" }, fakeFetch(routes));
+    expect(body.error.code).toBe("BAD_ARGS");
+    expect(body.error.hint).toContain("Milltown, Co Kerry");
+    expect(body.error.hint).toContain("Milltown, Co Galway");
   });
 
   it("cso_area_profile rejects unknown areas and years", async () => {
