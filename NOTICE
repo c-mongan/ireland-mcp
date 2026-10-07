@@ -24,6 +24,11 @@ carries the source, licence and attribution text; keep that attribution when
 you reuse the data. This project is not affiliated with or endorsed by any of
 the publishers below.
 
+National Council for Special Education open data — https://opendata.ncse.ie
+  Licence: Creative Commons Attribution; consult each dataset for exact terms.
+  Attribution: School special-education teaching and SNA allocation data
+  © National Council for Special Education.
+
 Central Statistics Office (CSO) PxStat — https://data.cso.ie
   Licence: CC BY 4.0
   Attribution: Source: Central Statistics Office, Ireland (www.cso.ie).
@@ -140,8 +145,3 @@ CityBikes API / PyBikes — https://api.citybik.es/v2/
   where supplied.
   Attribution: CityBikes API / PyBikes (citybik.es), plus underlying operators
   such as JCDecaux Dublin Bikes and TFI Bikes where shown.
-
-National Council for Special Education open data — https://opendata.ncse.ie
-  Licence: Creative Commons Attribution; consult each dataset for exact terms.
-  Attribution: School special-education teaching and SNA allocation data
-  © National Council for Special Education.
