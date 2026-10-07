@@ -8,7 +8,8 @@ const MCP_HOST = "mcp.irishopendata.ie";
 export function redirectFor(host: string, pathAndQuery: string): HttpResponseInit {
   const name = host.toLowerCase().replace(/:\d+$/, "");
   const path = pathAndQuery.startsWith("/") ? pathAndQuery : `/${pathAndQuery}`;
-  const target = SITE_ALIASES.has(name) ? path : name === MCP_HOST && path === "/" ? "/" : null;
+  const pathname = path.split("?", 1)[0];
+  const target = SITE_ALIASES.has(name) || (name === MCP_HOST && pathname === "/") ? path : null;
   if (target === null) return { status: 404, jsonBody: { error: "Not found. The MCP endpoint is /mcp." } };
   return { status: 301, headers: { location: `${CANONICAL_SITE}${target}`, "cache-control": "public, max-age=3600" } };
 }

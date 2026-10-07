@@ -59,13 +59,6 @@ Cost controls:
 
 ## Custom domain (irishopendata.ie)
 
-The site lives on the Static Web App (Free SKU, two custom domains: apex and `www`). The MCP endpoint and the `.com` aliases point at the Function App, where `src/functions/redirect.ts` sends allow-listed hosts to `https://irishopendata.ie` with a 301. Unknown hosts get a 404, so the redirect cannot act as an open redirect. The `azurewebsites.net` and `azurestaticapps.net` URLs keep working.
+The apex site lives on the Static Web App. `www.irishopendata.ie` and `mcp.irishopendata.ie` point at the Function App, where `src/functions/redirect.ts` sends allow-listed site aliases (any path) and the MCP root to `https://irishopendata.ie` with a 301, preserving the query string. Other paths on the MCP host are not redirected, and unknown hosts get a 404, so the redirect cannot act as an open redirect. The `azurewebsites.net` and `azurestaticapps.net` URLs keep working.
 
-| Host | DNS records (registrar DNS) | Azure binding |
-|---|---|---|
-| `irishopendata.ie` | TXT validation token + A record to the SWA's apex IP | `az staticwebapp hostname set --hostname irishopendata.ie --validation-method dns-txt-token` |
-| `www.irishopendata.ie` | CNAME to the SWA default host | `az staticwebapp hostname set --hostname www.irishopendata.ie` |
-| `mcp.irishopendata.ie` | CNAME to `<func>.azurewebsites.net` + TXT `asuid.mcp` = the app's `customDomainVerificationId` | `az functionapp config hostname add`, then a managed certificate and an SNI binding |
-| `irishopendata.com`, `www.irishopendata.com` | A to the Function App inbound IP (apex) / CNAME (www) + `asuid` TXT | Same as `mcp`; the redirect function returns a 301 to the `.ie` site |
-
-Read the verification ID and inbound IP with `az resource show --resource-type Microsoft.Web/sites -g <rg> -n <func> --query "properties.{id:customDomainVerificationId,ip:inboundIpAddress}"`. `az functionapp show` returns nulls for these fields on Flex Consumption.
+The Function App uses free App Service managed certificates (Flex site-scoped certificates, two of the three allowed), so no purchased certificate is needed. The DNS zone is in `infra/dns-zone.bicep`. Registration, delegation, bindings, validation and rollback are in [domain-go-live.md](domain-go-live.md).
