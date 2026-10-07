@@ -439,6 +439,204 @@
     "showAs": "Donnchadh Ó Laoghaire",
     "pId": "DonnchadhOLaoghaire"
    }
+  },
+  {
+   "member": {
+    "memberCode": "Catherine-Connolly.D.2016-10-03",
+    "dateOfDeath": null,
+    "image": false,
+    "lastName": "Connolly",
+    "wikiTitle": null,
+    "gender": "",
+    "fullName": "Catherine Connolly",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Catherine-Connolly.D.2016-10-03",
+    "memberships": [
+     {
+      "membership": {
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Catherine-Connolly.D.2016-10-03/house/dail/34",
+       "dateRange": {
+        "start": "2024-11-29",
+        "end": "2025-10-25"
+       },
+       "house": {
+        "showAs": "34th Dáil",
+        "houseNo": "34",
+        "chamberType": "house",
+        "houseCode": "dail",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34"
+       },
+       "parties": [
+        {
+         "party": {
+          "dateRange": {
+           "end": "2025-10-25",
+           "start": "2024-11-29"
+          },
+          "partyCode": "Independent",
+          "showAs": "Independent",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/party/dail/34/Independent"
+         }
+        }
+       ],
+       "represents": [
+        {
+         "represent": {
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/34/constituency/Galway-West",
+          "representType": "constituency",
+          "representCode": "Galway-West",
+          "showAs": "Galway West"
+         }
+        }
+       ],
+       "offices": [],
+       "committees": [
+        {
+         "committeeCode": "ACC",
+         "mainStatus": "Live",
+         "memberDateRange": {
+          "start": "2025-05-07 00:00:00+00:00",
+          "end": "2025-10-25 00:00:00+00:00"
+         },
+         "uri": "https://data.oireachtas.ie/ie/oireachtas/committee/dail/34/committee_of_public_accounts",
+         "status": "Live - Primary",
+         "committeeID": 236,
+         "committeeDateRange": {
+          "start": "2024-12-18 00:00:00+00:00",
+          "end": null
+         },
+         "expiryType": "Standing",
+         "committeeName": [
+          {
+           "nameEn": "Committee of Public Accounts",
+           "nameGa": "An Coiste um Chuntais Phoiblí",
+           "dateRange": {
+            "start": "2024-11-29 00:00:00+00:00",
+            "end": null
+           }
+          }
+         ],
+         "committeeType": [
+          "Shadow Department",
+          "Oversight"
+         ],
+         "role": [],
+         "serviceUnit": "Committees' Secretariat"
+        },
+        {
+         "committeeCode": "SC1",
+         "mainStatus": "Live",
+         "memberDateRange": {
+          "start": "2025-05-07 00:00:00+00:00",
+          "end": "2025-10-25 00:00:00+00:00"
+         },
+         "uri": "https://data.oireachtas.ie/ie/oireachtas/committee/dail/34/comhchoiste_na_gaeilge_na_gaeltachta_agus_phobal_labhartha_na_gaeilge",
+         "status": "Live - Primary",
+         "committeeID": 243,
+         "committeeDateRange": {
+          "start": "2025-02-12 00:00:00+00:00",
+          "end": null
+         },
+         "expiryType": "Standing",
+         "committeeName": [
+          {
+           "nameEn": "Comhchoiste na Gaeilge, na Gaeltachta agus Phobal Labhartha na Gaeilge",
+           "nameGa": "Comhchoiste na Gaeilge, na Gaeltachta agus Phobal Labhartha na Gaeilge",
+           "dateRange": {
+            "start": "2025-01-29 00:00:00+00:00",
+            "end": null
+           }
+          }
+         ],
+         "committeeType": [
+          "Shadow Department",
+          "Policy"
+         ],
+         "role": {
+          "title": "Cathaoirleach",
+          "dateRange": {
+           "start": "2025-05-07 00:00:00+00:00",
+           "end": "2025-10-25 00:00:00+00:00"
+          }
+         },
+         "serviceUnit": "Committees' Secretariat"
+        },
+        {
+         "committeeCode": "SCS",
+         "mainStatus": "Live",
+         "memberDateRange": {
+          "start": "2025-05-07 00:00:00+00:00",
+          "end": "2025-10-25 00:00:00+00:00"
+         },
+         "uri": "https://data.oireachtas.ie/ie/oireachtas/committee/dail/34/roghchoiste_na_gaeilge_na_gaeltachta_agus_phobal_labhartha_na_gaeilge",
+         "status": "Live - Primary",
+         "committeeID": 244,
+         "committeeDateRange": {
+          "start": "2025-02-12 00:00:00+00:00",
+          "end": null
+         },
+         "expiryType": "Standing",
+         "committeeName": [
+          {
+           "nameEn": "Roghchoiste na Gaeilge, na Gaeltachta agus Phobal Labhartha na Gaeilge",
+           "nameGa": "Roghchoiste na Gaeilge, na Gaeltachta agus Phobal Labhartha na Gaeilge",
+           "dateRange": {
+            "start": "2025-01-29 00:00:00+00:00",
+            "end": null
+           }
+          }
+         ],
+         "committeeType": [
+          "Shadow Department",
+          "Policy"
+         ],
+         "role": {
+          "title": "Cathaoirleach",
+          "dateRange": {
+           "start": "2025-05-07 00:00:00+00:00",
+           "end": "2025-10-25 00:00:00+00:00"
+          }
+         },
+         "serviceUnit": "Committees' Secretariat"
+        },
+        {
+         "committeeCode": "WGC",
+         "mainStatus": "Live",
+         "memberDateRange": {
+          "start": "2025-05-07 00:00:00+00:00",
+          "end": "2025-10-25 00:00:00+00:00"
+         },
+         "uri": "https://data.oireachtas.ie/ie/oireachtas/committee/dail/34/working_group_of_committee_cathaoirligh",
+         "status": "Live - Primary",
+         "committeeID": 247,
+         "committeeDateRange": {
+          "start": "2025-02-12 00:00:00+00:00",
+          "end": null
+         },
+         "expiryType": "Standing",
+         "committeeName": [
+          {
+           "nameEn": "Working Group of Committee Cathaoirligh",
+           "nameGa": "An Gasra Oibre de Chathaoirligh Coistí",
+           "dateRange": {
+            "start": "2025-01-29 00:00:00+00:00",
+            "end": null
+           }
+          }
+         ],
+         "committeeType": [
+          "The Committee System and Parliamentary Administration"
+         ],
+         "role": [],
+         "serviceUnit": "Committees' Secretariat"
+        }
+       ]
+      }
+     }
+    ],
+    "firstName": "Catherine",
+    "showAs": "Catherine Connolly",
+    "pId": "CatherineConnolly"
+   }
   }
  ]
 }

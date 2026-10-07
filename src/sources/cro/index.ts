@@ -13,5 +13,6 @@ export const croModule = createCkanModule({
   site: "https://opendata.cro.ie",
   summary: "Irish companies register open data: company records and financial-statement datasets.",
   domain: "economy",
+  examples: { query: "'company register' or 'financial statements'", organization: "companies", dataset: "companies" },
   coverage: "CRO CKAN catalogue and queryable datastore resources for company and financial-statement records."
 });

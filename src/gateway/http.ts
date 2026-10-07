@@ -117,6 +117,14 @@ export class HttpClient {
         throw timedOut();
       }
 
+      if (CALLER_ERROR_STATUSES.has(response.status)) {
+        // The caller's arguments were rejected (bad column, invalid value, oversized query). This is
+        // not an outage, so it is BAD_ARGS and never counts toward the source's circuit breaker.
+        const reason = await upstreamReason(response);
+        throw new ToolError("BAD_ARGS", `${label} rejected the request parameters (HTTP ${response.status})${reason ? `: ${reason}` : "."}`, {
+          hint: "Fix the arguments (check field or column names, values and formats against the tool schema or the dataset's fields) and retry."
+        });
+      }
       if (!response.ok) await response.body?.cancel().catch(() => undefined);
       if (response.status === 404) throw new ToolError("NOT_FOUND", `${label} has no matching resource.`);
       if (response.status === 429) {
@@ -125,11 +133,11 @@ export class HttpClient {
           retryAfterSeconds: Number.isFinite(retryAfter) ? retryAfter : 60
         });
       }
-      if (response.status === 400) throw new ToolError("BAD_ARGS", `${label} rejected the request parameters.`);
       if (!response.ok) {
         const message = `${label} returned HTTP ${response.status}.`;
         const transient = TRANSIENT_STATUSES.has(response.status) || options.retryStatuses?.includes(response.status);
-        throw transient ? new TransientUpstreamError(message) : new ToolError("UPSTREAM_DOWN", message);
+        if (transient) throw new TransientUpstreamError(message, response.status);
+        throw new ToolError("UPSTREAM_DOWN", message, { hint: hintForStatus(response.status) });
       }
 
       const maxBytes = options.maxBytes ?? DEFAULT_MAX_BYTES;
@@ -149,10 +157,48 @@ export class HttpClient {
   }
 }
 
+/** 4xx statuses that mean "your request was wrong", not "the source is down". */
+const CALLER_ERROR_STATUSES = new Set([400, 409, 413, 414, 422]);
+
+function hintForStatus(status: number): string {
+  if (status === 401 || status === 403)
+    return `The upstream answered but refused access (HTTP ${status}); it may block this server's network or need credentials. This is not a timeout, and retrying soon is unlikely to help.`;
+  if (status >= 500) return `The upstream answered with a server error (HTTP ${status}). Try again in a minute.`;
+  return `The upstream answered with HTTP ${status}, which this server does not treat as a result. Retrying is unlikely to help.`;
+}
+
+/** Pulls a short, single-line reason out of an upstream error body (CKAN, ArcGIS, plain text). */
+async function upstreamReason(response: Response): Promise<string> {
+  let text: string;
+  try {
+    text = (await response.text()).slice(0, 4000);
+  } catch {
+    return "";
+  }
+  let reason = text;
+  try {
+    const body = JSON.parse(text) as Record<string, unknown>;
+    reason = leaves(body.error ?? body.message ?? body).join("; ");
+  } catch {
+    // Not JSON: keep the text.
+  }
+  const flat = reason.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return flat.length > 200 ? `${flat.slice(0, 199)}…` : flat;
+}
+
+/** "key: text" for each string leaf of an error object, skipping CKAN's internal __type. */
+function leaves(value: unknown, key = ""): string[] {
+  if (typeof value === "string") return [key ? `${key}: ${value}` : value];
+  if (Array.isArray(value)) return value.flatMap((item) => leaves(item, key));
+  if (value && typeof value === "object")
+    return Object.entries(value).flatMap(([k, v]) => (k === "__type" ? [] : leaves(v, /^\d+$/.test(k) ? key : k)));
+  return [];
+}
+
 /** Network errors, timeouts and gateway-style statuses: worth one bounded, backed-off retry. */
 class TransientUpstreamError extends ToolError {
-  constructor(message: string) {
-    super("UPSTREAM_DOWN", message);
+  constructor(message: string, status?: number) {
+    super("UPSTREAM_DOWN", message, status ? { hint: hintForStatus(status) } : {});
   }
 }
 

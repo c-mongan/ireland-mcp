@@ -14,6 +14,7 @@ export const ncseModule = createCkanModule({
   site: "https://opendata.ncse.ie",
   summary: "School allocations by academic year: special-education teaching (SET), special classes and special needs assistants (SNA). Allocations do not establish vacancies, capacity or school quality.",
   domain: "stats",
+  examples: { query: "'school allocations' or 'special classes'", organization: "resource-allocation", dataset: "2026-2027-school-allocations" },
   coverage: "NCSE published school allocation datasets. Discover the academic year and its active datastore resources before querying; resource IDs and year-specific field names may change."
 });
 

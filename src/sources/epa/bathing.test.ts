@@ -3,15 +3,48 @@ import { callTool } from "../../../test/helpers/callTool.js";
 import { fakeFetch } from "../../../test/helpers/fakeFetch.js";
 import { epaModule } from "./index.js";
 
+type LocBody = { data: { locations: Array<{ beach_id: string }>; next_offset: number | null } };
+
 describe("EPA bathing water", () => {
-  it("returns compact locations with pagination and dated classification", async () => {
-    const fetch = fakeFetch([{ match: /\/bw\/api\/v1\/locations\?page=2&per_page=1$/, body: JSON.stringify({ count: 243, page: 2, list: [{ beach_id: "IEWEBWL29_194_0100", beach_name: "Loughrea Lake", county_name: "Galway", annual_water_quality_assessment: "Excellent in 2025", has_all_season_bathing_restriction_in_place: "Yes", reason_for_all_season_bathing_restriction: "Water quality", beach_description: "x".repeat(10000) }] }) }]);
-    const r = await callTool<{ data: { locations: Array<Record<string, unknown>>; total: number }; truncated: boolean }>(epaModule, "epa_bathing_locations", { page: 2, limit: 1 }, fetch);
+  const register = Array.from({ length: 243 }, (_, i) => ({
+    beach_id: `IE${String(i).padStart(3, "0")}`,
+    beach_name: i === 120 ? "Salthill Beach" : `Beach ${i}`,
+    county_name: i % 3 === 0 ? "Galway" : "Clare",
+    annual_water_quality_assessment: `Beach ${i} is classified as achieving Excellent Water Quality in 2025 based on bacteriological results for 2022 to 2025. `.repeat(3),
+    beach_description: "x".repeat(10000)
+  }));
+  const registerFetch = () => fakeFetch([{ match: /\/bw\/api\/v1\/locations\?page=1&per_page=500$/, body: JSON.stringify({ count: 243, page: 1, list: register }) }]);
+
+  it("filters the whole register by beach name and county with compact rows", async () => {
+    const r = await callTool(epaModule, "epa_bathing_locations", { name: "salthill", county: "galway" }, registerFetch());
     expect(r.ok).toBe(true);
-    expect(r.body.data.total).toBe(243);
-    expect(r.body.data.locations[0]).toMatchObject({ beach_id: "IEWEBWL29_194_0100", annual_water_quality_assessment: "Excellent in 2025", has_all_season_bathing_restriction_in_place: "Yes", reason_for_all_season_bathing_restriction: "Water quality" });
+    expect(r.body.data).toMatchObject({ total: 1, register_total: 243, offset: 0, next_offset: null });
+    expect(r.body.data.locations[0]).toMatchObject({ beach_name: "Salthill Beach", county_name: "Galway", annual_water_quality_assessment: expect.stringContaining("Excellent") });
     expect(JSON.stringify(r.body)).not.toContain("x".repeat(100));
-    expect(r.body.truncated).toBe(true);
+    expect(r.body.url).toBe("https://data.epa.ie/bw/api/v1/locations?page=1&per_page=500");
+    const page2 = await callTool(epaModule, "epa_bathing_locations", { county: "Galway", page: 2, limit: 10 }, registerFetch());
+    expect(page2.body.data).toMatchObject({ total: 81, offset: 10, next_offset: 20 });
+    expect(page2.body.data.locations[0].beach_id).toBe("IE030");
+  });
+
+  it("pages through every location without gaps even when the token budget cuts a page", async () => {
+    const fetch = registerFetch();
+    const seen: string[] = [];
+    let offset: number | null = 0;
+    let truncatedPages = 0;
+    for (let guard = 0; offset !== null && guard < 50; guard += 1) {
+      const r: { ok: boolean; body: LocBody } = await callTool<LocBody>(epaModule, "epa_bathing_locations", { offset, limit: 50, max_tokens: 8000 }, fetch);
+      expect(r.ok).toBe(true);
+      const rows = r.body.data.locations;
+      expect(rows.length).toBeGreaterThan(0);
+      if (rows.length < 50 && r.body.data.next_offset !== null) truncatedPages += 1;
+      seen.push(...rows.map((row) => row.beach_id));
+      offset = r.body.data.next_offset;
+    }
+    expect(truncatedPages).toBeGreaterThan(0);
+    expect(seen).toHaveLength(243);
+    expect(new Set(seen).size).toBe(243);
+    expect(seen).toContain("IE120");
   });
   it("preserves restriction and update dates without inferring swimming safety", async () => {
     const fetch = fakeFetch([{ match: /\/alerts\?page=1&per_page=5$/, body: JSON.stringify({ count: 1, page: 1, list: [{ beach_id: "IESHBWL27_72_0100", has_bathing_restriction_in_place: "Yes", incident_end_date: null, last_updated: "2026-09-23T11:10:43" }] }) }]);

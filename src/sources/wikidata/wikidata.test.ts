@@ -26,4 +26,30 @@ describe("wikidata source", () => {
     const { body } = await callTool<WikidataBody>(wikidataModule, "wikidata_entity", { qid: "Q27" }, fetch);
     expect(body.data).toMatchObject({ qid: "Q27", label: "Ireland" });
   });
+
+  it("uses the fast entity-search index and ranks exact names first (uncached towns like Kilkee)", async () => {
+    const row = (qid: string, label: string, extra: Record<string, unknown> = {}) => ({
+      place: { type: "uri", value: `http://www.wikidata.org/entity/${qid}` },
+      placeLabel: { type: "literal", value: label },
+      ...extra
+    });
+    const body = {
+      head: { vars: [] },
+      results: {
+        bindings: [
+          row("Q100", "Kilkee (parish)"),
+          row("Q1013617", "Kilkee", { population: { type: "literal", value: "1325" }, countyLabel: { type: "literal", value: "County Clare" } }),
+          row("Q1013617", "Kilkee", { countyLabel: { type: "literal", value: "Munster" } })
+        ]
+      }
+    };
+    const fetch = fakeFetch([{ match: /query\.wikidata\.org\/sparql/, body: JSON.stringify(body) }]);
+    const result = await callTool<WikidataBody>(wikidataModule, "wikidata_place", { name: "kilkee", limit: 5 }, fetch);
+    expect(result.body.data.matches?.map((m) => m.qid)).toEqual(["Q1013617", "Q100"]);
+    expect(result.body.data.matches?.[0]).toMatchObject({ label: "Kilkee", population: 1325 });
+    const sparql = new URL(fetch.calls[0]!.url).searchParams.get("query")!;
+    expect(sparql).toContain('wikibase:api "EntitySearch"');
+    expect(sparql).toContain('mwapi:search "kilkee"');
+    expect(sparql).not.toContain("LCASE");
+  });
 });

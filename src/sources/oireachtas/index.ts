@@ -52,7 +52,7 @@ const fold = (value: string) =>
     .toLowerCase()
     .trim();
 
-function summariseMember(raw: Json, house: string) {
+function summariseMember(raw: Json, house: string, today: string) {
   const m = raw.member;
   const membership =
     (m.memberships ?? []).map((x: Json) => x.membership).find((x: Json) => x.house?.houseNo === house) ?? m.memberships?.[0]?.membership;
@@ -69,6 +69,9 @@ function summariseMember(raw: Json, house: string) {
     constituency: (membership?.represents?.[0]?.represent?.showAs as string | undefined) ?? null,
     house: (membership?.house?.showAs as string | undefined) ?? null,
     current_offices: offices,
+    date_range: { start: (membership?.dateRange?.start as string | undefined) ?? null, end: (membership?.dateRange?.end as string | undefined) ?? null },
+    // A seat is held until its end date; an ended membership (resignation, death, election to another office) is former.
+    current: !membership?.dateRange?.end || String(membership.dateRange.end) >= today,
     uri: m.uri as string
   };
 }
@@ -101,28 +104,46 @@ const membersTool = defineTool({
   name: "oireachtas_search_members",
   title: "Search TDs and Senators",
   description:
-    "Find members of the Dáil or Seanad by name, party or constituency. Defaults to the current 34th Dáil. Returns member codes usable with oireachtas_search_questions.",
+    "Find sitting members of the Dáil or Seanad by name, party or constituency. Defaults to the current 34th Dáil and to members whose seat has not ended; set include_former=true to also list members who left mid-term (each has date_range and current). Returns member codes usable with oireachtas_search_questions.",
   inputSchema: {
     name: z.string().max(80).optional().describe("Part of the member's name (accents optional)."),
     party: z.string().max(80).optional().describe("Party name, e.g. 'Fianna Fáil', 'Sinn Féin', 'Independent'."),
     constituency: z.string().max(80).optional().describe("Constituency or Seanad panel, e.g. 'Cork South-Central'."),
     chamber,
     house_no: z.string().regex(/^\d{1,2}$/).optional().describe("Dáil/Seanad number; defaults to the current house."),
+    include_former: z
+      .boolean()
+      .default(false)
+      .describe("Also return members whose seat in this house has ended. Always on for a past (dissolved) house."),
     limit
   },
-  handler: async ({ name, party, constituency, chamber: house, house_no, limit: max }, ctx) => {
+  handler: async ({ name, party, constituency, chamber: house, house_no, include_former, limit: max }, ctx) => {
     const houseNo = house_no ?? CURRENT_HOUSE[house];
+    // Every membership of a dissolved house has an end date, so "current only" applies to the sitting house.
+    const sittingHouse = houseNo === CURRENT_HOUSE[house];
+    const today = ctx.now().toISOString().slice(0, 10);
     const list = await membersOf(ctx, house, houseNo);
-    const matches = list.results
-      .map((r) => summariseMember(r, houseNo))
-      .filter(
-        (m) =>
-          (!name || fold(m.name).includes(fold(name))) &&
-          (!party || fold(m.party ?? "").includes(fold(party))) &&
-          (!constituency || fold(m.constituency ?? "").includes(fold(constituency)))
-      );
+    const all = list.results.map((r) => summariseMember(r, houseNo, today));
+    const filtered = all.filter(
+      (m) =>
+        (!name || fold(m.name).includes(fold(name))) &&
+        (!party || fold(m.party ?? "").includes(fold(party))) &&
+        (!constituency || fold(m.constituency ?? "").includes(fold(constituency)))
+    );
+    const matches = filtered.filter((m) => include_former || !sittingHouse || m.current);
     const { items, truncated } = bound(matches, max);
-    return envelope(oireachtasInfo, { data: { total: matches.length, members: items }, url: list.url, cached: list.cached, stale: list.stale, truncated });
+    const former = filtered.length - matches.length;
+    return envelope(oireachtasInfo, {
+      data: {
+        total: matches.length,
+        members: items,
+        ...(former ? { note: `${former} former member(s) matching this search whose seat has ended are excluded; set include_former=true to list them.` } : {})
+      },
+      url: list.url,
+      cached: list.cached,
+      stale: list.stale,
+      truncated
+    });
   }
 });
 
@@ -288,7 +309,10 @@ async function search(query: string, max: number, ctx: ToolContext) {
   const words = fold(query).split(/\s+/).filter((w) => w.length > 2);
   const score = (text: string) => words.filter((w) => fold(text).includes(w)).length;
   const hits = [
-    ...members.results.map((r) => summariseMember(r, CURRENT_HOUSE.dail)).map((m) => ({
+    ...members.results
+      .map((r) => summariseMember(r, CURRENT_HOUSE.dail, ctx.now().toISOString().slice(0, 10)))
+      .filter((m) => m.current)
+      .map((m) => ({
       s: score(`${m.name} ${m.party ?? ""} ${m.constituency ?? ""}`),
       hit: { id: `oireachtas:member/${m.member_code}`, title: `${m.name} TD (${m.party ?? "?"}, ${m.constituency ?? "?"})`, url: m.uri }
     })),
@@ -327,10 +351,11 @@ async function fetchById(key: string, ctx: ToolContext) {
   if (member) {
     const list = await membersOf(ctx, "dail", CURRENT_HOUSE.dail);
     const raw = list.results.find((r) => r.member?.memberCode === member[1]);
-    if (!raw) throw new ToolError("NOT_FOUND", `No current TD with code ${member[1]}.`);
-    const m = summariseMember(raw, CURRENT_HOUSE.dail);
+    if (!raw) throw new ToolError("NOT_FOUND", `No TD of the current Dáil with code ${member[1]}.`);
+    const m = summariseMember(raw, CURRENT_HOUSE.dail, ctx.now().toISOString().slice(0, 10));
     const text = [
       `${m.name} — ${m.house ?? ""}`,
+      m.current ? "" : `Former member: seat ended ${m.date_range.end}.`,
       `Party: ${m.party ?? "?"}. Constituency: ${m.constituency ?? "?"}.`,
       m.current_offices.length ? `Current offices: ${m.current_offices.join("; ")}.` : ""
     ]
