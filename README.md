@@ -9,6 +9,44 @@
 
 Hosted endpoint: `https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp`
 Transport: Streamable HTTP. Auth: none. Writes: none.
+Website: <https://lemon-meadow-03b2b8903.3.azurestaticapps.net> (the planned `irishopendata.ie` domain is not live yet; see [docs/domain-go-live.md](docs/domain-go-live.md)).
+Registry: [`io.github.c-mongan/ireland-mcp`](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.c-mongan%2Fireland-mcp/versions/latest) on the official MCP Registry.
+
+## Try it in 60 seconds
+
+1. Add the server to your client. For GitHub Copilot CLI:
+   `copilot mcp add --transport http ireland https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp`
+   For VS Code, add `.vscode/mcp.json`: `{ "servers": { "ireland": { "type": "http", "url": "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp" } } }`.
+2. Ask: *"Using the ireland MCP tools, give me the Census 2022 profile of Ennis, Co Clare, and the Met Éireann forecast for Galway. Cite the sources."*
+3. Check the answer cites `https://data.cso.ie/table/F1015` and the Met Éireann location-forecast URL.
+
+<p align="center">
+  <img src="docs/demo/inspector.gif" alt="MCP Inspector calling the hosted endpoint: nearby Galway, CSO profile for Ennis, Met Éireann forecast and Property Price Register stats, each with a source citation" width="800">
+</p>
+
+| Client (tested 7 Oct 2026 against the hosted endpoint) | Result |
+| --- | --- |
+| MCP Inspector (Playwright, [`scripts/demo-inspector.mjs`](scripts/demo-inspector.mjs)) | 4/4 calls (`nearby`, CSO, Met Éireann, PPR) returned data with citations. [CSO Ennis](docs/demo/inspector-cso-ennis.png), [PPR Galway 2024](docs/demo/inspector-ppr-galway-2024.png). |
+| VS Code Insiders, Copilot agent mode | Census 2022 Ennis (27,923 people) and Galway forecast, with CSO and Met Éireann citations. [Screenshot](docs/demo/vscode-copilot-chat.png). |
+| GitHub Copilot CLI | 3/3 questions answered with citations: Met Éireann Galway, PPR Cork, CSO Ennis. [Evidence](docs/demo/README.md). |
+| Every catalogue operation | [docs/live-all-ops.md](docs/live-all-ops.md): 64 pass, 0 fail. Kohesio is blocked from Azure IPs; NTA needs a key. |
+
+How a call flows:
+
+```mermaid
+flowchart LR
+  Q[Client question] --> T[ireland_call / nearby / search]
+  T --> V[Schema validation]
+  V --> C{Cache hit?}
+  C -- yes --> E[Evidence envelope]
+  C -- no --> B{Circuit breaker open?}
+  B -- yes --> S[Stale cache or UPSTREAM_DOWN with hint]
+  B -- no --> U[Upstream public API: CSO, Met Éireann, PPR, ...]
+  U -- ok --> E
+  U -- error or timeout --> S
+  S --> E
+  E --> A[Answer with source URL, licence, attribution, retrieved_at]
+```
 
 <p align="center">
   <a href="docs/architecture/ireland-mcp-arch-v5.drawio">
@@ -209,7 +247,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full checklist.
 
 ## Registry and publishing
 
-Ireland MCP is **listed on the [official MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.c-mongan/ireland-mcp)** as a remote-only Streamable HTTP server named `io.github.c-mongan/ireland-mcp` (v1.0.0). Clients that browse the registry can install it by name. The future domain name is planned as `ie.irishopendata/ireland` after DNS verification. Publishing notes and directory checklists are in [docs/publishing.md](docs/publishing.md). Do not publish from a fork without changing the name and endpoint.
+Ireland MCP is **listed on the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.c-mongan%2Fireland-mcp/versions/latest)** as a remote-only Streamable HTTP server named `io.github.c-mongan/ireland-mcp` (v1.0.0). Clients that browse the registry can install it by name. The future domain name is planned as `ie.irishopendata/ireland` after DNS verification. Publishing notes and directory checklists are in [docs/publishing.md](docs/publishing.md). Do not publish from a fork without changing the name and endpoint.
 
 ## Credits and prior art
 
