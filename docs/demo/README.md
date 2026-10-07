@@ -1,5 +1,14 @@
 # Real-client demo evidence
 
+## v1.1.1 QA re-run (7 October 2026, commit `d64cc20`)
+
+| Client | Question | Result | Citation checked |
+| --- | --- | --- | --- |
+| MCP Inspector (Playwright) | Nearby, CSO Ennis, Met Galway, PPR, EPA bathing locations | Pass, 5/5 | [`inspector/`](qa-r2/inspector/) screenshots |
+| GitHub Copilot CLI | Current TDs for Galway West; Salthill bathing water; Kilkee on Wikidata | Pass, 3/3 | Oireachtas, EPA and Wikidata URLs in [`copilot-cli-v1.1.1.md`](qa-r2/copilot-cli-v1.1.1.md) |
+| VS Code Insiders | `vscode-insiders:mcp/install?...` link from the README | Pass: opens the MCP server install page with the hosted URL | n/a |
+| Raw MCP calls | QA findings H1–H4 and M6 | Pass | [`hosted-checks.md`](qa-r2/hosted-checks.md) |
+
 ## v1.1.0 re-run (7 October 2026, commit `6882a97`)
 
 | Client | Question | Result | Citation checked |
