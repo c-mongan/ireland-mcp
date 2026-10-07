@@ -22,8 +22,8 @@ const common = ["beach_id", "beach_name", "county_name"];
 export const bathingTools = [
   { name: "epa_bathing_locations", title: "EPA bathing-water locations", route: "locations", key: "locations",
     description: "Browse EPA bathing-water locations with annual classifications. Paginated; annual classifications are not current swimming-safety advice.",
-    fields: [...common, "local_authority_name", "beach_type", "easting", "northing", "annual_water_quality_assessment", "next_monitoring_date", "beach_profile_url"],
-    caveat: "Annual classifications cover multiple years; check dated samples and published restrictions separately." },
+    fields: [...common, "local_authority_name", "beach_type", "easting", "northing", "annual_water_quality_assessment", "has_all_season_bathing_restriction_in_place", "reason_for_all_season_bathing_restriction", "next_monitoring_date", "beach_profile_url"],
+    caveat: "Annual classifications cover multiple years; inspect season-long restrictions here as well as dated samples, incidents and local notices." },
   { name: "epa_bathing_alerts", title: "EPA bathing-water restrictions", route: "alerts", key: "alerts",
     description: "Browse published EPA bathing-water incidents and restrictions with update dates. An empty page does not establish swimming safety; check local notices.",
     fields: [...common, "incident_id", "has_bathing_restriction_in_place", "incident_start_date", "incident_end_date", "incident_expected_duration", "bathing_restriction_type", "incident_description", "bathing_notice_pdf", "last_updated"],

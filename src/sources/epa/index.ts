@@ -12,7 +12,7 @@ export const epaInfo: SourceInfo = {
   id: "epa",
   name: "EPA Ireland open data",
   licence: "Creative Commons Attribution 4.0",
-  attribution: "Water Framework Directive open data © Environmental Protection Agency Ireland.",
+  attribution: "Water Framework Directive and bathing-water open data © Environmental Protection Agency Ireland.",
   homepage: "https://data.epa.ie/api-list/"
 };
 
@@ -114,7 +114,7 @@ export const epaModule: SourceModule = {
   info: epaInfo,
   summary: "EPA WFD waterbody status/risk plus bathing-water locations, dated samples and published restrictions.",
   domain: "environment",
-  coverage: "Republic of Ireland WFD catchments, subcatchments and waterbodies from EPA open APIs.",
+  coverage: "Republic of Ireland WFD catchments and waterbodies, plus published bathing-water locations, restrictions and dated measurements from EPA open APIs.",
   tools: [searchTool, waterbodyTool, ...bathingTools],
   async search(query: string, limit: number, ctx: ToolContext): Promise<SearchHit[]> {
     const url = `${WFD_BASE}/search?${new URLSearchParams({ v: query, page: "1", size: String(limit) }).toString()}`;

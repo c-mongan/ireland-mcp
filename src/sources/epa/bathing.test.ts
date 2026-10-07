@@ -5,11 +5,11 @@ import { epaModule } from "./index.js";
 
 describe("EPA bathing water", () => {
   it("returns compact locations with pagination and dated classification", async () => {
-    const fetch = fakeFetch([{ match: /\/bw\/api\/v1\/locations\?page=2&per_page=1$/, body: JSON.stringify({ count: 243, page: 2, list: [{ beach_id: "IEWEBWL29_194_0100", beach_name: "Loughrea Lake", county_name: "Galway", annual_water_quality_assessment: "Excellent in 2025", beach_description: "x".repeat(10000) }] }) }]);
+    const fetch = fakeFetch([{ match: /\/bw\/api\/v1\/locations\?page=2&per_page=1$/, body: JSON.stringify({ count: 243, page: 2, list: [{ beach_id: "IEWEBWL29_194_0100", beach_name: "Loughrea Lake", county_name: "Galway", annual_water_quality_assessment: "Excellent in 2025", has_all_season_bathing_restriction_in_place: "Yes", reason_for_all_season_bathing_restriction: "Water quality", beach_description: "x".repeat(10000) }] }) }]);
     const r = await callTool<{ data: { locations: Array<Record<string, unknown>>; total: number }; truncated: boolean }>(epaModule, "epa_bathing_locations", { page: 2, limit: 1 }, fetch);
     expect(r.ok).toBe(true);
     expect(r.body.data.total).toBe(243);
-    expect(r.body.data.locations[0]).toMatchObject({ beach_id: "IEWEBWL29_194_0100", annual_water_quality_assessment: "Excellent in 2025" });
+    expect(r.body.data.locations[0]).toMatchObject({ beach_id: "IEWEBWL29_194_0100", annual_water_quality_assessment: "Excellent in 2025", has_all_season_bathing_restriction_in_place: "Yes", reason_for_all_season_bathing_restriction: "Water quality" });
     expect(JSON.stringify(r.body)).not.toContain("x".repeat(100));
     expect(r.body.truncated).toBe(true);
   });
