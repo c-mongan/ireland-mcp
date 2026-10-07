@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { context, metrics, trace } from "@opentelemetry/api";
 import { AsyncLocalStorageContextManager } from "@opentelemetry/context-async-hooks";
-import { BasicTracerProvider, InMemorySpanExporter, SimpleSpanProcessor } from "@opentelemetry/sdk-trace-base";
+import { AlwaysOnSampler, BasicTracerProvider, InMemorySpanExporter, SimpleSpanProcessor } from "@opentelemetry/sdk-trace-base";
 import { AggregationTemporality, InMemoryMetricExporter, MeterProvider, PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 import { z } from "zod";
 import { createContext } from "./context.js";
@@ -129,7 +129,7 @@ describe("OpenTelemetry", () => {
 
   beforeAll(() => {
     context.setGlobalContextManager(contextManager.enable());
-    trace.setGlobalTracerProvider(new BasicTracerProvider({ spanProcessors: [new SimpleSpanProcessor(spans)] }));
+    trace.setGlobalTracerProvider(new BasicTracerProvider({ sampler: new AlwaysOnSampler(), spanProcessors: [new SimpleSpanProcessor(spans)] }));
     metrics.setGlobalMeterProvider(new MeterProvider({ readers: [reader] }));
   });
   afterAll(() => {
