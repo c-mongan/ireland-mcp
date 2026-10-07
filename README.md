@@ -11,6 +11,7 @@ Hosted endpoint: `https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp`
 Transport: Streamable HTTP. Auth: none. Writes: none.
 Website: <https://lemon-meadow-03b2b8903.3.azurestaticapps.net> (the planned `irishopendata.ie` domain is not live yet; see [docs/domain-go-live.md](docs/domain-go-live.md)).
 Registry: [`io.github.c-mongan/ireland-mcp`](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.c-mongan%2Fireland-mcp/versions/latest) on the official MCP Registry.
+Hosted coverage: **26 of 28 sources work on the hosted endpoint.** Kohesio blocks Azure IP addresses (HTTP 403), so run it locally over stdio. NTA realtime needs an operator key that the hosted service does not have.
 
 ## Try it in 60 seconds
 
@@ -18,7 +19,7 @@ Registry: [`io.github.c-mongan/ireland-mcp`](https://registry.modelcontextprotoc
    `copilot mcp add --transport http ireland https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp`
    For VS Code, add `.vscode/mcp.json`: `{ "servers": { "ireland": { "type": "http", "url": "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp" } } }`.
 2. Ask: *"Using the ireland MCP tools, give me the Census 2022 profile of Ennis, Co Clare, and the Met Éireann forecast for Galway. Cite the sources."*
-3. Check the answer cites `https://data.cso.ie/table/F1015` and the Met Éireann location-forecast URL.
+3. Check the answer cites `https://data.cso.ie/table/F1015` and the Met Éireann location-forecast URL. The forecast URL is `http://`; Met Éireann's `https://` host currently redirects to an origin that fails TLS.
 
 <p align="center">
   <img src="docs/demo/inspector.gif" alt="MCP Inspector calling the hosted endpoint: nearby Galway, CSO profile for Ennis, Met Éireann forecast and Property Price Register stats, each with a source citation" width="800">
@@ -247,7 +248,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full checklist.
 
 ## Registry and publishing
 
-Ireland MCP is **listed on the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.c-mongan%2Fireland-mcp/versions/latest)** as a remote-only Streamable HTTP server named `io.github.c-mongan/ireland-mcp` (v1.0.0). Clients that browse the registry can install it by name. The future domain name is planned as `ie.irishopendata/ireland` after DNS verification. Publishing notes and directory checklists are in [docs/publishing.md](docs/publishing.md). Do not publish from a fork without changing the name and endpoint.
+Ireland MCP is **listed on the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.c-mongan%2Fireland-mcp/versions/latest)** as a remote-only Streamable HTTP server named `io.github.c-mongan/ireland-mcp` (v1.0.1). Clients that browse the registry can install it by name. The future domain name is planned as `ie.irishopendata/ireland` after DNS verification. Publishing notes and directory checklists are in [docs/publishing.md](docs/publishing.md). Do not publish from a fork without changing the name and endpoint.
 
 ## Credits and prior art
 

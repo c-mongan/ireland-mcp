@@ -3,8 +3,8 @@
   "name": "io.github.c-mongan/ireland-mcp",
   "title": "Ireland MCP",
   "description": "Read-only Irish public data for AI assistants: stats, weather, transport, law, property and maps.",
-  "version": "1.0.0",
-  "websiteUrl": "https://github.com/c-mongan/ireland-mcp",
+  "version": "1.0.1",
+  "websiteUrl": "https://lemon-meadow-03b2b8903.3.azurestaticapps.net",
   "repository": {
     "url": "https://github.com/c-mongan/ireland-mcp",
     "source": "github",
