@@ -10,6 +10,8 @@ export interface HttpOptions {
   body?: string;
   timeoutMs?: number;
   retries?: number;
+  /** Extra HTTP statuses to treat as transient, e.g. a source known to flap with 403 from cloud IPs. */
+  retryStatuses?: readonly number[];
   maxBytes?: number;
   /** Label used in error messages instead of the raw URL (keeps keys out of errors). */
   label?: string;
@@ -18,11 +20,27 @@ export interface HttpOptions {
 export const DEFAULT_TIMEOUT_MS = 10_000;
 export const DEFAULT_MAX_BYTES = 5 * 1024 * 1024;
 const USER_AGENT = "ireland-mcp/1.0 (+https://github.com/c-mongan/ireland-mcp)";
+/** Gateway, timeout and overload statuses that usually clear on a second try. 501/505 and 4xx are not retried. */
+const TRANSIENT_STATUSES = new Set([408, 500, 502, 503, 504]);
+const BACKOFF_BASE_MS = 250;
+const BACKOFF_CAP_MS = 2_000;
+
+export interface RetryTiming {
+  sleep?: (ms: number) => Promise<void>;
+  random?: () => number;
+}
+
+/** Equal-jitter exponential backoff: attempt 0 waits 125-250ms, attempt 1 waits 250-500ms, capped at 2s. */
+export function backoffMs(attempt: number, random: () => number = Math.random): number {
+  const ceiling = Math.min(BACKOFF_CAP_MS, BACKOFF_BASE_MS * 2 ** attempt);
+  return Math.round(ceiling / 2 + (ceiling / 2) * random());
+}
 
 export class HttpClient {
   constructor(
     private readonly fetchImpl: FetchLike = (input, init) => fetch(input, init),
-    private readonly budgets?: UpstreamBudgets
+    private readonly budgets?: UpstreamBudgets,
+    private readonly timing: RetryTiming = {}
   ) {}
 
   /** One CLIENT span per logical request; the URL is not recorded because queries can carry tool arguments. */
@@ -55,17 +73,16 @@ export class HttpClient {
 
   private async withRetries(url: string, options: HttpOptions): Promise<Uint8Array> {
     const retries = options.retries ?? 1;
-    let lastError: unknown;
-    for (let attempt = 0; attempt <= retries; attempt += 1) {
+    const sleep = this.timing.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
+    for (let attempt = 0; ; attempt += 1) {
       try {
         return await this.once(url, options);
       } catch (error) {
-        lastError = error;
-        if (error instanceof ResponseTooLargeError) throw error;
-        if (error instanceof ToolError && error.code !== "UPSTREAM_DOWN") throw error;
+        // Only transient failures are retried; 403s, 501s, bad payloads and size bounds fail fast.
+        if (!(error instanceof TransientUpstreamError) || attempt >= retries) throw error;
+        await sleep(backoffMs(attempt, this.timing.random));
       }
     }
-    throw lastError;
   }
 
   async text(url: string, options: HttpOptions = {}): Promise<string> {
@@ -84,7 +101,7 @@ export class HttpClient {
   private async once(url: string, options: HttpOptions): Promise<Uint8Array> {
     const label = options.label ?? hostOf(url);
     const controller = new AbortController();
-    const timedOut = () => new ToolError("UPSTREAM_DOWN", `${label} could not be reached or did not respond in time.`);
+    const timedOut = () => new TransientUpstreamError(`${label} could not be reached or did not respond in time.`);
     // The timer covers headers and body, so a slow-dripping body cannot hang a tool call.
     const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
     try {
@@ -109,11 +126,15 @@ export class HttpClient {
         });
       }
       if (response.status === 400) throw new ToolError("BAD_ARGS", `${label} rejected the request parameters.`);
-      if (!response.ok) throw new ToolError("UPSTREAM_DOWN", `${label} returned HTTP ${response.status}.`);
+      if (!response.ok) {
+        const message = `${label} returned HTTP ${response.status}.`;
+        const transient = TRANSIENT_STATUSES.has(response.status) || options.retryStatuses?.includes(response.status);
+        throw transient ? new TransientUpstreamError(message) : new ToolError("UPSTREAM_DOWN", message);
+      }
 
       const maxBytes = options.maxBytes ?? DEFAULT_MAX_BYTES;
       const tooLarge = () =>
-        new ResponseTooLargeError(`${label} response is larger than the ${maxBytes} byte bound.`, {
+        new ToolError("UPSTREAM_DOWN", `${label} response is larger than the ${maxBytes} byte bound.`, {
           hint: "Narrow the query (fewer dimensions, a smaller limit or a filter)."
         });
       const declared = Number(response.headers.get("content-length") ?? "0");
@@ -128,10 +149,10 @@ export class HttpClient {
   }
 }
 
-/** Marks a size-bound failure: retrying would only download the same oversized body again. */
-class ResponseTooLargeError extends ToolError {
-  constructor(message: string, options: { hint?: string }) {
-    super("UPSTREAM_DOWN", message, options);
+/** Network errors, timeouts and gateway-style statuses: worth one bounded, backed-off retry. */
+class TransientUpstreamError extends ToolError {
+  constructor(message: string) {
+    super("UPSTREAM_DOWN", message);
   }
 }
 
@@ -164,7 +185,7 @@ async function readBounded(
         next = await Promise.race([reader.read(), aborted]);
       } catch (error) {
         if (error instanceof ToolError) throw error;
-        throw new ToolError("UPSTREAM_DOWN", `${label} failed while sending its response.`);
+        throw new TransientUpstreamError(`${label} failed while sending its response.`);
       }
       if (next.done) break;
       total += next.value.byteLength;

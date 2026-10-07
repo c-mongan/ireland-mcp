@@ -4,7 +4,8 @@ import { TieredCache, type CacheEntry, type PersistentStore } from "./cache.js";
 import { createContext } from "./context.js";
 import { bound, envelope, MAX_LIMIT } from "./envelope.js";
 import { ToolError, toToolError } from "./errors.js";
-import { HttpClient } from "./http.js";
+import { backoffMs, HttpClient } from "./http.js";
+import { UpstreamBudgets } from "./upstreamBudget.js";
 import { handleMcpHttp } from "./httpHandler.js";
 import { defineTool, type SourceModule } from "./module.js";
 import { clientKey, limitFromEnv, RateLimiter } from "./rateLimit.js";
@@ -148,6 +149,70 @@ describe("HttpClient", () => {
     });
     expect(await client.text("https://x.ie/")).toBe("ok");
     expect(calls).toBe(2);
+  });
+
+  describe("transient retry", () => {
+    const sequence = (...statuses: Array<number | "network">) => {
+      const calls: number[] = [];
+      const fetch = async () => {
+        const next = statuses[Math.min(calls.length, statuses.length - 1)]!;
+        calls.push(calls.length);
+        if (next === "network") throw new Error("ECONNRESET");
+        return new Response(next === 200 ? "ok" : "x", { status: next });
+      };
+      const waits: number[] = [];
+      const timing = { sleep: async (ms: number) => void waits.push(ms), random: () => 1 };
+      return { fetch, calls, waits, timing };
+    };
+
+    it.each([408, 500, 502, 503, 504, "network" as const])("retries %s after a backoff and then succeeds", async (first) => {
+      const { fetch, calls, waits, timing } = sequence(first, 200);
+      expect(await new HttpClient(fetch, undefined, timing).text("https://x.ie/")).toBe("ok");
+      expect(calls).toHaveLength(2);
+      expect(waits).toEqual([250]);
+    });
+
+    it.each([401, 403, 410, 501])("fails fast on non-transient HTTP %i", async (status) => {
+      const { fetch, calls, waits, timing } = sequence(status, 200);
+      await expect(new HttpClient(fetch, undefined, timing).text("https://x.ie/", { retries: 3 })).rejects.toMatchObject({
+        code: "UPSTREAM_DOWN",
+        message: expect.stringContaining(`HTTP ${status}`)
+      });
+      expect(calls).toHaveLength(1);
+      expect(waits).toEqual([]);
+    });
+
+    it("bounds attempts, grows the backoff and still reports the real failure", async () => {
+      const { fetch, calls, waits, timing } = sequence(503);
+      await expect(new HttpClient(fetch, undefined, timing).text("https://x.ie/", { retries: 2 })).rejects.toMatchObject({
+        code: "UPSTREAM_DOWN",
+        message: expect.stringContaining("HTTP 503")
+      });
+      expect(calls).toHaveLength(3);
+      expect(waits).toEqual([250, 500]);
+    });
+
+    it("lets a source opt extra statuses into retry", async () => {
+      const { fetch, calls, timing } = sequence(403, 200);
+      expect(await new HttpClient(fetch, undefined, timing).text("https://x.ie/", { retryStatuses: [403] })).toBe("ok");
+      expect(calls).toHaveLength(2);
+    });
+
+    it("counts a retried call once against the circuit breaker", async () => {
+      const budgets = new UpstreamBudgets({ failureThreshold: 2 });
+      const { fetch, timing } = sequence(503);
+      const client = new HttpClient(fetch, budgets, timing);
+      await expect(client.text("https://data.cso.ie/x")).rejects.toMatchObject({ code: "UPSTREAM_DOWN" });
+      expect(budgets.snapshot().cso?.consecutiveFailures).toBe(1);
+    });
+
+    it("keeps jittered backoff within half to full of a capped exponential ceiling", () => {
+      expect(backoffMs(0, () => 0)).toBe(125);
+      expect(backoffMs(0, () => 1)).toBe(250);
+      expect(backoffMs(1, () => 1)).toBe(500);
+      expect(backoffMs(10, () => 1)).toBe(2000);
+      expect(backoffMs(10, () => 0)).toBe(1000);
+    });
   });
 
   it("maps network errors and oversized bodies to UPSTREAM_DOWN", async () => {

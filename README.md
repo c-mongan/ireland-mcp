@@ -44,7 +44,10 @@ flowchart LR
   B -- yes --> S[Stale cache or UPSTREAM_DOWN with hint]
   B -- no --> U[Upstream public API: CSO, Met Éireann, PPR, ...]
   U -- ok --> E
-  U -- error or timeout --> S
+  U -- 5xx or timeout --> R[One jittered retry]
+  R -- ok --> E
+  R -- still failing --> S
+  U -- other error --> S
   S --> E
   E --> A[Answer with source URL, licence, attribution, retrieved_at]
 ```
@@ -126,7 +129,7 @@ Need typed tools anyway?
 
 ## Architecture
 
-The server is a stateless Azure Functions Flex app with a lean gateway in front of the source modules. The gateway owns the operation index, response budgets, cache, upstream budgets, circuit breakers and evidence envelope; every normal result includes source URL, licence, attribution and retrieval metadata.
+The server is a stateless Azure Functions Flex app with a lean gateway in front of the source modules. The gateway owns the operation index, response budgets, cache, upstream budgets, circuit breakers, one jittered retry for transient 5xx/timeout failures and evidence envelope; every normal result includes source URL, licence, attribution and retrieval metadata.
 
 | Diagram | Editable source |
 | --- | --- |
