@@ -49,15 +49,25 @@ const statusTool = defineTool({
     region: z.enum(["ALL", "ROI", "NI"]).default("ALL").describe("ALL = whole island, ROI = Republic of Ireland, NI = Northern Ireland.")
   },
   handler: async ({ region }, ctx) => {
-    const date = dublinDate();
-    const load = (area: string) => ctx.cachedJson<{ Rows?: Row[] }>(chartUrl(region, area, date), 5 * MINUTE, { label: `EirGrid ${area}` });
-    const [demand, wind, co2] = await Promise.all([load("demandactual"), load("windactual"), load("co2intensity")]);
+    const load = (area: string, date: string) =>
+      ctx.cachedJson<{ Rows?: Row[] }>(chartUrl(region, area, date), 5 * MINUTE, { label: `EirGrid ${area}` });
+    const loadDay = (date: string) => Promise.all([load("demandactual", date), load("windactual", date), load("co2intensity", date)]);
+    const hasReadings = (day: Awaited<ReturnType<typeof loadDay>>) => day.some((r) => latest(r.value.Rows));
+    // Just after midnight Irish time the new day's charts are empty; fall back to yesterday's last readings.
+    const today = dublinDate(ctx.now());
+    let date = today;
+    let day = await loadDay(today);
+    if (!hasReadings(day)) {
+      date = dublinDate(new Date(ctx.now().getTime() - 24 * 60 * 60 * 1000));
+      day = await loadDay(date);
+    }
+    const [demand, wind, co2] = day;
     const d = latest(demand.value.Rows);
     const w = latest(wind.value.Rows);
     const c = latest(co2.value.Rows);
     const windAt = new Map((wind.value.Rows ?? []).filter((r) => typeof r.Value === "number").map((r) => [r.EffectiveTime, r.Value as number]));
     const common = [...(demand.value.Rows ?? [])].reverse().find((r) => typeof r.Value === "number" && r.Value > 0 && windAt.has(r.EffectiveTime));
-    if (!d && !w && !c) throw new ToolError("UPSTREAM_DOWN", "EirGrid returned no readings for today yet.", { hint: "Try again in a few minutes." });
+    if (!d && !w && !c) throw new ToolError("UPSTREAM_DOWN", "EirGrid returned no readings for today or yesterday.", { hint: "Try again in a few minutes." });
     return envelope(eirgridInfo, {
       data: {
         region,
@@ -68,7 +78,8 @@ const statusTool = defineTool({
         wind_share_pct: common ? Math.round(((windAt.get(common.EffectiveTime) ?? 0) / (common.Value as number)) * 1000) / 10 : null,
         wind_share_time: common?.EffectiveTime ?? null,
         co2_g_per_kwh: c?.Value ?? null,
-        co2_time: c?.EffectiveTime ?? null
+        co2_time: c?.EffectiveTime ?? null,
+        ...(date !== today ? { note: `No readings for ${today} yet (just after midnight); showing the latest readings from ${date}.` } : {})
       },
       url: chartUrl(region, "demandactual", date),
       cached: demand.cached && wind.cached && co2.cached,
