@@ -144,6 +144,13 @@ describe("typed toolsets", () => {
 });
 
 describe("meta tools", () => {
+  it("finds rain forecasts rather than matching the substring in train", async () => {
+    const client = await connectClient(createAppServer(ctx));
+    const found = text(await client.callTool({ name: "ireland_catalogue", arguments: { query: "rain", limit: 1 } }));
+    expect(found.operations[0]).toMatchObject({ source: "met-eireann", operation: "met_get_forecast" });
+    await client.close();
+  });
+
   it("finds relevant operations with bounded results and source/domain filters", async () => {
     const client = await connectClient(createAppServer(ctx));
     const call = (args: Record<string, unknown>) => client.callTool({ name: "ireland_catalogue", arguments: args }).then(text);
