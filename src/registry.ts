@@ -3,6 +3,7 @@ import type { SourceModule, ToolContext } from "./gateway/module.js";
 import { crossInfo, crossSourceTools } from "./cross/index.js";
 import { buildServer } from "./gateway/server.js";
 import type { TelemetrySink } from "./gateway/telemetry.js";
+import { ncseModule } from "./sources/ncse/index.js";
 import { csoModule } from "./sources/cso/index.js";
 import { dataGovIeModule } from "./sources/data-gov-ie/index.js";
 import { geohiveModule } from "./sources/geohive/index.js";
@@ -34,6 +35,7 @@ import { worldBankModule } from "./sources/world-bank/index.js";
 
 export const sourceModules: SourceModule[] = [
   csoModule,
+  ncseModule,
   worldBankModule,
   eurostatModule,
   ecbModule,

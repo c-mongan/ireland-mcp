@@ -63,7 +63,8 @@ describe("cross-source tools", () => {
   });
 
   it("list_sources covers every registered module with licences and tools", async () => {
-    const { body } = await call(crossSourceTools(sourceModules), "list_sources", {}, ctx);
+    const { body } = await call(crossSourceTools(sourceModules), "list_sources", { max_tokens: 8000 }, ctx);
+    expect(body.truncated).toBe(false);
     expect(body.data.sources.map((s: { id: string }) => s.id)).toEqual(sourceModules.map((m) => m.info.id));
     for (const s of body.data.sources) expect(s.licence && s.attribution && s.tools.length).toBeTruthy();
   });
@@ -78,6 +79,7 @@ describe("cross-source tools", () => {
     expect(body.data.forecast.hours.length).toBe(6);
     expect(body.data.national_warnings).toHaveLength(1);
     expect(body.data.national_warnings[0].type).toBe("Wind");
+    expect(body.truncated).toBe(false);
     expect(body.data.sources.map((s: { source: string }) => s.source)).toHaveLength(3);
   });
 
