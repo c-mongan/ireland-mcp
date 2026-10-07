@@ -39,6 +39,22 @@ function parsePoint(raw: string | undefined): { lat: number; lon: number } | nul
   return match ? { lon: Number(match[1]), lat: Number(match[2]) } : null;
 }
 
+const fold = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+
+interface PlaceMatch {
+  qid: string;
+  label: string | null;
+  exact_label: boolean;
+  description: string | null;
+  irish_name: string | null;
+  population: number | null;
+  county_or_admin: string | null;
+  county_qid: string | null;
+  coordinates: { lat: number; lon: number } | null;
+  website: string | null;
+  url: string | null;
+}
+
 function sparqlUrl(query: string): string {
   const params = new URLSearchParams({ query, format: "json" });
   return `${ENDPOINT}?${params.toString()}`;
@@ -48,7 +64,7 @@ async function query(ctx: ToolContext, sparql: string) {
   const url = sparqlUrl(sparql);
   const result = await ctx.cachedJson<SparqlJson>(url, 7 * DAY, {
     label: "Wikidata Query Service",
-    timeoutMs: 8_000,
+    timeoutMs: 6_000,
     retries: 0,
     maxBytes: 1_500_000,
     headers: { accept: "application/sparql-results+json", "user-agent": USER_AGENT },
@@ -60,14 +76,19 @@ async function query(ctx: ToolContext, sparql: string) {
 const placeTool = defineTool({
   name: "wikidata_place",
   title: "Irish place from Wikidata",
-  description: "Find Irish places by English label or alias using a safe Wikidata template (country filter wd:Q27). Returns population, county/admin area, coordinates, Irish name and website when available.",
+  description: "Find Irish places by English name or alias using Wikidata's entity search and a safe template (country filter wd:Q27). Exact name matches come first (exact_label=true). Returns population, county/admin area, coordinates, Irish name and website when available.",
   example: { name: "Galway" },
   inputSchema: { name: z.string().min(2).max(80).describe("Irish place label or alias, e.g. Galway or Cork."), limit: limitSchema },
   handler: async ({ name, limit }, ctx) => {
-    const needle = literal(name.trim());
-    const sparql = `SELECT ?place ?placeLabel ?placeDescription ?irishLabel ?population ?county ?countyLabel ?coord ?website WHERE {
-  { ?place rdfs:label ?matchedLabel. } UNION { ?place skos:altLabel ?matchedLabel. }
-  FILTER(LANG(?matchedLabel) = "en" && LCASE(STR(?matchedLabel)) = LCASE(${needle}))
+    // Wikidata's EntitySearch (label + alias prefix index) answers in well under a second; the old
+    // full LCASE label scan timed out for any uncached town. Exact label matches are ranked first.
+    const sparql = `SELECT ?place ?ordinal ?placeLabel ?placeDescription ?irishLabel ?population ?county ?countyLabel ?coord ?website WHERE {
+  SERVICE wikibase:mwapi {
+    bd:serviceParam wikibase:endpoint "www.wikidata.org"; wikibase:api "EntitySearch";
+      mwapi:search ${literal(name.trim())}; mwapi:language "en"; mwapi:limit "50".
+    ?place wikibase:apiOutputItem mwapi:item.
+    ?ordinal wikibase:apiOrdinal true.
+  }
   ?place wdt:P17 wd:Q27.
   OPTIONAL { ?place wdt:P1082 ?population. }
   OPTIONAL { ?place wdt:P131 ?county. }
@@ -75,20 +96,30 @@ const placeTool = defineTool({
   OPTIONAL { ?place rdfs:label ?irishLabel FILTER(LANG(?irishLabel) = "ga") }
   OPTIONAL { ?place wdt:P856 ?website. }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-} LIMIT ${limit}`;
+} ORDER BY ?ordinal LIMIT 100`;
     const result = await query(ctx, sparql);
-    const matches = (result.value.results?.bindings ?? []).map((row) => ({
-      qid: qidFromUri(row.place?.value),
-      label: row.placeLabel?.value ?? null,
-      description: row.placeDescription?.value ?? null,
-      irish_name: row.irishLabel?.value ?? null,
-      population: row.population?.value ? Number(row.population.value) : null,
-      county_or_admin: row.countyLabel?.value ?? null,
-      county_qid: qidFromUri(row.county?.value),
-      coordinates: parsePoint(row.coord?.value),
-      website: row.website?.value ?? null,
-      url: row.place?.value ?? null
-    }));
+    const wanted = fold(name);
+    const byQid = new Map<string, PlaceMatch>();
+    for (const row of result.value.results?.bindings ?? []) {
+      const qid = qidFromUri(row.place?.value);
+      if (!qid || byQid.has(qid)) continue;
+      const label = row.placeLabel?.value ?? null;
+      byQid.set(qid, {
+        qid,
+        label,
+        exact_label: label !== null && fold(label) === wanted,
+        description: row.placeDescription?.value ?? null,
+        irish_name: row.irishLabel?.value ?? null,
+        population: row.population?.value ? Number(row.population.value) : null,
+        county_or_admin: row.countyLabel?.value ?? null,
+        county_qid: qidFromUri(row.county?.value),
+        coordinates: parsePoint(row.coord?.value),
+        website: row.website?.value ?? null,
+        url: row.place?.value ?? null
+      });
+    }
+    // Stable sort keeps Wikidata's relevance order within the exact and partial groups.
+    const matches = [...byQid.values()].sort((a, b) => Number(b.exact_label) - Number(a.exact_label));
     const { items, truncated } = bound(matches, limit);
     return envelope(wikidataInfo, { data: { name, matches: items, total: matches.length }, url: result.url, cached: result.cached, stale: result.stale, truncated });
   }
@@ -136,7 +167,7 @@ const entityTool = defineTool({
 });
 
 async function search(term: string, max: number, ctx: ToolContext) {
-  const { data } = (await placeTool.handler({ name: term, limit: Math.min(max, 10) }, ctx)) as ReturnType<typeof envelope<{ matches: Array<{ qid: string | null; label: string | null; url: string | null }> }>>;
+  const { data } = (await placeTool.handler({ name: term, limit: Math.min(max, 10) }, ctx)) as ReturnType<typeof envelope<{ matches: PlaceMatch[] }>>;
   return data.matches.filter((m) => m.qid && m.url).map((m) => ({ id: `wikidata:${m.qid}`, title: `${m.label ?? m.qid} (Wikidata ${m.qid})`, url: m.url! }));
 }
 

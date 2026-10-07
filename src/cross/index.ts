@@ -14,7 +14,8 @@ export const crossInfo: SourceInfo = {
   homepage: "https://github.com/c-mongan/ireland-mcp"
 };
 
-const SEARCH_TIMEOUT_MS = 10_000;
+/** One slow source must not hold up the combined search; its result still warms the cache for next time. */
+export const SEARCH_TIMEOUT_MS = 5_000;
 
 const withTimeout = <T>(p: Promise<T>, ms: number, label: string) =>
   Promise.race([p, new Promise<never>((_, reject) => setTimeout(() => reject(new ToolError("UPSTREAM_DOWN", `${label} timed out.`)), ms).unref?.())]);
@@ -53,6 +54,7 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
       );
       const lists = settled.map((s) => (s.status === "fulfilled" ? s.value : ([] as SearchHit[])));
       if (settled.every((s) => s.status === "rejected")) throw toToolError((settled[0] as PromiseRejectedResult).reason);
+      // ChatGPT's search contract is exactly { results }; slow or failed sources are simply omitted.
       return { results: interleave(lists, 20) };
     }
   });

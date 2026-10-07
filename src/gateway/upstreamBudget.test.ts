@@ -181,4 +181,31 @@ describe("HttpClient with budgets", () => {
     expect(await ctx.cachedJson("https://ws.cso.ie/a", 1000)).toMatchObject({ value: { v: 1 }, stale: true });
     expect(fetch.calls.length).toBe(callsBefore);
   });
+
+  it("never lets callers' bad arguments (4xx such as CKAN 409) trip the breaker for everyone", async () => {
+    const bad = JSON.stringify({ success: false, error: { filters: ['field "nonexistent_col" not in table'], __type: "Validation Error" } });
+    const fetch = fakeFetch([
+      { match: /nonexistent_col/, status: 409, body: bad },
+      { match: /package_search/, body: '{"success":true,"result":{"count":0,"results":[]}}' }
+    ]);
+    const budgets = new UpstreamBudgets({ failureThreshold: 5, cooldownMs: 30_000 });
+    const http = new HttpClient(fetch, budgets);
+    const url = "https://opendata.ncse.ie/api/3/action/datastore_search?filters=%7B%22nonexistent_col%22%3A%22x%22%7D";
+    for (let i = 0; i < 8; i += 1) {
+      await expect(http.json(url)).rejects.toMatchObject({
+        code: "BAD_ARGS",
+        message: expect.stringContaining('HTTP 409): filters: field "nonexistent_col" not in table'),
+        hint: expect.stringContaining("column names")
+      });
+    }
+    expect(budgets.snapshot().ncse).toMatchObject({ state: "closed", consecutiveFailures: 0 });
+    await expect(http.json("https://opendata.ncse.ie/api/3/action/package_search?q=school")).resolves.toMatchObject({ success: true });
+  });
+
+  it("reports an upstream refusal (403) differently from a timeout", async () => {
+    const http = new HttpClient(fakeFetch([{ match: /kohesio/, status: 403, body: "Forbidden" }]));
+    const error = await http.text("https://kohesio.ec.europa.eu/api", { retries: 0 }).catch((e: unknown) => e);
+    expect(error).toMatchObject({ code: "UPSTREAM_DOWN", message: expect.stringContaining("HTTP 403"), hint: expect.stringContaining("refused access") });
+    expect((error as ToolError).hint).not.toContain("did not respond");
+  });
 });

@@ -17,7 +17,11 @@ export interface CkanConfig {
   domain: Domain;
   coverage: string;
   ttlMs?: number;
+  /** Portal-specific examples for tool descriptions; defaults suit data.gov.ie. */
+  examples?: { query: string; organization: string; dataset: string };
 }
+
+const DEFAULT_EXAMPLES = { query: "'bike counts' or 'air quality'", organization: "dublin-city-council", dataset: "moby-bikes" };
 
 interface CkanEnvelope<T> {
   success: boolean;
@@ -75,6 +79,7 @@ export function createCkanModule(config: CkanConfig): SourceModule {
   const api = `${site}/api/3/action`;
   const ttl = config.ttlMs ?? HOUR;
   const datasetUrl = (name: string) => `${site}/dataset/${name}`;
+  const ex = config.examples ?? DEFAULT_EXAMPLES;
 
   const summarise = (p: CkanPackage) => ({
     id: p.name,
@@ -94,7 +99,7 @@ export function createCkanModule(config: CkanConfig): SourceModule {
   }
 
   async function packageShow(ctx: ToolContext, id: string) {
-    if (!DATASET_ID.test(id)) throw new ToolError("BAD_ARGS", "Dataset id must be the dataset's URL name, e.g. 'moby-bikes'.");
+    if (!DATASET_ID.test(id)) throw new ToolError("BAD_ARGS", `Dataset id must be the dataset's URL name, e.g. '${ex.dataset}'.`);
     const url = `${api}/package_show?id=${encodeURIComponent(id)}`;
     const result = await ctx.cachedJson<CkanEnvelope<CkanPackage>>(url, ttl, { label: portal });
     return { url, value: unwrap(result.value, portal), cached: result.cached, stale: result.stale };
@@ -105,8 +110,8 @@ export function createCkanModule(config: CkanConfig): SourceModule {
     title: `Search ${portal} datasets`,
     description: `Search ${portal} open-data catalogue (CKAN) by keywords; optionally filter by publisher organisation slug or file format.`,
     inputSchema: {
-      query: z.string().min(1).max(200).describe("Keywords, e.g. 'bike counts' or 'air quality'."),
-      organization: z.string().regex(/^[a-z0-9_-]+$/).max(100).optional().describe("Publisher slug, e.g. 'dublin-city-council'."),
+      query: z.string().min(1).max(200).describe(`Keywords, e.g. ${ex.query}.`),
+      organization: z.string().regex(/^[a-z0-9_-]+$/).max(100).optional().describe(`Publisher slug, e.g. '${ex.organization}'.`),
       format: z.string().regex(/^[A-Za-z0-9.+-]+$/).max(20).optional().describe("Resource format, e.g. CSV, GeoJSON, API."),
       limit: z.number().int().min(1).max(MAX_LIMIT).default(20)
     },
@@ -128,7 +133,7 @@ export function createCkanModule(config: CkanConfig): SourceModule {
     name: `${prefix}_get_dataset`,
     title: `Get a ${portal} dataset`,
     description: `Get one ${portal} dataset's description, licence and downloadable resources. Resources with datastore=true can be queried with ${prefix}_query_datastore.`,
-    inputSchema: { id: z.string().min(2).max(100).describe("Dataset URL name from search, e.g. 'moby-bikes'.") },
+    inputSchema: { id: z.string().min(2).max(100).describe(`Dataset URL name from search, e.g. '${ex.dataset}'.`) },
     handler: async ({ id }, ctx) => {
       const result = await packageShow(ctx, id);
       const p = result.value;

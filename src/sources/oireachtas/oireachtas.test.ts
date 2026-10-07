@@ -27,6 +27,19 @@ describe("Oireachtas module", () => {
     expect(harris.body.licence).toContain("Oireachtas");
   });
 
+  it("lists only sitting members by default and flags former ones on request", async () => {
+    // Catherine Connolly's 34th Dáil seat ended 2025-10-25 (elected President).
+    const current = await callTool(mod, "oireachtas_search_members", { constituency: "Galway West" }, fakeFetch(routes));
+    expect(current.body.data.members).toHaveLength(0);
+    expect(current.body.data.note).toMatch(/1 former member/);
+    const former = await callTool(mod, "oireachtas_search_members", { constituency: "Galway West", include_former: true }, fakeFetch(routes));
+    expect(former.body.data.members).toEqual([
+      expect.objectContaining({ name: "Catherine Connolly", current: false, date_range: { start: "2024-11-29", end: "2025-10-25" } })
+    ]);
+    const sitting = await callTool(mod, "oireachtas_search_members", { name: "harris" }, fakeFetch(routes));
+    expect(sitting.body.data.members[0]).toMatchObject({ current: true, date_range: { start: "2024-11-29", end: null } });
+  });
+
   it("searches bills by title words with summarised stages", async () => {
     const { body } = await callTool(mod, "oireachtas_search_bills", { query: "tobacco" }, fakeFetch(routes));
     expect(body.data.bills).toHaveLength(1);

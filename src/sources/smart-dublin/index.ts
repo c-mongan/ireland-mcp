@@ -13,5 +13,6 @@ export const smartDublinModule = createCkanModule({
   site: "https://data.smartdublin.ie",
   summary: "Dublin city/county datasets: cycle counters, parking, footfall, planning, environment; queryable tables.",
   domain: "stats",
+  examples: { query: "'cycle counts' or 'footfall'", organization: "dublin-city-council", dataset: "dublin-city-centre-cycle-counts" },
   coverage: "Dublin's four local authorities' open-data catalogue (transport, environment, footfall, bikes), plus DataStore rows."
 });

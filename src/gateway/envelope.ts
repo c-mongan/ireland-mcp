@@ -58,7 +58,7 @@ export const DEFAULT_MAX_TOKENS = 2000;
 export const MAX_MAX_TOKENS = 8000;
 const MIN_MAX_TOKENS = 100;
 /** Room kept for the truncation annotation itself. */
-const ANNOTATION_RESERVE_CHARS = 400;
+const ANNOTATION_RESERVE_CHARS = 600;
 const STRING_MARKER = "… [truncated]";
 
 export const estimateTokens = (text: string): number => Math.ceil(text.length / 4);
@@ -149,6 +149,17 @@ export function applyBudget(value: unknown, maxTokens?: number, options: { annot
       obj.total = first.total;
     }
     obj.hint = `Result cut to fit ~${tokens} tokens. Narrow the request (filters, smaller limit) or pass max_tokens (up to ${MAX_MAX_TOKENS}).`;
+    if (first && first.returned < first.total) {
+      // Rows cut from a page are not in the next page. Paged tools that report data.offset/next_offset
+      // get next_offset moved back so callers resume at the first dropped row; others are warned.
+      const data = isContainer(obj.data) && !Array.isArray(obj.data) ? (obj.data as Record<string, unknown>) : undefined;
+      if (data && typeof data.offset === "number" && "next_offset" in data && /^data\.[^.[\]]+$/.test(first.path)) {
+        data.next_offset = data.offset + first.returned;
+        obj.hint += ` Continue with offset=${data.next_offset}.`;
+      } else {
+        obj.hint += ` Only the first ${first.returned} of this page's ${first.total} items are shown; the rest are not in the next page, so lower limit to about ${Math.max(1, first.returned)} to page without gaps.`;
+      }
+    }
   }
   // Some objects contain only short scalar fields, leaving nothing for largestCut.
   // Fail closed instead of returning an oversized, misleadingly partial payload.

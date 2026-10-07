@@ -1,5 +1,5 @@
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { fakeFetch, parseToolText, type Route } from "../../test/helpers/fakeFetch.js";
 import { createContext } from "../gateway/context.js";
 import { ToolError } from "../gateway/errors.js";
@@ -7,7 +7,7 @@ import type { SourceModule, ToolContext } from "../gateway/module.js";
 import { runTool } from "../gateway/server.js";
 import { sourceModules } from "../registry.js";
 import { BOUNDARY_LAYERS } from "../sources/geohive/index.js";
-import { crossSourceTools, interleave } from "./index.js";
+import { SEARCH_TIMEOUT_MS, crossSourceTools, interleave } from "./index.js";
 import { findPlace } from "./places.js";
 
 const fx = (dir: string, name: string) => fileURLToPath(new URL(`../sources/${dir}/fixtures/${name}`, import.meta.url));
@@ -47,6 +47,21 @@ describe("cross-source tools", () => {
     expect(ok).toBe(true);
     expect(Object.keys(body)).toEqual(["results"]);
     expect(body.results.map((r: { id: string }) => r.id)).toEqual(["a:x-0", "b:x-0", "a:x-1", "a:x-2"]);
+  });
+
+  it("search answers within the per-source deadline when one source hangs", async () => {
+    vi.useFakeTimers();
+    try {
+      const hanging: SourceModule = { ...fakeModule("slow", 1), search: () => new Promise(() => {}) };
+      const pending = call(crossSourceTools([fakeModule("a", 2), hanging]), "search", { query: "x" }, ctx);
+      await vi.advanceTimersByTimeAsync(SEARCH_TIMEOUT_MS + 10);
+      const { ok, body } = await pending;
+      expect(SEARCH_TIMEOUT_MS).toBeLessThanOrEqual(5_000);
+      expect(ok).toBe(true);
+      expect(body.results.map((r: { id: string }) => r.id)).toEqual(["a:x-0", "a:x-1"]);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("search fails cleanly only when every source fails", async () => {
