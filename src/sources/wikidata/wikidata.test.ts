@@ -15,7 +15,7 @@ describe("wikidata source", () => {
   it("uses a safe Irish-place template and descriptive user agent", async () => {
     const fetch = fakeFetch([{ match: /query\.wikidata\.org\/sparql/, file: fixturePath(import.meta.url, "galway-simple.json") }]);
     const { body } = await callTool<WikidataBody>(wikidataModule, "wikidata_place", { name: "Galway", limit: 3 }, fetch);
-    expect(body.data.matches?.[0]).toMatchObject({ qid: "Q129610", label: "Galway", population: 83456 });
+    expect(body.data.matches?.[0]).toMatchObject({ qid: "Q129610", label: "Galway", population: 83456, url: "https://www.wikidata.org/wiki/Q129610" });
     const call = fetch.calls[0]!;
     expect(decodeURIComponent(call.url).replace(/\+/g, " ")).toContain("wdt:P17 wd:Q27");
     expect(String((call.init?.headers as Record<string, string>)["user-agent"])).toContain("templated Irish public-data lookup");
