@@ -180,7 +180,7 @@ export async function observationsAt(ctx: ToolContext, station: Station) {
 
 // The same versioned HTTPS feed used by met.ie/warnings-today.html.
 const warningSchema = z.object({
-  id: z.string().optional(),
+  id: z.union([z.string(), z.number()]).optional(),
   type: z.string(),
   level: z.string(),
   headline: z.string(),

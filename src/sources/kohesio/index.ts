@@ -7,6 +7,8 @@ import { defineTool, type FetchedDocument, type SearchHit, type SourceModule, ty
 const BASE = "https://kohesio.ec.europa.eu/api";
 const IRELAND = "https://linkedopendata.eu/entity/Q2";
 const TTL = DAY;
+/** Kohesio flaps from cloud IPs: allow three attempts (worst case three times the per-attempt upstream timeout). */
+const RETRIES = 2;
 
 export const kohesioInfo: SourceInfo = {
   id: "kohesio",
@@ -81,7 +83,7 @@ function compactProject(p: RawProject | DetailProject) {
 
 async function getJson<T>(ctx: ToolContext, url: string) {
   try {
-    const result = await ctx.cachedJson<T>(url, TTL, { label: "Kohesio" });
+    const result = await ctx.cachedJson<T>(url, TTL, { label: "Kohesio", retries: RETRIES });
     return { url, value: result.value, cached: result.cached, stale: result.stale };
   } catch (error) {
     if (error instanceof ToolError && error.message.includes("HTTP 403")) {

@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { callTool, fixturePath } from "../../../test/helpers/callTool.js";
 import { fakeFetch } from "../../../test/helpers/fakeFetch.js";
@@ -35,5 +36,22 @@ describe("kohesio", () => {
     expect(result.body.error.hint).toContain("Kohesio blocks some cloud-hosted IPs");
     expect(result.body.error.hint).toContain("node dist/src/cli.js --toolsets=kohesio");
     expect(result.body.error.hint).not.toContain("npx");
+  });
+
+  it("retries transient Kohesio failures a bounded number of times", async () => {
+    const body = readFileSync(fx("projects-ie.json"));
+    let calls = 0;
+    const flaky = async () => (++calls < 3 ? new Response("Forbidden", { status: 403 }) : new Response(body, { status: 200 }));
+    const result = await callTool<SearchBody>(kohesioModule, "kohesio_search_projects", { limit: 3 }, flaky);
+    expect(result.ok).toBe(true);
+    expect(calls).toBe(3);
+
+    calls = 0;
+    const down = async () => {
+      calls += 1;
+      return new Response("Forbidden", { status: 403 });
+    };
+    expect((await callTool(kohesioModule, "kohesio_search_projects", { limit: 3 }, down)).ok).toBe(false);
+    expect(calls).toBe(3);
   });
 });

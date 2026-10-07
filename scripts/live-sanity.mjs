@@ -7,6 +7,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createContext } from "../dist/src/gateway/context.js";
 import { createAppServer } from "../dist/src/registry.js";
+import { classify, exitCode } from "./live-sanity-policy.mjs";
 
 const year = new Date().getUTCFullYear();
 const CASES = [
@@ -75,13 +76,13 @@ for (const [source, name, args, ok, opts = {}] of CASES) {
     const body = JSON.parse(r.content[0].text);
     const data = opts.raw ? body : body.data;
     const pass = !r.isError && Boolean(ok(data ?? {}));
-    results.push({
+    results.push(classify({
       source,
       tool: name,
       status: pass ? "PASS" : "FAIL",
       ms: Date.now() - started,
       note: r.isError ? `${body.error?.code}: ${body.error?.message}` : body.stale ? "served stale" : ""
-    });
+    }));
   } catch (error) {
     results.push({ source, tool: name, status: "FAIL", ms: Date.now() - started, note: String(error?.message ?? error) });
   }
@@ -92,6 +93,8 @@ if (process.argv.includes("--json")) console.log(JSON.stringify(results, null, 2
 else {
   console.log(`Surface: ${toolsets ? `toolsets=${toolsets}` : "default (meta tools)"}, ${listed.size} tools listed.\n`);
   console.log(`| Source | Tool | Result | ms | Note |\n|---|---|---|---|---|`);
-  for (const r of results) console.log(`| ${r.source} | ${r.tool} | ${r.status} | ${r.ms} | ${r.note.replace(/\|/g, "/").slice(0, 120)} |`);
+  for (const r of results) console.log(`| ${r.source} | ${r.tool} | ${r.status} | ${r.ms} | ${r.note.replace(/\|/g, "/").slice(0, 160)} |`);
+  const warned = results.filter((r) => r.status === "WARN");
+  if (warned.length) console.log(`\nWARN: ${warned.length} known-flaky upstream failure(s) reported but not failing the run.`);
 }
-process.exit(results.some((r) => r.status === "FAIL") ? 1 : 0);
+process.exit(exitCode(results));
