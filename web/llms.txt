@@ -6,7 +6,7 @@ Endpoint: https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp
 Future endpoint: https://mcp.irishopendata.ie/mcp
 Transport: Streamable HTTP JSON-RPC over POST
 Auth: none
-Default tool surface: 7 tools, 5,241 characters, about 1.3k tokens on this branch
+Default tool surface: 7 tools, 8,284 characters, about 2.1k tokens
 Full surface: use ?toolsets=all only when a client needs all typed tools listed
 
 Install:
