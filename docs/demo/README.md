@@ -1,5 +1,18 @@
 # Real-client demo evidence
 
+## v1.1.0 re-run (7 October 2026, commit `6882a97`)
+
+| Client | Question | Result | Citation checked |
+| --- | --- | --- | --- |
+| MCP Inspector (Playwright) | The four calls below plus `epa_bathing_locations` (new in v1.1.0) | Pass, 5/5 | As below, plus `data.epa.ie/bw/api/v1/locations` |
+| GitHub Copilot CLI | NCSE 2026-2027 school allocations (new source) | Pass | `https://opendata.ncse.ie/dataset/2026-2027-school-allocations` |
+| GitHub Copilot CLI | Three EPA bathing-water classifications (new source) | Pass | `https://data.epa.ie/bw/api/v1/locations?page=1&per_page=3` |
+| VS Code Insiders, Copilot agent mode (GPT-5.6 Sol) | EPA bathing classifications and the NCSE allocations dataset | Pass | Both URLs above |
+
+Answers are in [`transcripts-v1.1.0.md`](transcripts-v1.1.0.md); the Inspector result is [`inspector-epa-bathing-locations.png`](inspector-epa-bathing-locations.png). Hosted [live-all-ops](../live-all-ops.md): 70 operations pass, 2 need a key, 2 are blocked from Azure, 0 fail.
+
+## v1.0 run
+
 All runs used the hosted endpoint `https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp` on 7 October 2026, after deploying commit `8b8d530`.
 
 | Client                                             | Question                                                                                                 | Result                                                                                                                                                                     | Citation checked                                                                                                            |
