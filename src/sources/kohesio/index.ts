@@ -83,7 +83,7 @@ function compactProject(p: RawProject | DetailProject) {
 
 async function getJson<T>(ctx: ToolContext, url: string) {
   try {
-    const result = await ctx.cachedJson<T>(url, TTL, { label: "Kohesio", retries: RETRIES });
+    const result = await ctx.cachedJson<T>(url, TTL, { label: "Kohesio", retries: RETRIES, retryStatuses: [403] });
     return { url, value: result.value, cached: result.cached, stale: result.stale };
   } catch (error) {
     if (error instanceof ToolError && error.message.includes("HTTP 403")) {
