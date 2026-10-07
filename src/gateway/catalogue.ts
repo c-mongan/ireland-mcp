@@ -101,3 +101,17 @@ export function shortDescription(text: string, max = 160): string {
   const first = /^(.+?[.!?])(\s|$)/.exec(text)?.[1] ?? text;
   return first.length > max ? `${first.slice(0, max - 1)}…` : first;
 }
+
+/** Bounded lexical discovery; schemas are fetched only for the selected operation. */
+export function discoverOperations(modules: readonly SourceModule[], query: string, limit: number) {
+  const terms = [...new Set(query.toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? [])];
+  const matches = modules.flatMap((module) => module.tools.map((tool) => {
+    const name = tool.name.toLowerCase().replaceAll("_", " ");
+    const text = `${tool.title} ${tool.description}`.toLowerCase();
+    const context = `${module.info.id} ${module.info.name} ${module.summary}`.toLowerCase();
+    const score = terms.reduce((sum, term) => sum + (name.includes(term) ? 4 : 0) + (text.includes(term) ? 2 : 0) + (context.includes(term) ? 1 : 0), 0);
+    return { score, source: module.info.id, operation: tool.name, title: tool.title, description: shortDescription(tool.description) };
+  })).filter((op) => op.score > 0).sort((a, b) => b.score - a.score || a.source.localeCompare(b.source) || a.operation.localeCompare(b.operation));
+  return { operations: matches.slice(0, limit).map((op) => ({ source: op.source, operation: op.operation, title: op.title, description: op.description })), total: matches.length, truncated: matches.length > limit,
+    next: "ireland_describe(source, operation) for arguments, then ireland_call." };
+}

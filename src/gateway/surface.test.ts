@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { z } from "zod";
 import { connectClient } from "../../test/helpers/mcpClient.js";
 import { fakeFetch } from "../../test/helpers/fakeFetch.js";
-import { appModules, createAppServer, sourceModules } from "../registry.js";
+import { createAppServer, sourceModules } from "../registry.js";
 import { DOMAINS, listOperations, exampleArgs } from "./catalogue.js";
 import { createContext } from "./context.js";
 import { applyBudget, envelope } from "./envelope.js";
@@ -49,11 +49,15 @@ describe("default lean surface", () => {
     }
   });
 
-  it("indexes every operation by source in the ireland_call description, so models can call it directly", async () => {
-    const call = (await listTools()).find((t) => t.name === "ireland_call")!;
-    for (const { source, tool } of listOperations(appModules().modules)) {
-      expect(call.description).toMatch(new RegExp(`${source}: [^;]*\\b${tool.name}\\b`));
+  it("keeps the default definition small as source operations grow", async () => {
+    const make = (count: number) => buildServer({ modules: [{ ...demoModule, tools: Array.from({ length: count }, (_, i) => ({ ...rowsTool, name: `demo_rows_${i}` })) }], context: ctx });
+    const sizes = [];
+    for (const count of [1, 200]) {
+      const client = await connectClient(make(count));
+      sizes.push(JSON.stringify(await client.listTools()).length);
+      await client.close();
     }
+    expect(sizes[1]).toBe(sizes[0]);
   });
 
   it("keeps nearby cheap enough to stay top level (<350 tokens)", async () => {
@@ -140,6 +144,22 @@ describe("typed toolsets", () => {
 });
 
 describe("meta tools", () => {
+  it("finds relevant operations with bounded results and source/domain filters", async () => {
+    const client = await connectClient(createAppServer(ctx));
+    const call = (args: Record<string, unknown>) => client.callTool({ name: "ireland_catalogue", arguments: args }).then(text);
+    const rail = await call({ query: "train departures", source: "irish-rail", limit: 1 });
+    expect(rail.operations).toHaveLength(1);
+    expect(rail.operations[0]).toMatchObject({ source: "irish-rail", operation: "rail_get_departures" });
+    expect(rail.operations[0].description).toBeTruthy();
+    expect(rail.operations[0]).not.toHaveProperty("input_schema");
+    const excluded = await call({ query: "train departures", domain: "environment" });
+    expect(excluded.operations.every((o: { source: string }) => o.source !== "irish-rail")).toBe(true);
+    expect((await call({ query: "zzznomatchzzz" })).operations).toEqual([]);
+    const unknown = await client.callTool({ name: "ireland_catalogue", arguments: { query: "train", source: "missing" } });
+    expect(unknown.isError).toBe(true);
+    await client.close();
+  });
+
   it("catalogue groups every source by domain with its operations", async () => {
     const client = await connectClient(createAppServer(ctx));
     const all = text(await client.callTool({ name: "ireland_catalogue", arguments: {} }));
