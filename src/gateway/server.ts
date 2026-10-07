@@ -252,12 +252,18 @@ function registerMetaTools(
         source: z.string().describe("Source id."),
         operation: z.string().describe("Operation name."),
         args: z.record(z.string(), z.unknown()).optional().describe("Operation arguments."),
+        // Models often write `arguments` (the MCP field name); without this alias the filters were silently dropped.
+        arguments: z.record(z.string(), z.unknown()).optional().describe("Alias of args."),
         max_tokens: maxTokensSchema
       },
       outputSchema: OUTPUT_SCHEMA,
       annotations: { title: "Call an operation", ...ANNOTATIONS }
     },
-    async ({ source, operation, args, max_tokens }) => {
+    async ({ source, operation, args: argsField, arguments: argumentsAlias, max_tokens }) => {
+      if (argsField && argumentsAlias) {
+        return fail(new ToolError("BAD_ARGS", "Pass operation arguments in `args` or `arguments`, not both.").toJSON());
+      }
+      const args = argsField ?? argumentsAlias;
       let op: Operation;
       try {
         op = findOperation(modules, source, operation);

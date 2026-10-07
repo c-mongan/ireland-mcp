@@ -118,7 +118,7 @@ Portable Copilot / MCP JSON:
 
 ## Why it is lean
 
-Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **7 tools, 8,284 characters, about 2,071 tokens** (`toolsets=all` is 80 tools, about 22k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
+Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **7 tools, 8,407 characters, about 2,102 tokens** (`toolsets=all` is 80 tools, about 22k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
 
 <p align="center">
   <a href="docs/architecture/ireland-mcp-lean-surface.drawio">

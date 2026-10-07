@@ -200,6 +200,15 @@ describe("meta tools", () => {
     expect(typoBody.error.message).toContain("Valid arguments: n");
     expect(typoBody.expected_schema.properties.n).toBeDefined();
 
+    // `arguments` is accepted as an alias of `args`, so filters are never silently dropped.
+    const alias = await client.callTool({ name: "ireland_call", arguments: { source: "demo", operation: "demo_rows", arguments: { n: 2, area: "Ennis" } } });
+    expect(text(alias).error.message).toContain("Unknown argument for demo_rows: area");
+    const aliasOk = await client.callTool({ name: "ireland_call", arguments: { source: "demo", operation: "demo_rows", arguments: { n: 1 } } });
+    expect(text(aliasOk).data.items).toHaveLength(1);
+    const both = await client.callTool({ name: "ireland_call", arguments: { source: "demo", operation: "demo_rows", args: { n: 1 }, arguments: { n: 2 } } });
+    expect(both.isError).toBe(true);
+    expect(text(both).error.code).toBe("BAD_ARGS");
+
     const withBudget = await client.callTool({ name: "ireland_call", arguments: { source: "demo", operation: "demo_rows", args: { n: 2, max_tokens: 500 } } });
     expect(withBudget.isError).toBeFalsy();
     expect(body.example).toEqual({ n: 3 });
