@@ -115,7 +115,7 @@ const placeTool = defineTool({
         county_qid: qidFromUri(row.county?.value),
         coordinates: parsePoint(row.coord?.value),
         website: row.website?.value ?? null,
-        url: row.place?.value ?? null
+        url: `https://www.wikidata.org/wiki/${qid}`
       });
     }
     // Stable sort keeps Wikidata's relevance order within the exact and partial groups.
