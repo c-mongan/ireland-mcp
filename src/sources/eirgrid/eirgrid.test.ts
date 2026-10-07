@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { fakeFetch, type Route } from "../../../test/helpers/fakeFetch.js";
 import { callTool, fixturePath } from "../../../test/helpers/callTool.js";
+import { createContext } from "../../gateway/context.js";
 import { eirgridModule as mod } from "./index.js";
 
 const f = (name: string) => fixturePath(import.meta.url, name);
@@ -46,6 +47,22 @@ describe("EirGrid module", () => {
     const { ok } = await callTool(mod, "grid_get_status", {}, fetch);
     expect(ok).toBe(true);
     expect(fetch.calls).toHaveLength(3);
+  });
+
+  it("falls back to yesterday's readings just after midnight, and says so", async () => {
+    const now = () => new Date("2026-10-07T23:02:00Z"); // 00:02 on 8 Oct in Dublin
+    const empty = '{"Rows":[]}';
+    const midnight: Route[] = [
+      { match: /dateFrom=08-Oct-2026/, body: empty },
+      ...["demandactual", "windactual", "co2intensity"].map((area) => ({ match: new RegExp(`dateFrom=07-Oct-2026.*areas=${area}`), file: f(`${area}.json`) }))
+    ];
+    const fetch = fakeFetch(midnight);
+    const { ok, body } = await callTool(mod, "grid_get_status", { region: "ALL" }, createContext({ fetch, now }));
+    expect(ok).toBe(true);
+    expect(body.data.demand_mw).toBe(5753);
+    expect(body.data.note).toContain("08-Oct-2026");
+    expect(JSON.stringify(body)).toContain("dateFrom=07-Oct-2026");
+    expect(fetch.calls).toHaveLength(6);
   });
 
   it("reports UPSTREAM_DOWN when the dashboard returns no rows", async () => {
