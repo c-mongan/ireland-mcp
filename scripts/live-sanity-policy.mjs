@@ -1,6 +1,6 @@
 // Exit policy for the live smoke run. Kept separate from live-sanity.mjs so it can be unit-tested without network.
 
-/** Sources whose upstream is known to block or flap from cloud runners. Failures are reported as WARN, not FAIL. */
+/** Sources with a specific known cloud-runner failure eligible for WARN. */
 export const KNOWN_FLAKY = {
   kohesio: "Kohesio returns HTTP 403 to some cloud-hosted IPs (GitHub runners); it works from residential IPs."
 };
@@ -9,13 +9,14 @@ export const KNOWN_FLAKY = {
 export const MAX_TOLERATED_FLAKY = 1;
 
 /**
- * Downgrades an isolated upstream failure from a known-flaky source to WARN.
- * Only UPSTREAM_DOWN qualifies: a wrong answer or a schema break still fails.
+ * Downgrades only the normalized Kohesio cloud-runner HTTP 403 to WARN.
+ * Other outages, timeouts and unexpected handler/schema failures still fail.
  */
 export function classify(result, knownFlaky = KNOWN_FLAKY) {
   if (result.status !== "FAIL") return result;
   const reason = knownFlaky[result.source];
-  if (!reason || !String(result.note ?? "").startsWith("UPSTREAM_DOWN")) return result;
+  if (!reason || result.source !== "kohesio"
+    || result.note !== "UPSTREAM_DOWN: Kohesio returned HTTP 403.") return result;
   return { ...result, status: "WARN", note: `${result.note} Known flaky: ${reason}` };
 }
 
