@@ -8,7 +8,7 @@ import { noopSink, type TelemetrySink } from "./telemetry.js";
 import { ALL_TOOLSETS, resolveToolsets } from "./toolsets.js";
 
 export const SERVER_NAME = "ireland-mcp";
-export const SERVER_VERSION = "1.0.0";
+export const SERVER_VERSION = "1.0.1";
 export const HOSTED_URL = "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net";
 export const REPO_URL = "https://github.com/c-mongan/ireland-mcp";
 
@@ -121,7 +121,31 @@ export function buildServer(options: BuildServerOptions): McpServer {
 
   registerResources(server, modules);
   registerPrompts(server);
+  portableToolSchemas(server);
   return server;
+}
+
+type Handler = (request: unknown, extra: unknown) => Promise<unknown>;
+
+/**
+ * Zod spells "any extra keys" as `additionalProperties: {}`, which schema linters (MCP Inspector's
+ * portability check) flag as untyped. Rewrites it to the equivalent, portable `true` in tools/list.
+ */
+function portableToolSchemas(server: McpServer) {
+  const handlers = (server.server as unknown as { _requestHandlers?: Map<string, Handler> })._requestHandlers;
+  const list = handlers?.get("tools/list");
+  if (!handlers || !list) return;
+  handlers.set("tools/list", async (request, extra) => openObjects(await list(request, extra)));
+}
+
+function openObjects(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(openObjects);
+  if (!isPlainObject(value)) return value;
+  const out: Record<string, unknown> = {};
+  for (const [key, child] of Object.entries(value)) {
+    out[key] = key === "additionalProperties" && isPlainObject(child) && Object.keys(child).length === 0 ? true : openObjects(child);
+  }
+  return out;
 }
 
 function registerTyped(server: McpServer, tool: AnyTool, source: string, context: ToolContext, sink: TelemetrySink) {
@@ -239,6 +263,19 @@ function registerMetaTools(
         op = findOperation(modules, source, operation);
       } catch (error) {
         return fail(toToolError(error).toJSON());
+      }
+      const valid = Object.keys(op.tool.inputSchema);
+      const unknown = Object.keys(args ?? {}).filter((key) => key !== "max_tokens" && !valid.includes(key));
+      if (unknown.length > 0) {
+        const failure = fail({
+          ...new ToolError(
+            "BAD_ARGS",
+            `Unknown argument${unknown.length > 1 ? "s" : ""} for ${op.tool.name}: ${unknown.join(", ")}. Valid arguments: ${valid.join(", ") || "(none)"}.`
+          ).toJSON(),
+          expected_schema: operationSchema(op.tool),
+          example: exampleArgs(op.tool)
+        });
+        return tagOperation(failure, op.source, op.tool.name);
       }
       const parsed = z.object(op.tool.inputSchema).safeParse(args ?? {});
       if (!parsed.success) {

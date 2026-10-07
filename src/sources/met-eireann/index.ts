@@ -15,6 +15,7 @@ export const metInfo: SourceInfo = {
 
 const TTL = 15 * MINUTE;
 // The point-forecast API is only served over plain HTTP (HTTPS returns 404).
+// Stays on http: the https host 301s to an Azure Container Apps origin that fails the TLS handshake (checked 2026-10).
 export const FORECAST_BASE = "http://openaccess.pf.api.met.ie/metno-wdb2ts/locationforecast";
 export const OBSERVATIONS_BASE = "https://prodapi.metweb.ie/observations";
 export const WARNINGS_URL = "https://prodapi.met.ie/v2/warnings/";

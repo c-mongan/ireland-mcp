@@ -83,6 +83,9 @@ describe("typed toolsets", () => {
     for (const m of sourceModules) for (const t of m.tools) expect(names).toContain(t.name);
     for (const n of ["list_sources", "ireland_snapshot", ...META]) expect(names).toContain(n);
     expect(tools.every((t) => t.outputSchema?.type === "object")).toBe(true);
+    // Portable spelling: `additionalProperties: true`, never the untyped `{}` zod emits.
+    expect(JSON.stringify(tools)).not.toContain('"additionalProperties":{}');
+    expect(tools.find((t) => t.name === "ireland_call")!.outputSchema).toMatchObject({ additionalProperties: true });
     const size = JSON.stringify({ tools }).length;
     process.stderr.write(`toolsets=all tools/list: ${tools.length} tools, ${size} chars (≈${Math.round(size / 4)} tokens)\n`);
   });
@@ -188,6 +191,17 @@ describe("meta tools", () => {
     const body = text(bad);
     expect(body.error.code).toBe("BAD_ARGS");
     expect(body.expected_schema.properties.n).toBeDefined();
+
+    const typo = await client.callTool({ name: "ireland_call", arguments: { source: "demo", operation: "demo_rows", args: { n: 2, area: "Ennis" } } });
+    expect(typo.isError).toBe(true);
+    const typoBody = text(typo);
+    expect(typoBody.error.code).toBe("BAD_ARGS");
+    expect(typoBody.error.message).toContain("Unknown argument for demo_rows: area");
+    expect(typoBody.error.message).toContain("Valid arguments: n");
+    expect(typoBody.expected_schema.properties.n).toBeDefined();
+
+    const withBudget = await client.callTool({ name: "ireland_call", arguments: { source: "demo", operation: "demo_rows", args: { n: 2, max_tokens: 500 } } });
+    expect(withBudget.isError).toBeFalsy();
     expect(body.example).toEqual({ n: 3 });
 
     const unknownSource = await client.callTool({ name: "ireland_call", arguments: { source: "zzz", operation: "x", args: {} } });
