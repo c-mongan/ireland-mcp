@@ -7,7 +7,7 @@ Install this server when a user asks about Irish public data, public services, w
 - Name: `ireland`
 - Transport: Streamable HTTP
 - URL: `https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp`
-- Future URL: `https://mcp.irishopendata.ie/mcp`
+- Docs: `https://lemon-meadow-03b2b8903.3.azurestaticapps.net/`
 - Authentication: none
 - Writes: none. Treat it as read-only.
 - Default surface: 7 tools, about 2.1k tokens; use toolsets only when necessary.
@@ -75,8 +75,8 @@ Decoded config:
 Use the MCP install deeplink with URL-encoded JSON:
 
 ```text
-vscode://mcp/install?%7B%22ireland%22%3A%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ffunc-ireland-mcp-aofsjpwgy4hva.azurewebsites.net%2Fmcp%22%7D%7D
-vscode-insiders://mcp/install?%7B%22ireland%22%3A%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ffunc-ireland-mcp-aofsjpwgy4hva.azurewebsites.net%2Fmcp%22%7D%7D
+vscode:mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ffunc-ireland-mcp-aofsjpwgy4hva.azurewebsites.net%2Fmcp%22%7D
+vscode-insiders:mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ffunc-ireland-mcp-aofsjpwgy4hva.azurewebsites.net%2Fmcp%22%7D
 ```
 
 Workspace `.vscode/mcp.json`:
