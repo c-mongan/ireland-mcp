@@ -60,6 +60,19 @@ const CALLS = [
     },
     expect: [/"median_eur": \d+/, /propertypriceregister\.ie/],
   },
+  {
+    name: "epa-bathing-locations",
+    tool: "ireland_call",
+    args: {
+      source: "epa",
+      operation: "epa_bathing_locations",
+      args: { page: 1, limit: 3 },
+    },
+    expect: [
+      /"annual_water_quality_assessment"/,
+      /data\.epa\.ie\/bw\/api\/v1\/locations/,
+    ],
+  },
 ];
 
 await mkdir(OUT, { recursive: true });
