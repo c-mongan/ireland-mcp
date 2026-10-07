@@ -134,7 +134,7 @@ var baseSettings = [
 var originSettings = empty(mcpAllowedOrigins) ? [] : [{ name: 'MCP_ALLOWED_ORIGINS', value: mcpAllowedOrigins }]
 var ntaSettings = hasNtaKey ? [{ name: 'NTA_API_KEY', value: '@Microsoft.KeyVault(SecretUri=${ntaSecret!.properties.secretUri})' }] : []
 
-resource app 'Microsoft.Web/sites@2024-04-01' = {
+resource app 'Microsoft.Web/sites@2024-11-01' = {
   name: appName
   location: location
   tags: union(tags, { 'azd-service-name': 'api' })
@@ -142,6 +142,8 @@ resource app 'Microsoft.Web/sites@2024-04-01' = {
   identity: { type: 'SystemAssigned' }
   properties: {
     serverFarmId: plan.id
+    // Creation-time opt-in. Existing apps need a replacement; see docs/deploy.md.
+    siteScopedCertificatesEnabled: true
     httpsOnly: true
     publicNetworkAccess: 'Enabled'
     functionAppConfig: {
