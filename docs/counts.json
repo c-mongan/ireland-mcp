@@ -1,0 +1,14 @@
+{
+  "sources": 29,
+  "hosted_working": 27,
+  "hosted_limited": [
+    "kohesio",
+    "nta"
+  ],
+  "operations": 74,
+  "source_operations": 71,
+  "cross_operations": 3,
+  "default_tools": 7,
+  "all_tools": 80,
+  "prompts": 3
+}

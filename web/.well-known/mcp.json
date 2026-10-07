@@ -3,32 +3,43 @@
   "name": "Ireland MCP",
   "id": "io.github.c-mongan/ireland-mcp",
   "description": "Read-only MCP server for Irish public data. No keys, no login.",
-  "homepage": "https://irishopendata.ie/",
+  "homepage": "https://lemon-meadow-03b2b8903.3.azurestaticapps.net/",
   "repository": "https://github.com/c-mongan/ireland-mcp",
   "license": "MIT",
   "protocol": {
     "name": "model-context-protocol",
-    "versions": ["2025-06-18", "2025-11-25"]
+    "versions": [
+      "2025-06-18",
+      "2025-11-25"
+    ]
   },
   "transports": [
     {
       "type": "http",
       "url": "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp",
-      "auth": { "type": "none" }
+      "auth": {
+        "type": "none"
+      }
     }
   ],
   "capabilities": {
     "tools": true,
     "resources": true,
-    "prompts": false,
+    "prompts": true,
     "sampling": false
   },
   "toolsets": {
-    "default": "Lean cross-source surface of about 7 tools and about 1.4k tokens.",
+    "default": "Lean cross-source surface of 7 tools, about 2.1k tokens.",
     "all": "Append ?toolsets=all to list every typed source tool.",
     "source": "Use /mcp/x/{source-id} or ?toolsets={source-id} for one source."
   },
-  "agent_docs": "https://irishopendata.ie/AGENTS.md",
-  "llms_txt": "https://irishopendata.ie/llms.txt",
-  "status": "https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json"
+  "agent_docs": "https://lemon-meadow-03b2b8903.3.azurestaticapps.net/AGENTS.md",
+  "llms_txt": "https://lemon-meadow-03b2b8903.3.azurestaticapps.net/llms.txt",
+  "status": "https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json",
+  "prompts": [
+    "area_profile",
+    "commute_check",
+    "compare_counties"
+  ],
+  "counts": "https://lemon-meadow-03b2b8903.3.azurestaticapps.net/counts.json"
 }

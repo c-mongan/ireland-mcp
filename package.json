@@ -1,6 +1,6 @@
 {
   "name": "ireland-mcp",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Read-only Model Context Protocol server for Irish public data: CSO, Oireachtas, GeoHive, data.gov.ie, Smart Dublin, Met Éireann, planning, heritage, environment and more.",
   "license": "MIT",
   "author": "Conor Mongan",
@@ -46,6 +46,7 @@
     "live:sanity": "node scripts/live-sanity.mjs",
     "live:all": "npm run build && node scripts/live-all-ops.mjs",
     "measure:tools": "node scripts/measure-tools.mjs",
+    "counts": "npm run build && node scripts/counts.mjs",
     "ppr:build": "node dist/src/sources/ppr/buildIndexCli.js",
     "eval": "node scripts/eval.mjs",
     "prepublishOnly": "npm run build",

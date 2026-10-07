@@ -3,7 +3,7 @@
 Ireland MCP is a public, read-only Model Context Protocol server for Irish public data. It needs no API key, account or login.
 
 Endpoint: https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp
-Future endpoint: https://mcp.irishopendata.ie/mcp
+Docs: https://lemon-meadow-03b2b8903.3.azurestaticapps.net/
 Transport: Streamable HTTP JSON-RPC over POST
 Auth: none
 Default tool surface: 7 tools, 8,284 characters, about 2.1k tokens
@@ -12,8 +12,8 @@ Full surface: use ?toolsets=all only when a client needs all typed tools listed
 Install:
 - Claude connector: add a custom connector named Ireland MCP with the endpoint URL and no authentication.
 - ChatGPT: enable Developer Mode connectors, create an MCP connector, use the endpoint URL and no authentication.
-- VS Code: vscode://mcp/install?%7B%22ireland%22%3A%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ffunc-ireland-mcp-aofsjpwgy4hva.azurewebsites.net%2Fmcp%22%7D%7D
-- VS Code Insiders: vscode-insiders://mcp/install?%7B%22ireland%22%3A%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ffunc-ireland-mcp-aofsjpwgy4hva.azurewebsites.net%2Fmcp%22%7D%7D
+- VS Code: vscode:mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ffunc-ireland-mcp-aofsjpwgy4hva.azurewebsites.net%2Fmcp%22%7D
+- VS Code Insiders: vscode-insiders:mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ffunc-ireland-mcp-aofsjpwgy4hva.azurewebsites.net%2Fmcp%22%7D
 - Cursor: cursor://anysphere.cursor-deeplink/mcp/install?name=ireland&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vZnVuYy1pcmVsYW5kLW1jcC1hb2ZzanB3Z3k0aHZhLmF6dXJld2Vic2l0ZXMubmV0L21jcCJ9
 - Copilot CLI: copilot mcp add --transport http ireland https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp
 - Claude Code: claude mcp add --transport http ireland https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp

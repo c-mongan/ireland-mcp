@@ -1,5 +1,4 @@
 const MCP_URL = "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp";
-const FUTURE_MCP_URL = "https://mcp.irishopendata.ie/mcp";
 const STATUS_URL = "https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json";
 
 const SOURCE_FALLBACK = [
@@ -50,33 +49,33 @@ const SOURCE_FALLBACK = [
 ];
 
 const SOURCE_DETAILS = {
-  ncse: { licence: "Creative Commons Attribution; see dataset", example: "Find published special-education allocations for schools in Galway." },
-  cso: { licence: "CSO reuse / PSI", example: "What was Galway’s population in Census 2022?" },
+  ncse: { licence: "Creative Commons Attribution", example: "Find published special-education allocations for schools in Galway." },
+  cso: { licence: "CC BY 4.0", example: "What was Galway’s population in Census 2022?" },
   "world-bank": { licence: "CC BY 4.0", example: "Show Ireland’s population trend from World Bank." },
   eurostat: { licence: "Eurostat reuse policy", example: "Compare Irish unemployment with the EU average." },
-  ecb: { licence: "ECB terms", example: "What is the latest ECB deposit rate?" },
+  ecb: { licence: "ECB Data Portal terms of use", example: "What is the latest ECB deposit rate?" },
   pobal: { licence: "CC BY 4.0", example: "Find deprivation scores near Ballymun." },
-  "data-gov-ie": { licence: "Varies, catalogue-first", example: "Find open datasets about active travel." },
-  "smart-dublin": { licence: "CC BY 4.0 / publisher", example: "Which Dublin datasets mention cycle counters?" },
+  "data-gov-ie": { licence: "Per dataset (mostly CC BY 4.0)", example: "Find open datasets about active travel." },
+  "smart-dublin": { licence: "Per dataset (mostly CC BY 4.0)", example: "Which Dublin datasets mention cycle counters?" },
   "census-areas": { licence: "CC BY 4.0", example: "Which census small area contains 53.35,-6.26?" },
   cro: { licence: "CC BY 4.0", example: "Find CRO datasets about companies." },
-  kohesio: { licence: "EU reuse policy", example: "Find EU-funded projects in Galway." },
+  kohesio: { licence: "European Commission reuse policy", example: "Find EU-funded projects in Galway." },
   ted: { licence: "EU reuse policy", example: "Find recent Irish tenders about schools." },
-  nta: { licence: "NTA API terms", example: "Summarise current GTFS-R service disruption." },
-  "irish-rail": { licence: "Irish Rail open API", example: "When are the next trains from Dublin Connolly?" },
-  luas: { licence: "TII open endpoint", example: "When is the next tram at Heuston?" },
-  bikes: { licence: "CityBikes attribution/link", example: "Find bike-share stations near Grand Canal Dock." },
+  nta: { licence: "CC BY 4.0", example: "Summarise current GTFS-R service disruption." },
+  "irish-rail": { licence: "Irish Rail realtime API terms", example: "When are the next trains from Dublin Connolly?" },
+  luas: { licence: "CC BY 4.0", example: "When is the next tram at Heuston?" },
+  bikes: { licence: "CityBikes free service with attribution", example: "Find bike-share stations near Grand Canal Dock." },
   "met-eireann": { licence: "CC BY 4.0", example: "Will it rain in Cork in the next 12 hours?" },
-  marine: { licence: "Marine Institute open data", example: "Which buoys are reporting high waves?" },
-  "opw-water": { licence: "OPW waterlevel.ie", example: "What is the latest level at Athlone?" },
+  marine: { licence: "CC BY 4.0", example: "Which buoys are reporting high waves?" },
+  "opw-water": { licence: "CC BY 4.0", example: "What is the latest level at Athlone?" },
   epa: { licence: "CC BY 4.0", example: "Find EPA waterbodies near the Liffey." },
   "environment-sites": { licence: "CC BY 4.0", example: "What protected sites are near this point?" },
-  eirgrid: { licence: "EirGrid dashboard data", example: "What is the current wind share on the grid?" },
-  oireachtas: { licence: "Oireachtas open data", example: "Find recent bills mentioning housing." },
-  legislation: { licence: "Irish Statute Book", example: "Show section 1 of a 2024 Act." },
-  geohive: { licence: "Tailte Éireann / OSi", example: "Which constituency contains 53.27,-9.05?" },
+  eirgrid: { licence: "Attribution required (EirGrid disclaimer)", example: "What is the current wind share on the grid?" },
+  oireachtas: { licence: "Oireachtas (Open Data) PSI Licence", example: "Find recent bills mentioning housing." },
+  legislation: { licence: "PSI General Licence / CC BY 4.0", example: "Show section 1 of a 2024 Act." },
+  geohive: { licence: "CC BY 4.0", example: "Which constituency contains 53.27,-9.05?" },
   wikidata: { licence: "CC0 1.0", example: "Tell me about Ballymun from Wikidata." },
-  ppr: { licence: "PSRA public register", example: "Median Galway home price last year?" },
+  ppr: { licence: "PSI General Licence / CC BY 4.0", example: "Median Galway home price last year?" },
   planning: { licence: "CC BY 4.0", example: "Find planning applications near Cork city." },
   heritage: { licence: "CC BY 4.0", example: "What monuments are near Newgrange?" },
   cross: { licence: "Mixed source provenance", example: "Give me a place snapshot for Trinity College." }
@@ -132,8 +131,8 @@ const httpServerConfig = { name: "ireland", type: "http", url: endpoint };
 const mcpJson = { servers: { ireland: { type: "http", url: endpoint } } };
 const copilotJson = { mcpServers: { ireland: { type: "http", url: endpoint } } };
 const cursorConfig = { type: "http", url: endpoint };
-const vscodeLink = `vscode://mcp/install?${encodeURIComponent(JSON.stringify(httpServerConfig))}`;
-const vscodeInsidersLink = `vscode-insiders://mcp/install?${encodeURIComponent(JSON.stringify(httpServerConfig))}`;
+const vscodeLink = `vscode:mcp/install?${encodeURIComponent(JSON.stringify(httpServerConfig))}`;
+const vscodeInsidersLink = `vscode-insiders:mcp/install?${encodeURIComponent(JSON.stringify(httpServerConfig))}`;
 const cursorLink = `cursor://anysphere.cursor-deeplink/mcp/install?name=ireland&config=${encodeURIComponent(safeBtoa(JSON.stringify(cursorConfig)))}`;
 
 const INSTALLERS = [
@@ -334,7 +333,8 @@ async function initLiveStats() {
       rpc("tools/call", { name: "ireland_catalogue", arguments: {} })
     ]);
     const domains = normaliseCatalogue(catalogue);
-    const sourceCount = domains.reduce((sum, group) => sum + (group.sources?.length || 0), 0);
+    // `cross` combines other sources; it is not a data source (see docs/counts.json).
+    const sourceCount = domains.reduce((sum, group) => sum + (group.sources || []).filter((s) => s.id !== "cross").length, 0);
     $("stat-sources").textContent = new Intl.NumberFormat("en-IE").format(sourceCount);
     $("stat-ops").textContent = new Intl.NumberFormat("en-IE").format(tools.tools?.length || 7);
     $("live-label").textContent = "Live Server Online";

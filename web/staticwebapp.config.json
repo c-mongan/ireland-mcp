@@ -1,16 +1,4 @@
 {
-  "navigationFallback": {
-    "rewrite": "/index.html",
-    "exclude": [
-      "/llms.txt",
-      "/AGENTS.md",
-      "/.well-known/mcp.json",
-      "/.well-known/mcp/server-card.json",
-      "*.mp4",
-      "*.css",
-      "*.js"
-    ]
-  },
   "mimeTypes": {
     ".mp4": "video/mp4",
     ".txt": "text/plain; charset=utf-8",
@@ -22,5 +10,11 @@
     "x-content-type-options": "nosniff",
     "referrer-policy": "no-referrer",
     "permissions-policy": "camera=(), microphone=(), geolocation=()"
+  },
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/404.html",
+      "statusCode": 404
+    }
   }
 }
