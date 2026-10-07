@@ -35,20 +35,22 @@ Hosted coverage: **27 of 29 sources work on the hosted endpoint.** Kohesio block
 How a call flows:
 
 ```mermaid
-flowchart LR
+flowchart TD
   Q[Client question] --> T[ireland_call / nearby / search]
   T --> V[Schema validation]
   V --> C{Cache hit?}
   C -- yes --> E[Evidence envelope]
   C -- no --> B{Circuit breaker open?}
-  B -- yes --> S[Stale cache or UPSTREAM_DOWN with hint]
+  B -- yes --> S{Stale cache available?}
   B -- no --> U[Upstream public API: CSO, Met Éireann, PPR, ...]
   U -- ok --> E
   U -- 5xx or timeout --> R[One jittered retry]
   R -- ok --> E
   R -- still failing --> S
   U -- other error --> S
-  S --> E
+  S -- yes --> F[Stale cached result: stale=true]
+  F --> E
+  S -- no --> X["MCP error: isError=true, UPSTREAM_DOWN with hint; no cited result"]
   E --> A[Answer with source URL, licence, attribution, retrieved_at]
 ```
 

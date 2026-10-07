@@ -3,7 +3,7 @@
 // Start the Inspector first, with a saved Streamable HTTP server named "ireland-live" pointing at the endpoint:
 //   DANGEROUSLY_OMIT_AUTH=true MCP_AUTO_OPEN_ENABLED=false npx -y @modelcontextprotocol/inspector@2.9.0
 // Then: node scripts/demo-inspector.mjs [--out <dir>] [--inspector http://127.0.0.1:6274] [--server ireland-live]
-import { mkdir, readdir, rename } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { chromium } from "@playwright/test";
 
@@ -20,7 +20,11 @@ const CALLS = [
     name: "nearby-galway",
     tool: "nearby",
     args: { lat: 53.2743, lon: -9.049, hours: 6 },
-    expect: [/"name": "Galway City Council"/, /"licence": "CC BY 4\.0"/],
+    expect: [
+      /"name": "Galway City Council"/,
+      /"licence": "CC BY 4\.0"/,
+      /"url": "https:\/\/www\.geohive\.ie\/"/,
+    ],
   },
   {
     name: "cso-ennis",
@@ -82,6 +86,7 @@ const context = await browser.newContext({
   recordVideo: { dir: OUT, size: { width: 1440, height: 900 } },
 });
 const page = await context.newPage();
+const video = page.video();
 const results = [];
 
 try {
@@ -142,15 +147,14 @@ try {
       .click();
   }
 } finally {
-  await context.close();
-  await browser.close();
+  try {
+    await context.close();
+    await video.saveAs(join(OUT, "inspector-session.webm"));
+  } finally {
+    await browser.close();
+  }
 }
 
-const videos = (await readdir(OUT)).filter(
-  (f) => f.endsWith(".webm") && !f.startsWith("inspector"),
-);
-if (videos[0])
-  await rename(join(OUT, videos[0]), join(OUT, "inspector-session.webm"));
 for (const r of results)
   console.log(
     `${r.ok ? "PASS" : "FAIL"} ${r.name} ${r.ms}ms ${r.missing.join(" ")}`,
