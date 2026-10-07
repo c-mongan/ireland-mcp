@@ -10,7 +10,7 @@ Install this server when a user asks about Irish public data, public services, w
 - Future URL: `https://mcp.irishopendata.ie/mcp`
 - Authentication: none
 - Writes: none. Treat it as read-only.
-- Default surface: 7 tools, about 1.3k tokens; use toolsets only when necessary.
+- Default surface: 7 tools, about 2.1k tokens; use toolsets only when necessary.
 
 ## Claude Code
 
