@@ -3,7 +3,7 @@
 [![CI](https://github.com/c-mongan/ireland-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/c-mongan/ireland-mcp/actions/workflows/ci.yml)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-34c08a.svg)](LICENSE)
 [![MCP](https://img.shields.io/badge/MCP-Streamable%20HTTP-6f42c1.svg)](https://modelcontextprotocol.io)
-[![Token budget](https://img.shields.io/badge/default%20surface-7%20tools%20%7C%20~1.8k%20tokens-0a7.svg)](#why-its-lean)
+[![Token budget](https://img.shields.io/badge/default%20surface-7%20tools%20%7C%20~2.1k%20tokens-0a7.svg)](#why-its-lean)
 
 **Ireland MCP is a free, read-only MCP server that lets AI assistants answer questions with live Irish public data and citations.**
 
@@ -11,7 +11,7 @@ Hosted endpoint: `https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp`
 Transport: Streamable HTTP. Auth: none. Writes: none.
 Website: <https://lemon-meadow-03b2b8903.3.azurestaticapps.net> (the planned `irishopendata.ie` domain is not live yet; see [docs/domain-go-live.md](docs/domain-go-live.md)).
 Registry: [`io.github.c-mongan/ireland-mcp`](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.c-mongan%2Fireland-mcp/versions/latest) on the official MCP Registry.
-Hosted coverage: **26 of 28 sources work on the hosted endpoint.** Kohesio blocks Azure IP addresses (HTTP 403), so run it locally over stdio. NTA realtime needs an operator key that the hosted service does not have.
+Hosted coverage: **27 of 29 sources work on the hosted endpoint.** Kohesio blocks Azure IP addresses (HTTP 403), so run it locally over stdio. NTA realtime needs an operator key that the hosted service does not have.
 
 ## Try it in 60 seconds
 
@@ -107,7 +107,7 @@ Portable Copilot / MCP JSON:
 
 ## Why it is lean
 
-Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **7 tools, 7,192 characters, about 1,798 tokens** on this branch (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
+Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **7 tools, 8,284 characters, about 2,071 tokens** (`toolsets=all` is 80 tools, about 22k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
 
 <p align="center">
   <a href="docs/architecture/ireland-mcp-lean-surface.drawio">
@@ -139,7 +139,7 @@ The server is a stateless Azure Functions Flex app with a lean gateway in front 
 
 ## Sources
 
-Generated from `src/registry.ts` and the 28 source modules. The default `nearby`, `search` and `fetch` shortcuts sit above these sources.
+Generated from `src/registry.ts` and the 29 source modules. The default `nearby`, `search` and `fetch` shortcuts sit above these sources.
 
 | Domain | Source id | Publisher / source | Operations | Licence |
 | --- | --- | --- | ---: | --- |
@@ -231,11 +231,13 @@ npm run dev:http     # local HTTP dev server, MCP at /mcp
 
 69 routing questions, run through a multi-round agent loop that sends the server instructions as the system prompt (2026-10-05, Azure OpenAI):
 
-| Model | Default surface (7 tools) | `all` surface (74 tools) |
+| Model | Default surface (7 tools) | `all` surface (74 tools at the time) |
 | --- | --- | --- |
 | gpt-5.6-luna | **100%** | **100%** |
 | gpt-5.4-mini | 91% | 97% |
 | gpt-4.1-nano (worst-case floor) | 84% | 90% |
+
+A 2026-10-08 rerun of the expanded 79-question set with 29 sources scored gpt-4.1-nano at 85% on the default surface.
 
 gpt-5.x models reject `temperature: 0`. For them, set `EVAL_TEMPERATURE=default`, for example: `AZURE_DEPLOYMENT=gpt-56-luna EVAL_TEMPERATURE=default npm run eval`.
 
@@ -252,7 +254,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full checklist.
 
 ## Registry and publishing
 
-Ireland MCP is **listed on the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.c-mongan%2Fireland-mcp/versions/latest)** as a remote-only Streamable HTTP server named `io.github.c-mongan/ireland-mcp` (v1.0.1). Clients that browse the registry can install it by name. The future domain name is planned as `ie.irishopendata/ireland` after DNS verification. Publishing notes and directory checklists are in [docs/publishing.md](docs/publishing.md). Do not publish from a fork without changing the name and endpoint.
+Ireland MCP is **listed on the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.c-mongan%2Fireland-mcp/versions/latest)** as a remote-only Streamable HTTP server named `io.github.c-mongan/ireland-mcp` (v1.1.0). Clients that browse the registry can install it by name. The future domain name is planned as `ie.irishopendata/ireland` after DNS verification. Publishing notes and directory checklists are in [docs/publishing.md](docs/publishing.md). Do not publish from a fork without changing the name and endpoint.
 
 ## Credits and prior art
 
