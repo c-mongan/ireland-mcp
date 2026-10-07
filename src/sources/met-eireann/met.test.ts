@@ -53,7 +53,8 @@ describe("Met Éireann module", () => {
     const fetcher = fakeFetch([{ match: /^https:\/\/prodapi\.met\.ie\/v2\/warnings\/$/, body: JSON.stringify({
       warnings: {
         national: [{ id: "land", level: "Orange", type: "Rain", regions: ["EI07"], headline: "Heavy rain", onset: "2026-10-06T23:00:00Z" }],
-        marine: [{ id: "sea", level: "Yellow", type: "small-craft", regions: ["EI811"], headline: "Strong winds" }],
+        // The live feed uses numeric ids (seen 2026-10-07).
+        marine: [{ id: 1, level: "Yellow", type: "small-craft", regions: ["EI811"], headline: "Strong winds" }],
         environmental: [], northern_ireland: [], advisories: [], highestMarine: "yellow", smallCraftWarningsOnly: false
       }
     }) }]);
