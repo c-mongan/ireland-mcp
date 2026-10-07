@@ -142,7 +142,7 @@ resource app 'Microsoft.Web/sites@2024-11-01' = {
   identity: { type: 'SystemAssigned' }
   properties: {
     serverFarmId: plan.id
-    // Creation-time opt-in. Existing apps need a replacement; see docs/deploy.md.
+    // Creation-time opt-in (cannot be enabled later). The live app has it; see docs/domain-go-live.md.
     siteScopedCertificatesEnabled: true
     httpsOnly: true
     publicNetworkAccess: 'Enabled'
