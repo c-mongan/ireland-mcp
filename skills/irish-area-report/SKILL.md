@@ -31,7 +31,8 @@ be called directly with the same `args`.
      `{ "lat": 53.27, "lon": -9.05 }`, or `geohive/geohive_boundaries_at_point` for boundaries only.
    - If the snapshot says the place is not found, ask for a nearby town or coordinates. Do not guess.
 2. **Population.** Call `cso/cso_area_profile` with `{ "area": "<county>", "years": ["2016", "2022"] }`
-   to show change between censuses. Census areas are counties (Dublin may be split; use the label returned).
+   to show change between censuses (Dublin may be split; use the label returned). For a town, pass
+   `{ "area": "<town>" }` to get Census 2022 town figures (F1015, no change); say which level you used.
 3. **Boundaries.** Report county, local authority, Dáil constituency, electoral division and small
    area from the GeoHive block. For other layers, use `geohive/geohive_list_layers` then
    `geohive/geohive_query_layer`.

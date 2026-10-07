@@ -10,8 +10,9 @@
 - Input: `lat`, `lon`, `hours` (1–48, default 6). Same boundaries and forecast, no population.
 
 ## cso.cso_area_profile
-- Input: `area` (county name, F1001 county code, or `State`), optional `years` (census years such as "2016", "2022").
-- Population rows come from CSO table F1001.
+- Input: `area` (county name, F1001 county code, `State`, or a Census 2022 town such as `Ennis`), optional `years` (county census years such as "2016", "2022").
+- Counties come from CSO table F1001 (`level: "county"`, with change). Towns come from F1015 (`level: "town"`, 2022 only, with average age and age bands; `change` is null).
+- An ambiguous town name (e.g. `Milltown`) returns BAD_ARGS listing the full names to retry with.
 
 ## ppr.ppr_price_stats
 - Input filters: `county`, `address`, `eircode`, `from`, `to`, `min_price`, `max_price`,
