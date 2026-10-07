@@ -135,6 +135,7 @@ describe("UpstreamBudgets", () => {
 describe("sourceForUrl", () => {
   it("maps upstream hosts to source ids", () => {
     expect(sourceForUrl("https://ws.cso.ie/public/api.jsonrpc")).toBe("cso");
+    expect(sourceForUrl("https://opendata.ncse.ie/api/test")).toBe("ncse");
     expect(sourceForUrl("https://api.oireachtas.ie/v1/legislation")).toBe("oireachtas");
     expect(sourceForUrl("https://services-eu1.arcgis.com/x")).toBe("geohive");
     expect(sourceForUrl("http://openaccess.pf.api.met.ie/metno")).toBe("met-eireann");

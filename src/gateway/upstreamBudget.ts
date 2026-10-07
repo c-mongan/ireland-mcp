@@ -198,6 +198,7 @@ const HOST_SOURCES: Record<string, string> = {
   "services-eu1.arcgis.com": "geohive",
   "data.gov.ie": "data-gov-ie",
   "data.smartdublin.ie": "smart-dublin",
+  "opendata.ncse.ie": "ncse",
   "www.met.ie": "met-eireann",
   "prodapi.met.ie": "met-eireann",
   "prodapi.metweb.ie": "met-eireann",

@@ -52,6 +52,7 @@ export function defaultProbes(env: Record<string, string | undefined>): Probe[] 
     { source: "geohive", url: `${ARCGIS_BASE}?f=json` },
     { source: "wikidata", url: "https://query.wikidata.org/sparql?query=ASK%20%7B%20wd%3AQ27%20wdt%3AP31%20%3Ftype%20%7D&format=json" },
     { source: "data-gov-ie", url: "https://data.gov.ie/api/3/action/status_show" },
+    { source: "ncse", url: "https://opendata.ncse.ie/api/3/action/status_show" },
     { source: "cro", url: "https://opendata.cro.ie/api/3/action/status_show" },
     { source: "kohesio", url: "https://kohesio.ec.europa.eu/api/queries/countries?language=en" },
     { source: "smart-dublin", url: "https://data.smartdublin.ie/api/3/action/status_show" },

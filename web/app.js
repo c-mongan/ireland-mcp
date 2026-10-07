@@ -4,6 +4,7 @@ const STATUS_URL = "https://raw.githubusercontent.com/c-mongan/ireland-mcp/statu
 
 const SOURCE_FALLBACK = [
   { domain: "stats", sources: [
+    { id: "ncse", name: "NCSE school allocations", summary: "Published SET and SNA allocations by school and academic year; not school vacancies or quality.", operations: ["ncse_search_datasets", "ncse_get_dataset", "ncse_query_datastore"] },
     { id: "cso", name: "Central Statistics Office (CSO) PxStat", summary: "Official statistics: census, population, prices, labour market, housing and thousands more PxStat tables.", operations: ["cso_search_tables", "cso_get_table_metadata", "cso_get_data", "cso_area_profile"] },
     { id: "world-bank", name: "World Bank Indicators for Ireland", summary: "Comparable macro, population, climate and development indicators for Ireland.", operations: ["worldbank_get_indicator", "worldbank_ireland_profile"] },
     { id: "eurostat", name: "Eurostat Statistics API", summary: "Ireland-vs-EU statistical comparisons across population, economy and society datasets.", operations: ["eurostat_search_datasets", "eurostat_get_data", "eurostat_compare_ie_eu"] },
@@ -49,6 +50,7 @@ const SOURCE_FALLBACK = [
 ];
 
 const SOURCE_DETAILS = {
+  ncse: { licence: "Creative Commons Attribution; see dataset", example: "Find published special-education allocations for schools in Galway." },
   cso: { licence: "CSO reuse / PSI", example: "What was Galway’s population in Census 2022?" },
   "world-bank": { licence: "CC BY 4.0", example: "Show Ireland’s population trend from World Bank." },
   eurostat: { licence: "Eurostat reuse policy", example: "Compare Irish unemployment with the EU average." },

@@ -119,7 +119,7 @@ Need typed tools anyway?
 | Default HTTP | `/mcp` lists only `ireland_catalogue`, `ireland_describe`, `ireland_call`, `ireland_about`, `search`, `fetch`, `nearby`. |
 | Source toolsets | `/mcp?toolsets=cso,irish-rail` lists selected typed tools too. |
 | One source path | `/mcp/x/{source}` lists that source's typed tools, for example `/mcp/x/met-eireann`. |
-| Everything | `/mcp?toolsets=all` lists all 74 tools and is useful for debugging, not routine chat. |
+| Everything | `/mcp?toolsets=all` lists all available tools and is useful for debugging, not routine chat. |
 | Local stdio | From source: `node dist/src/cli.js --toolsets=cso` or `IRELAND_MCP_TOOLSETS=all node dist/src/cli.js` (npm package not yet published). |
 
 `max_tokens` defaults to about 2,000 output tokens and can be set from 100 to 8,000. Large results return `truncated`, counts and narrowing hints instead of flooding the context.
@@ -140,6 +140,7 @@ Generated from `src/registry.ts` and the 28 source modules. The default `nearby`
 
 | Domain | Source id | Publisher / source | Operations | Licence |
 | --- | --- | --- | ---: | --- |
+| stats | `ncse` | [NCSE school allocations](https://opendata.ncse.ie) ([operations](docs/ncse-school-allocations.md)) | 3 | Creative Commons Attribution; check dataset terms |
 | stats | `cso` | [Central Statistics Office (CSO) PxStat](https://data.cso.ie) | 4 | CC BY 4.0 |
 | economy | `world-bank` | [World Bank Open Data](https://data.worldbank.org/country/ireland) | 2 | CC BY 4.0 |
 | stats | `eurostat` | [Eurostat Statistics API](https://ec.europa.eu/eurostat) | 3 | Eurostat reuse policy (CC BY 4.0 equivalent) |
