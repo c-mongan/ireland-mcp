@@ -271,4 +271,3 @@ Data comes from the publishers listed above, including CSO, data.gov.ie, Met Éi
 ## Security
 
 Security reports: [SECURITY.md](SECURITY.md). This project is read-only, but MCP servers can still retrieve untrusted web content; clients should follow their normal MCP trust and approval model.
-
