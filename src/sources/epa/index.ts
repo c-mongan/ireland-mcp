@@ -1,3 +1,4 @@
+import { bathingTools } from "./bathing.js";
 import { z } from "zod";
 import { DAY } from "../../gateway/context.js";
 import { bound, envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js";
@@ -12,7 +13,7 @@ export const epaInfo: SourceInfo = {
   name: "EPA Ireland open data",
   licence: "Creative Commons Attribution 4.0",
   attribution: "Water Framework Directive open data © Environmental Protection Agency Ireland.",
-  homepage: "https://data.epa.ie/api-list/wfd-open-data/"
+  homepage: "https://data.epa.ie/api-list/"
 };
 
 interface WfdSearchResponse {
@@ -111,10 +112,10 @@ const waterbodyTool = defineTool({
 
 export const epaModule: SourceModule = {
   info: epaInfo,
-  summary: "EPA Water Framework Directive search and waterbody status/risk lookups.",
+  summary: "EPA WFD waterbody status/risk plus bathing-water locations, dated samples and published restrictions.",
   domain: "environment",
   coverage: "Republic of Ireland WFD catchments, subcatchments and waterbodies from EPA open APIs.",
-  tools: [searchTool, waterbodyTool],
+  tools: [searchTool, waterbodyTool, ...bathingTools],
   async search(query: string, limit: number, ctx: ToolContext): Promise<SearchHit[]> {
     const url = `${WFD_BASE}/search?${new URLSearchParams({ v: query, page: "1", size: String(limit) }).toString()}`;
     const result = await getJson<WfdSearchResponse>(ctx, url);
