@@ -29,7 +29,7 @@ const SOURCE_FALLBACK = [
     { id: "met-eireann", name: "Met Éireann", summary: "Point forecasts, station observations and active weather warnings.", operations: ["met_get_forecast", "met_get_observations", "met_get_warnings"] },
     { id: "marine", name: "Marine Institute Weather Buoy Network", summary: "Live wind, wave and sea-temperature readings from offshore buoys.", operations: ["marine_get_buoys"] },
     { id: "opw-water", name: "OPW Hydrometric Network", summary: "Live water levels and temperatures from about 460 gauges.", operations: ["water_find_stations", "water_get_level"] },
-    { id: "epa", name: "EPA Ireland open data", summary: "Water Framework Directive waterbody search and detail.", operations: ["epa_wfd_search", "epa_wfd_waterbody"] },
+    { id: "epa", name: "EPA Ireland open data", summary: "Waterbody status plus bathing-water locations, dated samples and published restrictions.", operations: ["epa_wfd_search", "epa_wfd_waterbody", "epa_bathing_locations", "epa_bathing_alerts", "epa_bathing_measurements"] },
     { id: "environment-sites", name: "NPWS designated protected sites", summary: "Protected site lookup near coordinates or intersecting a point.", operations: ["protected_sites_at", "protected_sites_near"] }
   ] },
   { domain: "energy", sources: [

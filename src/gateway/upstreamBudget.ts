@@ -212,6 +212,7 @@ const HOST_SOURCES: Record<string, string> = {
   "www.smartgriddashboard.com": "eirgrid",
   "erddap.marine.ie": "marine",
   "waterlevel.ie": "opw-water",
+  "data.epa.ie": "epa",
   "api.ted.europa.eu": "ted",
   "api.citybik.es": "bikes",
   "query.wikidata.org": "wikidata"

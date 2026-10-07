@@ -162,7 +162,7 @@ Generated from `src/registry.ts` and the 28 source modules. The default `nearby`
 | environment | `marine` | [Marine Institute weather buoys](https://data.gov.ie/dataset/weather-buoy-network) | 1 | CC BY 4.0 |
 | environment | `opw-water` | [OPW waterlevel.ie](https://waterlevel.ie/) | 2 | CC BY 4.0 |
 | environment | `environment-sites` | [NPWS designated protected sites](https://experience.arcgis.com/experience/edf34d92e28040fd87d3d14f55d8d95f/) | 2 | CC BY 4.0 |
-| environment | `epa` | [EPA Water Framework Directive open data](https://data.epa.ie/api-list/wfd-open-data/) | 2 | CC BY 4.0 |
+| environment | `epa` | [EPA WFD and bathing-water open data](https://data.epa.ie/api-list/) ([operations](docs/epa-bathing-water.md)) | 5 | CC BY 4.0 |
 | transport | `nta` | [National Transport Authority GTFS-Realtime](https://developer.nationaltransport.ie) | 2 | CC BY 4.0 |
 | transport | `irish-rail` | [Iarnród Éireann realtime API](https://api.irishrail.ie/realtime/) | 2 | Public open data; attribution required |
 | transport | `luas` | [Luas Forecasting API / TII](https://data.gov.ie/dataset/luas-forecasting-api) | 2 | CC BY 4.0 |

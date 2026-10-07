@@ -141,6 +141,7 @@ describe("sourceForUrl", () => {
     expect(sourceForUrl("http://openaccess.pf.api.met.ie/metno")).toBe("met-eireann");
     expect(sourceForUrl("https://prodapi.met.ie/v2/warnings/")).toBe("met-eireann");
     expect(sourceForUrl("https://luasforecasts.rpa.ie/xml/get.ashx")).toBe("luas");
+    expect(sourceForUrl("https://data.epa.ie/api/test")).toBe("epa");
     expect(sourceForUrl("https://unknown.example.org/a")).toBe("unknown.example.org");
     expect(sourceForUrl("not a url")).toBe("upstream");
   });
