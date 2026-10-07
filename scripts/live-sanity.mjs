@@ -11,6 +11,7 @@ import { classify, exitCode } from "./live-sanity-policy.mjs";
 
 const year = new Date().getUTCFullYear();
 const CASES = [
+  ["ncse", "ncse_search_datasets", { query: "school allocations", limit: 2 }, (d) => d.datasets?.length > 0],
   ["cso", "cso_area_profile", { area: "Galway" }, (d) => d.census?.length > 0],
   ["world-bank", "worldbank_get_indicator", { indicator: "SP.POP.TOTL", last: 2 }, (d) => d.observations?.[0]?.value > 5_000_000],
   [
