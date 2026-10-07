@@ -196,7 +196,6 @@ const HOST_SOURCES: Record<string, string> = {
   "www.oireachtas.ie": "oireachtas",
   "www.geohive.ie": "geohive",
   "services-eu1.arcgis.com": "geohive",
-  "data.epa.ie": "epa",
   "data.gov.ie": "data-gov-ie",
   "data.smartdublin.ie": "smart-dublin",
   "opendata.ncse.ie": "ncse",
@@ -213,6 +212,7 @@ const HOST_SOURCES: Record<string, string> = {
   "www.smartgriddashboard.com": "eirgrid",
   "erddap.marine.ie": "marine",
   "waterlevel.ie": "opw-water",
+  "data.epa.ie": "epa",
   "api.ted.europa.eu": "ted",
   "api.citybik.es": "bikes",
   "query.wikidata.org": "wikidata"
