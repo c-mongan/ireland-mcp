@@ -5,7 +5,7 @@ Status on 2026-10-08:
 - **`irishopendata.com` is live.** It is registered at Blacknight and delegated to the Azure DNS zone `irishopendata.com` in `rg-ireland-mcp`.
   - Docs site: `https://irishopendata.com`.
   - MCP endpoint: `https://mcp.irishopendata.com/mcp`.
-- **`irishopendata.ie` is registered but `pendingCreate`.** The owner's ID document has been submitted; registry approval is still pending. Its Azure DNS zone already exists.
+- **`irishopendata.ie` is not live on Azure.** The last confirmed registrar status was `pendingCreate`, with the owner's ID document submitted; approval has not been rechecked. At 14:38 UTC on 2026-10-08, a public DNS-over-HTTPS NS lookup returned `Status: 0` and `ns1.blacknightdns.com`, `ns2.blacknightdns.com`, `ns3.blacknightdns.com`, and `ns4.blacknightdns.com`. Its Azure DNS zone is preprovisioned but not delegated, and no `.ie` Azure bindings have been created. Any `.ie` delegation or go-live requires separate explicit authorization.
 
 The original URLs keep working and are never touched:
 
@@ -18,8 +18,8 @@ The original URLs keep working and are never touched:
 irishopendata.com       ALIAS → Static Web App swa-ireland-mcp   (SWA free managed cert)        LIVE
 www.irishopendata.com   CNAME → Function App → 301 to the canonical site                       LIVE
 mcp.irishopendata.com   CNAME → Function App → /mcp is the MCP endpoint; / redirects to the site LIVE
-irishopendata.ie        ALIAS → swa-ireland-mcp                                                 pending .IE registration
-mcp.irishopendata.ie    CNAME → Function App                                                    pending .IE registration
+irishopendata.ie        ALIAS → swa-ireland-mcp                                                 Azure records only; not bound/delegated
+mcp.irishopendata.ie    CNAME → Function App                                                    Azure records only; not bound/delegated
 ```
 
 The canonical site comes from the Function App setting `CANONICAL_SITE_URL`:
