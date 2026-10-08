@@ -1,0 +1,5 @@
+const U="https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp";
+const H={"content-type":"application/json",accept:"application/json, text/event-stream"};
+const call=async(args)=>{const r=await fetch(U,{method:"POST",headers:H,body:JSON.stringify({jsonrpc:"2.0",id:1,method:"tools/call",params:{name:"ireland_call",arguments:{source:"epa",operation:"epa_bathing_locations",args}}})});const t=await r.text();const m=t.match(/^data: (.*)$/m);return JSON.parse(JSON.parse(m?m[1]:t).result.content[0].text);};
+const ids=[];let off=0,pages=0,total;for(;;){const b=await call({offset:off,limit:50});pages++;const items=b.data.locations??b.data.results??b.data.items;total??=b.data.register_total??b.data.total;ids.push(...items.map(x=>x.beach_id));const n=b.next_offset??b.data.next_offset;if(n==null||pages>60)break;if(n!==off+items.length)console.log("GAP at",off,items.length,n);off=n;}
+console.log(JSON.stringify({pages,rows:ids.length,unique:new Set(ids).size,total,salthill:ids.includes("IEWEBWC170_0000_0200")}));
