@@ -26,6 +26,28 @@ param maximumInstanceCount int = 10
 @description('Comma-separated Origin allowlist for /mcp; empty keeps the app default.')
 param mcpAllowedOrigins string = ''
 
+@description('Optional stable resource suffix when adopting an existing environment. Empty uses the azd naming algorithm.')
+param resourceNameSuffix string = ''
+
+@description('Opt in to the existing irishopendata.com production domains. Never creates .ie bindings or changes delegation.')
+param enableProductionDomains bool = false
+
+@description('Existing SWA apex TXT validation token. Required for production domain replay; not a credential.')
+param staticWebAppValidationToken string = ''
+
+@description('Canonical site origin. Empty preserves the application default in generic environments.')
+param canonicalSiteUrl string = enableProductionDomains ? 'https://irishopendata.com' : ''
+
+@description('Existing action group resource IDs for availability alerts. No existing action group is modified.')
+param availabilityActionGroupIds array = []
+
+@description('Optional availability alert email, supplied from the existing budget contact at deployment time. Empty skips the email action group.')
+param availabilityAlertEmail string = ''
+
+@secure()
+@description('Additional Function app settings to preserve when adopting an environment. Managed settings take precedence.')
+param additionalAppSettings object = {}
+
 @description('Budget start; must be the first day of a month.')
 param budgetStartDate string = utcNow('yyyy-MM-01')
 
@@ -47,6 +69,35 @@ module service 'service.bicep' = {
     ntaApiKey: ntaApiKey
     maximumInstanceCount: maximumInstanceCount
     mcpAllowedOrigins: mcpAllowedOrigins
+    resourceNameSuffix: empty(resourceNameSuffix) ? toLower(uniqueString(subscription().id, group.id, environmentName)) : resourceNameSuffix
+    canonicalSiteUrl: empty(canonicalSiteUrl) && enableProductionDomains ? 'https://irishopendata.com' : canonicalSiteUrl
+    additionalAppSettings: additionalAppSettings
+    healthCheckUrl: enableProductionDomains ? 'https://mcp.irishopendata.com/healthz' : ''
+  }
+}
+
+module domains 'production-domains.bicep' = if (enableProductionDomains) {
+  name: 'ireland-mcp-production-domains'
+  scope: group
+  params: {
+    functionAppName: service.outputs.appName
+    functionDefaultHost: service.outputs.defaultHostName
+    functionVerificationId: service.outputs.customDomainVerificationId
+    staticWebAppValidationToken: staticWebAppValidationToken
+    location: location
+  }
+}
+
+module availability 'availability.bicep' = if (enableProductionDomains) {
+  name: 'ireland-mcp-production-availability'
+  scope: group
+  params: {
+    location: location
+    tags: tags
+    insightsName: service.outputs.insightsName
+    healthTestName: service.outputs.healthTestName
+    actionGroupIds: availabilityActionGroupIds
+    alertEmail: availabilityAlertEmail
   }
 }
 

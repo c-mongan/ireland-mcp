@@ -11,7 +11,7 @@ The service runs on Azure Functions Flex Consumption (FC1) in North Europe.
 | Function app (Flex FC1, Node 22, system identity) | `/mcp` (plus `/mcp/x/{source}` for one typed toolset), `/healthz` and the nightly PPR index timer |
 | Storage account (no shared keys, no public blobs) | Deployment package, `ppr` index container, `mcpcache` table |
 | Application Insights + Log Analytics (1 GB/day cap) | OpenTelemetry traces and metrics, Entra auth only |
-| Standard availability test (`enableAvailabilityTest`, default on) | GET `/healthz` every 15 minutes from three EU regions |
+| Standard availability test (`enableAvailabilityTest`, default on) | GET `/healthz` every 15 minutes from three EU regions; production custom domains also monitor the site and MCP initialize |
 | Key Vault (only when `NTA_API_KEY` is set) | Holds the NTA key; the app reads it by Key Vault reference |
 | Budget (only when `BUDGET_CONTACT_EMAIL` is set) | Emails at 80% actual and 100% forecast spend |
 
@@ -62,3 +62,38 @@ Cost controls:
 The apex site lives on the Static Web App `swa-ireland-mcp`. `.github/workflows/deploy-site.yml` uploads `web/` whenever it changes on `main`, using the `AZURE_STATIC_WEB_APPS_API_TOKEN` repository secret. To deploy by hand, run `npx @azure/static-web-apps-cli deploy ./web --env production --deployment-token "$(az staticwebapp secrets list -n swa-ireland-mcp -g rg-ireland-mcp --query properties.apiKey -o tsv)"`. `www.` and `mcp.` hosts point at the Function App, where `src/functions/redirect.ts` sends allow-listed site aliases (any path) and the MCP root to the canonical site (`CANONICAL_SITE_URL`, default `https://irishopendata.com`) with a 301, preserving the query string. Other paths on the MCP host are not redirected, and unknown hosts get a 404, so the redirect cannot act as an open redirect. The `azurewebsites.net` and `azurestaticapps.net` URLs keep working.
 
 The Function App uses free App Service managed certificates (Flex site-scoped certificates; `mcp` and `www` for `.com` use two of the three allowed), so no purchased certificate is needed. The DNS zone is in `infra/dns-zone.bicep`. Registration, delegation, bindings, validation and rollback are in [domain-go-live.md](domain-go-live.md).
+
+Keep Azure platform CORS aligned with the application's configured origin
+allowlist. The deployed Functions host intercepts browser preflights even with
+an empty platform list; disabling that list blocks browser access rather than
+delegating OPTIONS to the application. The application still denies actual
+requests from unknown origins with HTTP 403 and permits MCP clients that send
+no Origin header. Credentials are not enabled.
+
+After provisioning, verify an OPTIONS request from `https://irishopendata.com`
+returns `Access-Control-Allow-Origin: https://irishopendata.com`; a 204 alone
+does not prove browser access works. A denied platform preflight may also return
+204, but without a CORS grant, so the browser cannot send the actual request.
+Platform-generated preflights bypass the application's security headers;
+application-generated MCP, health, redirect, and error responses carry them.
+
+### Custom-domain monitoring cost
+
+Retail estimates checked on 2026-10-08 using the
+[Azure Retail Prices API](https://learn.microsoft.com/rest/api/cost-management/retail-prices/azure-retail-prices),
+in EUR for North Europe, before tax, discounts, or subscription credits:
+
+| Item | Rate | Estimated monthly amount |
+|---|---|---|
+| Existing public DNS zones (`.com` and `.ie`) | EUR 0.44/zone/month | EUR 0.88; no new zones |
+| Public DNS queries | EUR 0.352/million queries (first billion) | Usage-dependent |
+| Standard availability tests | EUR 0.0005/execution | EUR 4.32/test for 30 days at three locations every 15 minutes |
+| Three tests: site, MCP health, MCP initialize | 25,920 executions/30 days | EUR 12.96 total; EUR 8.64 above the existing single test |
+| Metric alerts | First ten monitored metrics free, then EUR 0.088/metric/month | Depends on subscription-wide usage |
+| SWA Free, managed certificates, email action group | No fixed charge for these changes | EUR 0 added |
+
+The existing health test is retargeted to the MCP custom domain rather than
+duplicated. A 31-day month adds about EUR 8.93 instead of EUR 8.64. Retry
+executions, Function invocations, and telemetry ingestion can add usage charges;
+the existing EUR 20 budget is an alert, not a spending cap. Keep the Function
+scale cap, application rate limit, cache policy, and Log Analytics daily cap.
