@@ -5,7 +5,6 @@ import { appModules, sourceModules } from "./registry.js";
  * "N of M sources work hosted" number comes from one place (see docs/counts.json and src/counts.test.ts).
  */
 export const HOSTED_LIMITS: Record<string, string> = {
-  kohesio: "Kohesio blocks Azure IP addresses (HTTP 403); run it locally over stdio.",
   nta: "NTA realtime needs an operator key that the hosted service does not have."
 };
 
@@ -69,5 +68,6 @@ export function liveOpsSummary(report: string): string {
   if (!generated || !line) throw new Error("docs/live-all-ops.md has no Generated/Operations summary line.");
   const [pass, notConfigured, blocked, fail] = line.slice(1).map(Number) as [number, number, number, number];
   const total = pass + notConfigured + blocked + fail;
-  return `[docs/live-all-ops.md](docs/live-all-ops.md) (${generated}): ${pass} of ${total} pass, ${fail} fail; ${notConfigured} need the NTA key, ${blocked} are Kohesio, blocked from Azure IPs.`;
+  const notes = [`${notConfigured} need the NTA key`, ...(blocked ? [`${blocked} blocked from Azure IPs`] : [])];
+  return `[docs/live-all-ops.md](docs/live-all-ops.md) (${generated}): ${pass} of ${total} pass, ${fail} fail; ${notes.join(", ")}.`;
 }

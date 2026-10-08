@@ -15,7 +15,7 @@ Registry: [`io.github.c-mongan/ireland-mcp`](https://registry.modelcontextprotoc
 | Count | Value | Definition |
 | --- | ---: | --- |
 | Data sources | 29 | Upstream public-data sources, one module each. The `cross` combiner is not a source. |
-| Working on the hosted endpoint | 27 of 29 | Kohesio blocks Azure IP addresses (HTTP 403); run it locally over stdio. NTA realtime needs an operator key that the hosted service does not have. |
+| Working on the hosted endpoint | 28 of 29 | NTA realtime needs an operator key that the hosted service does not have. |
 | Catalogue operations | 74 | 71 source operations plus 3 cross-source ones (`list_sources`, `nearby`, `ireland_snapshot`), all callable through `ireland_call`. |
 | Default tools | 7 | What `tools/list` returns: 4 meta tools plus `search`, `fetch` and `nearby`. |
 | Tools with `?toolsets=all` | 80 | Every operation as a typed tool, plus the 4 meta tools, `search` and `fetch`. |
@@ -39,7 +39,7 @@ Registry: [`io.github.c-mongan/ireland-mcp`](https://registry.modelcontextprotoc
 | MCP Inspector (Playwright, [`scripts/demo-inspector.mjs`](scripts/demo-inspector.mjs)) | 4/4 calls (`nearby`, CSO, Met Éireann, PPR) returned data with citations. [CSO Ennis](docs/demo/inspector-cso-ennis.png), [PPR Galway 2024](docs/demo/inspector-ppr-galway-2024.png). |
 | VS Code Insiders, Copilot agent mode | Census 2022 Ennis (27,923 people) and Galway forecast, with CSO and Met Éireann citations. [Screenshot](docs/demo/vscode-copilot-chat.png). |
 | GitHub Copilot CLI | 3/3 questions answered with citations: Met Éireann Galway, PPR Cork, CSO Ennis. [Evidence](docs/demo/README.md). |
-| Every catalogue operation | <!-- live-ops:start -->[docs/live-all-ops.md](docs/live-all-ops.md) (2026-10-07): 70 of 74 pass, 0 fail; 2 need the NTA key, 2 are Kohesio, blocked from Azure IPs.<!-- live-ops:end --> |
+| Every catalogue operation | <!-- live-ops:start -->[docs/live-all-ops.md](docs/live-all-ops.md) (2026-10-08): 72 of 74 pass, 0 fail; 2 need the NTA key.<!-- live-ops:end --> |
 
 How a call flows:
 
@@ -162,7 +162,7 @@ Generated from `src/registry.ts` and the 29 source modules. The default `nearby`
 | stats | `pobal` | [Pobal HP Deprivation Index 2022](https://data.gov.ie/dataset/pobal-hp-deprivation-index-scores-2022) | 1 | CC BY 4.0 |
 | stats | `data-gov-ie` | [data.gov.ie](https://data.gov.ie) | 3 | Per dataset, mostly CC BY 4.0 |
 | economy | `cro` | [Companies Registration Office open data](https://opendata.cro.ie) | 3 | CC BY 4.0 |
-| economy | `kohesio` | [European Commission Kohesio](https://kohesio.ec.europa.eu/) — may block some cloud-hosted IPs; use local stdio if hosted calls return 403 | 2 | EU reuse policy / CC BY 4.0 compatible |
+| economy | `kohesio` | [European Commission Kohesio](https://kohesio.ec.europa.eu/) — packaged, dated Irish CSV exports; not live data ([refresh guide](docs/kohesio-exports.md)) | 2 | EU reuse policy / CC BY 4.0 compatible |
 | stats | `smart-dublin` | [Smart Dublin open data](https://data.smartdublin.ie) | 3 | Per dataset, mostly CC BY 4.0 |
 | stats | `census-areas` | [CSO Census 2022 small areas / Tailte Éireann](https://data-osi.opendata.arcgis.com/datasets/osi::cso-small-areas-national-statistical-boundaries-2022-generalised-20m) | 1 | CC BY 4.0 |
 | law/politics | `oireachtas` | [Houses of the Oireachtas Open Data API](https://api.oireachtas.ie) | 5 | Oireachtas Open Data PSI Licence |
@@ -265,7 +265,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full checklist.
 
 ## Registry and publishing
 
-Ireland MCP is **listed on the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.c-mongan%2Fireland-mcp/versions/latest)** as a remote-only Streamable HTTP server named `io.github.c-mongan/ireland-mcp` (v1.1.1). Clients that browse the registry can install it by name. The future domain name is planned as `ie.irishopendata/ireland` after DNS verification. Publishing notes and directory checklists are in [docs/publishing.md](docs/publishing.md). Do not publish from a fork without changing the name and endpoint.
+Ireland MCP is **listed on the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.c-mongan%2Fireland-mcp/versions/latest)** as a remote-only Streamable HTTP server named `io.github.c-mongan/ireland-mcp` (v1.1.2). Clients that browse the registry can install it by name. The future domain name is planned as `ie.irishopendata/ireland` after DNS verification. Publishing notes and directory checklists are in [docs/publishing.md](docs/publishing.md). Do not publish from a fork without changing the name and endpoint.
 
 ## Credits and prior art
 

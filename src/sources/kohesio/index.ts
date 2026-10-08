@@ -1,155 +1,89 @@
+import { readFileSync } from "node:fs";
 import { z } from "zod";
-import { DAY } from "../../gateway/context.js";
-import { bound, envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js";
+import { envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type FetchedDocument, type SearchHit, type SourceModule, type ToolContext } from "../../gateway/module.js";
-
-const BASE = "https://kohesio.ec.europa.eu/api";
-const IRELAND = "https://linkedopendata.eu/entity/Q2";
-const TTL = DAY;
-/** Kohesio flaps from cloud IPs: allow three attempts (worst case three times the per-attempt upstream timeout). */
-const RETRIES = 2;
+import { DATA_PAGE, type Snapshot } from "./export.js";
 
 export const kohesioInfo: SourceInfo = {
-  id: "kohesio",
-  name: "Kohesio EU-funded projects",
+  id: "kohesio", name: "Kohesio EU-funded projects",
   licence: "European Commission reuse policy / CC BY 4.0 compatible",
-  attribution: "European Commission, Kohesio platform.",
+  attribution: "European Commission, Kohesio platform. Dated Irish country exports; not live data.",
   homepage: "https://kohesio.ec.europa.eu/"
 };
 
-interface ProjectListResponse { list?: RawProject[]; numberResults?: number; similarWords?: string[] }
-interface RawProject {
-  link?: string;
-  item?: string;
-  labels?: string[];
-  descriptions?: string[];
-  startTimes?: string[];
-  endTimes?: string[];
-  euBudgets?: string[];
-  totalBudgets?: string[];
-  coordinates?: string[];
-  countrycode?: string[];
-}
-interface DetailProject extends RawProject {
-  budget?: string;
-  description?: string;
-  euBudget?: string;
-  label?: string;
-  countryLabel?: string[];
-  beneficiaries?: Array<{ beneficiaryLabel?: string; link?: string; website?: string }>;
-  funds?: Array<{ id?: string; label?: string; fullLabel?: string; website?: string }>;
-  regions?: Array<{ label?: string }>;
-  categoryLabels?: string[];
-}
-
-function first(value: unknown): string | null {
-  if (Array.isArray(value)) return typeof value[0] === "string" && value[0].trim() ? value[0] : null;
-  return typeof value === "string" && value.trim() ? value : null;
-}
-function text(value: unknown): string | null {
-  const raw = first(value);
-  return raw ? raw.replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim() : null;
-}
-function money(value: unknown): number | null {
-  const raw = first(value);
-  if (!raw) return null;
-  const n = Number(raw.replace(/[^0-9.-]/g, ""));
-  return Number.isFinite(n) ? n : null;
+// Packaged with the deployment. Hosted requests never call the rate-limited frontend API.
+let snapshot: Snapshot | undefined;
+function load(): Snapshot {
+  snapshot ??= JSON.parse(readFileSync(new URL("./snapshot.json", import.meta.url), "utf8")) as Snapshot;
+  return snapshot;
 }
 function projectId(idOrUrl: string): string {
   const id = idOrUrl.trim();
-  if (/^Q\d+$/.test(id)) return `https://linkedopendata.eu/entity/${id}`;
-  if (/^https:\/\/linkedopendata\.eu\/entity\/Q\d+$/.test(id)) return id;
+  if (/^Q\d+$/.test(id)) return id;
+  if (/^https:\/\/linkedopendata\.eu\/entity\/Q\d+$/.test(id)) return id.split("/").pop()!;
   throw new ToolError("BAD_ARGS", "Project id must be a Kohesio Q id, e.g. Q232198, or its linkedopendata.eu URL.");
 }
-function compactProject(p: RawProject | DetailProject) {
-  return {
-    id: p.item ?? first(p.link)?.split("/").pop() ?? null,
-    title: text((p as DetailProject).label) ?? text(p.labels) ?? null,
-    description: text((p as DetailProject).description) ?? text(p.descriptions),
-    start: first(p.startTimes),
-    end: first(p.endTimes),
-    eu_budget: money(p.euBudgets ?? (p as DetailProject).euBudget),
-    total_budget: money(p.totalBudgets ?? (p as DetailProject).budget),
-    coordinates: first(p.coordinates),
-    country: first((p as DetailProject).countryLabel) ?? first(p.countrycode),
-    beneficiaries: ((p as DetailProject).beneficiaries ?? []).slice(0, 5).map((b) => ({ name: b.beneficiaryLabel ?? null, url: b.link ?? null, website: b.website || null })),
-    funds: ((p as DetailProject).funds ?? []).slice(0, 5).map((f) => ({ id: f.id ?? null, label: f.fullLabel ?? f.label ?? null, website: f.website ?? null })),
-    categories: ((p as DetailProject).categoryLabels ?? []).slice(0, 8),
-    url: p.link ?? (p.item ? `https://linkedopendata.eu/entity/${p.item}` : null)
-  };
+function getProject(id: string) {
+  const key = projectId(id);
+  const project = load().projects.find((p) => p.id === key);
+  if (!project) throw new ToolError("NOT_FOUND", "Project is not present in the packaged Irish Kohesio exports.", {
+    hint: "This is a dated snapshot, not a live or exhaustive project lookup. Check the Kohesio website for newer records or Interreg projects."
+  });
+  return project;
 }
-
-async function getJson<T>(ctx: ToolContext, url: string) {
-  try {
-    const result = await ctx.cachedJson<T>(url, TTL, { label: "Kohesio", retries: RETRIES, retryStatuses: [403] });
-    return { url, value: result.value, cached: result.cached, stale: result.stale };
-  } catch (error) {
-    if (error instanceof ToolError && error.message.includes("HTTP 403")) {
-      throw new ToolError("UPSTREAM_DOWN", "Kohesio returned HTTP 403.", {
-        hint: "Kohesio blocks some cloud-hosted IPs; run Ireland MCP from a built source checkout with node dist/src/cli.js --toolsets=kohesio (stdio)."
-      });
-    }
-    throw error;
-  }
+function searchProjects(query = "", region = "", minBudget?: number) {
+  const q = query.trim().toLocaleLowerCase("en");
+  const r = region.trim().toLocaleLowerCase("en");
+  return load().projects.filter((p) =>
+    (!q || [p.title, p.description, p.locality, ...p.regions, ...p.beneficiaries.map((b) => b.name), ...p.funds.map((f) => f.label)].join(" ").toLocaleLowerCase("en").includes(q)) &&
+    (!r || p.regions.some((v) => v.toLocaleLowerCase("en").includes(r))) &&
+    (minBudget === undefined || (p.eu_budget !== null && p.eu_budget >= minBudget))
+  );
 }
+const snapshotMetadata = () => ({ ...load().metadata, exports: load().metadata.exports.map(({ columns: _columns, ...e }) => e) });
+const evidence = () => ({ url: DATA_PAGE, cached: true, retrievedAt: new Date(load().metadata.exports[0]!.retrieved_at) });
 
 const searchTool = defineTool({
-  name: "kohesio_search_projects",
-  title: "Search EU-funded Irish projects",
-  description: "Search Kohesio EU cohesion-funded projects in Ireland by keyword, town/region, fund or budget filters.",
+  name: "kohesio_search_projects", title: "Search EU-funded Irish projects",
+  description: "Search a dated snapshot of the official Kohesio Ireland CSV exports by keyword, region name/code or minimum EU budget. Not live data; excludes separate Interreg exports.",
   example: { query: "Galway", limit: 5 },
   inputSchema: {
-    query: z.string().max(120).optional().describe("Keyword search, e.g. 'Galway', 'university' or 'SME'."),
-    region: z.string().max(100).optional().describe("Kohesio region filter if known."),
+    query: z.string().max(120).optional().describe("Case-insensitive text in title, summary, locality, regions, fund or beneficiary."),
+    region: z.string().max(100).optional().describe("Case-insensitive NUTS region name or code in the export."),
     min_eu_budget: z.number().nonnegative().optional(),
     limit: z.number().int().min(1).max(MAX_LIMIT).default(10),
     offset: z.number().int().min(0).max(100_000).default(0)
   },
-  handler: async ({ query, region, min_eu_budget, limit, offset }, ctx) => {
-    const params = new URLSearchParams({ country: IRELAND, limit: String(limit), offset: String(offset), language: "en" });
-    if (query) params.set("keywords", query);
-    if (region) params.set("region", region);
-    if (min_eu_budget !== undefined) params.set("budgetEUBiggerThan", String(min_eu_budget));
-    const result = await getJson<ProjectListResponse>(ctx, `${BASE}/projects?${params.toString()}`);
-    const projects = (result.value.list ?? []).map(compactProject);
-    const { items, truncated } = bound(projects, limit);
-    return envelope(kohesioInfo, { data: { total: result.value.numberResults ?? projects.length, projects: items }, url: result.url, cached: result.cached, stale: result.stale, truncated: truncated || (result.value.numberResults ?? 0) > offset + items.length });
+  handler: async ({ query, region, min_eu_budget, limit, offset }) => {
+    const matches = searchProjects(query, region, min_eu_budget);
+    const projects = matches.slice(offset, offset + limit);
+    return envelope(kohesioInfo, { ...evidence(), data: { total: matches.length, projects, offset,
+      next_offset: offset + projects.length < matches.length ? offset + projects.length : null,
+      snapshot: snapshotMetadata() }, truncated: offset + projects.length < matches.length });
   }
 });
-
 const getTool = defineTool({
-  name: "kohesio_get_project",
-  title: "Get a Kohesio project",
-  description: "Get one Kohesio EU-funded project by its Q id from kohesio_search_projects.",
+  name: "kohesio_get_project", title: "Get a Kohesio project",
+  description: "Get an Irish project by Q id from the packaged official Kohesio CSV snapshot. Not a live lookup.",
   example: { id: "Q232198" },
-  inputSchema: { id: z.string().min(2).max(120).describe("Kohesio project id, e.g. Q232198, or linkedopendata.eu entity URL.") },
-  handler: async ({ id }, ctx) => {
-    const urlId = projectId(id);
-    const encoded = encodeURIComponent(urlId);
-    const result = await getJson<DetailProject>(ctx, `${BASE}/projects/${encoded}?id=${encoded}&language=en`);
-    return envelope(kohesioInfo, { data: compactProject(result.value), url: result.url, cached: result.cached, stale: result.stale });
-  }
+  inputSchema: { id: z.string().min(2).max(120).describe("Kohesio Q id or linkedopendata.eu entity URL.") },
+  handler: async ({ id }) => envelope(kohesioInfo, { ...evidence(), data: { ...getProject(id), snapshot: snapshotMetadata() } })
 });
-
 export const kohesioModule: SourceModule = {
   info: kohesioInfo,
-  summary: "EU cohesion-funded projects and beneficiaries in Ireland from the European Commission Kohesio platform.",
+  summary: "EU cohesion-funded Irish projects from dated official European Commission Kohesio CSV exports; not live data.",
   domain: "economy",
-  coverage: "Irish EU-funded projects indexed by Kohesio across available programming periods.",
+  coverage: "Packaged Irish country exports for 2014–2020 and 2021–2027. Snapshot dates and download attribution returned with results; excludes separate Interreg exports.",
   tools: [searchTool, getTool],
-  async search(query: string, limit: number, ctx: ToolContext): Promise<SearchHit[]> {
-    const params = new URLSearchParams({ country: IRELAND, keywords: query, limit: String(limit), offset: "0", language: "en" });
-    const result = await getJson<ProjectListResponse>(ctx, `${BASE}/projects?${params.toString()}`);
-    return (result.value.list ?? []).slice(0, limit).map((p) => ({ id: `${kohesioInfo.id}:${p.item}`, title: text(p.labels) ?? p.item ?? "Kohesio project", url: p.link ?? kohesioInfo.homepage }));
+  async search(query: string, limit: number, _ctx: ToolContext): Promise<SearchHit[]> {
+    return searchProjects(query).slice(0, Math.min(MAX_LIMIT, Math.max(1, limit))).map((p) => ({
+      id: `kohesio:${p.id}`, title: `${p.title} [Kohesio snapshot ${load().metadata.exports.find((e) => e.programming_period === p.programming_period)!.snapshot_date}]`, url: p.url
+    }));
   },
-  async fetchById(key: string, ctx: ToolContext): Promise<FetchedDocument> {
-    const id = key.replace(/^project:/, "");
-    const urlId = projectId(id);
-    const encoded = encodeURIComponent(urlId);
-    const result = await getJson<DetailProject>(ctx, `${BASE}/projects/${encoded}?id=${encoded}&language=en`);
-    const data = compactProject(result.value);
-    return { id: `${kohesioInfo.id}:${data.id}`, title: data.title ?? String(data.id), text: JSON.stringify(data, null, 2), url: result.url, metadata: { source: kohesioInfo.id } };
+  async fetchById(key: string, _ctx: ToolContext): Promise<FetchedDocument> {
+    const p = getProject(key.replace(/^project:/, ""));
+    return { id: `kohesio:${p.id}`, title: p.title, text: JSON.stringify({ ...p, snapshot: snapshotMetadata() }, null, 2),
+      url: p.url, metadata: { source: kohesioInfo.id, attribution: kohesioInfo.attribution, snapshot: snapshotMetadata() } };
   }
 };

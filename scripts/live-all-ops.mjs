@@ -323,7 +323,7 @@ async function main() {
     `Generated: ${new Date().toISOString()}`,
     `Operations: ${pass} PASS, ${notConfigured} NOT_CONFIGURED, ${hostedBlocked} HOSTED_BLOCKED, ${fail} FAIL.`,
     "",
-    "Known hosted limitation: Kohesio may return HTTP 403 from cloud-hosted IPs. If that happens, run Ireland MCP from a built source checkout with `node dist/src/cli.js --toolsets=kohesio` (stdio).",
+    "Kohesio answers come from packaged, dated official Irish CSV exports (not live data); see [kohesio-exports.md](kohesio-exports.md).",
     "",
     "## Default tool exercise",
     "",
