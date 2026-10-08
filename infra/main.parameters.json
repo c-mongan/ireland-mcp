@@ -8,6 +8,11 @@
     "budgetContactEmail": { "value": "${BUDGET_CONTACT_EMAIL=}" },
     "monthlyBudget": { "value": "${MONTHLY_BUDGET=20}" },
     "maximumInstanceCount": { "value": "${MAX_INSTANCE_COUNT=10}" },
-    "mcpAllowedOrigins": { "value": "${MCP_ALLOWED_ORIGINS=}" }
+    "mcpAllowedOrigins": { "value": "${MCP_ALLOWED_ORIGINS=}" },
+    "resourceNameSuffix": { "value": "${AZURE_RESOURCE_NAME_SUFFIX=}" },
+    "enableProductionDomains": { "value": "${ENABLE_PRODUCTION_DOMAINS=false}" },
+    "staticWebAppValidationToken": { "value": "${SWA_DOMAIN_VALIDATION_TOKEN=}" },
+    "canonicalSiteUrl": { "value": "${CANONICAL_SITE_URL=}" },
+    "availabilityAlertEmail": { "value": "${AVAILABILITY_CONTACT_EMAIL=}" }
   }
 }

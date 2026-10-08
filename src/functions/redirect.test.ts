@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { canonicalSite, redirectFor } from "./redirect.js";
+import { canonicalSite, redirectFor, siteAliasRedirect } from "./redirect.js";
+import { SECURITY_HEADERS } from "../gateway/securityHeaders.js";
 
-const moved = (location: string) => ({ status: 301, headers: { location, "cache-control": "public, max-age=3600" } });
+const moved = (location: string) => ({ status: 301, headers: { ...SECURITY_HEADERS, location, "cache-control": "public, max-age=3600" } });
 
 describe("custom-domain redirects", () => {
   it.each([
@@ -36,6 +37,20 @@ describe("custom-domain redirects", () => {
 
   it("returns 404 for unknown hosts, so it cannot become an open redirect", () => {
     expect(redirectFor("evil.example", "/").status).toBe(404);
+    expect(redirectFor("evil.example", "/").headers).toEqual(SECURITY_HEADERS);
     expect(redirectFor("func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net", "/").status).toBe(404);
   });
+
+  it("checks only allow-listed site aliases before explicit routes and preserves the query", () => {
+    expect(siteAliasRedirect({ url: "https://WWW.IRISHOPENDATA.COM:443/mcp?x=1&next=%2Fhealthz" }))
+      .toEqual(moved("https://irishopendata.com/mcp?x=1&next=%2Fhealthz"));
+    expect(siteAliasRedirect({ url: "https://irishopendata.ie/healthz?deep=1" }))
+      .toEqual(moved("https://irishopendata.com/healthz?deep=1"));
+    expect(siteAliasRedirect()).toBeUndefined();
+  });
+
+  it.each(["evil.example", "www.irishopendata.com.evil.example", "mcp.irishopendata.com", "irishopendata.com", "example.azurewebsites.net"])(
+    "does not apply the site-alias guard to %s",
+    (host) => expect(siteAliasRedirect({ url: `https://${host}/healthz?deep=1` })).toBeUndefined()
+  );
 });

@@ -11,10 +11,45 @@ param instanceMemoryMB int = 2048
 @description('Comma-separated Origin allowlist for /mcp. Empty uses the built-in default list (see PRIVACY.md and README).')
 param mcpAllowedOrigins string = ''
 
+@minLength(3)
+@maxLength(21)
+param resourceNameSuffix string = toLower(uniqueString(subscription().id, resourceGroup().id, environmentName))
+param canonicalSiteUrl string = ''
+@secure()
+param additionalAppSettings object = {}
+
+func normalizeOrigin(origin string) string => toLower(reduce(range(0, length(trim(origin))), trim(origin), (value, _) => endsWith(value, '/') ? substring(value, 0, max(0, length(value) - 1)) : value))
+
+// Keep in sync with src/gateway/origin.ts; the regression test checks this contract.
+var defaultAllowedOrigins = [
+  'https://claude.ai'
+  'https://chatgpt.com'
+  'vscode-webview://*'
+  'http://localhost'
+  'http://localhost:*'
+  'http://127.0.0.1'
+  'http://127.0.0.1:*'
+  'https://lemon-meadow-03b2b8903.3.azurestaticapps.net'
+  'https://irishopendata.ie'
+  'https://www.irishopendata.ie'
+  'https://irishopendata.com'
+  'https://www.irishopendata.com'
+]
+var effectiveOriginSetting = !empty(mcpAllowedOrigins) ? mcpAllowedOrigins : contains(additionalAppSettings, 'MCP_ALLOWED_ORIGINS') ? string(additionalAppSettings.MCP_ALLOWED_ORIGINS) : ''
+var rawOrigins = trim(effectiveOriginSetting)
+var extendOrigins = startsWith(rawOrigins, '+')
+var configuredOrigins = map(split(extendOrigins ? substring(rawOrigins, 1) : rawOrigins, ','), entry => normalizeOrigin(entry))
+var effectiveOrigins = empty(rawOrigins) ? defaultAllowedOrigins : extendOrigins ? concat(defaultAllowedOrigins, configuredOrigins) : configuredOrigins
+var concreteBrowserOrigins = filter(effectiveOrigins, entry => !empty(entry) && !contains(entry, '*'))
+var platformOrigins = contains(effectiveOrigins, '*') ? ['*'] : union(concreteBrowserOrigins, [])
+
 @description('Create an App Insights standard availability test against /healthz.')
 param enableAvailabilityTest bool = true
 
-var token = toLower(uniqueString(subscription().id, resourceGroup().id, environmentName))
+@description('Optional URL for the existing health-test identity. Empty uses the Function default hostname.')
+param healthCheckUrl string = ''
+
+var token = resourceNameSuffix
 var appName = 'func-ireland-mcp-${token}'
 var deploymentContainer = 'app-package-${take(token, 10)}'
 var hasNtaKey = !empty(ntaApiKey)
@@ -121,18 +156,20 @@ resource plan 'Microsoft.Web/serverfarms@2024-04-01' = {
   properties: { reserved: true }
 }
 
-var baseSettings = [
-  { name: 'AzureWebJobsStorage__accountName', value: storage.name }
-  { name: 'AzureWebJobsStorage__credential', value: 'managedidentity' }
-  { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: insights.properties.ConnectionString }
-  { name: 'APPLICATIONINSIGHTS_AUTHENTICATION_STRING', value: 'Authorization=AAD' }
-  { name: 'CACHE_TABLE_NAME', value: cacheTable.name }
-  { name: 'PPR_CONTAINER', value: pprContainer.name }
-  { name: 'RATE_LIMIT_PER_MINUTE', value: '60' }
-  { name: 'OTEL_SERVICE_NAME', value: 'ireland-mcp' }
-]
-var originSettings = empty(mcpAllowedOrigins) ? [] : [{ name: 'MCP_ALLOWED_ORIGINS', value: mcpAllowedOrigins }]
-var ntaSettings = hasNtaKey ? [{ name: 'NTA_API_KEY', value: '@Microsoft.KeyVault(SecretUri=${ntaSecret!.properties.secretUri})' }] : []
+var baseSettings = {
+  AzureWebJobsStorage__accountName: storage.name
+  AzureWebJobsStorage__credential: 'managedidentity'
+  APPLICATIONINSIGHTS_CONNECTION_STRING: insights.properties.ConnectionString
+  APPLICATIONINSIGHTS_AUTHENTICATION_STRING: 'Authorization=AAD'
+  CACHE_TABLE_NAME: cacheTable.name
+  PPR_CONTAINER: pprContainer.name
+  RATE_LIMIT_PER_MINUTE: '60'
+  OTEL_SERVICE_NAME: 'ireland-mcp'
+}
+var originSettings = empty(mcpAllowedOrigins) ? {} : { MCP_ALLOWED_ORIGINS: mcpAllowedOrigins }
+var canonicalSettings = empty(canonicalSiteUrl) ? {} : { CANONICAL_SITE_URL: canonicalSiteUrl }
+var ntaSettings = hasNtaKey ? { NTA_API_KEY: '@Microsoft.KeyVault(SecretUri=${ntaSecret!.properties.secretUri})' } : {}
+var appSettings = union(additionalAppSettings, baseSettings, originSettings, canonicalSettings, ntaSettings)
 
 resource app 'Microsoft.Web/sites@2024-11-01' = {
   name: appName
@@ -163,12 +200,16 @@ resource app 'Microsoft.Web/sites@2024-11-01' = {
     siteConfig: {
       minTlsVersion: '1.2'
       ftpsState: 'Disabled'
-      // Platform CORS stays off so the app's Origin allowlist and CORS handler (httpHandler.ts) run.
-      // With platform CORS on, Azure answers preflights itself and overrides the app's headers.
+      // Functions host handles OPTIONS before app code. Permit matching browser preflights;
+      // application code still validates Origin on the actual request.
       cors: {
-        allowedOrigins: []
+        allowedOrigins: platformOrigins
+        supportCredentials: false
       }
-      appSettings: concat(baseSettings, originSettings, ntaSettings)
+      appSettings: map(items(appSettings), setting => {
+        name: setting.key
+        value: setting.value
+      })
     }
   }
 }
@@ -223,8 +264,9 @@ resource healthTest 'Microsoft.Insights/webtests@2022-06-15' = if (enableAvailab
       { Id: 'emea-fr-pra-edge' }
     ]
     Request: {
-      RequestUrl: 'https://${app.properties.defaultHostName}/healthz'
+      RequestUrl: empty(healthCheckUrl) ? 'https://${app.properties.defaultHostName}/healthz' : healthCheckUrl
       HttpVerb: 'GET'
+      FollowRedirects: false
       ParseDependentRequests: false
     }
     ValidationRules: {
@@ -241,4 +283,8 @@ resource healthTest 'Microsoft.Insights/webtests@2022-06-15' = if (enableAvailab
 }
 
 output appName string = app.name
+output defaultHostName string = app.properties.defaultHostName
+output customDomainVerificationId string = app.properties.customDomainVerificationId
+output insightsName string = insights.name
+output healthTestName string = enableAvailabilityTest ? healthTest!.name : ''
 output endpoint string = 'https://${app.properties.defaultHostName}/mcp'

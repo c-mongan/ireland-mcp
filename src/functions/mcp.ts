@@ -1,14 +1,15 @@
 import { app, type HttpRequest, type HttpResponseInit } from "@azure/functions";
 import { createContext } from "../gateway/context.js";
-import { handleMcpHttp } from "../gateway/httpHandler.js";
-import { parseAllowedOrigins } from "../gateway/origin.js";
+import { handleMcpHttp, mcpResponseHeaders } from "../gateway/httpHandler.js";
+import { isOriginAllowed, parseAllowedOrigins } from "../gateway/origin.js";
 import { initTelemetry } from "../gateway/otel.js";
 import { limitFromEnv, RateLimiter } from "../gateway/rateLimit.js";
 import { tableStoreFromEnv } from "../gateway/tableStore.js";
-import { consoleSink } from "../gateway/telemetry.js";
+import { consoleSink, reportHandlerError } from "../gateway/telemetry.js";
 import { sharedBudgets } from "../gateway/upstreamBudget.js";
 import { toolsetsFromUrl } from "../gateway/toolsets.js";
 import { createAppServer } from "../registry.js";
+import { siteAliasRedirect } from "./redirect.js";
 
 const MAX_BODY_BYTES = 256 * 1024;
 
@@ -21,10 +22,35 @@ const rateLimiter = new RateLimiter(limitFromEnv(process.env.RATE_LIMIT_PER_MINU
 const allowedOrigins = parseAllowedOrigins(process.env.MCP_ALLOWED_ORIGINS);
 
 export async function mcpHandler(request: HttpRequest): Promise<HttpResponseInit> {
+  const redirect = siteAliasRedirect(request);
+  if (redirect) return redirect;
+  const origin = request.headers.get("origin");
+  const headers = mcpResponseHeaders(origin, allowedOrigins);
+  try {
+    return await handleRequest(request, origin, headers);
+  } catch (error) {
+    reportHandlerError("mcpHandler", error);
+    return {
+      status: 500,
+      headers,
+      jsonBody: { jsonrpc: "2.0", error: { code: -32603, message: "Internal server error." }, id: null }
+    };
+  }
+}
+
+async function handleRequest(request: HttpRequest, origin: string | null, headers: Record<string, string>): Promise<HttpResponseInit> {
+  // Reject untrusted browser origins before reading bodies or applying the Function-level size guard.
+  if (origin !== null && !isOriginAllowed(origin, allowedOrigins)) {
+    return {
+      status: 403,
+      headers,
+      jsonBody: { jsonrpc: "2.0", error: { code: -32000, message: "Origin not allowed." }, id: null }
+    };
+  }
   const declared = Number(request.headers.get("content-length") ?? "0");
-  if (declared > MAX_BODY_BYTES) return { status: 413, jsonBody: { error: "Request body too large." } };
+  if (declared > MAX_BODY_BYTES) return { status: 413, headers, jsonBody: { error: "Request body too large." } };
   const body = request.method === "POST" ? await request.text() : undefined;
-  if (body && body.length > MAX_BODY_BYTES) return { status: 413, jsonBody: { error: "Request body too large." } };
+  if (body && body.length > MAX_BODY_BYTES) return { status: 413, headers, jsonBody: { error: "Request body too large." } };
 
   const webRequest = new Request(request.url, {
     method: request.method,

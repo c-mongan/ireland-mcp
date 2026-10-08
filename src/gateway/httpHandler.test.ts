@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { context, metrics, trace } from "@opentelemetry/api";
 import { AsyncLocalStorageContextManager } from "@opentelemetry/context-async-hooks";
 import { AlwaysOnSampler, BasicTracerProvider, InMemorySpanExporter, SimpleSpanProcessor } from "@opentelemetry/sdk-trace-base";
@@ -11,6 +11,8 @@ import { handleMcpHttp } from "./httpHandler.js";
 import { defineTool, type SourceModule } from "./module.js";
 import { RateLimiter } from "./rateLimit.js";
 import { buildServer } from "./server.js";
+import { SECURITY_HEADERS } from "./securityHeaders.js";
+import { UnknownToolsetError } from "./toolsets.js";
 import { fakeFetch } from "../../test/helpers/fakeFetch.js";
 
 const info = { id: "cso", name: "Demo", licence: "CC BY 4.0", attribution: "Demo", homepage: "https://example.ie" };
@@ -55,6 +57,7 @@ const post = (body: unknown, headers: Record<string, string> = {}) =>
     body: JSON.stringify(body)
   });
 const SWA = "https://lemon-meadow-03b2b8903.3.azurestaticapps.net";
+afterEach(() => vi.restoreAllMocks());
 
 describe("origin validation", () => {
   it("rejects a disallowed Origin with 403 before touching the server", async () => {
@@ -92,6 +95,7 @@ describe("origin validation", () => {
     const res = await handleMcpHttp(post({ jsonrpc: "2.0", id: 1, method: "tools/list" }), { createServer });
     expect(res.status).toBe(200);
     expect(res.headers.get("access-control-allow-origin")).toBe("*");
+    expect(res.headers.get("vary")).toBe("Origin");
   });
 
   it("honours a configured allowlist", async () => {
@@ -100,6 +104,85 @@ describe("origin validation", () => {
       allowedOrigins: ["https://only.example"]
     });
     expect(res.status).toBe(403);
+  });
+
+  it.each(["https://irishopendata.com", "https://www.irishopendata.com", "https://irishopendata.ie", "https://claude.ai", "https://chatgpt.com"])(
+    "preserves the existing allowed browser origin %s",
+    async (origin) => {
+      const res = await handleMcpHttp(post({ jsonrpc: "2.0", id: 1, method: "tools/list" }, { origin }), { createServer });
+      expect(res.status).toBe(200);
+      expect(res.headers.get("access-control-allow-origin")).toBe(origin);
+    }
+  );
+});
+
+describe("HTTP security headers", () => {
+  const body = { jsonrpc: "2.0", id: 1, method: "tools/list" };
+  const expectSecurity = (res: Response) => {
+    for (const [name, value] of Object.entries(SECURITY_HEADERS)) expect(res.headers.get(name)).toBe(value);
+    expect(res.headers.get("strict-transport-security")).toBe("max-age=31536000");
+    expect(res.headers.get("vary")).toContain("Origin");
+  };
+
+  it.each([
+    ["success", () => post(body, { origin: SWA }), 200],
+    ["notification", () => post({ jsonrpc: "2.0", method: "notifications/initialized" }, { origin: SWA }), 202],
+    ["preflight", () => new Request("https://fn/mcp", { method: "OPTIONS", headers: { origin: SWA } }), 204],
+    ["method error", () => new Request("https://fn/mcp", { headers: { origin: SWA } }), 405],
+    ["declared body limit", () => post(body, { origin: SWA, "content-length": "1000001" }), 413],
+    ["actual body limit", () => post("x".repeat(1_000_001), { origin: SWA }), 413],
+    ["batch limit", () => post(Array.from({ length: 21 }, () => body), { origin: SWA }), 400],
+    ["transport error", () => post(body, { origin: SWA, accept: "text/plain" }), 406]
+  ])("adds headers to %s without changing CORS", async (_name, request, status) => {
+    const res = await handleMcpHttp(request(), { createServer });
+    expect(res.status).toBe(status);
+    expectSecurity(res);
+    expect(res.headers.get("access-control-allow-origin")).toBe(SWA);
+  });
+
+  it.each(["POST", "OPTIONS"])("adds headers to denied %s requests without granting CORS", async (method) => {
+    const res = await handleMcpHttp(new Request("https://fn/mcp", { method, headers: { origin: "https://evil.example" } }), { createServer });
+    expect(res.status).toBe(403);
+    expectSecurity(res);
+    expect(res.headers.get("access-control-allow-origin")).toBeNull();
+  });
+
+  it("preserves rate-limit status and retry-after", async () => {
+    const rateLimiter = new RateLimiter(1);
+    const options = { createServer, rateLimiter };
+    await handleMcpHttp(post(body, { origin: SWA }), options);
+    const limited = await handleMcpHttp(post(body, { origin: SWA }), options);
+    expect(limited.status).toBe(429);
+    expect(Number(limited.headers.get("retry-after"))).toBeGreaterThan(0);
+    expect(limited.headers.get("access-control-allow-origin")).toBe(SWA);
+    expectSecurity(limited);
+  });
+
+  it("covers toolset errors and unexpected failures without exposing internals", async () => {
+    for (const error of [new UnknownToolsetError("Unknown toolset."), new Error("private internal detail")]) {
+      const res = await handleMcpHttp(post(body, { origin: SWA }), { createServer: () => { throw error; } });
+      expect(res.status).toBe(error instanceof UnknownToolsetError ? 400 : 500);
+      expectSecurity(res);
+      expect(res.headers.get("access-control-allow-origin")).toBe(SWA);
+      expect(await res.text()).not.toContain("private internal detail");
+    }
+  });
+
+  it("covers transport failures with a sanitized 500", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const res = await handleMcpHttp(post(body, { origin: SWA }), {
+      createServer: () => {
+        const server = createServer();
+        server.connect = async () => { throw new Error("private transport detail"); };
+        return server;
+      }
+    });
+    expect(res.status).toBe(500);
+    expectSecurity(res);
+    expect(res.headers.get("access-control-allow-origin")).toBe(SWA);
+    expect(await res.text()).not.toContain("private transport detail");
+    expect(log).toHaveBeenCalledExactlyOnceWith(JSON.stringify({ type: "handler_error", handler: "handleMcpHttp", errorType: "Error" }));
+    expect(JSON.stringify(log.mock.calls)).not.toContain("private transport detail");
   });
 });
 

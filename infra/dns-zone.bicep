@@ -8,6 +8,8 @@ param functionDefaultHost string
 @description('Function App properties.customDomainVerificationId (read with az resource show; az functionapp show returns null on Flex).')
 param functionVerificationId string
 param functionHosts array = ['mcp', 'www']
+@description('Existing SWA ownership TXT token. Empty skips ownership TXT records (for the pending .ie zone).')
+param staticWebAppValidationToken string = ''
 
 resource swa 'Microsoft.Web/staticSites@2023-01-01' existing = {
   name: staticWebAppName
@@ -44,6 +46,15 @@ resource functionOwnership 'Microsoft.Network/dnsZones/TXT@2018-05-01' = [for ho
   properties: {
     TTL: 3600
     TXTRecords: [{ value: [functionVerificationId] }]
+  }
+}]
+
+resource staticSiteOwnership 'Microsoft.Network/dnsZones/TXT@2018-05-01' = [for name in ['@', '_dnsauth']: if (!empty(staticWebAppValidationToken)) {
+  parent: zone
+  name: name
+  properties: {
+    TTL: 3600
+    TXTRecords: [{ value: [staticWebAppValidationToken] }]
   }
 }]
 

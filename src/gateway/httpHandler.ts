@@ -4,6 +4,8 @@ import { endMcpOperations, startMcpOperations, withOperationContext } from "./mc
 import { DEFAULT_ALLOWED_ORIGINS, isOriginAllowed } from "./origin.js";
 import { hashedClientKey } from "./privacy.js";
 import type { RateLimiter } from "./rateLimit.js";
+import { SECURITY_HEADERS } from "./securityHeaders.js";
+import { reportHandlerError } from "./telemetry.js";
 import { UnknownToolsetError } from "./toolsets.js";
 
 export interface McpHttpOptions {
@@ -35,9 +37,11 @@ const CORS_HEADERS: Record<string, string> = {
   "access-control-max-age": "600"
 };
 
-/** Allowed browser origins are echoed (with Vary) rather than answered with "*". */
-function corsFor(origin: string | null): Record<string, string> {
-  return origin ? { ...CORS_HEADERS, "access-control-allow-origin": origin, vary: "Origin" } : CORS_HEADERS;
+/** Denied origins get no CORS grant; every variant varies on Origin, including non-browser requests. */
+export function mcpResponseHeaders(origin: string | null, allowedOrigins: readonly string[] = DEFAULT_ALLOWED_ORIGINS): Record<string, string> {
+  const headers = { ...SECURITY_HEADERS, vary: "Origin" };
+  if (origin !== null && !isOriginAllowed(origin, allowedOrigins)) return headers;
+  return { ...headers, ...CORS_HEADERS, ...(origin !== null ? { "access-control-allow-origin": origin } : {}) };
 }
 
 /**
@@ -45,15 +49,25 @@ function corsFor(origin: string | null): Record<string, string> {
  * Functions instance can answer any request. Responses are plain JSON, not SSE.
  */
 export async function handleMcpHttp(request: Request, options: McpHttpOptions): Promise<Response> {
+  const headers = mcpResponseHeaders(request.headers.get("origin"), options.allowedOrigins);
+  try {
+    return await handleRequest(request, options, headers);
+  } catch (error) {
+    reportHandlerError("handleMcpHttp", error);
+    return errorResponse(500, -32603, "Internal server error.", headers);
+  }
+}
+
+async function handleRequest(request: Request, options: McpHttpOptions, headers: Record<string, string>): Promise<Response> {
   // MCP 2025-11-25: validate Origin when present. Absent Origin means a non-browser client.
   const origin = request.headers.get("origin");
   if (origin !== null && !isOriginAllowed(origin, options.allowedOrigins ?? DEFAULT_ALLOWED_ORIGINS)) {
     return new Response(JSON.stringify({ jsonrpc: "2.0", error: { code: -32000, message: "Origin not allowed." }, id: null }), {
       status: 403,
-      headers: { "content-type": "application/json", vary: "Origin" }
+      headers: { "content-type": "application/json", ...headers }
     });
   }
-  const cors = corsFor(origin);
+  const cors = headers;
   const jsonRpcError = (status: number, code: number, message: string, headers: Record<string, string> = {}) =>
     errorResponse(status, code, message, { ...cors, ...headers });
 

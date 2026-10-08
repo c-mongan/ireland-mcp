@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": { "value": "ireland-mcp" },
+    "location": { "value": "northeurope" },
+    "resourceNameSuffix": { "value": "aofsjpwgy4hva" },
+    "maximumInstanceCount": { "value": 10 },
+    "monthlyBudget": { "value": 20 },
+    "budgetStartDate": { "value": "2026-10-01" },
+    "enableProductionDomains": { "value": true },
+    "staticWebAppValidationToken": { "value": "_h6b8rofq6ozlaihstd6ok0u95bkmf6z" },
+    "canonicalSiteUrl": { "value": "https://irishopendata.com" }
+  }
+}

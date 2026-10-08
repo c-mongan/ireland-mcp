@@ -20,3 +20,14 @@ export const consoleSink: TelemetrySink = (event) => {
 };
 
 export const noopSink: TelemetrySink = () => undefined;
+
+/** Report caught HTTP failures without exception messages, custom names, or request data. */
+export function reportHandlerError(handler: "healthResponse" | "mcpHandler" | "handleMcpHttp", error: unknown): void {
+  if (process.env.IRELAND_MCP_TELEMETRY === "off") return;
+  let errorType = "_OTHER";
+  if (error instanceof Error) errorType = "Error";
+  if (error instanceof TypeError) errorType = "TypeError";
+  if (error instanceof SyntaxError) errorType = "SyntaxError";
+  if (error instanceof RangeError) errorType = "RangeError";
+  console.error(JSON.stringify({ type: "handler_error", handler, errorType }));
+}
