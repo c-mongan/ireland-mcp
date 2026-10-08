@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-const endpointPattern = /https:\/\/func-ireland-mcp-aofsjpwgy4hva\.azurewebsites\.net\/mcp/;
+const endpointPattern = /https:\/\/mcp\.irishopendata\.com\/mcp/;
 const shotsDir = resolve("test-results/ui-shots");
 
 async function mockNetwork(page: Page) {
@@ -46,9 +46,9 @@ test("install copy works and deeplinks use current formats", async ({ page, cont
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.goto("/#install");
   const href = await page.getByRole("link", { name: "Install in VS Code" }).getAttribute("href");
-  expect(href).toMatch(/^vscode:\/\/mcp\/install\?/);
+  expect(href).toMatch(/^vscode:mcp\/install\?/);
   const payload = JSON.parse(decodeURIComponent(href!.split("?")[1]));
-  expect(payload).toEqual({ name: "ireland", type: "http", url: "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp" });
+  expect(payload).toEqual({ name: "ireland", type: "http", url: "https://mcp.irishopendata.com/mcp" });
   await page.getByRole("tab", { name: "Cursor" }).click();
   const cursorHref = await page.getByRole("link", { name: "Install in Cursor" }).getAttribute("href");
   expect(cursorHref).toMatch(/^cursor:\/\/anysphere\.cursor-deeplink\/mcp\/install\?name=ireland&config=/);

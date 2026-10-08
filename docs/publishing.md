@@ -6,7 +6,7 @@ This repo is prepared for the official MCP Registry, but do not publish or submi
 
 - Current name: `io.github.c-mongan/ireland-mcp`
 - Current auth method: GitHub OIDC / GitHub namespace
-- Current endpoint: `https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp`
+- Current endpoint: `https://mcp.irishopendata.com/mcp`
 - Registry schema: `https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json`
 - Transport: `streamable-http`
 - Package entries: none. The registry manifest is remote-only for now.

@@ -1,4 +1,4 @@
-// Public Azure DNS zone for irishopendata.ie. Deploy separately into the app's resource group:
+// Public Azure DNS zone for irishopendata.ie or irishopendata.com (set zoneName). Deploy separately into the app's resource group:
 //   az deployment group create -g <rg> --template-file infra/dns-zone.bicep \
 //     --parameters staticWebAppName=<swa> functionDefaultHost=<app>.azurewebsites.net functionVerificationId=<id>
 // The registrar must delegate the domain to the zone's name servers. See docs/domain-go-live.md.
