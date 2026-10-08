@@ -50,7 +50,8 @@ async function handleRequest(request: HttpRequest, origin: string | null, header
   const declared = Number(request.headers.get("content-length") ?? "0");
   if (declared > MAX_BODY_BYTES) return { status: 413, headers, jsonBody: { error: "Request body too large." } };
   const body = request.method === "POST" ? await request.text() : undefined;
-  if (body && body.length > MAX_BODY_BYTES) return { status: 413, headers, jsonBody: { error: "Request body too large." } };
+  // Count bytes, not UTF-16 characters, so undeclared multibyte bodies cannot exceed the limit.
+  if (body && Buffer.byteLength(body, "utf8") > MAX_BODY_BYTES) return { status: 413, headers, jsonBody: { error: "Request body too large." } };
 
   const webRequest = new Request(request.url, {
     method: request.method,
@@ -60,7 +61,8 @@ async function handleRequest(request: HttpRequest, origin: string | null, header
   const response = await handleMcpHttp(webRequest, {
     createServer: (req) => createAppServer(context, consoleSink, toolsetsFromUrl(req.url)),
     rateLimiter,
-    allowedOrigins
+    allowedOrigins,
+    maxBodyBytes: MAX_BODY_BYTES
   });
   return {
     status: response.status,

@@ -64,10 +64,15 @@ export function renderCounts(c: Counts): string {
 /** The README's one-line live-ops summary, taken from docs/live-all-ops.md. */
 export function liveOpsSummary(report: string): string {
   const generated = report.match(/^Generated: (\d{4}-\d{2}-\d{2})/m)?.[1];
-  const line = report.match(/^Operations: (\d+) PASS, (\d+) NOT_CONFIGURED, (\d+) HOSTED_BLOCKED, (\d+) FAIL\./m);
+  // DEGRADED was added later; older reports omit it.
+  const line = report.match(/^Operations: (\d+) PASS, (\d+) NOT_CONFIGURED, (\d+) HOSTED_BLOCKED, (?:(\d+) DEGRADED, )?(\d+) FAIL\./m);
   if (!generated || !line) throw new Error("docs/live-all-ops.md has no Generated/Operations summary line.");
-  const [pass, notConfigured, blocked, fail] = line.slice(1).map(Number) as [number, number, number, number];
-  const total = pass + notConfigured + blocked + fail;
-  const notes = [`${notConfigured} need the NTA key`, ...(blocked ? [`${blocked} blocked from Azure IPs`] : [])];
+  const [pass, notConfigured, blocked, degraded, fail] = line.slice(1).map((n) => Number(n ?? 0)) as [number, number, number, number, number];
+  const total = pass + notConfigured + blocked + degraded + fail;
+  const notes = [
+    `${notConfigured} need the NTA key`,
+    ...(blocked ? [`${blocked} blocked from Azure IPs`] : []),
+    ...(degraded ? [`${degraded} degraded (stale or partial)`] : [])
+  ];
   return `[docs/live-all-ops.md](docs/live-all-ops.md) (${generated}): ${pass} of ${total} pass, ${fail} fail; ${notes.join(", ")}.`;
 }

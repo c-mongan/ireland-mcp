@@ -2,6 +2,7 @@
 // Local Streamable HTTP server without Azure Functions Core Tools: POST /mcp, GET /healthz, and web/ as static files.
 // Usage: npm run build && npm run dev:http   (PORT defaults to 7071; HOST to 127.0.0.1)
 import { createServer } from "node:http";
+import { Readable } from "node:stream";
 import { readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -27,13 +28,11 @@ createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", `http://localhost:${port}`);
   try {
     if (url.pathname === "/mcp" || /^\/mcp\/x\/[^/]+\/?$/.test(url.pathname)) {
-      const chunks = [];
-      for await (const chunk of req) chunks.push(chunk);
-      const body = req.method === "POST" ? Buffer.concat(chunks).toString("utf8") : undefined;
+      const body = req.method === "POST" ? Readable.toWeb(req) : undefined;
       const headers = new Headers();
       for (const [k, v] of Object.entries(req.headers)) if (typeof v === "string") headers.set(k, v);
       headers.set("x-forwarded-for", req.socket.remoteAddress ?? "local");
-      const response = await handleMcpHttp(new Request(url, { method: req.method, headers, ...(body !== undefined ? { body } : {}) }), {
+      const response = await handleMcpHttp(new Request(url, { method: req.method, headers, ...(body !== undefined ? { body, duplex: "half" } : {}) }), {
         createServer: (request) => createAppServer(context, consoleSink, toolsetsFromUrl(request.url)),
         rateLimiter,
         allowedOrigins

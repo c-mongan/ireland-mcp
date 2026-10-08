@@ -56,3 +56,22 @@ describe("published counts (single source of truth: src/counts.ts)", () => {
     expect(problems).toEqual([]);
   });
 });
+
+describe("liveOpsSummary", () => {
+  const report = (ops: string) => `Generated: 2026-10-08T12:00:00Z\nOperations: ${ops}\n`;
+
+  it("parses reports written before the DEGRADED field existed", () => {
+    expect(liveOpsSummary(report("72 PASS, 2 NOT_CONFIGURED, 0 HOSTED_BLOCKED, 0 FAIL."))).toBe(
+      "[docs/live-all-ops.md](docs/live-all-ops.md) (2026-10-08): 72 of 74 pass, 0 fail; 2 need the NTA key."
+    );
+  });
+
+  it("parses the current format and counts degraded operations", () => {
+    expect(liveOpsSummary(report("70 PASS, 2 NOT_CONFIGURED, 0 HOSTED_BLOCKED, 0 DEGRADED, 2 FAIL."))).toBe(
+      "[docs/live-all-ops.md](docs/live-all-ops.md) (2026-10-08): 70 of 74 pass, 2 fail; 2 need the NTA key."
+    );
+    expect(liveOpsSummary(report("70 PASS, 2 NOT_CONFIGURED, 1 HOSTED_BLOCKED, 1 DEGRADED, 0 FAIL."))).toBe(
+      "[docs/live-all-ops.md](docs/live-all-ops.md) (2026-10-08): 70 of 74 pass, 0 fail; 2 need the NTA key, 1 blocked from Azure IPs, 1 degraded (stale or partial)."
+    );
+  });
+});

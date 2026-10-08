@@ -7,6 +7,7 @@ export class CircuitBreaker {
   private failures = 0;
   private openedAt: number | undefined;
   private trialInFlight = false;
+  private generation = 0;
 
   constructor(
     private readonly threshold: number,
@@ -20,31 +21,36 @@ export class CircuitBreaker {
     return "open";
   }
 
-  tryPass(): { allowed: true } | { allowed: false; retryAfterSeconds: number } {
-    if (this.openedAt === undefined) return { allowed: true };
+  tryPass(): { allowed: true; generation: number } | { allowed: false; retryAfterSeconds: number } {
+    if (this.openedAt === undefined) return { allowed: true, generation: this.generation };
     const remaining = this.openedAt + this.cooldownMs - this.now();
     if (remaining > 0) return { allowed: false, retryAfterSeconds: Math.max(1, Math.ceil(remaining / 1000)) };
     if (this.trialInFlight) return { allowed: false, retryAfterSeconds: Math.max(1, Math.ceil(this.cooldownMs / 1000)) };
     this.trialInFlight = true;
-    return { allowed: true };
+    return { allowed: true, generation: this.generation };
   }
 
-  onSuccess(): void {
+  onSuccess(generation = this.generation): void {
+    if (generation !== this.generation) return;
+    if (this.openedAt !== undefined) this.generation += 1;
     this.failures = 0;
     this.openedAt = undefined;
     this.trialInFlight = false;
   }
 
-  onFailure(): void {
+  onFailure(generation = this.generation): void {
+    if (generation !== this.generation) return;
     this.failures += 1;
     if (this.trialInFlight || this.failures >= this.threshold) {
+      this.generation += 1;
       this.openedAt = this.now();
       this.trialInFlight = false;
     }
   }
 
   /** Releases a half-open trial that ended in a caller error (neither success nor upstream failure). */
-  onNeutral(): void {
+  onNeutral(generation = this.generation): void {
+    if (generation !== this.generation) return;
     this.trialInFlight = false;
   }
 
@@ -159,18 +165,18 @@ export class UpstreamBudgets {
     }
     const slot = semaphore.acquire();
     if (slot === false) {
-      breaker.onNeutral();
+      breaker.onNeutral(gate.generation);
       throw new ToolError("UPSTREAM_DOWN", `${source} is busy; too many calls are already queued.`, { retryAfterSeconds: 5 });
     }
     await slot;
     try {
       const value = await fn(this.config.timeoutMs);
-      breaker.onSuccess();
+      breaker.onSuccess(gate.generation);
       return value;
     } catch (error) {
-      if (error instanceof ToolError && error.code === "UPSTREAM_DOWN") breaker.onFailure();
-      else if (error instanceof ToolError) breaker.onNeutral();
-      else breaker.onFailure();
+      if (error instanceof ToolError && error.code === "UPSTREAM_DOWN" && error.retryable) breaker.onFailure(gate.generation);
+      else if (error instanceof ToolError) breaker.onNeutral(gate.generation);
+      else breaker.onFailure(gate.generation);
       throw error;
     } finally {
       semaphore.release();

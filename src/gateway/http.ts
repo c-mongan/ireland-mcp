@@ -94,7 +94,7 @@ export class HttpClient {
     try {
       return JSON.parse(body) as T;
     } catch {
-      throw new ToolError("UPSTREAM_DOWN", `${options.label ?? hostOf(url)} returned a response that was not valid JSON.`);
+      throw new ToolError("UPSTREAM_DOWN", `${options.label ?? hostOf(url)} returned a response that was not valid JSON.`, { retryable: false });
     }
   }
 
@@ -137,13 +137,14 @@ export class HttpClient {
         const message = `${label} returned HTTP ${response.status}.`;
         const transient = TRANSIENT_STATUSES.has(response.status) || options.retryStatuses?.includes(response.status);
         if (transient) throw new TransientUpstreamError(message, response.status);
-        throw new ToolError("UPSTREAM_DOWN", message, { hint: hintForStatus(response.status) });
+        throw new ToolError("UPSTREAM_DOWN", message, { hint: hintForStatus(response.status), retryable: false });
       }
 
       const maxBytes = options.maxBytes ?? DEFAULT_MAX_BYTES;
       const tooLarge = () =>
         new ToolError("UPSTREAM_DOWN", `${label} response is larger than the ${maxBytes} byte bound.`, {
-          hint: "Narrow the query (fewer dimensions, a smaller limit or a filter)."
+          hint: "Narrow the query (fewer dimensions, a smaller limit or a filter).",
+          retryable: false
         });
       const declared = Number(response.headers.get("content-length") ?? "0");
       if (declared > maxBytes) {

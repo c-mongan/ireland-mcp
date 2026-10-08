@@ -102,6 +102,57 @@ describe("TieredCache", () => {
     expect(results.map((r) => r.value)).toEqual([42, 42, 42]);
   });
 
+  it("serves the same stale fallback to all callers sharing a failed refresh", async () => {
+    let now = 0;
+    const cache = new TieredCache({ now: () => now });
+    await cache.getOrLoad("k", 1000, async () => "last known data");
+    now = 2000;
+    let rejectRefresh!: (error: Error) => void;
+    const loader = vi.fn(() => new Promise<string>((_resolve, reject) => { rejectRefresh = reject; }));
+    const calls = [1, 2, 3].map(() => cache.getOrLoad("k", 1000, loader));
+    const results = Promise.all(calls);
+    await Promise.resolve();
+    rejectRefresh(new ToolError("UPSTREAM_DOWN", "temporary outage"));
+    await expect(results).resolves.toEqual(Array.from({ length: 3 }, () => ({
+      value: "last known data", cached: true, stale: true
+    })));
+    expect(loader).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(["NOT_FOUND", "BAD_ARGS", "NOT_CONFIGURED"] as const)("does not hide %s behind stale data", async (code) => {
+    let now = 0;
+    const cache = new TieredCache({ now: () => now });
+    await cache.getOrLoad("k", 1000, async () => "old");
+    now = 2000;
+    await expect(cache.getOrLoad("k", 1000, async () => { throw new ToolError(code, "permanent failure"); }))
+      .rejects.toMatchObject({ code });
+  });
+
+  it.each([401, 403, 422])("does not retry or hide HTTP %i behind cached data", async (status) => {
+    let now = 0;
+    const cache = new TieredCache({ now: () => now });
+    const fetch = vi.fn(async () => new Response("denied", { status }));
+    const client = new HttpClient(fetch);
+    await cache.getOrLoad("k", 1000, async () => "old");
+    now = 2000;
+    await expect(cache.getOrLoad("k", 1000, () => client.text("https://example.ie/data")))
+      .rejects.toThrow(`HTTP ${status}`);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("shares persistent lookup as well as the refresh between concurrent callers", async () => {
+    let release!: (value: CacheEntry | undefined) => void;
+    const read = new Promise<CacheEntry | undefined>((resolve) => { release = resolve; });
+    const get = vi.fn(() => read);
+    const cache = new TieredCache({ store: { get, set: async () => undefined } });
+    const loader = vi.fn(async () => "fresh");
+    const calls = [cache.getOrLoad("k", 1000, loader), cache.getOrLoad("k", 1000, loader)];
+    release(undefined);
+    expect((await Promise.all(calls)).map((r) => r.value)).toEqual(["fresh", "fresh"]);
+    expect(get).toHaveBeenCalledTimes(1);
+    expect(loader).toHaveBeenCalledTimes(1);
+  });
+
   it("reads through and writes to the persistent store", async () => {
     const data = new Map<string, CacheEntry>([["p", { value: "persisted", expiresAt: 10_000, storedAt: 0 }]]);
     const store: PersistentStore = {
