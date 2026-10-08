@@ -1,4 +1,4 @@
-const MCP_URL = "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp";
+const MCP_URL = "https://mcp.irishopendata.com/mcp";
 const STATUS_URL = "https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json";
 
 const SOURCE_FALLBACK = [

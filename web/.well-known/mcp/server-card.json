@@ -3,7 +3,7 @@
   "name": "Ireland MCP",
   "id": "io.github.c-mongan/ireland-mcp",
   "description": "Read-only MCP server for Irish public data. No keys, no login.",
-  "homepage": "https://lemon-meadow-03b2b8903.3.azurestaticapps.net/",
+  "homepage": "https://irishopendata.com/",
   "repository": "https://github.com/c-mongan/ireland-mcp",
   "license": "MIT",
   "protocol": {
@@ -16,7 +16,7 @@
   "transports": [
     {
       "type": "http",
-      "url": "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp",
+      "url": "https://mcp.irishopendata.com/mcp",
       "auth": {
         "type": "none"
       }
@@ -33,13 +33,13 @@
     "all": "Append ?toolsets=all to list every typed source tool.",
     "source": "Use /mcp/x/{source-id} or ?toolsets={source-id} for one source."
   },
-  "agent_docs": "https://lemon-meadow-03b2b8903.3.azurestaticapps.net/AGENTS.md",
-  "llms_txt": "https://lemon-meadow-03b2b8903.3.azurestaticapps.net/llms.txt",
+  "agent_docs": "https://irishopendata.com/AGENTS.md",
+  "llms_txt": "https://irishopendata.com/llms.txt",
   "status": "https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json",
   "prompts": [
     "area_profile",
     "commute_check",
     "compare_counties"
   ],
-  "counts": "https://lemon-meadow-03b2b8903.3.azurestaticapps.net/counts.json"
+  "counts": "https://irishopendata.com/counts.json"
 }

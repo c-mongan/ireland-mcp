@@ -8,8 +8,8 @@ import { noopSink, type TelemetrySink } from "./telemetry.js";
 import { ALL_TOOLSETS, resolveToolsets } from "./toolsets.js";
 
 export const SERVER_NAME = "ireland-mcp";
-export const SERVER_VERSION = "1.1.2";
-export const HOSTED_URL = "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net";
+export const SERVER_VERSION = "1.1.3";
+export const HOSTED_URL = "https://mcp.irishopendata.com";
 export const REPO_URL = "https://github.com/c-mongan/ireland-mcp";
 
 export const INSTRUCTIONS = [

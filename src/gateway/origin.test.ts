@@ -16,6 +16,7 @@ describe("isOriginAllowed", () => {
       "https://irishopendata.ie",
       "https://www.irishopendata.ie",
       "https://irishopendata.com",
+      "https://www.irishopendata.com",
       "HTTPS://Claude.AI"
     ]) {
       expect(isOriginAllowed(origin, allow), origin).toBe(true);
