@@ -144,17 +144,34 @@ $("endpoint-line").textContent = endpoint;
 let rpcId = 1;
 async function rpc(method, params = {}) {
   const id = rpcId++;
-  const response = await fetch(endpoint, {
-    method: "POST",
-    signal: AbortSignal.timeout(20000),
-    headers: {
-      "content-type": "application/json",
-      accept: "application/json, text/event-stream",
-      "mcp-protocol-version": "2025-06-18"
-    },
-    body: JSON.stringify({ jsonrpc: "2.0", id, method, params })
-  });
-  const text = await response.text();
+  const readOnly = method === "tools/list" ||
+    (method === "tools/call" && ["ireland_call", "ireland_catalogue"].includes(params.name));
+  let response;
+  let text;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      response = await fetch(endpoint, {
+        method: "POST",
+        signal: AbortSignal.timeout(30000),
+        headers: {
+          "content-type": "application/json",
+          accept: "application/json, text/event-stream",
+          "mcp-protocol-version": "2025-06-18"
+        },
+        body: JSON.stringify({ jsonrpc: "2.0", id, method, params })
+      });
+      text = await response.text();
+      break;
+    } catch (error) {
+      const timedOut = error?.name === "TimeoutError" || error?.name === "AbortError";
+      const networkFailure = error instanceof TypeError;
+      if (!timedOut && !networkFailure) throw error;
+      if (readOnly && attempt === 0) continue;
+      throw new Error(timedOut
+        ? "The server took too long to respond. It may be waking up; please try again."
+        : "Could not connect to the server. Check your connection and please try again.", { cause: error });
+    }
+  }
   const isStream = response.headers.get("content-type")?.includes("text/event-stream") || /^(event:|data:|:)/m.test(text);
   const body = isStream
     ? text.split(/\r?\n\r?\n/).map((event) => event.split(/\r?\n/)

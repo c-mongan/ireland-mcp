@@ -86,6 +86,43 @@ test("playground calls ireland_call against mocked MCP route", async ({ page }) 
   await expect(page.locator("#pg-output")).toContainText('"ok": true');
 });
 
+for (const failure of ["TimeoutError", "AbortError", "TypeError"] as const) {
+  for (const recover of [true, false]) {
+    test(`playground retries ${failure} once and ${recover ? "recovers" : "shows friendly guidance"}`, async ({ page }) => {
+      await page.addInitScript(({ failure, recover }) => {
+        const originalFetch = window.fetch.bind(window);
+        let attempts = 0;
+        window.fetch = async (input, init) => {
+          const body = typeof init?.body === "string" ? JSON.parse(init.body) : null;
+          if (body?.params?.name === "ireland_call") {
+            attempts++;
+            document.documentElement.dataset.queryAttempts = String(attempts);
+            if (!recover || attempts === 1) {
+              if (failure === "TypeError") throw new TypeError("Failed to fetch");
+              throw new DOMException("signal timed out", failure);
+            }
+          }
+          return originalFetch(input, init);
+        };
+      }, { failure, recover });
+      await page.goto("/#playground");
+      const run = page.getByRole("button", { name: /Run live query/i });
+      await run.click();
+      if (recover) {
+        await expect(page.locator("#pg-output")).toContainText("Population estimates");
+        await expect(page.locator("#pg-output")).not.toHaveClass(/error/);
+      } else {
+        await expect(page.locator("#pg-output")).toContainText(failure === "TypeError" ? "Could not connect" : "took too long");
+        await expect(page.locator("#pg-output")).toContainText("please try again");
+        await expect(page.locator("#pg-output")).not.toContainText("signal timed out");
+        await expect(page.locator("#pg-status")).toContainText("Query failed");
+      }
+      await expect(page.locator("html")).toHaveAttribute("data-query-attempts", "2");
+      await expect(run).toBeEnabled();
+    });
+  }
+}
+
 test("canonical metadata and public social assets are available", async ({ page, request }) => {
   await page.goto("/");
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://irishopendata.com/");
@@ -230,11 +267,13 @@ test("catalogue source names and summaries are rendered as text", async ({ page 
   await expect(page.locator(".source-card img, .source-card script")).toHaveCount(0);
 });
 
-test("playground preserves arguments and shows RPC errors with retry available", async ({ page }) => {
+test("playground preserves arguments and shows RPC errors without automatic retry", async ({ page }) => {
   let received: unknown;
+  let attempts = 0;
   await page.route(endpointPattern, async (route) => {
     const body = route.request().postDataJSON();
     if (body.params?.name !== "ireland_call") return route.fallback();
+    attempts++;
     received = body.params.arguments;
     await route.fulfill({ status: 429, json: { jsonrpc: "2.0", id: body.id, error: { code: -32000, message: "Please retry later." } } });
   });
@@ -248,7 +287,41 @@ test("playground preserves arguments and shows RPC errors with retry available",
   await expect(page.locator("#pg-output")).toHaveText("Please retry later.");
   await expect(page.locator("#pg-output")).toHaveClass(/error/);
   await expect(run).toBeEnabled();
+  expect(attempts).toBe(1);
   expect(received).toEqual({ source: "cso", operation: "cso_get_data", args: { table: "FP001", filters: { year: ["2022"] } }, limit: 5, max_tokens: 1400 });
+});
+
+test("playground retries an interrupted response body with a fresh cold-start deadline", async ({ page }) => {
+  await page.addInitScript(() => {
+    const originalFetch = window.fetch.bind(window);
+    const timeout = AbortSignal.timeout.bind(AbortSignal);
+    let deadline = 0;
+    let previousSignal: AbortSignal | null | undefined;
+    let attempts = 0;
+    AbortSignal.timeout = (milliseconds) => {
+      deadline = milliseconds;
+      return timeout(milliseconds);
+    };
+    window.fetch = async (input, init) => {
+      const body = typeof init?.body === "string" ? JSON.parse(init.body) : null;
+      if (body?.params?.name !== "ireland_call") return originalFetch(input, init);
+      attempts++;
+      document.documentElement.dataset.deadline = String(deadline);
+      document.documentElement.dataset.freshDeadline = String(init?.signal !== previousSignal);
+      previousSignal = init?.signal;
+      if (attempts === 1) {
+        return new Response(new ReadableStream({
+          start(controller) { controller.error(new TypeError("Network connection lost")); }
+        }));
+      }
+      return originalFetch(input, init);
+    };
+  });
+  await page.goto("/#playground");
+  await page.getByRole("button", { name: /Run live query/i }).click();
+  await expect(page.locator("#pg-output")).toContainText("Population estimates");
+  await expect(page.locator("html")).toHaveAttribute("data-deadline", "30000");
+  await expect(page.locator("html")).toHaveAttribute("data-fresh-deadline", "true");
 });
 
 test("playground accepts SSE data frames after a keepalive and marks tool errors", async ({ page }) => {

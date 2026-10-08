@@ -84,6 +84,11 @@ status reports as stale; display every source returned by the status feed. Show
 provider errors and missing setup separately. A refused provider request remains
 a failure. Preserve the exact community-project disclaimer.
 
+Read-only MCP requests allow 30 seconds per attempt for cold starts and retry
+once on a timeout or network failure, including interrupted response bodies.
+After that, show friendly retry guidance instead of browser transport errors.
+Do not retry HTTP, JSON-RPC, tool or malformed-response errors automatically.
+
 Verify with `npm run test:e2e`, desktop and 320px mobile inspection in both themes,
 and one live browser query on an allowed origin. Browser tests use mock data and
 do not prove upstream availability. Social-preview metadata should reference only
