@@ -11,12 +11,15 @@ const DEFAULT_HINTS: Record<ErrorCode, string> = {
 export class ToolError extends Error {
   readonly code: ErrorCode;
   readonly hint: string;
+  /** Internal classification for retries, circuit breakers and stale fallback. */
+  readonly retryable: boolean;
   readonly retryAfterSeconds?: number;
 
-  constructor(code: ErrorCode, message: string, options: { hint?: string; retryAfterSeconds?: number } = {}) {
+  constructor(code: ErrorCode, message: string, options: { hint?: string; retryAfterSeconds?: number; retryable?: boolean } = {}) {
     super(message);
     this.name = "ToolError";
     this.code = code;
+    this.retryable = options.retryable ?? (code === "UPSTREAM_DOWN" || code === "RATE_LIMITED");
     this.hint = options.hint ?? DEFAULT_HINTS[code];
     if (options.retryAfterSeconds !== undefined) this.retryAfterSeconds = options.retryAfterSeconds;
   }

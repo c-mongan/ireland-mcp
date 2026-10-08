@@ -20,7 +20,7 @@
   "capabilities": {
     "tools": true,
     "resources": true,
-    "prompts": false,
+    "prompts": true,
     "sampling": false
   },
   "toolsets": {

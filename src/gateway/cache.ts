@@ -1,4 +1,5 @@
 import { LRUCache } from "lru-cache";
+import { ToolError } from "./errors.js";
 
 export interface CacheEntry {
   value: unknown;
@@ -38,7 +39,7 @@ export class TieredCache {
   private readonly memory: LRUCache<string, CacheEntry>;
   private readonly store?: PersistentStore;
   private readonly now: () => number;
-  private readonly inflight = new Map<string, Promise<unknown>>();
+  private readonly inflight = new Map<string, Promise<CacheResult<unknown>>>();
 
   constructor(options: CacheOptions = {}) {
     this.memory = new LRUCache<string, CacheEntry>({
@@ -52,21 +53,30 @@ export class TieredCache {
   }
 
   async getOrLoad<T>(key: string, ttlMs: number, loader: () => Promise<T>): Promise<CacheResult<T>> {
+    const pending = this.inflight.get(key) as Promise<CacheResult<T>> | undefined;
+    if (pending) return { ...await pending, cached: true };
+
+    // Share the complete refresh outcome, including stale fallback and persistence.
+    const refresh = this.lookupAndRefresh(key, ttlMs, loader);
+    this.inflight.set(key, refresh);
+    try {
+      return await refresh;
+    } finally {
+      this.inflight.delete(key);
+    }
+  }
+
+  private async lookupAndRefresh<T>(key: string, ttlMs: number, loader: () => Promise<T>): Promise<CacheResult<T>> {
     const existing = await this.lookup(key);
     if (existing && existing.expiresAt > this.now()) {
       return { value: existing.value as T, cached: true, stale: false };
     }
+    return this.refresh(key, ttlMs, loader, existing);
+  }
 
-    const pending = this.inflight.get(key) as Promise<T> | undefined;
-    if (pending) {
-      const value = await pending;
-      return { value, cached: true, stale: false };
-    }
-
-    const load = loader();
-    this.inflight.set(key, load);
+  private async refresh<T>(key: string, ttlMs: number, loader: () => Promise<T>, existing?: CacheEntry): Promise<CacheResult<T>> {
     try {
-      const value = await load;
+      const value = await loader();
       const now = this.now();
       const entry: CacheEntry = { value, expiresAt: now + ttlMs, storedAt: now };
       this.memory.set(key, entry);
@@ -75,12 +85,10 @@ export class TieredCache {
       }
       return { value, cached: false, stale: false };
     } catch (error) {
-      if (existing) {
+      if (existing && error instanceof ToolError && error.retryable) {
         return { value: existing.value as T, cached: true, stale: true };
       }
       throw error;
-    } finally {
-      this.inflight.delete(key);
     }
   }
 

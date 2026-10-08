@@ -12,9 +12,10 @@ export interface McpHttpOptions {
   rateLimiter?: RateLimiter;
   /** Browser origins allowed to call the endpoint. Defaults to DEFAULT_ALLOWED_ORIGINS. */
   allowedOrigins?: readonly string[];
+  maxBodyBytes?: number;
 }
 
-const MAX_BODY_CHARS = 1_000_000;
+const MAX_BODY_BYTES = 1_000_000;
 const MAX_BATCH = 20;
 
 /** Every message in a JSON-RPC batch is charged against the rate limit. Invalid JSON costs 1. */
@@ -64,11 +65,12 @@ export async function handleMcpHttp(request: Request, options: McpHttpOptions): 
     });
   }
 
-  if (Number(request.headers.get("content-length") ?? 0) > MAX_BODY_CHARS) {
+  const maxBodyBytes = options.maxBodyBytes ?? MAX_BODY_BYTES;
+  if (Number(request.headers.get("content-length") ?? 0) > maxBodyBytes) {
     return jsonRpcError(413, -32600, "Request body too large.");
   }
-  const bodyText = await request.text();
-  if (bodyText.length > MAX_BODY_CHARS) return jsonRpcError(413, -32600, "Request body too large.");
+  const bodyText = await readRequestBody(request, maxBodyBytes);
+  if (bodyText === null) return jsonRpcError(413, -32600, "Request body too large.");
   const messageCount = countMessages(bodyText);
   if (messageCount > MAX_BATCH) {
     return jsonRpcError(400, -32600, `Batches are limited to ${MAX_BATCH} messages.`);
@@ -135,4 +137,28 @@ function errorResponse(status: number, code: number, message: string, headers: R
     status,
     headers: { "content-type": "application/json", ...headers }
   });
+}
+
+/** Bound incoming bytes before decoding or assembling the complete body. */
+async function readRequestBody(request: Request, maxBytes: number): Promise<string | null> {
+  if (!request.body) return "";
+  const reader = request.body.getReader();
+  const decoder = new TextDecoder();
+  let bytes = 0;
+  let text = "";
+  try {
+    for (;;) {
+      const next = await reader.read();
+      if (next.done) return text + decoder.decode();
+      bytes += next.value.byteLength;
+      if (bytes > maxBytes) {
+        // Do not wait for a remote peer to acknowledge cancellation.
+        void reader.cancel().catch(() => undefined);
+        return null;
+      }
+      text += decoder.decode(next.value, { stream: true });
+    }
+  } finally {
+    reader.releaseLock();
+  }
 }

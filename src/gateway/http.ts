@@ -62,7 +62,7 @@ export class HttpClient {
       } catch (error) {
         lastError = error;
         if (error instanceof ResponseTooLargeError) throw error;
-        if (error instanceof ToolError && error.code !== "UPSTREAM_DOWN") throw error;
+        if (error instanceof ToolError && (error.code !== "UPSTREAM_DOWN" || !error.retryable)) throw error;
       }
     }
     throw lastError;
@@ -77,7 +77,7 @@ export class HttpClient {
     try {
       return JSON.parse(body) as T;
     } catch {
-      throw new ToolError("UPSTREAM_DOWN", `${options.label ?? hostOf(url)} returned a response that was not valid JSON.`);
+      throw new ToolError("UPSTREAM_DOWN", `${options.label ?? hostOf(url)} returned a response that was not valid JSON.`, { retryable: false });
     }
   }
 
@@ -109,7 +109,9 @@ export class HttpClient {
         });
       }
       if (response.status === 400) throw new ToolError("BAD_ARGS", `${label} rejected the request parameters.`);
-      if (!response.ok) throw new ToolError("UPSTREAM_DOWN", `${label} returned HTTP ${response.status}.`);
+      if (!response.ok) throw new ToolError("UPSTREAM_DOWN", `${label} returned HTTP ${response.status}.`, {
+        retryable: response.status === 408 || response.status >= 500
+      });
 
       const maxBytes = options.maxBytes ?? DEFAULT_MAX_BYTES;
       const tooLarge = () =>
@@ -131,7 +133,7 @@ export class HttpClient {
 /** Marks a size-bound failure: retrying would only download the same oversized body again. */
 class ResponseTooLargeError extends ToolError {
   constructor(message: string, options: { hint?: string }) {
-    super("UPSTREAM_DOWN", message, options);
+    super("UPSTREAM_DOWN", message, { ...options, retryable: false });
   }
 }
 

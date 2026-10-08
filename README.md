@@ -153,7 +153,7 @@ Generated from `src/registry.ts` and the 28 source modules. The default `nearby`
 
 - Read-only public data only. No login-gated, paid or key-required user data.
 - NTA realtime tools need a server-side NTA operator key; other tools work without keys.
-- Upstream data can be delayed, provisional, incomplete or temporarily down. Stale cache is labelled `stale: true`.
+- Upstream data can be delayed, provisional, incomplete or temporarily down. Stale cache is labelled `stale: true` and is used only for retryable failures. Permanent request, access and missing-resource errors remain visible.
 - Property Price Register values are declared sale prices, not valuations.
 - Legislation text is for retrieval and analysis, not legal advice.
 - Large tables are paginated or truncated. Use `fields`, `limit`, `cursor` and source filters.

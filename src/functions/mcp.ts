@@ -21,20 +21,16 @@ const rateLimiter = new RateLimiter(limitFromEnv(process.env.RATE_LIMIT_PER_MINU
 const allowedOrigins = parseAllowedOrigins(process.env.MCP_ALLOWED_ORIGINS);
 
 export async function mcpHandler(request: HttpRequest): Promise<HttpResponseInit> {
-  const declared = Number(request.headers.get("content-length") ?? "0");
-  if (declared > MAX_BODY_BYTES) return { status: 413, jsonBody: { error: "Request body too large." } };
-  const body = request.method === "POST" ? await request.text() : undefined;
-  if (body && body.length > MAX_BODY_BYTES) return { status: 413, jsonBody: { error: "Request body too large." } };
-
   const webRequest = new Request(request.url, {
     method: request.method,
     headers: new Headers(Object.fromEntries(request.headers.entries())),
-    ...(body !== undefined ? { body } : {})
-  });
+    ...(request.method === "POST" && request.body ? { body: request.body as unknown as BodyInit, duplex: "half" } : {})
+  } as RequestInit & { duplex?: string });
   const response = await handleMcpHttp(webRequest, {
     createServer: (req) => createAppServer(context, consoleSink, toolsetsFromUrl(req.url)),
     rateLimiter,
-    allowedOrigins
+    allowedOrigins,
+    maxBodyBytes: MAX_BODY_BYTES
   });
   return {
     status: response.status,

@@ -142,3 +142,18 @@ describe("cross-source tools", () => {
     expect(interleave([[1, 2], [3]], 2)).toEqual([1, 3]);
   });
 });
+
+it.each([
+  ["heritage", "heritage_monuments_near", "nearby", { lat: 53.3498, lon: -6.2603 }],
+  ["environment-sites", "protected_sites_at", "nearby", { lat: 53.3498, lon: -6.2603 }],
+  ["cso", "cso_area_profile", "ireland_snapshot", { place: "Dublin" }]
+] as const)("preserves stale evidence from %s in %s", async (source, operation, tool, args) => {
+  const modules = sourceModules.map((module) => module.info.id !== source ? module : {
+    ...module,
+    tools: module.tools.map((entry) => entry.name !== operation ? entry : {
+      ...entry, handler: async () => ({ data: { count: 0, monuments: [], sites: [], area: "Dublin" }, url: module.info.homepage, cached: true, stale: true })
+    })
+  });
+  const { body } = await call(crossSourceTools(modules), tool, args, createContext({ fetch: fakeFetch(routes) }));
+  expect(body.stale).toBe(true);
+});

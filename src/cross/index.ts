@@ -134,7 +134,9 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
           ? { radius_m: MONUMENT_RADIUS_M, count: smr.value.data.count, items: smr.value.data.monuments }
           : settledSection(smr),
       protected_sites: npws.status === "fulfilled" ? { count: npws.value.data.count, items: npws.value.data.sites } : settledSection(npws),
-      sources
+      sources,
+      cached: [smr, npws].every((section) => section.status === "fulfilled" && section.value.cached),
+      stale: [smr, npws].some((section) => section.status === "fulfilled" && section.value.stale)
     };
   }
 
@@ -163,8 +165,8 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
           sources: [cite(geohiveInfo, "https://www.geohive.ie/"), cite(metInfo, d.forecastUrl ?? metInfo.homepage), ...layers.sources]
         },
         url: crossInfo.homepage,
-        cached: d.cached,
-        stale: d.stale
+        cached: d.cached && layers.cached,
+        stale: d.stale || layers.stale
       });
     }
   });
@@ -213,7 +215,7 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
         cso && countyName ? cso.handler({ area: countyName }, ctx) : Promise.reject(new ToolError("NOT_FOUND", "County unknown for this point.")),
         activeWarnings(ctx)
       ]);
-      const pop = population.status === "fulfilled" ? (population.value as { data: unknown; url: string }) : null;
+      const pop = population.status === "fulfilled" ? (population.value as Section) : null;
       return envelope(crossInfo, {
         data: {
           place: where.name,
@@ -235,8 +237,8 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
           ]
         },
         url: crossInfo.homepage,
-        cached: near.cached,
-        stale: near.stale
+        cached: near.cached && Boolean(pop?.cached) && warnings.status === "fulfilled" && warnings.value.cached,
+        stale: near.stale || Boolean(pop?.stale) || (warnings.status === "fulfilled" && warnings.value.stale)
       });
     }
   });

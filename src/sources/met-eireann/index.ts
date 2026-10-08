@@ -154,13 +154,44 @@ const clean = (v: string | undefined) => {
   return t === "" || t === "-" || t === "n/a" ? null : Number.isFinite(Number(t)) ? Number(t) : t;
 };
 
+const measurementSchema = z.string().refine((value) => {
+  const text = value.trim();
+  return text === "" || text === "-" || text === "n/a" || Number.isFinite(Number(text));
+});
+const observationDate = z.string().regex(/^\d{2}-\d{2}-\d{4}$/).refine((value) => {
+  const [day, month, year] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year!, month! - 1, day!));
+  return date.getUTCFullYear() === year && date.getUTCMonth() + 1 === month && date.getUTCDate() === day;
+});
+
+const observationSchema = z.object({
+  name: z.string().trim().min(1),
+  date: observationDate,
+  reportTime: z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/),
+  temperature: measurementSchema.optional(),
+  weatherDescription: z.string().optional(),
+  windSpeed: measurementSchema.optional(),
+  windGust: measurementSchema.optional(),
+  cardinalWindDirection: z.string().optional(),
+  humidity: measurementSchema.optional(),
+  rainfall: measurementSchema.optional(),
+  pressure: measurementSchema.optional()
+});
+
 export async function observationsAt(ctx: ToolContext, station: Station) {
   const url = `${OBSERVATIONS_BASE}/${encodeURIComponent(station.slug)}/today`;
-  const result = await ctx.cachedJson<RawObservation[]>(url, TTL, { label: "Met Éireann observations" });
-  const rows = Array.isArray(result.value) ? result.value : [];
-  if (rows.length && fold(rows[0]!.name) !== fold(station.name)) {
-    throw new ToolError("NOT_FOUND", `Met Éireann has no observations for ${station.name} today.`);
-  }
+  const result = await ctx.cachedJson<RawObservation[]>(url, TTL, {
+    label: "Met Éireann observations",
+    validate: (value) => {
+      if (!z.array(observationSchema).safeParse(value).success) {
+        throw new ToolError("UPSTREAM_DOWN", "Met Éireann returned malformed observations.", { retryable: false });
+      }
+      if (value.some((row) => fold(row.name) !== fold(station.name))) {
+        throw new ToolError("NOT_FOUND", `Met Éireann has no observations for ${station.name} today.`);
+      }
+    }
+  });
+  const rows = result.value;
   const observations = rows.map((r) => {
     const [d, m, y] = (r.date ?? "").split("-");
     return {
