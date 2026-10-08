@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { fakeFetch, type Route } from "../../../test/helpers/fakeFetch.js";
 import { callTool, fixturePath } from "../../../test/helpers/callTool.js";
+import { createContext } from "../../gateway/context.js";
 import { findStation, metModule as mod, nearestStation } from "./index.js";
 
 const f = (name: string) => fixturePath(import.meta.url, name);
@@ -41,6 +42,36 @@ describe("Met Éireann module", () => {
     expect(malin.body.error.code).toBe("NOT_FOUND");
     const unknown = await callTool(mod, "met_get_observations", { station: "Atlantis" }, fakeFetch(routes));
     expect(unknown.body.error.hint).toContain("Valentia");
+  });
+
+  it.each([null, { error: "busy" }, [null], [{}], [{ name: "Dublin Airport", date: "bad", reportTime: "09:00" }],
+    [{ name: "Dublin Airport", date: "31-02-2026", reportTime: "09:00" }],
+    [{ name: "Dublin Airport", date: "07-10-2026", reportTime: "29:99" }],
+    [{ name: "Dublin Airport", date: "07-10-2026", reportTime: "09:00", temperature: "broken" }]])(
+    "rejects malformed observations before caching: %j", async (payload) => {
+      let requests = 0;
+      const context = createContext({ fetch: async () => {
+        requests += 1;
+        return new Response(JSON.stringify(payload));
+      } });
+      for (let i = 0; i < 2; i += 1) {
+        const result = await callTool(mod, "met_get_observations", { station: "Dublin Airport" }, context);
+        expect(result.ok).toBe(false);
+        expect(result.body.error.code).toBe("UPSTREAM_DOWN");
+      }
+      expect(requests).toBe(2);
+    }
+  );
+
+  it("rejects a different station in any observation row", async () => {
+    const { ok, body } = await callTool(mod, "met_get_observations", { station: "Dublin Airport" }, fakeFetch([
+      { match: /observations/, body: JSON.stringify([
+        { name: "Dublin Airport", date: "07-10-2026", reportTime: "09:00" },
+        { name: "Cork", date: "07-10-2026", reportTime: "10:00" }
+      ]) }
+    ]));
+    expect(ok).toBe(false);
+    expect(body.error.code).toBe("NOT_FOUND");
   });
 
   it("lists warnings", async () => {

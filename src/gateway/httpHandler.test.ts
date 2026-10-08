@@ -186,6 +186,39 @@ describe("HTTP security headers", () => {
   });
 });
 
+describe("request body limits", () => {
+  it("stops reading an oversized chunked body before creating a server", async () => {
+    let pulls = 0;
+    let cancelled = false;
+    let created = false;
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        pulls += 1;
+        if (pulls <= 100) controller.enqueue(new Uint8Array(64_000));
+        else controller.close();
+      },
+      cancel() { cancelled = true; }
+    });
+    const request = new Request("https://fn.example/mcp", {
+      method: "POST", body, duplex: "half"
+    } as RequestInit & { duplex: string });
+    const response = await handleMcpHttp(request, { createServer: () => {
+      created = true;
+      return createServer();
+    } });
+    expect(response.status).toBe(413);
+    expect(created).toBe(false);
+    expect(cancelled).toBe(true);
+    expect(pulls).toBeLessThan(20);
+  });
+
+  it("bounds encoded bytes, including multibyte text without Content-Length", async () => {
+    const request = new Request("https://fn.example/mcp", { method: "POST", body: "€".repeat(400_000) });
+    const response = await handleMcpHttp(request, { createServer });
+    expect(response.status).toBe(413);
+  });
+});
+
 describe("rate-limit keys", () => {
   it("are hashed so the client address is never stored", async () => {
     const keys: string[] = [];

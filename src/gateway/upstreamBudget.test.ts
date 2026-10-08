@@ -76,6 +76,27 @@ describe("UpstreamBudgets", () => {
     const budgets = new UpstreamBudgets({ failureThreshold: 1 }, () => 0);
     await expect(budgets.run("cso", () => Promise.reject(new ToolError("NOT_FOUND", "nope")))).rejects.toThrow("nope");
     await expect(budgets.run("cso", () => Promise.reject(new ToolError("BAD_ARGS", "bad")))).rejects.toThrow("bad");
+    await expect(budgets.run("cso", () => Promise.reject(new ToolError("UPSTREAM_DOWN", "HTTP 403", { retryable: false })))).rejects.toThrow("HTTP 403");
+    expect(budgets.snapshot().cso).toMatchObject({ state: "closed" });
+  });
+
+  it.each(["success", "neutral"])("ignores a late %s from before the breaker opened", async (outcome) => {
+    let now = 0;
+    const budgets = new UpstreamBudgets({ failureThreshold: 1, cooldownMs: 1000 }, () => now);
+    let finishOld!: () => void;
+    const old = budgets.run("cso", () => new Promise<void>((resolve, reject) => {
+      finishOld = () => outcome === "success" ? resolve() : reject(new ToolError("BAD_ARGS", "old request"));
+    })).catch(() => undefined);
+    await expect(budgets.run("cso", down)).rejects.toThrow("boom");
+    now = 1001;
+    let finishTrial!: () => void;
+    const trial = budgets.run("cso", () => new Promise<void>((resolve) => { finishTrial = resolve; }));
+    await Promise.resolve();
+    finishOld();
+    await old;
+    await expect(budgets.run("cso", async () => "extra trial")).rejects.toMatchObject({ code: "UPSTREAM_DOWN" });
+    finishTrial();
+    await trial;
     expect(budgets.snapshot().cso).toMatchObject({ state: "closed" });
   });
 

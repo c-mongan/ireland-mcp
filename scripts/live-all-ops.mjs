@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 // Live all-operations proof. Uses a real MCP client transport against stdio dist/src/cli.js
 // or a deployed Streamable HTTP endpoint (--url https://.../mcp), and calls every catalogue operation via ireland_call.
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { mkdir, writeFile } from "node:fs/promises";
 import { setTimeout as sleep } from "node:timers/promises";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+import { assessResult } from "./live-result.mjs";
 import { appModules } from "../dist/src/registry.js";
 
 const DEPLOYED_URL = "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp";
@@ -76,10 +79,14 @@ function localExamples() {
 }
 
 function parseArgs() {
-  const out = { url: null, json: false, delayMs: null };
+  const out = { url: null, json: false, delayMs: null, report: null };
   for (let i = 2; i < process.argv.length; i += 1) {
     const arg = process.argv[i];
     if (arg === "--json") out.json = true;
+    else if (arg === "--report") {
+      out.report = process.argv[++i];
+      if (!out.report || out.report.startsWith("--")) throw new Error("--report requires a path");
+    }
     else if (arg === "--deployed") out.url = DEPLOYED_URL;
     else if (arg === "--url") out.url = process.argv[++i] ?? DEPLOYED_URL;
     else if (arg.startsWith("--url=")) out.url = arg.slice("--url=".length) || DEPLOYED_URL;
@@ -121,20 +128,6 @@ function bodyOf(result) {
   }
 }
 
-function statusOf(result) {
-  const body = bodyOf(result);
-  if (!result.isError) return { status: "PASS", body };
-  const code = body.error?.code ?? "ERROR";
-  if (code === "NOT_CONFIGURED") return { status: "NOT_CONFIGURED", body };
-  if (
-    body.operation?.startsWith("kohesio_") &&
-    code === "UPSTREAM_DOWN" &&
-    (/HTTP 403/.test(body.error?.message ?? "") || /Kohesio blocks some cloud-hosted IPs/.test(body.error?.hint ?? ""))
-  ) {
-    return { status: "HOSTED_BLOCKED", body };
-  }
-  return { status: "FAIL", body };
-}
 
 function countRows(value) {
   if (Array.isArray(value)) return value.length;
@@ -167,7 +160,8 @@ async function timed(label, fn) {
   const started = Date.now();
   try {
     const result = await fn();
-    return { label, ms: Date.now() - started, result, ...statusOf(result), summary: summarise(result) };
+    const assessment = assessResult(result, label);
+    return { label, ms: Date.now() - started, result, ...assessment, summary: assessment.reason ?? summarise(result) };
   } catch (error) {
     return { label, ms: Date.now() - started, status: "FAIL", body: {}, summary: String(error?.message ?? error) };
   }
@@ -218,7 +212,7 @@ async function listTools(client) {
 async function callOperation(client, op, sample) {
   const args = { source: op.source, operation: op.operation, args: sample, max_tokens: 4000 };
   const first = await callTool(client, "ireland_call", args);
-  const { status, body } = statusOf(first);
+  const { status, body } = assessResult(first, `${op.source}/${op.operation}`);
   if (op.source === "wikidata" && status === "FAIL" && body.error?.code === "UPSTREAM_DOWN") {
     await sleep(1500);
     const second = await callTool(client, "ireland_call", args);
@@ -315,13 +309,14 @@ async function main() {
   const pass = opRows.filter((r) => r.status === "PASS").length;
   const notConfigured = opRows.filter((r) => r.status === "NOT_CONFIGURED").length;
   const hostedBlocked = opRows.filter((r) => r.status === "HOSTED_BLOCKED").length;
+  const degraded = opRows.filter((r) => r.status === "DEGRADED").length;
   const fail = opRows.filter((r) => r.status === "FAIL").length;
   const report = [
     "# Live all-operations report",
     "",
     `Target: ${target}`,
     `Generated: ${new Date().toISOString()}`,
-    `Operations: ${pass} PASS, ${notConfigured} NOT_CONFIGURED, ${hostedBlocked} HOSTED_BLOCKED, ${fail} FAIL.`,
+    `Operations: ${pass} PASS, ${notConfigured} NOT_CONFIGURED, ${hostedBlocked} HOSTED_BLOCKED, ${degraded} DEGRADED, ${fail} FAIL.`,
     "",
     "Kohesio answers come from packaged, dated official Irish CSV exports (not live data); see [kohesio-exports.md](kohesio-exports.md).",
     "",
@@ -344,19 +339,20 @@ async function main() {
     ...mdRows,
     ""
   ].join("\n");
-  await mkdir(new URL("../docs/", import.meta.url), { recursive: true });
-  await writeFile(REPORT_PATH, report);
+  const reportPath = args.report ? resolve(args.report) : fileURLToPath(REPORT_PATH);
+  await mkdir(dirname(reportPath), { recursive: true });
+  await writeFile(reportPath, report);
 
-  const summary = { target, default: defaultRows, errors, operations: opRows, counts: { pass, notConfigured, hostedBlocked, fail }, report: "docs/live-all-ops.md" };
+  const summary = { target, default: defaultRows, errors, operations: opRows, counts: { pass, notConfigured, hostedBlocked, degraded, fail }, report: reportPath };
   if (args.json) console.log(JSON.stringify(summary, null, 2));
   else {
     console.log(`Target: ${target}`);
-    console.log(`Operations: ${pass} PASS, ${notConfigured} NOT_CONFIGURED, ${hostedBlocked} HOSTED_BLOCKED, ${fail} FAIL.`);
+    console.log(`Operations: ${pass} PASS, ${notConfigured} NOT_CONFIGURED, ${hostedBlocked} HOSTED_BLOCKED, ${degraded} DEGRADED, ${fail} FAIL.`);
     console.log(`Default tools: ${defaultRows.filter((r) => r.status === "PASS").length}/${defaultRows.length} PASS.`);
     console.log(`Error paths: ${errors.filter((r) => r.status === "PASS").length}/${errors.length} PASS.`);
-    console.log(`Report: docs/live-all-ops.md`);
+    console.log(`Report: ${reportPath}`);
   }
-  if (fail || defaultRows.some((r) => r.status !== "PASS") || errors.some((r) => r.status !== "PASS")) process.exit(1);
+  if (fail || degraded || defaultRows.some((r) => r.status !== "PASS") || errors.some((r) => r.status !== "PASS")) process.exit(1);
 }
 
 main().catch((error) => {

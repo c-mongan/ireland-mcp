@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 import { connectClient } from "../../test/helpers/mcpClient.js";
@@ -296,4 +297,19 @@ it("enforces budgets for scalar maps, root arrays and escaped strings", () => {
     expect(result).toMatchObject({ truncated: true });
     expect(JSON.stringify(value)).toBe(before);
   }
+});
+
+
+describe("published discovery capabilities", () => {
+  it("advertises the prompts returned by the MCP server", async () => {
+    const client = await connectClient(createAppServer(ctx));
+    try {
+      const { prompts } = await client.listPrompts();
+      expect(prompts.map((prompt) => prompt.name).sort()).toEqual(["area_profile", "commute_check", "compare_counties"]);
+      for (const file of ["../../web/.well-known/mcp.json", "../../web/.well-known/mcp/server-card.json"]) {
+        const card = JSON.parse(readFileSync(new URL(file, import.meta.url), "utf8"));
+        expect(card.capabilities.prompts).toBe(true);
+      }
+    } finally { await client.close(); }
+  });
 });
