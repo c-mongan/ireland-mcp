@@ -440,7 +440,7 @@ async function initStatus() {
       const pill = document.createElement("span");
       const label = source.status === "down" ? "unavailable" : source.status === "skipped" ? "setup needed" : source.status;
       const reason = source.httpStatus === 403 ? "Provider refused access (HTTP 403)" : source.error;
-      pill.textContent = `${source.source}: ${label}${reason ? ` · ${reason}` : typeof source.latencyMs === "number" ? ` · ${source.latencyMs} ms` : ""}`;
+      pill.textContent = `${source.source}: ${label}${reason ? ` · ${reason}` : source.note ? ` · ${source.note}` : typeof source.latencyMs === "number" ? ` · ${source.latencyMs} ms` : ""}`;
       return pill;
     }));
     card.append(main);

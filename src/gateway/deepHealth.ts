@@ -1,6 +1,7 @@
 import { CSO_REST } from "../sources/cso/client.js";
 import { dublinDate, EIRGRID_BASE } from "../sources/eirgrid/index.js";
 import { ARCGIS_BASE } from "../sources/geohive/index.js";
+import { snapshotHealth as kohesioSnapshotHealth } from "../sources/kohesio/index.js";
 import { RAIL_BASE } from "../sources/irish-rail/index.js";
 import { EISB } from "../sources/legislation/index.js";
 import { LUAS_BASE } from "../sources/luas/index.js";
@@ -18,6 +19,8 @@ export interface Probe {
   headers?: Record<string, string>;
   /** Reason the probe cannot run here (for example a missing API key). */
   skip?: string;
+  /** Local check for sources served from packaged data instead of a live upstream. */
+  local?: () => { ok: true; note: string } | { ok: false; error: string };
 }
 
 export interface SourceHealth {
@@ -26,6 +29,7 @@ export interface SourceHealth {
   latencyMs: number;
   httpStatus?: number;
   error?: string;
+  note?: string;
 }
 
 export interface DeepHealthReport {
@@ -54,7 +58,8 @@ export function defaultProbes(env: Record<string, string | undefined>): Probe[] 
     { source: "data-gov-ie", url: "https://data.gov.ie/api/3/action/status_show" },
     { source: "ncse", url: "https://opendata.ncse.ie/api/3/action/status_show" },
     { source: "cro", url: "https://opendata.cro.ie/api/3/action/status_show" },
-    { source: "kohesio", url: "https://kohesio.ec.europa.eu/api/queries/countries?language=en" },
+    // Tools read the packaged CSV snapshot, so probing the (cloud-IP-blocked) live API would be misleading.
+    { source: "kohesio", url: "", local: kohesioSnapshotHealth },
     { source: "smart-dublin", url: "https://data.smartdublin.ie/api/3/action/status_show" },
     { source: "met-eireann", url: WARNINGS_URL },
     ntaKey
@@ -129,6 +134,19 @@ export class DeepHealth {
 
   private async probe(probe: Probe): Promise<SourceHealth> {
     if (probe.skip) return { source: probe.source, status: "skipped", latencyMs: 0, error: probe.skip };
+    if (probe.local) {
+      const result = probe.local();
+      return result.ok
+        ? { source: probe.source, status: "up", latencyMs: 0, note: result.note }
+        : { source: probe.source, status: "down", latencyMs: 0, error: result.error };
+    }
+    const first = await this.attempt(probe);
+    // One retry for transient failures (timeout, network error, 5xx); 4xx is reported as-is.
+    const transient = first.status === "down" && (first.httpStatus === undefined || first.httpStatus >= 500);
+    return transient ? this.attempt(probe) : first;
+  }
+
+  private async attempt(probe: Probe): Promise<SourceHealth> {
     const started = performance.now();
     const controller = new AbortController();
     let timedOut = false;

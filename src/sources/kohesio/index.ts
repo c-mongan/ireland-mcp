@@ -18,6 +18,17 @@ function load(): Snapshot {
   snapshot ??= JSON.parse(readFileSync(new URL("./snapshot.json", import.meta.url), "utf8")) as Snapshot;
   return snapshot;
 }
+
+/** Health of the packaged snapshot: its retrieval date, or an error if it cannot be read. */
+export function snapshotHealth(): { ok: true; note: string } | { ok: false; error: string } {
+  try {
+    const exports = load().metadata.exports;
+    if (!exports.length) return { ok: false, error: "snapshot has no exports" };
+    return { ok: true, note: `packaged snapshot retrieved ${exports[0]!.retrieved_at.slice(0, 10)}` };
+  } catch {
+    return { ok: false, error: "snapshot unreadable" };
+  }
+}
 function projectId(idOrUrl: string): string {
   const id = idOrUrl.trim();
   if (/^Q\d+$/.test(id)) return id;
