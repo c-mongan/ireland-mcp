@@ -39,7 +39,7 @@ Registry: [`io.github.c-mongan/ireland-mcp`](https://registry.modelcontextprotoc
 | MCP Inspector (Playwright, [`scripts/demo-inspector.mjs`](scripts/demo-inspector.mjs)) | 4/4 calls (`nearby`, CSO, Met Éireann, PPR) returned data with citations. [CSO Ennis](docs/demo/inspector-cso-ennis.png), [PPR Galway 2024](docs/demo/inspector-ppr-galway-2024.png). |
 | VS Code Insiders, Copilot agent mode | Census 2022 Ennis (27,923 people) and Galway forecast, with CSO and Met Éireann citations. [Screenshot](docs/demo/vscode-copilot-chat.png). |
 | GitHub Copilot CLI | 3/3 questions answered with citations: Met Éireann Galway, PPR Cork, CSO Ennis. [Evidence](docs/demo/README.md). |
-| Every catalogue operation | <!-- live-ops:start -->[docs/live-all-ops.md](docs/live-all-ops.md) (2026-10-07): 70 of 74 pass, 0 fail; 2 need the NTA key, 2 are Kohesio, blocked from Azure IPs.<!-- live-ops:end --> |
+| Every catalogue operation | <!-- live-ops:start -->[docs/live-all-ops.md](docs/live-all-ops.md) (2026-10-08): 72 of 74 pass, 0 fail; 2 need the NTA key.<!-- live-ops:end --> |
 
 How a call flows:
 

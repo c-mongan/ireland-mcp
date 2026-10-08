@@ -18,7 +18,7 @@
 | GitHub Copilot CLI | Three EPA bathing-water classifications (new source) | Pass | `https://data.epa.ie/bw/api/v1/locations?page=1&per_page=3` |
 | VS Code Insiders, Copilot agent mode (GPT-5.6 Sol) | EPA bathing classifications and the NCSE allocations dataset | Pass | Both URLs above |
 
-Answers are in [`transcripts-v1.1.0.md`](transcripts-v1.1.0.md); the Inspector result is [`inspector-epa-bathing-locations.png`](inspector-epa-bathing-locations.png). Hosted [live-all-ops](../live-all-ops.md): 70 operations pass, 2 need a key, 2 are blocked from Azure, 0 fail.
+Answers are in [`transcripts-v1.1.0.md`](transcripts-v1.1.0.md); the Inspector result is [`inspector-epa-bathing-locations.png`](inspector-epa-bathing-locations.png). The current hosted result is in [live-all-ops](../live-all-ops.md).
 
 ## v1.0 run
 
