@@ -1,57 +1,63 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { callTool, fixturePath } from "../../../test/helpers/callTool.js";
-import { fakeFetch } from "../../../test/helpers/fakeFetch.js";
+import { createContext } from "../../gateway/context.js";
+import { callTool } from "../../../test/helpers/callTool.js";
 import { kohesioModule } from "./index.js";
 
-type SearchBody = { data: { total: number; projects: Array<{ id: string }> } };
-type ProjectBody = { data: { title: string; country: string } };
-const fx = (name: string) => fixturePath(import.meta.url, name);
+const offline = async (): Promise<Response> => { throw new Error("No upstream access in hosted requests"); };
 
-describe("kohesio", () => {
-  it("searches Irish EU-funded projects", async () => {
-    const fetch = fakeFetch([{ match: (url) => url.includes("/api/projects?") && url.includes("country=https"), file: fx("projects-ie.json") }]);
-    const result = await callTool<SearchBody>(kohesioModule, "kohesio_search_projects", { limit: 3 }, fetch);
+describe("Kohesio dated Ireland exports", () => {
+  it("searches a bundled, attributed snapshot without frontend API calls", async () => {
+    const result = await callTool(kohesioModule, "kohesio_search_projects", { limit: 3 }, offline);
     expect(result.ok).toBe(true);
-    expect(result.body.data.total).toBeGreaterThan(1000);
-    expect(result.body.data.projects[0]?.id).toBe("Q232198");
+    expect(result.body.data.total).toBe(979);
+    expect(result.body.data.projects).toHaveLength(3);
+    expect(result.body.data.snapshot.kind).toBe("static_export");
+    expect(result.body.data.snapshot.exports.map((e: { snapshot_date: string }) => e.snapshot_date)).toEqual(["2026-09-24", "2026-09-24"]);
+    expect(result.body.attribution).toContain("European Commission");
+    expect(result.body.url).not.toContain("/api/projects");
+    expect(result.body.truncated).toBe(true);
   });
 
-  it("gets one Kohesio project by Q id", async () => {
-    const fetch = fakeFetch([{ match: /\/api\/projects\/https%3A%2F%2Flinkedopendata\.eu%2Fentity%2FQ232198/, file: fx("project-q232198.json") }]);
-    const result = await callTool<ProjectBody>(kohesioModule, "kohesio_get_project", { id: "Q232198" }, fetch);
-    expect(result.ok).toBe(true);
-    expect(result.body.data.title).toContain("anonymous social media app");
-    expect(result.body.data.country).toBe("Ireland");
+  it("preserves Q ids, URL lookup and compact project fields for both periods", async () => {
+    for (const id of ["Q232198", "https://linkedopendata.eu/entity/Q7361323"]) {
+      const result = await callTool(kohesioModule, "kohesio_get_project", { id }, offline);
+      expect(result.ok).toBe(true);
+      expect(result.body.data.country).toBe("Ireland");
+      expect(result.body.data.title).toBeTruthy();
+      if (id === "Q232198") expect(result.body.data.eu_budget).toBeNull();
+      else expect(result.body.data.eu_budget).toBe(149999.99);
+      expect(result.body.data.snapshot.exports).toHaveLength(2);
+      expect(result.body.data.url).toContain("linkedopendata.eu/entity/Q");
+    }
   });
 
-  it.each([
-    { operation: "kohesio_search_projects", args: { query: "Galway", limit: 3 } },
-    { operation: "kohesio_get_project", args: { id: "Q232198" } }
-  ])("explains cloud-hosted Kohesio 403 blocks for $operation", async ({ operation, args }) => {
-    const fetch = fakeFetch([{ match: /\/api\/projects[/?]/, status: 403, body: "Forbidden" }]);
-    const result = await callTool(kohesioModule, operation, args, fetch);
-    expect(result.ok).toBe(false);
-    expect(result.body.error.code).toBe("UPSTREAM_DOWN");
-    expect(result.body.error.hint).toContain("Kohesio blocks some cloud-hosted IPs");
-    expect(result.body.error.hint).toContain("node dist/src/cli.js --toolsets=kohesio");
-    expect(result.body.error.hint).not.toContain("npx");
+  it("applies keyword, region, budget and stable pagination locally", async () => {
+    const all = await callTool(kohesioModule, "kohesio_search_projects", { query: "  longford  ", region: "IE063", min_eu_budget: 100_000, limit: 500, max_tokens: 8000 }, offline);
+    expect(all.ok).toBe(true);
+    expect(all.body.data.total).toBeGreaterThan(1);
+    expect(all.body.data.projects.every((p: { eu_budget: number }) => p.eu_budget >= 100_000)).toBe(true);
+    const page = await callTool(kohesioModule, "kohesio_search_projects", { query: "Longford", region: "ie063", min_eu_budget: 100_000, limit: 1, offset: 1 }, offline);
+    expect(page.body.data.total).toBe(all.body.data.total);
+    expect(page.body.data.projects[0].id).toBe(all.body.data.projects[1].id);
+    const empty = await callTool(kohesioModule, "kohesio_search_projects", { offset: 100_000 }, offline);
+    expect(empty.body.data.projects).toEqual([]);
+    expect(empty.body.truncated).toBe(false);
   });
 
-  it("retries transient Kohesio failures a bounded number of times", async () => {
-    const body = readFileSync(fx("projects-ie.json"));
-    let calls = 0;
-    const flaky = async () => (++calls < 3 ? new Response("Forbidden", { status: 403 }) : new Response(body, { status: 200 }));
-    const result = await callTool<SearchBody>(kohesioModule, "kohesio_search_projects", { limit: 3 }, flaky);
-    expect(result.ok).toBe(true);
-    expect(calls).toBe(3);
+  it("rejects invalid ids and missing Irish projects without a fabricated result", async () => {
+    const invalid = await callTool(kohesioModule, "kohesio_get_project", { id: "https://example.com/Q232198" }, offline);
+    expect(invalid.body.error.code).toBe("BAD_ARGS");
+    const missing = await callTool(kohesioModule, "kohesio_get_project", { id: "Q999999999" }, offline);
+    expect(missing.body.error.code).toBe("NOT_FOUND");
+  });
 
-    calls = 0;
-    const down = async () => {
-      calls += 1;
-      return new Response("Forbidden", { status: 403 });
-    };
-    expect((await callTool(kohesioModule, "kohesio_search_projects", { limit: 3 }, down)).ok).toBe(false);
-    expect(calls).toBe(3);
+  it("uses the same snapshot in cross-source search and fetch", async () => {
+    const ctx = createContext({ fetch: offline });
+    const hits = await kohesioModule.search!("hydrogen", 2, ctx);
+    expect(hits).toHaveLength(2);
+    const doc = await kohesioModule.fetchById!(hits[0]!.id.replace(/^kohesio:/, ""), ctx);
+    expect(doc.id).toBe(hits[0]!.id);
+    expect(doc.metadata?.snapshot).toBeDefined();
+    expect(doc.text).toContain("static_export");
   });
 });

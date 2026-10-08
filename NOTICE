@@ -77,6 +77,9 @@ CRO open data — https://opendata.cro.ie
 Kohesio — https://kohesio.ec.europa.eu/
   Licence: European Commission reuse policy / CC BY 4.0 compatible.
   Attribution: European Commission, Kohesio platform.
+  Includes dated Ireland CSV export snapshots; not live data.
+  Snapshot provenance and source URLs: src/sources/kohesio/snapshot.json
+  and docs/kohesio-exports.md.
 
 Smart Dublin (CKAN) — https://data.smartdublin.ie
   Licence: per dataset, mostly CC BY 4.0. Check each dataset's licence field.

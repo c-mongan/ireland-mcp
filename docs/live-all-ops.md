@@ -4,7 +4,7 @@ Target: https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp
 Generated: 2026-10-07T23:24:03.944Z
 Operations: 70 PASS, 2 NOT_CONFIGURED, 2 HOSTED_BLOCKED, 0 FAIL.
 
-Known hosted limitation: Kohesio may return HTTP 403 from cloud-hosted IPs. If that happens, run Ireland MCP from a built source checkout with `node dist/src/cli.js --toolsets=kohesio` (stdio).
+Historical hosted limitation (2026-10-07): the Kohesio frontend API returned HTTP 403. The replacement uses packaged dated CSV exports ([details and refresh guide](kohesio-exports.md)); these rows remain the original probe evidence until deployment and a new hosted check. The exports are not live data.
 
 ## Default tool exercise
 
