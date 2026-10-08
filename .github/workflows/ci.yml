@@ -21,6 +21,8 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test:coverage
+      - name: Validate Azure domain deployment ordering
+        run: node --test test/infra-arm.mjs
       - run: npm run build
       - name: MCP Inspector conformance (stdio)
         run: npm run inspector:check

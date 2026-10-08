@@ -58,6 +58,11 @@ managed certificate; SNI bindings read the returned thumbprint rather than pinni
 value that changes on renewal. The current two certificates expire on **2027-04-08**.
 Certificates depend on DNS, and SNI bindings depend on certificates. There is no
 certificate↔binding dependency cycle and no intermediate `sslState=Disabled` update.
+Both certificate and binding loops deploy one resource at a time. All certificates finish
+before any binding starts, avoiding App Service's shared site-update lock and HTTP 409
+conflicts between concurrent hostname writes. CI runs `node --test test/infra-arm.mjs`
+against the actual compiled ARM template to verify this ordering; it requires Azure CLI
+and Bicep, as does deployment.
 
 **Replay prerequisite:** the two Function hostnames already exist and are verified.
 This profile is not a one-shot bootstrap of a destroyed production site. After disaster

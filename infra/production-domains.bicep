@@ -59,6 +59,7 @@ var hosts = [
 ]
 
 // Issuance relies on already-verified hostnames. Do not replay a Disabled binding to break a dependency cycle.
+@batchSize(1)
 resource certificates 'Microsoft.Web/sites/certificates@2024-11-01' = [for host in hosts: {
   parent: app
   name: host.certificateName
@@ -67,6 +68,7 @@ resource certificates 'Microsoft.Web/sites/certificates@2024-11-01' = [for host 
   dependsOn: [comDns]
 }]
 
+@batchSize(1)
 resource bindings 'Microsoft.Web/sites/hostNameBindings@2024-11-01' = [for (host, i) in hosts: {
   parent: app
   name: host.hostname
@@ -76,4 +78,5 @@ resource bindings 'Microsoft.Web/sites/hostNameBindings@2024-11-01' = [for (host
     sslState: 'SniEnabled'
     thumbprint: certificates[i].properties.thumbprint
   }
+  dependsOn: [certificates]
 }]
