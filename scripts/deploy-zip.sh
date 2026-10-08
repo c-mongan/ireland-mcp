@@ -18,7 +18,13 @@ npm ci
 npm run build
 cp -R dist host.json package.json package-lock.json "$stage/"
 rm -rf "$stage/dist/test"
-(cd "$stage/" && npm ci --omit=dev --ignore-scripts && zip -qr app.zip . -x app.zip)
+(
+  cd "$stage/"
+  npm ci --omit=dev --ignore-scripts
+  # The Functions host must read the payload even when the caller uses umask 077.
+  chmod -R a+rX dist host.json package.json package-lock.json node_modules
+  zip -qr app.zip . -x app.zip
+)
 
 az functionapp deployment source config-zip -g "$rg" -n "$app" --src "$stage/app.zip" --build-remote false
 echo "Deployed to https://$(az functionapp show -g "$rg" -n "$app" --query properties.defaultHostName -o tsv)/mcp"

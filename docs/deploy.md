@@ -42,6 +42,24 @@ Cost controls:
    locally after `az login` (needs Storage Blob Data Contributor for your user).
    Until then, `ppr_*` tools use the live per-county CSV fallback.
 
+### ZIP payload permissions
+
+`scripts/deploy-zip.sh` supports a private caller `umask 077`. After installing
+production dependencies, it makes only the staged payload readable by all users,
+with traversable directories and existing executable bits preserved (`a+rX`).
+The temporary staging root and local ZIP stay private; source files and caller
+logs are not changed. The staging directory is removed on success or failure.
+
+Do not bypass this normalization when packaging by hand. A ZIP containing
+owner-only files (`0600`) or directories (`0700`) can trigger Kudu's
+`ZIP permission validation failed` warning and leave the Function host unable
+to start, even when the upload succeeds.
+
+Run `node --test test/deploy-zip.mjs` to exercise the real deploy script and ZIP
+under `umask 077`. The test substitutes only npm and Azure CLI boundaries, so it
+does not install dependencies or write to Azure. CI runs it alongside the
+domain-deployment ordering regression.
+
 ## GitHub Actions (OIDC)
 
 `.github/workflows/deploy.yml` runs only on manual dispatch.
