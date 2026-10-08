@@ -25,7 +25,8 @@ describe("DeepHealth", () => {
       expect.objectContaining({ source: "c", status: "skipped", error: "NTA_API_KEY not set" })
     ]);
     expect(report.sources.every((s) => typeof s.latencyMs === "number")).toBe(true);
-    expect(fetch.calls).toHaveLength(2);
+    // The 503 is retried once before being reported down.
+    expect(fetch.calls).toHaveLength(3);
   });
 
   it("keeps refused provider access degraded but excludes missing credentials", async () => {
@@ -38,6 +39,27 @@ describe("DeepHealth", () => {
     expect(healthy.status).toBe("ok");
     expect(healthy.sources[2]).toMatchObject({ status: "skipped" });
     expect(defaultProbes({}).find((p) => p.source === "met-eireann")?.url).toBe("https://prodapi.met.ie/v2/warnings/");
+  });
+
+  it("retries a transient failure once, but not a 4xx", async () => {
+    let calls = 0;
+    const flaky = (async () => (++calls === 1 ? new Response(null, { status: 502 }) : new Response("ok"))) as never;
+    const report = await new DeepHealth({ probes: probes.slice(0, 1), fetch: flaky }).check();
+    expect(report.sources[0]).toMatchObject({ status: "up", httpStatus: 200 });
+    expect(calls).toBe(2);
+    const refused = fakeFetch([{ match: () => true, status: 403 }]);
+    await new DeepHealth({ probes: probes.slice(0, 1), fetch: refused }).check();
+    expect(refused.calls).toHaveLength(1);
+  });
+
+  it("reports Kohesio from its packaged snapshot without a network call", async () => {
+    const fetch = fakeFetch([{ match: () => true, status: 403 }]);
+    const kohesio = defaultProbes({}).filter((p) => p.source === "kohesio");
+    const report = await new DeepHealth({ probes: kohesio, fetch }).check();
+    expect(report.sources[0]).toMatchObject({ source: "kohesio", status: "up", note: expect.stringMatching(/^packaged snapshot retrieved \d{4}-\d{2}-\d{2}$/) });
+    expect(fetch.calls).toHaveLength(0);
+    const broken = await new DeepHealth({ probes: [{ source: "x", url: "", local: () => ({ ok: false, error: "snapshot unreadable" }) }] }).check();
+    expect(broken.sources[0]).toMatchObject({ status: "down", error: "snapshot unreadable" });
   });
 
   it("caches the report for 60 seconds so it cannot amplify traffic", async () => {
