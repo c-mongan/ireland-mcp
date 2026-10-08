@@ -2,8 +2,8 @@
 
 Ireland MCP is a public, read-only Model Context Protocol server for Irish public data. It needs no API key, account or login.
 
-Endpoint: https://mcp.irishopendata.com/mcp
-Docs: https://irishopendata.com/
+Endpoint: [Ireland MCP Streamable HTTP endpoint](https://mcp.irishopendata.com/mcp)
+Docs: [Ireland MCP documentation and playground](https://irishopendata.com/)
 Transport: Streamable HTTP JSON-RPC over POST
 Auth: none
 Default tool surface: 7 tools, 8,407 characters, about 2.1k tokens
@@ -33,4 +33,12 @@ Toolsets:
 - All tools: add ?toolsets=all.
 - One source: /mcp/x/{source-id} or ?toolsets={source-id}.
 
-Source domains: stats, law/politics, places/property, environment, transport, energy and economy. Data remains under each publisher licence; responses include source and licence metadata where available. Privacy notes are in PRIVACY.md.
+Source domains: stats, law/politics, places/property, environment, transport, energy and economy. Data remains under each publisher licence; responses include source and licence metadata where available.
+
+## Documentation
+
+- [Agent installation guide](https://irishopendata.com/AGENTS.md): client configuration, compact tool workflow and citation guidance.
+- [MCP server card](https://irishopendata.com/.well-known/mcp/server-card.json): machine-readable service metadata.
+- [API guide and source catalogue](https://github.com/c-mongan/ireland-mcp/blob/main/README.md): supported sources, operations and self-hosting.
+- [Privacy policy](https://github.com/c-mongan/ireland-mcp/blob/main/PRIVACY.md): request handling and telemetry.
+- [Source attribution](https://github.com/c-mongan/ireland-mcp/blob/main/NOTICE): publisher licences and reuse requirements.

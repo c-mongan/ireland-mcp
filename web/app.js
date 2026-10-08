@@ -91,11 +91,59 @@ const EXAMPLES = [
 ];
 
 const $ = (id) => document.getElementById(id);
+
+function initTheme() {
+  const toggle = $("theme-toggle");
+  const preference = matchMedia("(prefers-color-scheme: dark)");
+  const storageKey = "ireland-mcp-theme";
+  let chosenTheme;
+  function storageFailure(error) {
+    // Private browsing and embedded contexts may forbid storage, not theming.
+    if (error?.name !== "SecurityError" && error?.name !== "QuotaExceededError") {
+      console.warn("Theme preference could not be stored.", error);
+    }
+  }
+  try {
+    const stored = localStorage.getItem(storageKey);
+    if (stored === "light" || stored === "dark") chosenTheme = stored;
+  } catch (error) {
+    storageFailure(error);
+  }
+  function renderTheme() {
+    const theme = chosenTheme || (preference.matches ? "dark" : "light");
+    document.documentElement.dataset.theme = theme;
+    if (toggle) {
+      toggle.setAttribute("aria-pressed", String(theme === "dark"));
+      const label = theme === "dark" ? "Switch to light mode" : "Switch to dark mode";
+      toggle.setAttribute("aria-label", label);
+      toggle.textContent = label;
+    }
+  }
+  toggle?.addEventListener("click", () => {
+    chosenTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    renderTheme();
+    try {
+      localStorage.setItem(storageKey, chosenTheme);
+    } catch (error) {
+      storageFailure(error);
+    }
+  });
+  preference.addEventListener("change", renderTheme);
+  window.addEventListener("storage", (event) => {
+    if (event.key !== storageKey && event.key !== null) return;
+    chosenTheme = event.newValue === "light" || event.newValue === "dark" ? event.newValue : undefined;
+    renderTheme();
+  });
+  renderTheme();
+}
+
+initTheme();
 const endpoint = document.querySelector('meta[name="mcp-endpoint"]')?.content?.trim() || MCP_URL;
 $("endpoint-line").textContent = endpoint;
 
 let rpcId = 1;
 async function rpc(method, params = {}) {
+  const id = rpcId++;
   const response = await fetch(endpoint, {
     method: "POST",
     signal: AbortSignal.timeout(20000),
@@ -104,13 +152,16 @@ async function rpc(method, params = {}) {
       accept: "application/json, text/event-stream",
       "mcp-protocol-version": "2025-06-18"
     },
-    body: JSON.stringify({ jsonrpc: "2.0", id: rpcId++, method, params })
+    body: JSON.stringify({ jsonrpc: "2.0", id, method, params })
   });
   const text = await response.text();
-  const jsonText = text.startsWith("event:")
-    ? text.split("\n").find((line) => line.startsWith("data:"))?.slice(5).trim()
-    : text;
-  const body = JSON.parse(jsonText || "{}");
+  const isStream = response.headers.get("content-type")?.includes("text/event-stream") || /^(event:|data:|:)/m.test(text);
+  const body = isStream
+    ? text.split(/\r?\n\r?\n/).map((event) => event.split(/\r?\n/)
+      .filter((line) => line.startsWith("data:")).map((line) => line.slice(5).trimStart()).join("\n"))
+      .filter(Boolean).map((data) => JSON.parse(data)).find((message) => message.id === id)
+    : JSON.parse(text || "{}");
+  if (!body) throw new Error("The server did not return a query response.");
   if (body.error) throw new Error(body.error.message || `HTTP ${response.status}`);
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return body.result;
@@ -129,7 +180,8 @@ function jsonBlock(value) {
 
 const httpServerConfig = { name: "ireland", type: "http", url: endpoint };
 const mcpJson = { servers: { ireland: { type: "http", url: endpoint } } };
-const copilotJson = { mcpServers: { ireland: { type: "http", url: endpoint } } };
+const copilotJson = { mcpServers: { ireland: { type: "http", url: endpoint, tools: ["*"] } } };
+const genericJson = { mcpServers: { ireland: { type: "http", url: endpoint } } };
 const cursorConfig = { type: "http", url: endpoint };
 const vscodeLink = `vscode:mcp/install?${encodeURIComponent(JSON.stringify(httpServerConfig))}`;
 const vscodeInsidersLink = `vscode-insiders:mcp/install?${encodeURIComponent(JSON.stringify(httpServerConfig))}`;
@@ -154,9 +206,9 @@ const INSTALLERS = [
     copy: endpoint, code: `Settings → Apps & Connectors → Advanced → Developer Mode\nCreate MCP connector\nName: Ireland MCP\nURL: ${endpoint}\nAuthentication: None\nRecommended tools: search, fetch, ireland_catalogue, ireland_call`
   },
   {
-    id: "copilot", label: "Copilot CLI", title: "Copilot CLI", body: "Use the slash command when available, or save the JSON snippet to ~/.copilot/mcp-config.json.",
-    copy: `/mcp add ireland ${endpoint}`,
-    code: `/mcp add ireland ${endpoint}\n\n${jsonBlock(copilotJson)}`
+    id: "copilot", label: "Copilot CLI", title: "Copilot CLI", body: "Run the command below, or save the JSON snippet to ~/.copilot/mcp-config.json.",
+    copy: `copilot mcp add --transport http ireland ${endpoint}`,
+    code: `copilot mcp add --transport http ireland ${endpoint}\n\n${jsonBlock(copilotJson)}`
   },
   {
     id: "gemini", label: "Gemini CLI", title: "Gemini CLI", body: "Add Ireland MCP to your Gemini CLI MCP servers using HTTP transport.",
@@ -164,10 +216,10 @@ const INSTALLERS = [
   },
   {
     id: "windsurf", label: "Windsurf", title: "Windsurf", body: "Open MCP settings, add a custom server named ireland, choose HTTP transport and paste the endpoint.",
-    copy: jsonBlock(copilotJson), code: jsonBlock(copilotJson)
+    copy: jsonBlock(genericJson), code: jsonBlock(genericJson)
   },
   {
-    id: "generic", label: "Generic JSON", title: "Generic MCP JSON", body: "Use this for agents that accept a project-level .mcp.json or MCP server map.",
+    id: "generic", label: "Generic JSON", title: "Generic MCP JSON", body: "VS Code workspace configuration: save this to .vscode/mcp.json. Other clients may use a different server-map format.",
     copy: jsonBlock(mcpJson), code: jsonBlock(mcpJson)
   }
 ];
@@ -237,15 +289,23 @@ async function copyText(text) {
   try {
     await navigator.clipboard.writeText(text);
   } catch {
+    const focused = document.activeElement;
     const area = document.createElement("textarea");
     area.value = text;
     area.setAttribute("readonly", "");
     area.style.position = "fixed";
     area.style.left = "-100vw";
     document.body.append(area);
-    area.select();
-    document.execCommand("copy");
-    area.remove();
+    try {
+      area.select();
+      if (!document.execCommand("copy")) throw new Error("Clipboard access is unavailable.");
+    } catch {
+      $("copy-status").textContent = "Copy unavailable. Select the configuration and copy it manually.";
+      return;
+    } finally {
+      area.remove();
+      focused?.focus({ preventScroll: true });
+    }
   }
   $("copy-status").textContent = "Copied.";
 }
@@ -332,6 +392,7 @@ async function initLiveStats() {
       rpc("tools/list", {}),
       rpc("tools/call", { name: "ireland_catalogue", arguments: {} })
     ]);
+    if (catalogue?.isError) throw new Error("Catalogue unavailable.");
     const domains = normaliseCatalogue(catalogue);
     // `cross` combines other sources; it is not a data source (see docs/counts.json).
     const sourceCount = domains.reduce((sum, group) => sum + (group.sources || []).filter((s) => s.id !== "cross").length, 0);
