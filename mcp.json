@@ -3,7 +3,7 @@
   "mcpServers": {
     "ireland": {
       "type": "streamable-http",
-      "url": "https://mcp.irishopendata.com/mcp"
+      "url": "https://mcp.irishopendata.ie/mcp"
     }
   }
 }
