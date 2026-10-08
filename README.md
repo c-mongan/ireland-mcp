@@ -15,7 +15,7 @@ Registry: [`io.github.c-mongan/ireland-mcp`](https://registry.modelcontextprotoc
 | Count | Value | Definition |
 | --- | ---: | --- |
 | Data sources | 29 | Upstream public-data sources, one module each. The `cross` combiner is not a source. |
-| Working on the hosted endpoint | 27 of 29 | The latest hosted probe predates the Kohesio CSV snapshot replacement (see below). NTA realtime needs an operator key that the hosted service does not have. |
+| Working on the hosted endpoint | 28 of 29 | NTA realtime needs an operator key that the hosted service does not have. |
 | Catalogue operations | 74 | 71 source operations plus 3 cross-source ones (`list_sources`, `nearby`, `ireland_snapshot`), all callable through `ireland_call`. |
 | Default tools | 7 | What `tools/list` returns: 4 meta tools plus `search`, `fetch` and `nearby`. |
 | Tools with `?toolsets=all` | 80 | Every operation as a typed tool, plus the 4 meta tools, `search` and `fetch`. |
@@ -265,7 +265,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full checklist.
 
 ## Registry and publishing
 
-Ireland MCP is **listed on the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.c-mongan%2Fireland-mcp/versions/latest)** as a remote-only Streamable HTTP server named `io.github.c-mongan/ireland-mcp` (v1.1.1). Clients that browse the registry can install it by name. The future domain name is planned as `ie.irishopendata/ireland` after DNS verification. Publishing notes and directory checklists are in [docs/publishing.md](docs/publishing.md). Do not publish from a fork without changing the name and endpoint.
+Ireland MCP is **listed on the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.c-mongan%2Fireland-mcp/versions/latest)** as a remote-only Streamable HTTP server named `io.github.c-mongan/ireland-mcp` (v1.1.2). Clients that browse the registry can install it by name. The future domain name is planned as `ie.irishopendata/ireland` after DNS verification. Publishing notes and directory checklists are in [docs/publishing.md](docs/publishing.md). Do not publish from a fork without changing the name and endpoint.
 
 ## Credits and prior art
 

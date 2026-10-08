@@ -5,7 +5,6 @@ import { appModules, sourceModules } from "./registry.js";
  * "N of M sources work hosted" number comes from one place (see docs/counts.json and src/counts.test.ts).
  */
 export const HOSTED_LIMITS: Record<string, string> = {
-  kohesio: "Kohesio blocks Azure IP addresses (HTTP 403); run it locally over stdio.",
   nta: "NTA realtime needs an operator key that the hosted service does not have."
 };
 

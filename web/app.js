@@ -15,7 +15,7 @@ const SOURCE_FALLBACK = [
   ] },
   { domain: "economy", sources: [
     { id: "cro", name: "Companies Registration Office open data", summary: "Irish company-register catalogue datasets and datastore queries.", operations: ["cro_search_datasets", "cro_get_dataset", "cro_query_datastore"] },
-    { id: "kohesio", name: "Kohesio EU-funded projects", summary: "EU-funded project search and project detail for Ireland.", operations: ["kohesio_search_projects", "kohesio_get_project"] },
+    { id: "kohesio", name: "Kohesio EU-funded projects", summary: "EU-funded Irish projects from dated official Kohesio CSV exports (not live).", operations: ["kohesio_search_projects", "kohesio_get_project"] },
     { id: "ted", name: "EU Tenders Electronic Daily", summary: "Irish and EU public-procurement notices from TED.", operations: ["ted_search_tenders", "ted_get_notice"] }
   ] },
   { domain: "transport", sources: [

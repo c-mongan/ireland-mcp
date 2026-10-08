@@ -1,8 +1,7 @@
 {
   "sources": 29,
-  "hosted_working": 27,
+  "hosted_working": 28,
   "hosted_limited": [
-    "kohesio",
     "nta"
   ],
   "operations": 74,
