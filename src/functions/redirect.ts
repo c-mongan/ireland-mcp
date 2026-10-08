@@ -1,7 +1,7 @@
 import { app, type HttpRequest, type HttpResponseInit } from "@azure/functions";
 import { SECURITY_HEADERS } from "../gateway/securityHeaders.js";
 
-/** Default canonical docs site. Set CANONICAL_SITE_URL=https://irishopendata.ie once the .ie apex is live. */
+/** Default canonical docs site. Production sets CANONICAL_SITE_URL=https://irishopendata.ie via IaC; this is the fallback. */
 export const CANONICAL_SITE = "https://irishopendata.com";
 const SITE_HOSTS = ["irishopendata.com", "www.irishopendata.com", "irishopendata.ie", "www.irishopendata.ie"];
 const MCP_HOSTS = new Set(["mcp.irishopendata.com", "mcp.irishopendata.ie"]);

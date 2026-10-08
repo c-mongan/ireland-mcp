@@ -279,7 +279,12 @@ irishopendata.ie:  ns1-01.azure-dns.com ns2-01.azure-dns.net ns3-01.azure-dns.or
 
 Some local resolvers block newly registered domains for a few days. When `dig` on your machine returns nothing, check with DNS-over-HTTPS: `curl -s 'https://dns.google/resolve?name=mcp.irishopendata.com&type=CNAME'`.
 
-## Finishing irishopendata.ie (after the .IE registry approves the ID document)
+## Finishing irishopendata.ie (done 2026-10-08, v1.1.4)
+
+Status: delegated to Azure DNS; apex bound to the SWA (`dns-txt-token`, token in `infra/production.parameters.json`); `mcp.irishopendata.ie` bound with the free managed certificate `mcp-irishopendata-ie` (third and last Flex slot, so `www.irishopendata.ie` has no TLS binding); `CANONICAL_SITE_URL=https://irishopendata.ie`. All of this is in `infra/production-domains.bicep`. `.com` hosts remain bound and working. Public resolvers can cache the old Blacknight delegation for up to 24 hours (parent NS TTL 86400).
+
+The steps used:
+
 
 1. **Delegate.** At Blacknight, open My Domains → `irishopendata.ie` → Nameservers. Choose "Use custom nameservers" and enter the four `-01` name servers above. This is the same flow used for `.com`.
 2. **Bind the apex** with step 2 below, using `ZONE=irishopendata.ie`.

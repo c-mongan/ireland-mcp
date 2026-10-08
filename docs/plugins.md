@@ -9,10 +9,10 @@ This repository is both a **plugin** and a **plugin marketplace**. Installing it
 ## Server URL (one place to change)
 
 ```
-IRELAND_MCP_URL = https://mcp.irishopendata.com/mcp
+IRELAND_MCP_URL = https://mcp.irishopendata.ie/mcp
 ```
 
-The `.ie` endpoint `https://mcp.irishopendata.ie/mcp` is planned. If the URL changes, replace it
+`https://mcp.irishopendata.com/mcp` remains a working alias. If the URL changes, replace it
 above in **two files only**: [`.mcp.json`](../.mcp.json) (Claude Code) and [`mcp.json`](../mcp.json)
 (Agent Plugins: Copilot CLI, VS Code). `test/skills.test.ts` checks that both files agree.
 

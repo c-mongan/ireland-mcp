@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
   <title id="title">Ireland MCP — Irish public data for your AI assistant</title>
-  <desc id="description">A green Ireland MCP share card with a mint four-point connection mark and the address irishopendata.com.</desc>
+  <desc id="description">A green Ireland MCP share card with a mint four-point connection mark and the address irishopendata.ie.</desc>
   <rect width="1200" height="630" fill="#101a17"/>
   <path d="M936 0H1200V630H936C872 442 872 188 936 0Z" fill="#21332a"/>
   <g fill="#a4e8bf">
@@ -13,6 +13,6 @@
       <text x="72" y="278">Irish public data</text>
       <text x="72" y="366">for your AI assistant</text>
     </g>
-    <text x="72" y="547" fill="#a4e8bf" font-size="26" font-weight="500">irishopendata.com</text>
+    <text x="72" y="547" fill="#a4e8bf" font-size="26" font-weight="500">irishopendata.ie</text>
   </g>
 </svg>

@@ -7,7 +7,7 @@
   },
   "globalHeaders": {
     "strict-transport-security": "max-age=31536000",
-    "content-security-policy": "default-src 'self'; connect-src 'self' https://mcp.irishopendata.com https://*.azurewebsites.net https://raw.githubusercontent.com http://localhost:7071; img-src 'self' data:; media-src 'self'; style-src 'self'; script-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+    "content-security-policy": "default-src 'self'; connect-src 'self' https://mcp.irishopendata.ie https://mcp.irishopendata.com https://*.azurewebsites.net https://raw.githubusercontent.com http://localhost:7071; img-src 'self' data:; media-src 'self'; style-src 'self'; script-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
     "x-frame-options": "DENY",
     "x-content-type-options": "nosniff",
     "referrer-policy": "no-referrer",

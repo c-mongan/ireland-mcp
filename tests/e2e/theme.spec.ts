@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 const storageKey = "ireland-mcp-theme";
 
 test.beforeEach(async ({ page }) => {
-  await page.route("https://mcp.irishopendata.com/mcp", (route) => route.abort());
+  await page.route("https://mcp.irishopendata.ie/mcp", (route) => route.abort());
   await page.route("https://raw.githubusercontent.com/**/status.json", (route) => route.abort());
 });
 

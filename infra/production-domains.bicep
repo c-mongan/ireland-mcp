@@ -5,6 +5,9 @@ param functionVerificationId string
 param location string = 'northeurope'
 @minLength(1)
 param staticWebAppValidationToken string
+@description('Existing SWA TXT validation token for the irishopendata.ie apex. Not a credential.')
+@minLength(1)
+param ieStaticWebAppValidationToken string
 
 resource app 'Microsoft.Web/sites@2024-11-01' existing = {
   name: functionAppName
@@ -35,7 +38,7 @@ module comDns 'dns-zone.bicep' = {
   }
 }
 
-// Preserve the pre-existing pending zone and records only. No .ie custom domains, certificates or delegation.
+// Delegation itself is set at the registrar (Blacknight) and is never changed here.
 module ieDns 'dns-zone.bicep' = {
   name: 'ireland-mcp-ie-dns'
   params: {
@@ -43,6 +46,7 @@ module ieDns 'dns-zone.bicep' = {
     staticWebAppName: staticSite.name
     functionDefaultHost: functionDefaultHost
     functionVerificationId: functionVerificationId
+    staticWebAppValidationToken: ieStaticWebAppValidationToken
   }
 }
 
@@ -53,9 +57,19 @@ resource apexBinding 'Microsoft.Web/staticSites/customDomains@2024-11-01' = {
   dependsOn: [comDns]
 }
 
+// SWA Free allows two custom domains: both apexes. Serialized after .com to avoid concurrent site writes.
+resource ieApexBinding 'Microsoft.Web/staticSites/customDomains@2024-11-01' = {
+  parent: staticSite
+  name: 'irishopendata.ie'
+  properties: { validationMethod: 'dns-txt-token' }
+  dependsOn: [ieDns, apexBinding]
+}
+
+// Flex allows three site-scoped certificates; all three are used. www.irishopendata.ie is not bound.
 var hosts = [
   { hostname: 'mcp.irishopendata.com', certificateName: 'mcp-irishopendata-com' }
   { hostname: 'www.irishopendata.com', certificateName: 'www-irishopendata-com' }
+  { hostname: 'mcp.irishopendata.ie', certificateName: 'mcp-irishopendata-ie' }
 ]
 
 // Issuance relies on already-verified hostnames. Do not replay a Disabled binding to break a dependency cycle.
@@ -65,7 +79,7 @@ resource certificates 'Microsoft.Web/sites/certificates@2024-11-01' = [for host 
   name: host.certificateName
   location: location
   properties: { canonicalName: host.hostname }
-  dependsOn: [comDns]
+  dependsOn: [comDns, ieDns]
 }]
 
 @batchSize(1)

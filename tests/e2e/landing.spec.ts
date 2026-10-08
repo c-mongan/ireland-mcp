@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-const endpointPattern = /https:\/\/mcp\.irishopendata\.com\/mcp/;
+const endpointPattern = /https:\/\/mcp\.irishopendata\.ie\/mcp/;
 const shotsDir = resolve("test-results/ui-shots");
 const counts = JSON.parse(readFileSync(resolve("docs/counts.json"), "utf8"));
 
@@ -49,7 +49,7 @@ test("install copy works and deeplinks use current formats", async ({ page, cont
   const href = await page.getByRole("link", { name: "Install in VS Code" }).getAttribute("href");
   expect(href).toMatch(/^vscode:mcp\/install\?/);
   const payload = JSON.parse(decodeURIComponent(href!.split("?")[1]));
-  expect(payload).toEqual({ name: "ireland", type: "http", url: "https://mcp.irishopendata.com/mcp" });
+  expect(payload).toEqual({ name: "ireland", type: "http", url: "https://mcp.irishopendata.ie/mcp" });
   const insiders = await page.getByRole("link", { name: "Install in Insiders" }).getAttribute("href");
   expect(insiders).toMatch(/^vscode-insiders:mcp\/install\?/);
   expect(JSON.parse(decodeURIComponent(insiders!.split("?")[1]))).toEqual(payload);
@@ -57,7 +57,7 @@ test("install copy works and deeplinks use current formats", async ({ page, cont
   const cursorHref = await page.getByRole("link", { name: "Install in Cursor" }).getAttribute("href");
   expect(cursorHref).toMatch(/^cursor:\/\/anysphere\.cursor-deeplink\/mcp\/install\?name=ireland&config=/);
   expect(JSON.parse(Buffer.from(new URL(cursorHref!).searchParams.get("config")!, "base64").toString("utf8"))).toEqual({
-    type: "http", url: "https://mcp.irishopendata.com/mcp"
+    type: "http", url: "https://mcp.irishopendata.ie/mcp"
   });
   await page.getByRole("button", { name: "Copy Config" }).click();
   await expect(page.locator("#copy-status")).toContainText("Copied");
@@ -69,14 +69,14 @@ test("serves llms.txt, AGENTS.md and server card", async ({ request }) => {
   const agents = await request.get("/AGENTS.md");
   await expect(agents).toBeOK();
   const instructions = await agents.text();
-  expect(instructions).toContain("claude mcp add --transport http ireland https://mcp.irishopendata.com/mcp");
-  expect(instructions).toContain("copilot mcp add --transport http ireland https://mcp.irishopendata.com/mcp");
+  expect(instructions).toContain("claude mcp add --transport http ireland https://mcp.irishopendata.ie/mcp");
+  expect(instructions).toContain("copilot mcp add --transport http ireland https://mcp.irishopendata.ie/mcp");
   const card = await request.get("/.well-known/mcp.json");
   await expect(card).toBeOK();
-  expect((await card.json()).transports[0].url).toBe("https://mcp.irishopendata.com/mcp");
+  expect((await card.json()).transports[0].url).toBe("https://mcp.irishopendata.ie/mcp");
   const serverCard = await request.get("/.well-known/mcp/server-card.json");
   await expect(serverCard).toBeOK();
-  expect(await serverCard.text()).toContain("https://mcp.irishopendata.com/mcp");
+  expect(await serverCard.text()).toContain("https://mcp.irishopendata.ie/mcp");
 });
 
 test("playground calls ireland_call against mocked MCP route", async ({ page }) => {
@@ -125,9 +125,9 @@ for (const failure of ["TimeoutError", "AbortError", "TypeError"] as const) {
 
 test("canonical metadata and public social assets are available", async ({ page, request }) => {
   await page.goto("/");
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://irishopendata.com/");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://irishopendata.ie/");
   for (const selector of ['meta[property="og:image"]', 'meta[name="twitter:image"]']) {
-    await expect(page.locator(selector)).toHaveAttribute("content", "https://irishopendata.com/social-card.png");
+    await expect(page.locator(selector)).toHaveAttribute("content", "https://irishopendata.ie/social-card.png");
   }
   await expect(page.locator('meta[property="og:image:width"]')).toHaveAttribute("content", "1200");
   await expect(page.locator('meta[property="og:image:height"]')).toHaveAttribute("content", "630");
@@ -144,7 +144,7 @@ test("canonical metadata and public social assets are available", async ({ page,
 });
 
 test("installer commands and JSON use the documented primary endpoint", async ({ page }) => {
-  const endpoint = "https://mcp.irishopendata.com/mcp";
+  const endpoint = "https://mcp.irishopendata.ie/mcp";
   await page.goto("/#install");
   await expect(page.locator("#endpoint-line")).toHaveText(endpoint);
   for (const [tab, command] of [
@@ -186,7 +186,7 @@ test("Gemini copies its displayed configuration and tabs support arrow keys", as
   const displayed = await page.locator("#install-panel pre").innerText();
   await page.getByRole("button", { name: "Copy Config" }).click();
   await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe(displayed);
-  expect(JSON.parse(displayed).mcpServers.ireland.httpUrl).toBe("https://mcp.irishopendata.com/mcp");
+  expect(JSON.parse(displayed).mcpServers.ireland.httpUrl).toBe("https://mcp.irishopendata.ie/mcp");
   await page.getByRole("tab", { name: "Gemini CLI" }).focus();
   await page.keyboard.press("ArrowRight");
   await expect(page.getByRole("tab", { name: "Windsurf" })).toBeFocused();
@@ -354,7 +354,7 @@ test("clipboard fallback restores focus and does not claim a denied copy succeed
   const copy = page.getByRole("button", { name: "Copy Config" });
   await copy.click();
   await expect(page.locator("#copy-status")).toHaveText("Copied.");
-  expect(await page.locator("html").getAttribute("data-copied")).toBe("claude mcp add --transport http ireland https://mcp.irishopendata.com/mcp");
+  expect(await page.locator("html").getAttribute("data-copied")).toBe("claude mcp add --transport http ireland https://mcp.irishopendata.ie/mcp");
   await expect(copy).toBeFocused();
   await expect(page.locator("textarea[readonly]")).toHaveCount(0);
   await page.evaluate(() => { document.execCommand = () => false; });

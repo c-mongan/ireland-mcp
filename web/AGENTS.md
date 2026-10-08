@@ -6,8 +6,8 @@ Install this server when a user asks about Irish public data, public services, w
 
 - Name: `ireland`
 - Transport: Streamable HTTP
-- URL: `https://mcp.irishopendata.com/mcp`
-- Docs: `https://irishopendata.com/`
+- URL: `https://mcp.irishopendata.ie/mcp`
+- Docs: `https://irishopendata.ie/`
 - Authentication: none
 - Writes: none. Treat it as read-only.
 - Default surface: 7 tools, about 2.1k tokens; use toolsets only when necessary.
@@ -17,7 +17,7 @@ Install this server when a user asks about Irish public data, public services, w
 Run:
 
 ```bash
-claude mcp add --transport http ireland https://mcp.irishopendata.com/mcp
+claude mcp add --transport http ireland https://mcp.irishopendata.ie/mcp
 ```
 
 For claude.ai, add a custom connector named `Ireland MCP`, paste the URL above and choose no authentication.
@@ -27,7 +27,7 @@ For claude.ai, add a custom connector named `Ireland MCP`, paste the URL above a
 Run:
 
 ```bash
-copilot mcp add --transport http ireland https://mcp.irishopendata.com/mcp
+copilot mcp add --transport http ireland https://mcp.irishopendata.ie/mcp
 ```
 
 Or write `~/.copilot/mcp-config.json`:
@@ -37,7 +37,7 @@ Or write `~/.copilot/mcp-config.json`:
   "mcpServers": {
     "ireland": {
       "type": "http",
-      "url": "https://mcp.irishopendata.com/mcp",
+      "url": "https://mcp.irishopendata.ie/mcp",
       "tools": ["*"]
     }
   }
@@ -49,7 +49,7 @@ Or write `~/.copilot/mcp-config.json`:
 1. Open Settings → Apps & Connectors → Advanced settings.
 2. Enable Developer Mode connectors if available on the account.
 3. Create an MCP connector named `Ireland MCP`.
-4. Use URL `https://mcp.irishopendata.com/mcp`.
+4. Use URL `https://mcp.irishopendata.ie/mcp`.
 5. Choose no authentication.
 6. Prefer `search`, `fetch`, `ireland_catalogue` and `ireland_call` for compact use.
 
@@ -58,7 +58,7 @@ Or write `~/.copilot/mcp-config.json`:
 Install link:
 
 ```text
-cursor://anysphere.cursor-deeplink/mcp/install?name=ireland&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vbWNwLmlyaXNob3BlbmRhdGEuY29tL21jcCJ9
+cursor://anysphere.cursor-deeplink/mcp/install?name=ireland&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vbWNwLmlyaXNob3BlbmRhdGEuaWUvbWNwIn0=
 ```
 
 Decoded config:
@@ -66,7 +66,7 @@ Decoded config:
 ```json
 {
   "type": "http",
-  "url": "https://mcp.irishopendata.com/mcp"
+  "url": "https://mcp.irishopendata.ie/mcp"
 }
 ```
 
@@ -75,8 +75,8 @@ Decoded config:
 Use the MCP install deeplink with URL-encoded JSON:
 
 ```text
-vscode:mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fmcp.irishopendata.com%2Fmcp%22%7D
-vscode-insiders:mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fmcp.irishopendata.com%2Fmcp%22%7D
+vscode:mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fmcp.irishopendata.ie%2Fmcp%22%7D
+vscode-insiders:mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fmcp.irishopendata.ie%2Fmcp%22%7D
 ```
 
 Workspace `.vscode/mcp.json`:
@@ -86,7 +86,7 @@ Workspace `.vscode/mcp.json`:
   "servers": {
     "ireland": {
       "type": "http",
-      "url": "https://mcp.irishopendata.com/mcp"
+      "url": "https://mcp.irishopendata.ie/mcp"
     }
   }
 }

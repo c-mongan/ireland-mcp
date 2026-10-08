@@ -3,7 +3,7 @@
   "name": "Ireland MCP",
   "id": "io.github.c-mongan/ireland-mcp",
   "description": "Read-only MCP server for Irish public data. No keys, no login.",
-  "homepage": "https://irishopendata.com/",
+  "homepage": "https://irishopendata.ie/",
   "repository": "https://github.com/c-mongan/ireland-mcp",
   "license": "MIT",
   "protocol": {
@@ -16,7 +16,7 @@
   "transports": [
     {
       "type": "http",
-      "url": "https://mcp.irishopendata.com/mcp",
+      "url": "https://mcp.irishopendata.ie/mcp",
       "auth": {
         "type": "none"
       }
@@ -33,13 +33,13 @@
     "all": "Append ?toolsets=all to list every typed source tool.",
     "source": "Use /mcp/x/{source-id} or ?toolsets={source-id} for one source."
   },
-  "agent_docs": "https://irishopendata.com/AGENTS.md",
-  "llms_txt": "https://irishopendata.com/llms.txt",
+  "agent_docs": "https://irishopendata.ie/AGENTS.md",
+  "llms_txt": "https://irishopendata.ie/llms.txt",
   "status": "https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json",
   "prompts": [
     "area_profile",
     "commute_check",
     "compare_counties"
   ],
-  "counts": "https://irishopendata.com/counts.json"
+  "counts": "https://irishopendata.ie/counts.json"
 }
