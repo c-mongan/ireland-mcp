@@ -26,6 +26,7 @@ for (const section of sections) {
       if (section === "installer") {
         await expect(frame.getByRole("tab", { selected: true })).toHaveText("Copilot CLI");
         await expect(frame.locator("#install-panel")).toContainText("copilot mcp add");
+        await expect(frame.locator("#install-panel")).toContainText("https://mcp.irishopendata.ie/mcp");
       }
       if (section === "directory") {
         await expect(frame.locator(".source-card")).toHaveCount(3);

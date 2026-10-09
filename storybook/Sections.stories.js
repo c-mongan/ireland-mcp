@@ -3,15 +3,13 @@ import pageHtml from "../web/index.html?raw";
 import siteCss from "../web/styles.css?raw";
 import demoCss from "./demo.css?raw";
 
-const endpoint = "https://mcp.irishopendata.com/mcp";
-
 function required(root, selector) {
   const element = root.querySelector(selector);
   if (!element) throw new Error(`Storybook cannot find production element: ${selector}`);
   return element;
 }
 
-function populateInstaller(section) {
+function populateInstaller(section, endpoint) {
   const tabs = required(section, ".install-tabs");
   tabs.innerHTML = '<button id="tab-copilot" type="button" role="tab" aria-controls="install-panel" aria-selected="true">Copilot CLI</button>';
   const panel = required(section, "#install-panel");
@@ -76,7 +74,7 @@ function render({ section: sectionId, theme, state }) {
     required(section, "#live-label").textContent = "Sample Server Online";
     required(section, "#motion-toggle").textContent = "Video paused in Storybook";
   }
-  if (sectionId === "install") populateInstaller(section);
+  if (sectionId === "install") populateInstaller(section, required(source, 'meta[name="mcp-endpoint"]').content);
   if (sectionId === "directory") populateDirectory(section);
   if (sectionId === "playground") populatePlayground(section, state);
   for (const element of section.querySelectorAll("button, input, textarea, select")) element.disabled = true;
