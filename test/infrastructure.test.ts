@@ -28,7 +28,7 @@ describe("Production infrastructure replay contracts", () => {
       resourceNameSuffix: { value: "aofsjpwgy4hva" },
       maximumInstanceCount: { value: 10 },
       enableProductionDomains: { value: true },
-      canonicalSiteUrl: { value: "https://irishopendata.com" },
+      canonicalSiteUrl: { value: "https://irishopendata.ie" },
       staticWebAppValidationToken: { value: "_h6b8rofq6ozlaihstd6ok0u95bkmf6z" }
     });
     expect(domains).toContain("name: 'swa-ireland-mcp'");
@@ -56,7 +56,7 @@ describe("Production infrastructure replay contracts", () => {
     expect(service).toContain("@secure()\nparam additionalAppSettings object = {}");
     expect(service).toContain("union(additionalAppSettings, baseSettings, originSettings, canonicalSettings, ntaSettings)");
     expect(service).toContain("{ CANONICAL_SITE_URL: canonicalSiteUrl }");
-    expect(main).toContain("empty(canonicalSiteUrl) && enableProductionDomains ? 'https://irishopendata.com'");
+    expect(main).toContain("empty(canonicalSiteUrl) && enableProductionDomains ? 'https://irishopendata.ie'");
   });
 
   it("mirrors the app default and replacement/extension CORS contract without credentials", () => {
@@ -106,7 +106,7 @@ describe("Production infrastructure replay contracts", () => {
     expect(isOriginAllowed("http://localhost:7071", parseAllowedOrigins("https://irishopendata.com"))).toBe(false);
   });
 
-  it("manages both existing zones but binds only .com without changing nameservers or CAA", () => {
+  it("manages both zones and binds both apexes plus mcp.ie without changing nameservers or CAA", () => {
     expect(domains).toContain("zoneName: 'irishopendata.com'");
     expect(domains).toContain("zoneName: 'irishopendata.ie'");
     expect(dns).toContain("name in ['@', '_dnsauth']");
@@ -115,9 +115,12 @@ describe("Production infrastructure replay contracts", () => {
     expect(dns).not.toContain("Microsoft.Network/dnsZones/CAA@");
     expect([...domains.matchAll(/hostname: '([^']+)'/g)].map((match) => match[1])).toEqual([
       "mcp.irishopendata.com",
-      "www.irishopendata.com"
+      "www.irishopendata.com",
+      "mcp.irishopendata.ie"
     ]);
     expect(domains).toContain("name: 'irishopendata.com'\n  properties: { validationMethod: 'dns-txt-token' }");
+    expect(domains).toContain("name: 'irishopendata.ie'\n  properties: { validationMethod: 'dns-txt-token' }");
+    expect(domains).toContain("staticWebAppValidationToken: ieStaticWebAppValidationToken");
   });
 
   it("uses site-scoped certificates before SNI bindings without disabling existing TLS", () => {
@@ -125,12 +128,13 @@ describe("Production infrastructure replay contracts", () => {
     expect(domains).toContain("Microsoft.Web/sites/certificates@2024-11-01");
     expect(domains).toContain("certificateName: 'mcp-irishopendata-com'");
     expect(domains).toContain("certificateName: 'www-irishopendata-com'");
+    expect(domains).toContain("certificateName: 'mcp-irishopendata-ie'");
     expect(domains).toContain("properties: { canonicalName: host.hostname }");
     expect(domains).toContain("thumbprint: certificates[i].properties.thumbprint");
     expect(domains).toContain("sslState: 'SniEnabled'");
     expect(domains).not.toMatch(/sslState:\s*'Disabled'/);
     const certificates = domains.split("resource certificates ")[1]?.split("resource bindings ")[0] ?? "";
-    expect(certificates).toContain("dependsOn: [comDns]");
+    expect(certificates).toContain("dependsOn: [comDns, ieDns]");
     expect(certificates).not.toContain("dependsOn: [bindings]");
   });
 

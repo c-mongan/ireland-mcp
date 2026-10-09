@@ -2,8 +2,8 @@
 
 Ireland MCP is a public, read-only Model Context Protocol server for Irish public data. It needs no API key, account or login.
 
-Endpoint: [Ireland MCP Streamable HTTP endpoint](https://mcp.irishopendata.com/mcp)
-Docs: [Ireland MCP documentation and playground](https://irishopendata.com/)
+Endpoint: [Ireland MCP Streamable HTTP endpoint](https://mcp.irishopendata.ie/mcp)
+Docs: [Ireland MCP documentation and playground](https://irishopendata.ie/)
 Transport: Streamable HTTP JSON-RPC over POST
 Auth: none
 Default tool surface: 7 tools, 8,407 characters, about 2.1k tokens
@@ -12,11 +12,11 @@ Full surface: use ?toolsets=all only when a client needs all typed tools listed
 Install:
 - Claude connector: add a custom connector named Ireland MCP with the endpoint URL and no authentication.
 - ChatGPT: enable Developer Mode connectors, create an MCP connector, use the endpoint URL and no authentication.
-- VS Code: vscode:mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fmcp.irishopendata.com%2Fmcp%22%7D
-- VS Code Insiders: vscode-insiders:mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fmcp.irishopendata.com%2Fmcp%22%7D
-- Cursor: cursor://anysphere.cursor-deeplink/mcp/install?name=ireland&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vbWNwLmlyaXNob3BlbmRhdGEuY29tL21jcCJ9
-- Copilot CLI: copilot mcp add --transport http ireland https://mcp.irishopendata.com/mcp
-- Claude Code: claude mcp add --transport http ireland https://mcp.irishopendata.com/mcp
+- VS Code: vscode:mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fmcp.irishopendata.ie%2Fmcp%22%7D
+- VS Code Insiders: vscode-insiders:mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fmcp.irishopendata.ie%2Fmcp%22%7D
+- Cursor: cursor://anysphere.cursor-deeplink/mcp/install?name=ireland&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vbWNwLmlyaXNob3BlbmRhdGEuaWUvbWNwIn0=
+- Copilot CLI: copilot mcp add --transport http ireland https://mcp.irishopendata.ie/mcp
+- Claude Code: claude mcp add --transport http ireland https://mcp.irishopendata.ie/mcp
 - Local stdio: npm package target `npx -y ireland-mcp` after npm publication; today use `npm ci && npm run build && node dist/src/cli.js` from source.
 
 Default tools:
@@ -37,8 +37,8 @@ Source domains: stats, law/politics, places/property, environment, transport, en
 
 ## Documentation
 
-- [Agent installation guide](https://irishopendata.com/AGENTS.md): client configuration, compact tool workflow and citation guidance.
-- [MCP server card](https://irishopendata.com/.well-known/mcp/server-card.json): machine-readable service metadata.
+- [Agent installation guide](https://irishopendata.ie/AGENTS.md): client configuration, compact tool workflow and citation guidance.
+- [MCP server card](https://irishopendata.ie/.well-known/mcp/server-card.json): machine-readable service metadata.
 - [API guide and source catalogue](https://github.com/c-mongan/ireland-mcp/blob/main/README.md): supported sources, operations and self-hosting.
 - [Privacy policy](https://github.com/c-mongan/ireland-mcp/blob/main/PRIVACY.md): request handling and telemetry.
 - [Source attribution](https://github.com/c-mongan/ireland-mcp/blob/main/NOTICE): publisher licences and reuse requirements.

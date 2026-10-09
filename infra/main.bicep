@@ -29,14 +29,17 @@ param mcpAllowedOrigins string = ''
 @description('Optional stable resource suffix when adopting an existing environment. Empty uses the azd naming algorithm.')
 param resourceNameSuffix string = ''
 
-@description('Opt in to the existing irishopendata.com production domains. Never creates .ie bindings or changes delegation.')
+@description('Opt in to the existing irishopendata.com and irishopendata.ie production domains. Never changes registrar delegation.')
 param enableProductionDomains bool = false
 
 @description('Existing SWA apex TXT validation token. Required for production domain replay; not a credential.')
 param staticWebAppValidationToken string = ''
 
+@description('Existing SWA TXT validation token for the irishopendata.ie apex. Required for production domain replay; not a credential.')
+param ieStaticWebAppValidationToken string = ''
+
 @description('Canonical site origin. Empty preserves the application default in generic environments.')
-param canonicalSiteUrl string = enableProductionDomains ? 'https://irishopendata.com' : ''
+param canonicalSiteUrl string = enableProductionDomains ? 'https://irishopendata.ie' : ''
 
 @description('Existing action group resource IDs for availability alerts. No existing action group is modified.')
 param availabilityActionGroupIds array = []
@@ -70,7 +73,7 @@ module service 'service.bicep' = {
     maximumInstanceCount: maximumInstanceCount
     mcpAllowedOrigins: mcpAllowedOrigins
     resourceNameSuffix: empty(resourceNameSuffix) ? toLower(uniqueString(subscription().id, group.id, environmentName)) : resourceNameSuffix
-    canonicalSiteUrl: empty(canonicalSiteUrl) && enableProductionDomains ? 'https://irishopendata.com' : canonicalSiteUrl
+    canonicalSiteUrl: empty(canonicalSiteUrl) && enableProductionDomains ? 'https://irishopendata.ie' : canonicalSiteUrl
     additionalAppSettings: additionalAppSettings
     healthCheckUrl: enableProductionDomains ? 'https://mcp.irishopendata.com/healthz' : ''
   }
@@ -84,6 +87,7 @@ module domains 'production-domains.bicep' = if (enableProductionDomains) {
     functionDefaultHost: service.outputs.defaultHostName
     functionVerificationId: service.outputs.customDomainVerificationId
     staticWebAppValidationToken: staticWebAppValidationToken
+    ieStaticWebAppValidationToken: ieStaticWebAppValidationToken
     location: location
   }
 }

@@ -10,6 +10,7 @@
     "budgetStartDate": { "value": "2026-10-01" },
     "enableProductionDomains": { "value": true },
     "staticWebAppValidationToken": { "value": "_h6b8rofq6ozlaihstd6ok0u95bkmf6z" },
-    "canonicalSiteUrl": { "value": "https://irishopendata.com" }
+    "ieStaticWebAppValidationToken": { "value": "_ubsqkd6qhr695r5sobll8leie4bqdsb" },
+    "canonicalSiteUrl": { "value": "https://irishopendata.ie" }
   }
 }
