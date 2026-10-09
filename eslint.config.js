@@ -2,7 +2,7 @@ import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: [".agents/skills/**", "dist/**", "coverage/**", "node_modules/**", "web/**", "**/fixtures/**"] },
+  { ignores: [".agents/skills/**", "dist/**", "coverage/**", "node_modules/**", "web/**", "storybook-static/**", "**/fixtures/**"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -10,5 +10,9 @@ export default tseslint.config(
     rules: {
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }]
     }
+  },
+  {
+    files: ["storybook/*.stories.js"],
+    languageOptions: { globals: { document: "readonly", DOMParser: "readonly", ResizeObserver: "readonly" } }
   }
 );

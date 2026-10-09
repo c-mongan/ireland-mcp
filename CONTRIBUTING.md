@@ -17,6 +17,43 @@ Unit tests never touch the network. They replay recorded fixtures through
 `test/helpers/fakeFetch.ts`. `npm run live:sanity` makes one real call per
 source; run it by hand, not in CI.
 
+## Frontend Storybook
+
+The separate HTML/Vite Storybook reuses `web/index.html` sections and
+`web/styles.css`. It does not alter or deploy the production site.
+
+```bash
+npm run storybook          # http://localhost:6006
+npm run build-storybook    # generates storybook-static/
+npm run test:storybook     # checks the static build in Chromium
+```
+
+Stories cover the hero, a Copilot installer, sample source cards, and playground
+idle/loading/success/empty/error states in both themes. They use fixed sample
+data, never run live queries, and disable installation, copy, and video actions.
+Each preview is isolated in a sandboxed frame so the site's styles and theme
+cannot affect Storybook itself. Dynamic fixtures mirror the generated UI classes;
+update them when changing the production renderers in `web/app.js`.
+
+`storybook/demo.css` enlarges source-card headings only in Storybook for the
+Chromatic change-review demo. Remove its rule to restore the production size;
+also update the heading-size assertion in `storybook/stories.spec.ts`.
+
+To publish, build first, then supply `CHROMATIC_PROJECT_TOKEN` through your
+shell environment or secret manager and run `npm run chromatic`.
+Never put the token in repository files or commit it.
+
+The `Chromatic` GitHub Actions workflow builds and checks Storybook on relevant
+pull requests, pushes to `main`, and manual runs. It publishes for same-repository
+PRs and non-Dependabot pushes/manual runs using the `CHROMATIC_PROJECT_TOKEN`
+Actions repository secret. Fork and Dependabot PRs run the local checks only;
+never expose the token to enable their publication or use `pull_request_target`
+to run their code with secrets.
+
+Visual differences remain pending review in Chromatic and do not fail the
+workflow by themselves. Build, browser-check and Chromatic service errors still
+fail it. Baselines are not automatically accepted.
+
 ## Rules every tool follows
 
 - Name: `{source}_{verb}` in snake_case, for example `met_get_warnings`.
