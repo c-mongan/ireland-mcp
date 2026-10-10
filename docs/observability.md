@@ -38,11 +38,17 @@ All events have `schema_version: 1`, `surface: mcp|web`, and the three privacy p
 | Event | Allowed product properties |
 | --- | --- |
 | `ireland_mcp_tool_completed` | `source`, `operation`, `outcome: ok|error`, `duration_ms`, optional Boolean `cached` and `stale`, optional `error_code` |
+| `ireland_query_started` | `source`, `operation` |
 | `ireland_query_completed` | `source`, `operation`, `outcome: ok|error`, `duration_ms` |
+| `ireland_result_action` | `source`, `operation`, `action: inspect_raw|open_source|connect` |
 | `ireland_install_action` | `client: vscode|cursor|claude|chatgpt|copilot|gemini|windsurf|generic|endpoint`, `action: select|copy|open` |
 | `ireland_theme_changed` | `theme: light|dark` |
 
 The backend accepts labels from the deployed source registry. The website accepts labels from its maintained static catalogue. Valid error codes are `UPSTREAM_DOWN`, `NOT_FOUND`, `BAD_ARGS`, `RATE_LIMITED`, `NOT_CONFIGURED`, and `_OTHER`. Durations are rounded to whole milliseconds and limited to 0–120,000 ms. Backend capture covers executed source tools; it does not count every HTTP request or rejected request.
+
+The website records `ireland_query_started` once when a visitor submits valid query arguments, before the request begins. It records result actions only after a visitor selects a control for the displayed result. `inspect_raw` opens the raw response; `open_source` selects its public source link; `connect` selects its connection control. These events use the displayed result's source and operation, not later edits to the query form. An invalid result action is rejected. No source URL or response content is included.
+
+Query attempts, technical success, and result actions are candidate measures of first use. They do not establish that the result answered a visitor's question. `connect` does not prove a successful MCP connection. See [product validation](product-validation.md) for the hypothesis and evidence limits. The added events preserve `schema_version: 1` and all existing event properties.
 
 ## Delivery limits and interpretation
 
@@ -56,7 +62,7 @@ All backend events use the fixed identity `ireland-mcp-service-aggregate`. Use *
 
 Browser capture allows at most 30 events per minute and two requests at the same time. Each request has a two-second cancellation deadline. There is no background queue or unload delivery. Failed requests are dropped without displaying their exception. Install `copy` means the clipboard accepted the configuration; install `open` means a link was selected. Neither proves installation in an MCP client.
 
-Use Chromatic for appearance and interaction regressions. Use PostHog to find frequent actions and failed or slow operations. Reproduce a suspected issue in the browser with test data before changing the design. Compare visual variants with Chromatic; use the safe event dimensions to assess the deployed result. Do not enable replay or raw query logging to make this comparison.
+Use Chromatic for appearance and browser tests for interaction regressions. Use PostHog to find frequent actions and failed or slow operations. Reproduce a suspected issue in the browser with test data before changing the design. Compare visual variants with Chromatic; use the safe event dimensions to assess the deployed result. Do not enable replay or raw query logging to make this comparison.
 
 ## Package release identity
 
@@ -66,7 +72,7 @@ The Azure deployment workflow supplies `IRELAND_MCP_EXPECTED_REVISION` from `git
 
 ## Verification
 
-The backend tests check opt-in configuration, scalar projection, unknown-label redaction, queue size, network rejection, HTTP failure, cancellation, shared flush, loss-summary counts and redaction, invalid or stale release values, and `IRELAND_MCP_TELEMETRY=off`. Browser tests check opt-in/out, DNT/GPC, ephemeral identities, absent cookies/storage, query/result redaction, arbitrary-event rejection, bounded capture, and unaffected UI after analytics failure.
+The backend tests check opt-in configuration, scalar projection, unknown-label redaction, queue size, network rejection, HTTP failure, cancellation, shared flush, loss-summary counts and redaction, invalid or stale release values, and `IRELAND_MCP_TELEMETRY=off`. Browser tests check opt-in/out, DNT/GPC, ephemeral identities, absent cookies/storage, query/result redaction, arbitrary-event rejection, bounded capture, and unaffected UI after analytics failure. First-use event tests check finite labels and actions, rejection of private fields and invalid actions, fixed privacy properties, and privacy settings changed after consent.
 
 ZIP tests inspect the archived release module and verify clean, dirty, changed-source and non-Git builds. They also prove that the workflow revision check stops an invalid upload.
 

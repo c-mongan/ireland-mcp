@@ -38,7 +38,7 @@ test("sample buttons load matching requests with keyboard access and never submi
     ["5", "ppr", "ppr_price_stats"],
     ["0", "cso", "cso_search_tables"]
   ]) {
-    const sample = page.locator(`[data-example-index="${index}"]`);
+    const sample = page.locator(`.question-examples [data-example-index="${index}"]`);
     await sample.focus();
     await page.keyboard.press("Enter");
     await expect(page.locator("#example-select")).toHaveValue(index);
@@ -46,11 +46,12 @@ test("sample buttons load matching requests with keyboard access and never submi
     await expect(page.locator("#pg-source")).toHaveValue(source);
     await expect(page.locator("#pg-operation")).toHaveValue(operation);
     await expect(sample).toHaveAttribute("aria-pressed", "true");
-    await expect(page.locator('[data-example-index][aria-pressed="true"]')).toHaveCount(1);
+    await expect(page.locator('.question-examples [data-example-index][aria-pressed="true"]')).toHaveCount(1);
   }
   await page.locator("#example-select").selectOption("3");
   await expect(page.locator('[data-example-index][aria-pressed="true"]')).toHaveCount(0);
   expect(submitted).toBe(0);
+  await page.locator("#pg-raw-details summary").click();
   await expect(page.locator("#pg-output")).toHaveAccessibleName("Live response");
   await expect(page.locator("#pg-output")).toHaveAttribute("aria-describedby", "response-guide");
 });

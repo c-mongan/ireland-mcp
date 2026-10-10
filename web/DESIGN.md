@@ -17,8 +17,9 @@ not a real Irish location. No new remote imagery or font dependencies are needed
 - The hero pairs the product promise with a question and an honest connection
   diagram. Its server summary remains live, but counts are compact information
   rows rather than oversized marketing metrics.
-- Installation is the first section. Static VS Code and Cursor links provide
-  quick entry; the existing app-generated tabs retain all setup options.
+- The live playground follows the hero, so visitors can inspect data before
+  installation. Static VS Code and Cursor links still provide quick entry in
+  the installation section; the app-generated tabs retain all setup options.
 - A three-step ordered diagram explains the discovery/call/citation flow.
   Retrieval time is explicitly distinguished from publication time.
 - Machine-readable documentation keeps all existing URLs and its section anchor.
@@ -27,6 +28,13 @@ not a real Irish location. No new remote imagery or font dependencies are needed
   the example selector, and keyboard focus moves to that selector after loading.
 - Keep the request and response visually separate. The response has an accessible
   name and guidance on source metadata and dates. Raw results stay visible.
+- A deterministic result preview uses documented fields for the seven examples.
+  It shows publisher, safe HTTP(S) source URL, licence and retrieval time. Cached,
+  stale, partial and truncated flags remain visible. Unknown or malformed data
+  receives a raw-response fallback. Missing values never become zero.
+- The rent example shows historical registered-tenancy statistics, not current
+  asking rents. In RIQ02, zero means insufficient published data. Preserve that
+  distinction. The frontend must not contain a fixed rent value.
 - Sources use a scannable directory. Subject navigation comes from the returned
   catalogue and links to the existing domain heading IDs. Do not add fixed links
   that assume every subject is present in the live catalogue.
@@ -77,6 +85,12 @@ decorative shadows and glass panels are unnecessary.
 - Use the same full-width sample buttons for pointer and keyboard input. Do not
   send a live request when a user selects a sample. The explicit submit button is
   the only way to run a playground request.
+- Clear the previous response when the selected example or advanced arguments
+  change. Disable query fields and sample controls during a pending request.
+  Keep the submitted source and operation next to the result. Show loading,
+  source errors and invalid JSON as separate states.
+- Keep complete raw response text in `#pg-output`, inside the keyboard-accessible
+  Raw response disclosure. Array previews show at most five rows per table.
 - Keep usage metrics optional. The footer control states whether metrics are on
   and explains what is sent. Do not send query text, arguments or results.
 

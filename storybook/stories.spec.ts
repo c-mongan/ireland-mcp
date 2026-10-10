@@ -5,7 +5,7 @@ import { expect, test } from "@playwright/test";
 
 const axeSource = readFileSync(createRequire(import.meta.url).resolve("axe-core/axe.min.js"), "utf8");
 
-const sections = ["hero", "installer", "directory", "playground-idle", "playground-loading", "playground-success", "playground-empty", "playground-error", "playground-truncated", "status-healthy", "status-degraded", "status-stale", "status-loading", "status-unreachable"];
+const sections = ["hero", "installer", "directory", "playground-idle", "playground-loading", "playground-success", "playground-empty", "playground-error", "playground-truncated", "playground-weather", "playground-transport", "playground-rent", "playground-cached-stale", "status-healthy", "status-degraded", "status-stale", "status-loading", "status-unreachable"];
 
 for (const section of sections) {
   for (const theme of ["dark", "light"]) {
@@ -45,16 +45,80 @@ for (const section of sections) {
       if (section.startsWith("playground")) {
         await expect(frame.locator(".request-heading h3")).toHaveText("Try a live request");
         await expect(frame.locator("#response-title")).toHaveText("Sample response");
+        const source = section === "playground-weather" ? "met-eireann" : section === "playground-transport" ? "luas" : "cso";
+        await expect(frame.locator("#pg-source")).toHaveValue(source);
+        if (section !== "playground-idle") await expect(frame.locator("#pg-request-label")).toContainText(`Sample request: ${source}`);
+        await expect(frame.locator("#response-area")).toHaveAttribute("aria-busy", String(section === "playground-loading"));
+        await expect(frame.locator("#pg-raw-details")).toHaveJSProperty("open", section === "playground-error");
+        if (section !== "playground-error") {
+          await expect(frame.locator("#pg-output")).toBeHidden();
+          const rawSummary = frame.locator("#pg-raw-details summary");
+          await rawSummary.focus();
+          await rawSummary.press("Enter");
+        }
+        await expect(frame.locator("#pg-output")).toBeVisible();
         await expect(frame.locator("#pg-output")).toHaveAccessibleName("Sample response");
         await expect(frame.locator("#pg-output")).not.toBeEmpty();
-        await expect(frame.locator("#pg-source")).toHaveValue("cso");
-        await expect(frame.locator("#pg-args")).toHaveValue(/population/);
         await expect(frame.locator("button:not(:disabled)")).toHaveCount(0);
-        if (section === "playground-error") await expect(frame.locator("#pg-output")).toHaveClass(/error/);
-        if (section === "playground-success") await expect(frame.locator("#pg-output")).toContainText("Sample population table");
+        const preview = frame.locator("#pg-result");
+        if (!["playground-idle", "playground-loading"].includes(section)) {
+          await expect(preview.locator(".result-provenance")).toContainText("Publisher");
+          await expect(preview.locator(".result-provenance")).toContainText("Licence");
+          await expect(preview.locator(".result-provenance")).toContainText("Retrieved");
+          if (section !== "playground-error") {
+            await expect(preview.locator(".result-provenance")).toContainText(source === "met-eireann" ? "Met Éireann" : source === "luas" ? "Luas Forecasting API" : "CSO PxStat");
+            await expect(preview.locator(".result-provenance")).toContainText("CC BY 4.0");
+            await expect(preview.locator(".result-provenance")).toContainText("1 Jan 2026, 12:00 UTC");
+          }
+          if (["playground-error", "playground-truncated"].includes(section)) {
+            await expect(preview.locator("a")).toHaveCount(0);
+            await expect(preview).toContainText("No safe source URL was supplied.");
+          } else {
+            const sourceLink = preview.locator("a[data-source-url]");
+            const expectedUrl = section === "playground-weather" ? "https://www.met.ie/warnings" : section === "playground-transport" ? "https://luas.ie/" : section === "playground-rent" ? "https://data.cso.ie/table/RIQ02" : "https://data.cso.ie/search?q=population";
+            await expect(sourceLink).toHaveText(expectedUrl);
+            await expect(sourceLink).toHaveAttribute("aria-label", "Open the source response");
+            await expect(sourceLink).toHaveAttribute("rel", "noreferrer");
+            await expect(sourceLink).toHaveAttribute("data-source-url", expectedUrl);
+            await expect(sourceLink).toHaveAttribute("aria-disabled", "true");
+          }
+        }
+        if (section === "playground-error") {
+          await expect(frame.locator("#pg-output")).toHaveClass(/error/);
+          await expect(preview.locator("h4")).toHaveText("The source returned an error");
+          await expect(preview.locator("table")).toHaveCount(0);
+        }
+        if (section === "playground-success") await expect(preview.locator("tbody")).toContainText("Sample population table");
+        if (section === "playground-empty") {
+          await expect(preview.locator("h4")).toHaveText("No tables in this response");
+          await expect(preview.locator("tbody")).toHaveText("No entries in this response.");
+        }
+        if (section === "playground-weather") await expect(preview.getByRole("table", { name: "Weather warnings" })).toContainText("Sample heavy rain warning");
+        if (section === "playground-transport") {
+          await expect(preview.locator("h4")).toHaveText("Luas arrivals at Heuston");
+          await expect(preview.getByRole("table", { name: "Inbound trams" })).toContainText("4 min");
+          await expect(preview.getByRole("table", { name: "Outbound trams" })).toContainText("Tallaght");
+        }
+        if (section === "playground-rent") {
+          await expect(preview).toContainText("Galway City");
+          await expect(preview).toContainText("2025Q4");
+          await expect(preview.locator(".result-description").first()).toContainText("registered");
+          await expect(preview.locator(".result-description").first()).toContainText("asking");
+        }
+        if (section === "playground-cached-stale") {
+          await expect(preview.locator(".result-notices")).toContainText("Cached response.");
+          await expect(preview.locator(".result-notices")).toContainText("Stale response.");
+          await expect(preview.locator(".result-notices")).toContainText("Truncated response.");
+        }
       }
       if (section === "playground-truncated") {
         await expect(frame.locator("#pg-output")).toContainText('"truncated": true');
+        await expect(frame.locator("#pg-result tbody tr")).toHaveCount(5);
+        await expect(frame.locator("#pg-result .result-notices")).toContainText("Showing the first 5 entries");
+        const title = frame.locator("#pg-result tbody td").first();
+        await expect(title).toContainText("<img src=x onerror=alert(1)>");
+        expect(await title.evaluate((node) => node.textContent?.length)).toBe(300);
+        await expect(frame.locator("#pg-result img")).toHaveCount(0);
         const output = frame.locator("#pg-output");
         await output.focus();
         await expect(output).toBeFocused();
@@ -67,18 +131,18 @@ for (const section of sections) {
         await expect(frame.locator(".status-sources")).toContainText("setup needed");
       }
       if (section === "status-unreachable") await expect(frame.locator("#status-card")).toContainText("Status feed unavailable");
-      await expect(frame.locator("video, script")).toHaveCount(0);
+      await expect(frame.locator("video, script, a[href]")).toHaveCount(0);
       // Axe needs timers, which the production preview sandbox blocks. Scan an exact
       // test-only document copy while retaining the original sandbox for UI checks.
       await expect(page.locator('iframe[title="Ireland MCP section preview"]')).toHaveAttribute("sandbox", "allow-same-origin");
       await page.evaluate(() => {
         const preview = document.querySelector<HTMLIFrameElement>('iframe[title="Ireland MCP section preview"]');
-        if (!preview) throw new Error("Storybook preview frame did not load");
+        if (!preview?.contentDocument) throw new Error("Storybook preview frame did not load");
         const scan = document.createElement("iframe");
         scan.name = "accessibility-scan";
         scan.title = "Accessibility test copy";
         scan.style.cssText = preview.style.cssText;
-        scan.srcdoc = preview.srcdoc;
+        scan.srcdoc = `<!doctype html>${preview.contentDocument.documentElement.outerHTML}`;
         preview.after(scan);
       });
       await expect(page.frameLocator('iframe[name="accessibility-scan"]').locator("main")).toBeVisible();
@@ -113,6 +177,13 @@ for (const theme of ["dark", "light"]) {
     await summary.press("Space");
     await expect(frame.locator("#pg-source")).toBeHidden();
     await summary.press("Tab");
+    await expect(frame.locator(".result-table-scroll")).toBeFocused();
+    await page.keyboard.press("Tab");
+    const rawSummary = frame.locator("#pg-raw-details summary");
+    await expect(rawSummary).toBeFocused();
+    await rawSummary.press("Enter");
+    await expect(frame.locator("#pg-raw-details")).toHaveJSProperty("open", true);
+    await rawSummary.press("Tab");
     await expect(frame.locator("#pg-output")).toBeFocused();
     await expect(frame.locator("#pg-output")).toHaveCSS("outline-style", "solid");
   });

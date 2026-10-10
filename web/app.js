@@ -1,4 +1,5 @@
-import { createAnalytics } from "./analytics.js";
+import { createAnalytics } from "./analytics.js?v=20261010-first-use";
+import { buildResultView, decodeToolPayload, renderResultView } from "./result-view.js?v=20261010-first-use";
 
 const MCP_URL = "https://mcp.irishopendata.ie/mcp";
 const STATUS_URL = "https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json";
@@ -89,10 +90,13 @@ const EXAMPLES = [
   { question: "Weather warnings now", source: "met-eireann", operation: "met_get_warnings", args: {} },
   { question: "Irish Rail departures from Connolly", source: "irish-rail", operation: "rail_get_departures", args: { station: "Dublin Connolly" } },
   { question: "Electricity grid status", source: "eirgrid", operation: "grid_get_status", args: {} },
-  { question: "Property price stats for Galway", source: "ppr", operation: "ppr_price_stats", args: { county: "Galway" } }
+  { question: "Property price stats for Galway", source: "ppr", operation: "ppr_price_stats", args: { county: "Galway" } },
+  { question: "Historical registered rents: Galway City two-bed apartments, 2025Q4", source: "cso", operation: "cso_get_data", args: { table_code: "RIQ02", filters: { STATISTIC: ["RIQ02"], "TLIST(Q1)": ["20254"], C02970V03592: ["02"], C02969V03591: ["04"], C03004V03625: ["141600"] }, limit: 5 } }
 ];
 
 const $ = (id) => document.getElementById(id);
+let displayedRequest;
+let queryRunning = false;
 const analytics = createAnalytics({
   operations: new Map(SOURCE_FALLBACK.flatMap((group) => group.sources.map((source) => [source.id, new Set(source.operations)])))
 });
@@ -421,10 +425,12 @@ function renderExamples() {
     for (const button of document.querySelectorAll("[data-example-index]")) {
       button.setAttribute("aria-pressed", String(button.dataset.exampleIndex === select.value));
     }
+    clearQueryResult();
   }
   select.addEventListener("change", apply);
   for (const button of document.querySelectorAll("[data-example-index]")) {
     button.addEventListener("click", () => {
+      if (queryRunning) return;
       select.value = button.dataset.exampleIndex;
       select.dispatchEvent(new Event("change", { bubbles: true }));
       select.scrollIntoView({ block: "center", behavior: "instant" });
@@ -435,10 +441,35 @@ function renderExamples() {
 }
 
 function payloadFromToolResult(result) {
-  const payload = result?.structuredContent ?? result?.content?.map?.((item) => item.text || "").join("\n") ?? result;
-  if (typeof payload !== "string") return jsonBlock(payload);
-  try { return jsonBlock(JSON.parse(payload)); } catch { return payload; }
+  const payload = decodeToolPayload(result);
+  return typeof payload === "string" ? payload : jsonBlock(payload) ?? "No response payload was supplied.";
 }
+
+function clearQueryResult() {
+  displayedRequest = undefined;
+  $("pg-request-label").textContent = "No request has run yet.";
+  $("pg-result").textContent = "Choose a sample and run it to inspect the returned data and its source.";
+  $("pg-result").dataset.state = "idle";
+  $("pg-output").textContent = "Choose an example, then run it.";
+  $("pg-output").classList.remove("error");
+  $("pg-status").textContent = "";
+  $("pg-raw-details").open = false;
+}
+
+function setQueryRunning(running) {
+  queryRunning = running;
+  $("response-area").setAttribute("aria-busy", String(running));
+  for (const control of document.querySelectorAll('#playground-form input, #playground-form textarea, #playground-form select, #playground-form button[type="submit"], [data-example-index]')) control.disabled = running;
+}
+
+for (const id of ["pg-source", "pg-operation", "pg-args"]) $(id).addEventListener("input", clearQueryResult);
+$("pg-raw-details").querySelector("summary").addEventListener("click", () => {
+  if (displayedRequest && !$("pg-raw-details").open) analytics.capture("ireland_result_action", { ...displayedRequest, action: "inspect_raw" });
+});
+document.addEventListener("click", (event) => {
+  const action = event.target.closest("[data-result-action]")?.dataset.resultAction;
+  if (displayedRequest && ["open_source", "connect"].includes(action)) analytics.capture("ireland_result_action", { ...displayedRequest, action });
+});
 
 async function initLiveStats() {
   try {
@@ -511,32 +542,56 @@ async function initStatus() {
 
 $("playground-form").addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (queryRunning) return;
   const status = $("pg-status");
   const output = $("pg-output");
+  clearQueryResult();
   let args;
-  try { args = JSON.parse($("pg-args").value || "{}"); } catch { output.textContent = "Arguments must be valid JSON."; output.classList.add("error"); return; }
-  const submit = event.currentTarget.querySelector("button[type=submit]");
-  if (submit.disabled) return;
-  submit.disabled = true;
+  try {
+    args = JSON.parse($("pg-args").value || "{}");
+    if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Arguments must be a JSON object.");
+  } catch (error) {
+    output.textContent = error instanceof SyntaxError ? "Arguments must be valid JSON." : error.message;
+    output.classList.add("error");
+    $("pg-result").textContent = "The request was not sent. Correct the arguments in Query settings.";
+    $("pg-result").dataset.state = "error";
+    $("pg-raw-details").open = true;
+    status.textContent = "Request not sent. Check the arguments.";
+    return;
+  }
+  setQueryRunning(true);
   status.textContent = "Running…";
+  output.textContent = "Waiting for the source response…";
+  $("pg-result").textContent = "Requesting public data. A first request can take longer while the service starts.";
+  $("pg-result").dataset.state = "loading";
   output.classList.remove("error");
   const started = performance.now();
   const source = $("pg-source").value.trim();
   const operation = $("pg-operation").value.trim();
+  $("pg-request-label").textContent = `Request: ${source} · ${operation}`;
+  analytics.capture("ireland_query_started", { source, operation });
   let outcome = "error";
   try {
     const result = await rpc("tools/call", { name: "ireland_call", arguments: { source, operation, args, limit: 5, max_tokens: 1400 } });
     outcome = result?.isError ? "error" : "ok";
     output.textContent = payloadFromToolResult(result);
     output.classList.toggle("error", Boolean(result?.isError));
-    status.textContent = `${new Intl.NumberFormat("en-IE").format(Math.round(performance.now() - started))} ms`;
+    displayedRequest = { source, operation };
+    renderResultView($("pg-result"), buildResultView(decodeToolPayload(result), { source, operation, isError: Boolean(result?.isError) }));
+    $("pg-result").dataset.state = result?.isError ? "error" : "success";
+    $("pg-raw-details").open = Boolean(result?.isError);
+    status.textContent = result?.isError ? "Query failed. The source returned an error." : `Response received · ${new Intl.NumberFormat("en-IE").format(Math.round(performance.now() - started))} ms`;
   } catch (error) {
+    outcome = "error";
     output.textContent = error instanceof Error ? error.message : String(error);
     output.classList.add("error");
+    $("pg-result").textContent = "The request failed. No data is shown. You can run it again.";
+    $("pg-result").dataset.state = "error";
+    $("pg-raw-details").open = true;
     status.textContent = "Query failed. You can try again.";
   } finally {
     analytics.capture("ireland_query_completed", { source, operation, outcome, duration_ms: performance.now() - started });
-    submit.disabled = false;
+    setQueryRunning(false);
   }
 });
 

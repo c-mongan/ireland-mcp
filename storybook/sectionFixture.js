@@ -1,6 +1,7 @@
 import pageHtml from "../web/index.html?raw";
 import siteCss from "../web/styles.css?raw";
 import demoCss from "./demo.css?raw";
+import { buildResultView, renderResultView } from "../web/result-view.js";
 
 function required(root, selector) {
   const element = root.querySelector(selector);
@@ -50,24 +51,53 @@ function populateDirectory(section) {
 function populatePlayground(section, state) {
   required(section, ".section-head p").textContent = "These fixed sample states demonstrate the interface. No live query runs in Storybook.";
   required(section, 'label[for="example-select"]').textContent = "Choose a sample example";
-  required(section, "#example-select").innerHTML = '<option>Sample CSO population search</option>';
-  required(section, "#pg-source").setAttribute("value", "cso");
-  required(section, "#pg-operation").setAttribute("value", "cso_search_tables");
-  required(section, "#pg-args").textContent = JSON.stringify({ query: "population", limit: 5 }, null, 2);
   required(section, 'button[type="submit"]').textContent = "Sample query (disabled)";
   required(section, "#response-title").textContent = "Sample response";
   const output = required(section, "#pg-output");
   const status = required(section, "#pg-status");
-  const states = {
-    idle: ["", "Choose an example, then run it."],
-    loading: ["Running sample query...", "Waiting for a sample response..."],
-    success: ["120 ms (sample)", JSON.stringify({ data: { items: [{ id: "sample-population", label: "Sample population table" }] }, source: "CSO PxStat", licence: "CC BY 4.0", retrieved_at: "2026-01-01T12:00:00Z" }, null, 2)],
-    empty: ["120 ms (sample)", JSON.stringify({ data: { items: [] }, source: "CSO PxStat" }, null, 2)],
-    truncated: ["120 ms (sample)", JSON.stringify({ data: { items: Array.from({ length: 12 }, (_, index) => ({ id: `sample-${index + 1}`, label: `Sample table ${index + 1}`, description: "A long sample description tests response wrapping without live provider data." })) }, source: "CSO PxStat", truncated: true, total: 250, retrieved_at: "2026-01-01T12:00:00Z" }, null, 2)],
-    error: ["Query failed. You can try again.", "Sample error: The source is temporarily unavailable. Please try again."]
+  const preview = required(section, "#pg-result");
+  const cso = {
+    source: "CSO PxStat", licence: "CC BY 4.0", retrieved_at: "2026-01-01T12:00:00Z",
+    attribution: "Contains Central Statistics Office data. Fixed sample for visual review.",
+    url: "https://data.cso.ie/search?q=population", cached: false, truncated: false
   };
-  if (!states[state]) throw new Error(`Unknown playground fixture state: ${state}`);
-  [status.textContent, output.textContent] = states[state];
+  const table = { code: "F1001", title: "Sample population table", released: "2025-12-01", url: "https://data.cso.ie/table/F1001" };
+  const states = {
+    idle: {}, loading: {},
+    success: { payload: { ...cso, data: [table] } },
+    empty: { payload: { ...cso, data: [] } },
+    "cached-stale": { payload: { ...cso, data: [table], cached: true, stale: true, truncated: true } },
+    truncated: { payload: { ...cso, url: "javascript:alert('unsafe source')", data: Array.from({ length: 12 }, (_, index) => ({ ...table, code: `SAMPLE${index + 1}`, title: index ? `Sample table ${index + 1}` : `<img src=x onerror=alert(1)> ${"A long sample title tests bounded wrapping. ".repeat(12)}` })), truncated: true, returned: 12, total: 250 } },
+    weather: { source: "met-eireann", operation: "met_get_warnings", args: {}, label: "Sample weather warnings", payload: { ...cso, source: "Met Éireann", url: "https://www.met.ie/warnings", attribution: "Met Éireann. Fixed sample warning for visual review.", data: { count: 1, warnings: [{ headline: "Sample heavy rain warning", level: "Yellow", onset: "2026-01-01T06:00:00Z", expiry: "2026-01-01T18:00:00Z" }] } } },
+    transport: { source: "luas", operation: "luas_get_forecast", args: { stop: "HEU" }, label: "Sample Luas arrivals", payload: { ...cso, source: "Luas Forecasting API", url: "https://luas.ie/", attribution: "Luas. Fixed sample arrivals for visual review.", data: { stop: { name: "Heuston" }, message: "Sample forecast. Check the operator before travel.", inbound: [{ destination: "The Point", due_in_min: 4 }], outbound: [{ destination: "Tallaght", due_in_min: 7 }] } } },
+    rent: { operation: "cso_get_data", args: { table_code: "RIQ02", filters: { STATISTIC: ["RIQ02"], "TLIST(Q1)": ["20254"], C02970V03592: ["02"], C02969V03591: ["04"], C03004V03625: ["141600"] }, limit: 5 }, label: "Sample historical registered-tenancy rent", payload: { ...cso, url: "https://data.cso.ie/table/RIQ02", data: { code: "RIQ02", title: "RTB Average Monthly Rent Report", rows: [{ STATISTIC: "RTB Average Monthly Rent Report", Quarter: "2025Q4", "Number of Bedrooms": "Two bed", "Property Type": "Apartment", Location: "Galway City", value: 1672.57, unit: "Euro" }], total_rows: 1 } } },
+    error: { payload: { error: { code: "UPSTREAM_ERROR", message: "Sample error: The source is temporarily unavailable. Please try again." } } }
+  };
+  const fixture = states[state];
+  if (!fixture) throw new Error(`Unknown playground fixture state: ${state}`);
+  const source = fixture.source || "cso";
+  const operation = fixture.operation || "cso_search_tables";
+  const option = section.ownerDocument.createElement("option");
+  option.textContent = fixture.label || "Sample CSO population search";
+  required(section, "#example-select").replaceChildren(option);
+  required(section, "#pg-source").setAttribute("value", source);
+  required(section, "#pg-operation").setAttribute("value", operation);
+  required(section, "#pg-args").textContent = JSON.stringify(fixture.args || { query: "population", limit: 5 }, null, 2);
+  const exampleIndex = { weather: "2", transport: "1", rent: "6" }[state] || "0";
+  for (const button of section.querySelectorAll(".sample-request")) button.setAttribute("aria-pressed", String(button.dataset.exampleIndex === exampleIndex));
+  required(section, "#pg-request-label").textContent = state === "idle" ? "No sample request has run yet." : `Sample request: ${source} · ${operation}`;
+  required(section, "#response-area").setAttribute("aria-busy", String(state === "loading"));
+  preview.dataset.state = state === "loading" ? "loading" : state === "idle" ? "idle" : state === "error" ? "error" : "success";
+  if (state === "idle" || state === "loading") {
+    status.textContent = state === "idle" ? "" : "Running sample query…";
+    preview.textContent = state === "idle" ? "Choose a sample and run it to inspect the returned data and its source." : "Waiting for the sample source response…";
+    output.textContent = state === "idle" ? "Choose an example, then run it." : "Waiting for a sample response…";
+  } else {
+    status.textContent = state === "error" ? "Query failed. You can try again." : "120 ms (sample)";
+    renderResultView(preview, buildResultView(fixture.payload, { source, operation, isError: state === "error" }));
+    output.textContent = JSON.stringify(fixture.payload, null, 2);
+  }
+  required(section, "#pg-raw-details").open = state === "error";
   output.classList.toggle("error", state === "error");
 }
 
@@ -113,6 +143,7 @@ export function sectionDocument({ section: sectionId, theme, state = "idle" }) {
   if (sectionId === "status") populateStatus(section, state);
   for (const element of section.querySelectorAll("button, input, textarea, select")) element.disabled = true;
   for (const link of section.querySelectorAll("a")) {
+    if (link.closest("#pg-result") && link.hasAttribute("href")) link.dataset.sourceUrl = link.href;
     link.removeAttribute("href");
     link.setAttribute("aria-disabled", "true");
   }
