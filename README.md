@@ -201,6 +201,7 @@ Generated from `src/registry.ts` and the 29 source modules. The default `nearby`
 - A status workflow publishes [`status/status.json`](https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json) and 7-day history.
 - OpenTelemetry can export MCP semantic-convention spans and operation-duration metrics to Azure Monitor.
 - Tool logs and telemetry avoid argument values and IP addresses. See [PRIVACY.md](PRIVACY.md).
+- Optional PostHog usage metrics and Chromatic visual checks are described in [observability](docs/observability.md) and the [quality loop](docs/quality-loop.md).
 - Browser CORS is restricted by `MCP_ALLOWED_ORIGINS`; non-browser MCP clients are unaffected.
 
 ## Limits
@@ -233,10 +234,15 @@ npm run dev:http     # local HTTP dev server, MCP at /mcp
 | `npm run typecheck && npm run lint` | TypeScript and ESLint. |
 | `npm run build` | Compile production JS and copy runtime assets. |
 | `npm run inspector:check` | MCP Inspector conformance. |
+| `npm run check` | Lint, types, unit tests, package/deployment contracts and a real stdio MCP client check. |
+| `npm run check:ui` | Storybook MCP, visual fixtures, accessibility and production website browser checks. Install Chromium first with `npx playwright install chromium`. |
+| `npm run check:mcp -- --url https://mcp.irishopendata.ie/mcp` | Hosted MCP protocol and catalogue checks. It makes no upstream data requests. |
 | `npm run measure:tools [-- all]` | Measure default or all-tool `tools/list`. |
-| `npm run live:sanity` | One real call per source through `ireland_call`; writes [docs/live-sanity.md](docs/live-sanity.md). |
+| `npm run live:sanity` | One real call per source through `ireland_call`; prints a Markdown receipt. See [docs/live-sanity.md](docs/live-sanity.md). |
 | `npm run live:all [-- --url https://mcp.irishopendata.ie/mcp]` | Real MCP client proof for every catalogue operation; writes [docs/live-all-ops.md](docs/live-all-ops.md). |
 | `npm run eval` | Promptfoo evaluation; default surface unless `EVAL_TOOLSETS=all`. |
+
+The [quality loop](docs/quality-loop.md) explains local, hosted, semantic and visual proof. The [playground access guide](docs/playground-auth.md) distinguishes the public query playground from ChatGPT sign-in and subscription use.
 
 ### Eval results
 

@@ -7,7 +7,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createContext } from "../dist/src/gateway/context.js";
 import { createAppServer } from "../dist/src/registry.js";
-import { classify, exitCode } from "./live-sanity-policy.mjs";
+import { assessSmokeResult, exitCode, ntaSummarySample } from "./live-sanity-policy.mjs";
 
 const year = new Date().getUTCFullYear();
 const CASES = [
@@ -32,7 +32,7 @@ const CASES = [
   ["smart-dublin", "smartdublin_search_datasets", { query: "bike", limit: 3 }, (d) => d.total > 0],
   ["met-eireann", "met_get_forecast", { lat: 53.3498, lon: -6.2603, hours: 3 }, (d) => d.forecast?.length === 3],
   ["met-eireann", "met_get_warnings", {}, (d) => Array.isArray(d.warnings)],
-  ["nta", "nta_get_realtime_summary", { limit: 3 }, (d) => d.entities > 0 || d.trip_updates > 0, { needsEnv: "NTA_API_KEY" }],
+  ["nta", "nta_get_realtime_summary", { limit: 3 }, ntaSummarySample, { needsEnv: "NTA_API_KEY" }],
   ["legislation", "legislation_list_acts", { year: year - 1, limit: 3 }, (d) => JSON.stringify(d).includes("title")],
   ["ppr", "ppr_price_stats", { county: "Galway" }, (d) => d.count > 0],
   ["irish-rail", "rail_get_departures", { station: "Dublin Connolly", minutes: 90 }, (d) => d.station?.code === "CNLLY"],
@@ -75,15 +75,13 @@ for (const [source, name, args, ok, opts = {}] of CASES) {
   const started = Date.now();
   try {
     const r = await call(source, name, args);
-    const body = JSON.parse(r.content[0].text);
-    const data = opts.raw ? body : body.data;
-    const pass = !r.isError && Boolean(ok(data ?? {}));
-    results.push(classify({
+    results.push(assessSmokeResult(r, {
       source,
       tool: name,
-      status: pass ? "PASS" : "FAIL",
+      check: ok,
+      raw: opts.raw,
+      typed: listed.has(name),
       ms: Date.now() - started,
-      note: r.isError ? `${body.error?.code}: ${body.error?.message}` : body.stale ? "served stale" : ""
     }));
   } catch (error) {
     results.push({ source, tool: name, status: "FAIL", ms: Date.now() - started, note: String(error?.message ?? error) });

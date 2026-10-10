@@ -48,6 +48,8 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       - name: Deploy prebuilt package
+        env:
+          IRELAND_MCP_EXPECTED_REVISION: ${{ github.sha }}
         run: npm run deploy:zip
       - name: Smoke test the deployed endpoint
         run: |

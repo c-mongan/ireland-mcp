@@ -26,6 +26,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        id: build
       - name: Live sanity
         id: sanity
         env:
@@ -33,10 +34,28 @@ jobs:
         run: |
           set -o pipefail
           npm run -s live:sanity | tee sanity.md
+      - name: Hosted MCP protocol
+        id: protocol
+        if: always() && steps.build.outcome == 'success'
+        env:
+          MCP_URL: https://mcp.irishopendata.ie/mcp
+        run: |
+          set -o pipefail
+          npm run -s check:mcp -- --url "$MCP_URL" | tee protocol.txt
+      - name: Keep the check receipts
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: live-quality-${{ github.run_id }}
+          path: |
+            sanity.md
+            protocol.txt
+          retention-days: 14
       - name: Summary
         if: always()
         run: |
           cat sanity.md >> "$GITHUB_STEP_SUMMARY" || true
+          cat protocol.txt >> "$GITHUB_STEP_SUMMARY" || true
           if grep -q '| WARN |' sanity.md 2>/dev/null; then
             echo "::warning title=Known-flaky upstream::$(grep '| WARN |' sanity.md | cut -d'|' -f2-3 | tr -d ' ' | paste -sd, -) failed but is tolerated (see summary)."
           fi
@@ -51,15 +70,23 @@ jobs:
             gh issue close "$existing" --comment "$(printf 'Passing run: %s/%s/actions/runs/%s\n\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"; cat sanity.md)"
           fi
       - name: Open or update the tracking issue
-        if: failure() && steps.sanity.outcome == 'failure'
+        if: failure() && (steps.sanity.outcome == 'failure' || steps.protocol.outcome == 'failure')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           title="Live smoke failing"
-          body="$(printf 'Run: %s/%s/actions/runs/%s\n\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"; cat sanity.md)"
+          {
+            printf 'Run: %s/%s/actions/runs/%s\n\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
+            for receipt in sanity.md protocol.txt; do
+              if [ -f "$receipt" ]; then
+                printf '\n### %s\n\n' "$receipt"
+                cat "$receipt"
+              fi
+            done
+          } > live-quality-issue.md
           existing="$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number')"
           if [ -n "$existing" ]; then
-            gh issue comment "$existing" --body "$body"
+            gh issue comment "$existing" --body-file live-quality-issue.md
           else
-            gh issue create --title "$title" --body "$body"
+            gh issue create --title "$title" --body-file live-quality-issue.md
           fi

@@ -8,7 +8,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 
-function runDeploy(t, deploymentStatus) {
+function runDeploy(t, deploymentStatus, { source = "clean", expected = "none" } = {}) {
   const fixture = mkdtempSync(join(tmpdir(), "ireland-deploy-zip-"));
   t.after(() => rmSync(fixture, { recursive: true, force: true }));
   const workspace = join(fixture, "workspace");
@@ -25,8 +25,22 @@ function runDeploy(t, deploymentStatus) {
     writeFileSync(join(workspace, name), "{}\n", { mode: 0o600 });
   }
 
+  writeFileSync(join(workspace, ".gitignore"), "dist/\nnode_modules/\n", { mode: 0o600 });
+  let revision = "";
+  if (source !== "no-git") {
+    const git = (...args) => execFileSync("git", ["-C", workspace, ...args], { encoding: "utf8" });
+    git("init", "-q");
+    git("config", "user.name", "Deployment fixture");
+    git("config", "user.email", "fixture@example.test");
+    git("add", ".gitignore", "scripts/deploy-zip.sh", "host.json", "package.json", "package-lock.json");
+    git("commit", "-q", "-m", "fixture");
+    revision = git("rev-parse", "HEAD").trim();
+    if (source === "dirty-before") writeFileSync(join(workspace, "package.json"), '{"dirty":true}\n', { mode: 0o600 });
+  }
+
   writeFileSync(join(bin, "npm"), `#!/usr/bin/env node
 import { chmodSync, mkdirSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 const args = process.argv.slice(2).join(" ");
 if (args === "ci") {
   mkdirSync("node_modules", { recursive: true });
@@ -35,6 +49,13 @@ if (args === "ci") {
   writeFileSync("dist/src/functions/mcp.js", "export {};\\n");
   mkdirSync("dist/test", { recursive: true });
   writeFileSync("dist/test/excluded.js", "must not ship\\n");
+  if (process.env.FIXTURE_BUILD_CHANGE === "dirty-during") {
+    writeFileSync("package.json", '{"changed":true}\\n');
+  } else if (process.env.FIXTURE_BUILD_CHANGE === "head-change") {
+    writeFileSync("package.json", '{"committed":true}\\n');
+    execFileSync("git", ["add", "package.json"]);
+    execFileSync("git", ["commit", "-q", "-m", "changed during build"]);
+  }
 } else if (args === "ci --omit=dev --ignore-scripts") {
   mkdirSync("node_modules/@fixture/runtime", { recursive: true });
   writeFileSync("node_modules/@fixture/runtime/index.js", "export {};\\n");
@@ -87,13 +108,22 @@ if (args.slice(0, 4).join(" ") === "functionapp deployment source config-zip") {
       FUNCTION_APP: "fixture-app",
       CAPTURED_ZIP: captured,
       CAPTURED_METADATA: metadata,
-      DEPLOYMENT_STATUS: String(deploymentStatus)
+      DEPLOYMENT_STATUS: String(deploymentStatus),
+      FIXTURE_BUILD_CHANGE: source,
+      IRELAND_MCP_EXPECTED_REVISION: expected === "matching" ? revision : expected === "wrong" ? "f".repeat(40) : ""
     },
     encoding: "utf8",
     timeout: 30_000
   });
   assert.ifError(result.error);
   const output = readFileSync(log, "utf8");
+  if (expected === "wrong" || (expected === "matching" && source !== "clean")) {
+    assert.equal(result.status, 1, output);
+    assert.match(output, /Deployment stopped: the build is not a clean checkout of the expected Git revision/);
+    assert.equal(existsSync(captured), false, "revision failure must occur before Azure upload");
+    assert.deepEqual(readdirSync(temporary), [], "private staging is cleaned after a provenance failure");
+    return { output, revision };
+  }
   assert.equal(result.status, deploymentStatus, output);
   const details = JSON.parse(readFileSync(metadata, "utf8"));
   assert.equal(details.stageMode, 0o700, "staging root must stay private");
@@ -105,11 +135,11 @@ if (args.slice(0, 4).join(" ") === "functionapp deployment source config-zip") {
   assert.equal(statSync(join(workspace, "node_modules")).mode & 0o777, 0o700);
   assert.equal(existsSync(details.stage), false, "staging must be cleaned up");
   assert.deepEqual(readdirSync(temporary), [], "no staging files may remain");
-  return { captured, output };
+  return { captured, output, revision };
 }
 
 test("private umask produces a readable Function ZIP without broadening source or logs", (t) => {
-  const { captured, output } = runDeploy(t, 0);
+  const { captured, output, revision } = runDeploy(t, 0, { expected: "matching" });
   assert.match(output, /Deployed to https:\/\/fixture-app\.azurewebsites\.net\/mcp/);
   const listing = execFileSync("zipinfo", ["-l", captured], { encoding: "utf8" });
   const entries = new Map();
@@ -121,6 +151,7 @@ test("private umask produces a readable Function ZIP without broadening source o
   }
   assert.deepEqual([...entries.keys()].sort(), [
     "dist/", "dist/src/", "dist/src/functions/", "dist/src/functions/mcp.js",
+    "dist/src/gateway/", "dist/src/gateway/release.js",
     "host.json", "node_modules/", "node_modules/.bin/", "node_modules/.bin/fixture",
     "node_modules/@fixture/", "node_modules/@fixture/runtime/",
     "node_modules/@fixture/runtime/index.js", "package-lock.json", "package.json"
@@ -140,6 +171,7 @@ test("private umask produces a readable Function ZIP without broadening source o
       assert.equal(mode[9], "-", `${name} must not gain world execute permission`);
     }
   }
+  assert.equal(execFileSync("unzip", ["-p", captured, "dist/src/gateway/release.js"], { encoding: "utf8" }), `export const PACKAGED_RELEASE = "${revision}";\n`);
   assert.equal(execFileSync("unzip", ["-p", captured, "host.json"], { encoding: "utf8" }), "{}\n");
   assert.equal(execFileSync("unzip", ["-p", captured, "dist/src/functions/mcp.js"], { encoding: "utf8" }), "export {};\n");
 });
@@ -148,3 +180,22 @@ test("failed Azure upload preserves its exit code and cleans private staging", (
   const { output } = runDeploy(t, 42);
   assert.doesNotMatch(output, /Deployed to/);
 });
+
+for (const source of ["dirty-before", "dirty-during", "head-change", "no-git"]) {
+  test(`${source} packaging omits an unproved release identity`, (t) => {
+    const { captured, output } = runDeploy(t, 0, { source });
+    assert.match(output, /Package release identity omitted/);
+    assert.equal(execFileSync("unzip", ["-p", captured, "dist/src/gateway/release.js"], { encoding: "utf8" }), "export const PACKAGED_RELEASE = undefined;\n");
+  });
+}
+
+for (const options of [
+  { expected: "wrong" },
+  { source: "dirty-before", expected: "matching" },
+  { source: "dirty-during", expected: "matching" },
+  { source: "head-change", expected: "matching" }
+]) {
+  test(`CI rejects unproved checkout identity: ${JSON.stringify(options)}`, (t) => {
+    runDeploy(t, 0, options);
+  });
+}

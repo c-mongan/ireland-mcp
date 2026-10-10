@@ -15,6 +15,26 @@ describe("live result acceptance", () => {
   it("permits a valid empty warnings result", () => {
     expect(assessResult(result(envelope), "met-eireann/met_get_warnings").status).toBe("PASS");
   });
+  it("allows an absent operation tag only for an explicitly typed route", () => {
+    const typed = { ...envelope, operation: undefined };
+    expect(assessResult(result(typed), "met-eireann/met_get_warnings").status).toBe("FAIL");
+    expect(assessResult(result(typed), "met-eireann/met_get_warnings", { requireOperationTag: false }).status).toBe("PASS");
+    expect(assessResult(result({ ...typed, operation: "met_get_forecast" }), "met-eireann/met_get_warnings", { requireOperationTag: false }).status).toBe("FAIL");
+  });
+  it("still validates evidence and freshness on typed routes", () => {
+    const typed = { ...envelope, operation: undefined };
+    expect(assessResult(result({ ...typed, source: "" }), "met-eireann/met_get_warnings", { requireOperationTag: false }).status).toBe("FAIL");
+    expect(assessResult(result({ ...typed, stale: true }), "met-eireann/met_get_warnings", { requireOperationTag: false }).status).toBe("DEGRADED");
+    expect(assessResult(result({ ...typed, stale: "false" }), "met-eireann/met_get_warnings", { requireOperationTag: false }).status).toBe("FAIL");
+  });
+  it("rejects conflicting canonical metadata when present on either route", () => {
+    const body = result(envelope);
+    for (const options of [{}, { requireOperationTag: false }]) {
+      expect(assessResult({ ...body, _meta: { "ireland/source": "met-eireann", "ireland/operation": "met_get_warnings" } }, "met-eireann/met_get_warnings", options).status).toBe("PASS");
+      expect(assessResult({ ...body, _meta: { "ireland/source": "nta" } }, "met-eireann/met_get_warnings", options).status).toBe("FAIL");
+      expect(assessResult({ ...body, _meta: { "ireland/operation": "met_get_forecast" } }, "met-eireann/met_get_warnings", options).status).toBe("FAIL");
+    }
+  });
   it("marks stale responses as degraded instead of live success", () => {
     expect(assessResult(result({ ...envelope, stale: true }), "met-eireann/met_get_warnings").status).toBe("DEGRADED");
   });

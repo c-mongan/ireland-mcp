@@ -23,6 +23,62 @@ describe("NTA module", () => {
     expect(JSON.stringify(body)).not.toContain("test-key-123");
   });
 
+  it.each([null, [], {}, { error: "service unavailable" }, { header: null, entity: [] },
+    { header: { gtfs_realtime_version: "2.0", timestamp: "invalid" }, entity: [] },
+    { header: { gtfs_realtime_version: "2.0" }, entity: [] },
+    { header: { timestamp: "1791216000" }, entity: [] },
+    { header: { gtfs_realtime_version: "9.0", timestamp: "1791216000" }, entity: [] },
+    { header: { gtfs_realtime_version: "2.0", timestamp: -1 }, entity: [] },
+    { header: { gtfs_realtime_version: "2.0", timestamp: 1e20 }, entity: [] },
+    { header: { gtfs_realtime_version: "2.0", timestamp: "1791216000" }, entity: {} },
+    { header: { gtfs_realtime_version: "2.0", timestamp: "1791216000" }, entity: [null] }
+  ].map((payload) => ({ payload })))("rejects malformed HTTP-200 feed envelopes before caching: $payload", async ({ payload }) => {
+    const fetch = fakeFetch([{ match: /TripUpdates/, body: JSON.stringify(payload) }]);
+    const context = createContext({ fetch, env });
+    for (let i = 0; i < 2; i += 1) {
+      const { ok, body } = await callTool(mod, "nta_get_realtime_summary", {}, context);
+      expect(ok).toBe(false);
+      expect(body.error.code).toBe("UPSTREAM_DOWN");
+      expect(body.error.message).toContain("malformed");
+      expect(JSON.stringify(body)).not.toContain("test-key-123");
+    }
+    expect(fetch.calls).toHaveLength(2);
+  });
+
+  it.each([[], undefined].map((entity) => ({ entity })))("accepts a valid empty feed without inventing trip data: $entity", async ({ entity }) => {
+    const fetch = fakeFetch([{ match: /TripUpdates/, body: JSON.stringify({
+      header: { gtfs_realtime_version: "2.0", timestamp: "1791216000" }, entity
+    }) }]);
+    const { ok, body } = await callTool(mod, "nta_get_realtime_summary", {}, fetch, env);
+    expect(ok).toBe(true);
+    expect(body.data).toMatchObject({ feed_timestamp: "2026-10-05T16:00:00.000Z", trips: 0, cancelled: 0, added: 0, routes: [] });
+  });
+
+  it("accepts PascalCase feed envelopes", async () => {
+    const fetch = fakeFetch([{ match: /TripUpdates/, body: JSON.stringify({
+      Header: { GtfsRealtimeVersion: "2.0", Timestamp: "1791216000" }, Entity: []
+    }) }]);
+    const { ok, body } = await callTool(mod, "nta_get_realtime_summary", {}, fetch, env);
+    expect(ok).toBe(true);
+    expect(body.data.feed_timestamp).toBe("2026-10-05T16:00:00.000Z");
+  });
+
+  it("does not hide a malformed refresh behind a stale cached feed", async () => {
+    const route: Route = { match: /TripUpdates/, file: fixturePath(import.meta.url, "tripupdates-synthetic.json") };
+    const fetch = fakeFetch([route]);
+    let time = 0;
+    const context = createContext({ fetch, env, now: () => new Date(time) });
+    expect((await callTool(mod, "nta_get_realtime_summary", {}, context)).ok).toBe(true);
+    time += 60_001;
+    delete route.file;
+    route.body = JSON.stringify({ error: "service unavailable" });
+    const { ok, body } = await callTool(mod, "nta_get_realtime_summary", {}, context);
+    expect(ok).toBe(false);
+    expect(body.error.code).toBe("UPSTREAM_DOWN");
+    expect(body.stale).toBeUndefined();
+    expect(fetch.calls).toHaveLength(2);
+  });
+
   it("filters trip updates by stop and handles camelCase feeds", async () => {
     const { body } = await callTool(mod, "nta_get_trip_updates", { stop_id: "8350DB000123" }, fakeFetch(routes), env);
     expect(body.data.total).toBe(1);

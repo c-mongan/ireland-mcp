@@ -22,7 +22,13 @@ jobs:
       - run: npm run typecheck
       - run: npm run test:coverage
       - name: Validate Azure deployment ordering and ZIP packaging
-        run: node --test test/infra-arm.mjs test/deploy-zip.mjs
+        run: node --test test/infra-arm.mjs test/deploy-zip.mjs test/status-checkout.mjs
       - run: npm run build
       - name: MCP Inspector conformance (stdio)
         run: npm run inspector:check
+      - name: MCP client protocol contracts
+        run: npm run check:mcp
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Production website browser contracts
+        run: npm run test:e2e
