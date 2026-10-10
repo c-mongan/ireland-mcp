@@ -32,6 +32,18 @@ PostHog can identify failed queries, slow requests and incomplete user flows whe
 
 Keep reviewed build URLs and commit identifiers with each visual issue. Compare the deployed result with the reviewed commit before closing the issue. Use one specific metric and one reproducible state per iteration.
 
-## MCP support limit
+## Storybook and Chromatic MCP
 
-The [Chromatic MCP setup guide](https://www.chromatic.com/docs/mcp/) requires Storybook 10.3 or later and React for the Storybook MCP addon. This project uses Storybook 10.6 with the HTML/Vite renderer. It meets the version requirement but does not use a supported renderer. The addon is not installed. Standard Storybook snapshots, browser checks and Chromatic publishing remain available. Do not claim a working Chromatic MCP endpoint for this project until the renderer is supported or a separately approved architecture change is complete.
+The official `@storybook/addon-mcp` is installed. Storybook uses a small React/Vite `SectionPreview` adapter to publish a component manifest. The adapter still renders the production HTML and CSS in the same sandboxed frame. React is a development dependency; the production website remains vanilla HTML, CSS and JavaScript. The preview is not a public export of the `ireland-mcp` package.
+
+Start the local MCP with `npm run storybook`. It binds to the local interface. Its endpoint is `http://localhost:6006/mcp`. The local server exposes documentation and development tools. Existing Playwright tests provide browser and accessibility checks; the optional Storybook Vitest addon is not installed, so MCP `test-run` is unavailable.
+
+Run `npm run typecheck:storybook` and `npm run test:storybook-mcp`. The MCP check starts an owned server on port 6007, calls the real protocol, checks all 28 story IDs, reads component properties and sample-data constraints, reads an error story, requests its preview, and stops the server. CI runs these checks before publishing.
+
+The published endpoint is [Ireland MCP on Chromatic](https://main--6ac8158d1a7f2613c29bb35a.chromatic.com/mcp). Chromatic exposes only the documentation tools: `docs-list`, `docs-show` and `docs-show-story`. Check a published build with `npm run test:storybook-mcp -- <published-mcp-url>`. A successful local check does not prove that the hosted endpoint works.
+
+For Codex, add the published endpoint with `codex mcp add ireland-chromatic --url https://main--6ac8158d1a7f2613c29bb35a.chromatic.com/mcp`. If Chromatic requires authentication, use `codex mcp login ireland-chromatic` and its normal OAuth flow. Keep credentials out of repository configuration. Restart the MCP connection after adding a server to an already running agent.
+
+Before a visual change, use `docs-list` with `withStoryIds: true`, then `docs-show` for `ireland-mcp-sections`. Use `docs-show-story` to read the affected sample state. Use the local `stories-preview` tool to open it. Read the documented properties before setting an argument. Change the production source, run the checks, publish, and review the Chromatic comparison. PostHog supplies the release and source/operation metrics that identify the state to inspect; these MCP tools supply the matching preview context.
+
+See the [Chromatic MCP guide](https://www.chromatic.com/docs/mcp/) and [Storybook MCP documentation](https://storybook.js.org/docs/ai/mcp/overview).
