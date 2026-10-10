@@ -94,8 +94,9 @@ test("pending queries reject duplicate submits and recover after a manual retry"
     await expect(output).toContainText('"licence": "CC BY 4.0"');
     await expect(output).toContainText('"retrieved_at": "2026-01-01T12:00:00Z"');
     await expect(output).not.toHaveClass(/error/);
+    await page.locator("#pg-raw-details summary").click();
     await expect(output).toHaveAccessibleName("Live response");
-    await expect(status).toHaveText(/^\d[\d,]* ms$/);
+    await expect(status).toHaveText(/^Response received · \d[\d,]* ms$/);
     await expect(run).toBeEnabled();
     const expectedCall = { source: "cso", operation: "cso_search_tables", args, limit: 5, max_tokens: 1400 };
     expect(calls).toEqual([expectedCall, expectedCall]);

@@ -30,6 +30,14 @@ export const PlaygroundErrorLight = { args: { section: "playground", state: "err
 
 export const PlaygroundTruncatedDark = { args: { section: "playground", state: "truncated", theme: "dark" } };
 export const PlaygroundTruncatedLight = { args: { section: "playground", state: "truncated", theme: "light" } };
+export const PlaygroundWeatherDark = { args: { section: "playground", state: "weather", theme: "dark" } };
+export const PlaygroundWeatherLight = { args: { section: "playground", state: "weather", theme: "light" } };
+export const PlaygroundTransportDark = { args: { section: "playground", state: "transport", theme: "dark" } };
+export const PlaygroundTransportLight = { args: { section: "playground", state: "transport", theme: "light" } };
+export const PlaygroundRentDark = { args: { section: "playground", state: "rent", theme: "dark" } };
+export const PlaygroundRentLight = { args: { section: "playground", state: "rent", theme: "light" } };
+export const PlaygroundCachedStaleDark = { args: { section: "playground", state: "cached-stale", theme: "dark" } };
+export const PlaygroundCachedStaleLight = { args: { section: "playground", state: "cached-stale", theme: "light" } };
 export const StatusHealthyDark = { args: { section: "status", state: "healthy", theme: "dark" } };
 export const StatusHealthyLight = { args: { section: "status", state: "healthy", theme: "light" } };
 export const StatusDegradedDark = { args: { section: "status", state: "degraded", theme: "dark" } };

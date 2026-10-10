@@ -104,8 +104,8 @@ test("query event cannot include user text, unknown labels, response data or URL
   await page.locator("#pg-args").fill('{"query":"private-query", "token":"private-secret"}');
   await page.getByRole("button", { name: /Run live query/i }).click();
   await expect(page.locator("#pg-output")).toContainText("private-result");
-  await expect.poll(() => captures.length).toBe(1);
-  const body = captures[0]!;
+  await expect.poll(() => captures.filter((capture) => capture.event === "ireland_query_completed").length).toBe(1);
+  const body = captures.find((capture) => capture.event === "ireland_query_completed")!;
   expect(body).toMatchObject({ event: "ireland_query_completed", properties: { source: "_OTHER", operation: "_OTHER", outcome: "ok" } });
   expect(JSON.stringify(body)).not.toContain("private");
   expect(Object.keys(body.properties as object).sort()).toEqual(["$geoip_disable", "$ip", "$process_person_profile", "duration_ms", "operation", "outcome", "release_commit", "schema_version", "source", "surface"].sort());

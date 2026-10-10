@@ -1,5 +1,6 @@
 const HOSTS = new Set(["https://eu.i.posthog.com", "https://us.i.posthog.com"]);
 const CLIENTS = new Set(["vscode", "cursor", "claude", "chatgpt", "copilot", "gemini", "windsurf", "generic", "endpoint"]);
+const RESULT_ACTIONS = new Set(["inspect_raw", "open_source", "connect"]);
 
 function privacyBlocked() {
   return navigator.globalPrivacyControl === true ||
@@ -8,11 +9,16 @@ function privacyBlocked() {
 
 /** Count known actions only. Do not pass query arguments, result text, or exception objects here. */
 export function safeProperties(event, input, operations) {
-  if (event === "ireland_query_completed") {
+  if (["ireland_query_started", "ireland_query_completed", "ireland_result_action"].includes(event)) {
     const known = operations.has(input.source);
-    return {
+    const labels = {
       source: known ? input.source : "_OTHER",
-      operation: known && operations.get(input.source).has(input.operation) ? input.operation : "_OTHER",
+      operation: known && operations.get(input.source).has(input.operation) ? input.operation : "_OTHER"
+    };
+    if (event === "ireland_query_started") return labels;
+    if (event === "ireland_result_action") return RESULT_ACTIONS.has(input.action) ? { ...labels, action: input.action } : undefined;
+    return {
+      ...labels,
       outcome: input.outcome === "ok" ? "ok" : "error",
       duration_ms: Number.isFinite(input.duration_ms) ? Math.max(0, Math.min(120000, Math.round(input.duration_ms))) : 0
     };
