@@ -3,7 +3,7 @@ import { SectionPreview } from "./SectionPreview";
 export default {
   title: "Ireland MCP/Sections",
   component: SectionPreview,
-  parameters: { layout: "fullscreen", chromatic: { viewports: [1280] }, docs: { description: { component: "Review-only previews of the real Ireland MCP website sections. Edit web/index.html and web/styles.css for product changes. These fixed samples block live requests, scripts, video, installation links and copy actions." } } },
+  parameters: { layout: "fullscreen", chromatic: { viewports: [1280] }, docs: { description: { component: "Review-only previews of the real Ireland MCP website sections and recorded demo poster. Edit web/index.html and web/styles.css for product changes. These previews block live requests, scripts, video playback, installation links and copy actions." } } },
   argTypes: {
     theme: { control: "radio", options: ["dark", "light"] },
     section: { control: false },
@@ -13,6 +13,8 @@ export default {
 
 export const HeroDark = { args: { section: "top", theme: "dark" }, parameters: { chromatic: { viewports: [360, 1280] } } };
 export const HeroLight = { args: { section: "top", theme: "light" }, parameters: { chromatic: { viewports: [360, 1280] } } };
+export const DemoPlayerDark = { args: { section: "demo-dialog", theme: "dark" }, parameters: { chromatic: { viewports: [360, 1280] } } };
+export const DemoPlayerLight = { args: { section: "demo-dialog", theme: "light" }, parameters: { chromatic: { viewports: [360, 1280] } } };
 export const InstallerDark = { args: { section: "install", theme: "dark" } };
 export const InstallerLight = { args: { section: "install", theme: "light" } };
 export const DirectoryDark = { args: { section: "directory", theme: "dark" } };

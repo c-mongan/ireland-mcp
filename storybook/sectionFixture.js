@@ -2,6 +2,7 @@ import pageHtml from "../web/index.html?raw";
 import siteCss from "../web/styles.css?raw";
 import demoCss from "./demo.css?raw";
 import { buildResultView, renderResultView } from "../web/result-view.js";
+import demoPoster from "../web/media/rent-demo-poster.jpg?inline";
 
 function required(root, selector) {
   const element = root.querySelector(selector);
@@ -132,6 +133,20 @@ function populateStatus(section, state) {
 export function sectionDocument({ section: sectionId, theme, state = "idle" }) {
   const source = new DOMParser().parseFromString(pageHtml, "text/html");
   const section = required(source, `#${sectionId}`).cloneNode(true);
+  if (sectionId === "demo-dialog") {
+    section.open = true;
+    const video = required(section, "#demo-video");
+    const poster = section.ownerDocument.createElement("img");
+    poster.id = video.id;
+    poster.className = video.className;
+    poster.src = demoPoster;
+    poster.alt = "Poster for the recorded historical rent query demo";
+    poster.setAttribute("aria-describedby", "demo-description");
+    video.replaceWith(poster);
+    required(section, "#demo-close").hidden = true;
+    required(section, "#demo-close").removeAttribute("autofocus");
+    required(section, "#demo-transcript").open = true;
+  }
   for (const element of section.querySelectorAll("script, noscript, video")) element.remove();
   if (sectionId === "top") {
     required(section, "#live-label").textContent = "Sample Server Online";
@@ -147,5 +162,8 @@ export function sectionDocument({ section: sectionId, theme, state = "idle" }) {
     link.removeAttribute("href");
     link.setAttribute("aria-disabled", "true");
   }
-  return `<!doctype html><html lang="en-IE" data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'none'; connect-src 'none'"><style>${siteCss}\n${demoCss}</style></head><body><p class="wrap" role="note">Storybook fixture: fixed sample data; live queries, installation links, copy actions and video are disabled.</p><main>${section.outerHTML}</main></body></html>`;
+  const note = sectionId === "demo-dialog"
+    ? "Storybook fixture: recorded demo poster and transcript; playback, links and close actions are disabled."
+    : "Storybook fixture: fixed sample data; live queries, installation links, copy actions and video are disabled.";
+  return `<!doctype html><html lang="en-IE" data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'none'; connect-src 'none'"><style>${siteCss}\n${demoCss}</style></head><body><p class="wrap" role="note">${note}</p><main>${section.outerHTML}</main></body></html>`;
 }

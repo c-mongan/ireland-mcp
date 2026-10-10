@@ -48,7 +48,7 @@ try {
 
   const index = textOf(await client.callTool({ name: "docs-list", arguments: { withStoryIds: true } }));
   const storyIds = [...new Set(index.match(/ireland-mcp-sections--[a-z-]+/g))];
-  assert.equal(storyIds.length, 36, "Expected all 36 section stories in MCP documentation");
+  assert.equal(storyIds.length, 38, "Expected all 38 section stories in MCP documentation");
   const docs = textOf(await client.callTool({ name: "docs-show", arguments: { id: "ireland-mcp-sections" } }));
   for (const value of ["web/index.html", "web/styles.css", "section:", "theme:", "state?:", "Scripts, network access", "./SectionPreview"]) {
     assert.ok(docs.includes(value), `Component documentation is missing ${value}`);
