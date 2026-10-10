@@ -29,15 +29,18 @@ npm run test:storybook     # checks the static build in Chromium
 ```
 
 Stories cover the hero, a Copilot installer, sample source cards, and playground
-idle/loading/success/empty/error states in both themes. They use fixed sample
-data, never run live queries, and disable installation, copy, and video actions.
+idle/loading/success/empty/error/truncated states in both themes. They also cover
+loading/healthy/degraded/stale/unreachable service status. Hero and successful
+query previews include mobile widths. They use fixed sample data, never run live
+queries, and disable installation, copy, and video actions.
 Each preview is isolated in a sandboxed frame so the site's styles and theme
 cannot affect Storybook itself. Dynamic fixtures mirror the generated UI classes;
 update them when changing the production renderers in `web/app.js`.
 
-`storybook/demo.css` enlarges source-card headings only in Storybook for the
-Chromatic change-review demo. Remove its rule to restore the production size;
-also update the heading-size assertion in `storybook/stories.spec.ts`.
+`storybook/demo.css` disables animation and transitions for stable snapshots.
+It preserves the production heading sizes. Keep the fixture navigation and
+generated classes consistent with the production markup. Browser checks cover
+keyboard use, accessibility, responsive layout, and network isolation.
 
 To publish, build first, then supply `CHROMATIC_PROJECT_TOKEN` through your
 shell environment or secret manager and run `npm run chromatic`.

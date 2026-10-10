@@ -22,9 +22,14 @@ not a real Irish location. No new remote imagery or font dependencies are needed
 - A three-step ordered diagram explains the discovery/call/citation flow.
   Retrieval time is explicitly distinguished from publication time.
 - Machine-readable documentation keeps all existing URLs and its section anchor.
-- The live playground comes before the source directory. Example questions are
-  prompts, never invented responses or claims about live conditions.
-- Sources use a scannable directory, not a grid of interchangeable cards.
+- The live playground comes before the source directory. Sample buttons load
+  real request settings. They do not run the request. Their selected state follows
+  the example selector, and keyboard focus moves to that selector after loading.
+- Keep the request and response visually separate. The response has an accessible
+  name and guidance on source metadata and dates. Raw results stay visible.
+- Sources use a scannable directory. Subject navigation comes from the returned
+  catalogue and links to the existing domain heading IDs. Do not add fixed links
+  that assume every subject is present in the live catalogue.
 - Status exposes upstream failures and freshness rather than promising uptime.
 
 ## Design tokens
@@ -69,6 +74,11 @@ decorative shadows and glass panels are unnecessary.
 - No-JavaScript installation fallback links to the existing agent guide.
 - Keep advanced arguments in Query settings. Always show the result and request
   status, with distinct errors.
+- Use the same full-width sample buttons for pointer and keyboard input. Do not
+  send a live request when a user selects a sample. The explicit submit button is
+  the only way to run a playground request.
+- Keep usage metrics optional. The footer control states whether metrics are on
+  and explains what is sent. Do not send query text, arguments or results.
 
 ## Integration contracts and verification
 

@@ -1,8 +1,23 @@
 import { HttpRequest } from "@azure/functions";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import * as posthog from "../gateway/posthog.js";
 import { mcpHandler } from "./mcp.js";
 
 describe("Azure MCP request boundary", () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it("finishes the bounded analytics flush before completing the Azure invocation", async () => {
+    let finish!: () => void;
+    const flush = vi.spyOn(posthog, "flushPostHog").mockImplementation(() => new Promise<void>((resolve) => { finish = resolve; }));
+    const request = new HttpRequest({ method: "POST", url: "https://fn.example/mcp", body: { string: "€".repeat(100_000) } });
+    let completed = false;
+    const response = mcpHandler(request).then((value) => { completed = true; return value; });
+    await vi.waitFor(() => expect(flush).toHaveBeenCalledOnce());
+    expect(completed).toBe(false);
+    finish();
+    expect((await response).status).toBe(413);
+  });
+
   it("applies its 256 KiB byte limit to undeclared multibyte bodies", async () => {
     const request = new HttpRequest({ method: "POST", url: "https://fn.example/mcp", body: { string: "€".repeat(100_000) } });
     const response = await mcpHandler(request);

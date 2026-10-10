@@ -8,10 +8,20 @@ import { tableStoreFromEnv } from "../gateway/tableStore.js";
 import { consoleSink, reportHandlerError } from "../gateway/telemetry.js";
 import { sharedBudgets } from "../gateway/upstreamBudget.js";
 import { toolsetsFromUrl } from "../gateway/toolsets.js";
-import { createAppServer } from "../registry.js";
+import { appModules, createAppServer } from "../registry.js";
+import { configurePostHog, flushPostHog } from "../gateway/posthog.js";
 import { siteAliasRedirect } from "./redirect.js";
 
 const MAX_BODY_BYTES = 256 * 1024;
+
+const analyticsRegistry = appModules();
+configurePostHog(new Map([
+  ...analyticsRegistry.modules.map((module) => [module.info.id, new Set(module.tools.map((tool) => tool.name))] as const),
+  ["cross", new Set([
+    ...analyticsRegistry.modules.find((module) => module.info.id === "cross")!.tools.map((tool) => tool.name),
+    ...analyticsRegistry.extraTools.map((tool) => tool.name)
+  ])]
+]));
 
 // No-op unless APPLICATIONINSIGHTS_CONNECTION_STRING is set; never blocks a request.
 void initTelemetry();
@@ -35,6 +45,9 @@ export async function mcpHandler(request: HttpRequest): Promise<HttpResponseInit
       headers,
       jsonBody: { jsonrpc: "2.0", error: { code: -32603, message: "Internal server error." }, id: null }
     };
+  } finally {
+    // Azure can freeze a worker after the response. Flush within the invocation, with a 500 ms bound.
+    await flushPostHog();
   }
 }
 

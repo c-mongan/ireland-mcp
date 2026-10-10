@@ -44,6 +44,69 @@ describe("Met Éireann module", () => {
     expect(unknown.body.error.hint).toContain("Valentia");
   });
 
+  it.each([
+    ["12:00", "11:00", "00:00"],
+    ["00:00", "11:00", "12:00"],
+    ["11:00", "12:00", "00:00"]
+  ])("selects the newest station reading regardless of upstream order: %j", async (...times) => {
+    // The real observations feed returned newest first on 10 October 2026.
+    const { ok, body } = await callTool(mod, "met_get_observations", { station: "Dublin Airport" }, fakeFetch([
+      { match: /observations/, body: JSON.stringify(times.map((reportTime) => ({
+        name: "Dublin Airport", date: "10-10-2026", reportTime,
+        temperature: reportTime === "12:00" ? "12" : "10"
+      }))) }
+    ]));
+    expect(ok).toBe(true);
+    expect(body.data.latest).toMatchObject({ time: "2026-10-10T12:00", temperature_c: 12 });
+    expect(body.data.observations.map((row: { time: string }) => row.time)).toEqual([
+      "2026-10-10T00:00", "2026-10-10T11:00", "2026-10-10T12:00"
+    ]);
+  });
+
+  it("preserves the newest placeholder row and exposes provider missing values as null", async () => {
+    const { ok, body } = await callTool(mod, "met_get_observations", { station: "Dublin Airport" }, fakeFetch([
+      { match: /observations/, body: JSON.stringify([
+        {
+          name: "Dublin Airport", date: "10-10-2026", reportTime: "13:00",
+          temperature: null, weatherDescription: "N/A", windSpeed: "NA", windGust: "-",
+          cardinalWindDirection: "-99", humidity: "-99", rainfall: null, pressure: null
+        },
+        { name: "Dublin Airport", date: "10-10-2026", reportTime: "12:00", temperature: "12" }
+      ]) }
+    ]));
+    expect(ok).toBe(true);
+    expect(body.data.observations).toHaveLength(2);
+    expect(body.data.latest).toEqual({
+      time: "2026-10-10T13:00", temperature_c: null, weather: null,
+      wind_speed_kmh: null, wind_gust_kmh: null, wind_direction: null,
+      humidity_pct: null, rainfall_mm: null, pressure_hpa: null
+    });
+    expect(body.data.note).toContain("2026-10-10T13:00");
+    expect(body.data.note).toContain("missing measurements");
+  });
+
+  it.each(["unknown", "not-a-number", "NaN", "Infinity", "12broken"])(
+    "rejects arbitrary measurement strings rather than treating them as missing: %s", async (temperature) => {
+      const { ok, body } = await callTool(mod, "met_get_observations", { station: "Dublin Airport" }, fakeFetch([
+        { match: /observations/, body: JSON.stringify([
+          { name: "Dublin Airport", date: "10-10-2026", reportTime: "13:00", temperature }
+        ]) }
+      ]));
+      expect(ok).toBe(false);
+      expect(body.error.code).toBe("UPSTREAM_DOWN");
+    }
+  );
+
+  it("keeps real negative temperatures, zero rain, and high humidity", async () => {
+    const { ok, body } = await callTool(mod, "met_get_observations", { station: "Dublin Airport" }, fakeFetch([
+      { match: /observations/, body: JSON.stringify([
+        { name: "Dublin Airport", date: "10-10-2026", reportTime: "13:00", temperature: "-2", rainfall: "0", humidity: "99" }
+      ]) }
+    ]));
+    expect(ok).toBe(true);
+    expect(body.data.latest).toMatchObject({ temperature_c: -2, rainfall_mm: 0, humidity_pct: 99 });
+  });
+
   it.each([null, { error: "busy" }, [null], [{}], [{ name: "Dublin Airport", date: "bad", reportTime: "09:00" }],
     [{ name: "Dublin Airport", date: "31-02-2026", reportTime: "09:00" }],
     [{ name: "Dublin Airport", date: "07-10-2026", reportTime: "29:99" }],

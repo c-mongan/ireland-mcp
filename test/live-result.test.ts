@@ -43,6 +43,19 @@ it("validates NTA fixture summary fields without requiring invented entities", (
   expect(operationContracts.nta_get_realtime_summary({ trips: 4, cancelled: 1, added: 1, routes: [] })).toBe(true);
 });
 
+it("rejects a station latest reading that is older than the observation series", () => {
+  const oldest = { time: "2026-10-10T00:00", temperature_c: 10 };
+  const newest = { time: "2026-10-10T12:00", temperature_c: 12 };
+  const data = { station: "Dublin Airport", observations: [newest, oldest] };
+  expect(operationContracts.met_get_observations({ ...data, latest: oldest })).toBe(false);
+  expect(operationContracts.met_get_observations({ ...data, latest: newest })).toBe(true);
+  expect(operationContracts.met_get_observations({ ...data, latest: { ...newest, temperature_c: 10 } })).toBe(false);
+  const missingNewest = { ...newest, temperature_c: null };
+  expect(operationContracts.met_get_observations({ ...data, observations: [missingNewest, oldest], latest: missingNewest })).toBe(true);
+  expect(operationContracts.met_get_observations({ ...data, observations: [missingNewest, oldest], latest: oldest })).toBe(false);
+  expect(operationContracts.met_get_observations({ station: "Dublin Airport", observations: [], latest: null })).toBe(true);
+});
+
 it("does not mark a partial combined-source response as healthy", () => {
   const body = { ...envelope, operation: "nearby", data: { lat: 53, lon: -6, boundaries: { error: { code: "UPSTREAM_DOWN" } }, forecast: [], sources: [] } };
   expect(assessResult(result(body), "cross/nearby").status).toBe("DEGRADED");

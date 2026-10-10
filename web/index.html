@@ -26,7 +26,7 @@
   <link rel="alternate icon" href="/favicon.ico" type="image/x-icon">
   <link rel="preconnect" href="https://mcp.irishopendata.ie">
   <link rel="preconnect" href="https://raw.githubusercontent.com">
-  <link rel="stylesheet" href="styles.css?v=20261008-refresh">
+  <link rel="stylesheet" href="styles.css?v=20261010-refine">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to Content</a>
@@ -50,7 +50,7 @@
       </div>
       <div class="wrap hero-grid">
         <div class="hero-copy">
-          <p class="hero-kicker"><span aria-hidden="true">↗</span> Open data. Open possibilities.</p>
+          <p class="hero-kicker"><span aria-hidden="true">↗</span> Public data, with its source.</p>
           <h1 id="hero-title">Your AI.<br><span>Irish public data.</span><br>Connected.</h1>
           <p class="lede">Give your AI assistant access to Ireland’s statistics, transport, weather, housing and more. One connection. Read-only data. Sources you can check.</p>
           <div class="hero-actions" aria-label="Primary actions">
@@ -81,7 +81,7 @@
             <strong>Small toolset. Broad reach.</strong>
             <small>Discover sources first. Load the operations you need, when you need them.</small>
           </div>
-          <code class="endpoint-line" id="endpoint-line">https://mcp.irishopendata.ie/mcp</code>
+          <div class="hero-endpoint"><span>Connect to this endpoint</span><code class="endpoint-line" id="endpoint-line">https://mcp.irishopendata.ie/mcp</code></div>
         </aside>
       </div>
       <div class="wrap hero-bottom">
@@ -146,17 +146,18 @@
       </div>
       <div class="playground-layout">
       <aside class="question-examples" aria-labelledby="questions-title">
-        <h3 id="questions-title">A few places to start</h3>
-        <p class="muted">Questions to explore with your connected assistant.</p>
+        <h3 id="questions-title">Pick a starting point</h3>
+        <p class="muted">Load a sample request. Review it, then run the query.</p>
         <ul>
-          <li><span>Statistics · CSO</span><p>“What was Galway’s population in Census 2022?”</p></li>
-          <li><span>Transport · Luas</span><p>“When is the next tram at Heuston?”</p></li>
-          <li><span>Environment · Met Éireann</span><p>“Are there active weather warnings?”</p></li>
-          <li><span>Housing · Property Price Register</span><p>“What are the property price stats for Galway?”</p></li>
+          <li><button class="sample-request" type="button" data-example-index="0" aria-pressed="true"><span>Statistics · CSO</span><strong>Find population tables</strong><span class="sample-action">Load request <span aria-hidden="true">↗</span></span></button></li>
+          <li><button class="sample-request" type="button" data-example-index="1" aria-pressed="false"><span>Transport · Luas</span><strong>Next trams at Heuston</strong><span class="sample-action">Load request <span aria-hidden="true">↗</span></span></button></li>
+          <li><button class="sample-request" type="button" data-example-index="2" aria-pressed="false"><span>Environment · Met Éireann</span><strong>Current weather warnings</strong><span class="sample-action">Load request <span aria-hidden="true">↗</span></span></button></li>
+          <li><button class="sample-request" type="button" data-example-index="5" aria-pressed="false"><span>Housing · Property Price Register</span><strong>Property price stats for Galway</strong><span class="sample-action">Load request <span aria-hidden="true">↗</span></span></button></li>
         </ul>
-        <p class="example-note">These are question prompts, not claims about current conditions. Check the source and date of any answer.</p>
+        <p class="example-note">The service returns public data. Your connected assistant can explain it. Check the source and date before you use it.</p>
       </aside>
-      <form id="playground-form" class="playground-card">
+      <form id="playground-form" class="playground-card" aria-label="Live public data query">
+        <div class="request-heading"><h3>Try a live request</h3><span>Read-only</span></div>
         <label for="example-select">Choose a live example</label>
         <select id="example-select" name="example" autocomplete="off"></select>
         <details class="query-settings">
@@ -172,8 +173,12 @@
           <button type="submit" class="btn primary">Run live query <span aria-hidden="true">→</span></button>
           <span id="pg-status" class="muted" role="status" aria-live="polite"></span>
         </div>
-        <h3>Live response</h3>
-        <pre tabindex="0" id="pg-output" class="output" aria-live="polite">Choose an example, then run it.</pre>
+        <section class="response-area" aria-labelledby="response-title">
+          <h3 id="response-title">Live response</h3>
+          <p id="response-guide" class="response-guide">Inspect the data and its source metadata. Retrieval time shows when the data was fetched. Check the publisher’s date for the age of the data.</p>
+          <pre tabindex="0" id="pg-output" class="output" aria-labelledby="response-title" aria-describedby="response-guide" aria-live="polite">Choose an example, then run it.</pre>
+        </section>
+        <p class="query-next">Ready to use this in a conversation? <a href="#install">Connect your assistant <span aria-hidden="true">↗</span></a></p>
       </form>
       </div>
     </section>
@@ -183,6 +188,7 @@
         <h2 id="directory-title">A country of open data.</h2>
         <p>Explore the source directory by subject. Each entry lists its operations, licence and an example question. Individual publishers set the terms for their data.</p>
       </div>
+      <nav id="source-nav" class="source-nav" aria-label="Source subjects"></nav>
       <div id="source-directory" class="source-directory" aria-live="polite"></div>
     </section>
 
@@ -203,8 +209,9 @@
     <p>Open source under the MIT licence. Data remains under each publisher’s licence — see <a href="https://github.com/c-mongan/ireland-mcp/blob/main/NOTICE">NOTICE</a>.</p>
     <p>Unofficial community project — not affiliated with the Irish Government.</p>
     <p>The background video is an AI-generated city timelapse. It does not depict a real Irish location.</p>
+    <div class="analytics-choice"><button class="btn secondary" id="analytics-toggle" type="button" aria-pressed="false">Enable usage metrics</button><p>Optional metrics count actions and query timings. Query text and results are not sent.</p></div>
   </footer>
 
-  <script src="app.js?v=20261008-retry" defer></script>
+  <script src="app.js?v=20261010-refine" type="module"></script>
 </body>
 </html>

@@ -138,27 +138,34 @@ export async function forecastAt(ctx: ToolContext, lat: number, lon: number, hou
 
 interface RawObservation {
   name: string;
-  temperature?: string;
+  temperature?: string | null;
   weatherDescription?: string;
-  windSpeed?: string;
-  windGust?: string;
+  windSpeed?: string | null;
+  windGust?: string | null;
   cardinalWindDirection?: string;
-  humidity?: string;
-  rainfall?: string;
-  pressure?: string;
+  humidity?: string | null;
+  rainfall?: string | null;
+  pressure?: string | null;
   date?: string;
   reportTime?: string;
 }
 
-const clean = (v: string | undefined) => {
-  const t = (v ?? "").trim();
-  return t === "" || t === "-" || t === "n/a" ? null : Number.isFinite(Number(t)) ? Number(t) : t;
+// Met's observations notes identify X, -, and n/a as missing. The live feed also
+// used null, NA, and -99 in a missing-observation row on 10 October 2026.
+const MISSING_OBSERVATION_VALUES = new Set(["", "-", "x", "n/a", "na", "-99"]);
+const isMissingObservation = (value: string | null | undefined) =>
+  value === null || value === undefined || MISSING_OBSERVATION_VALUES.has(value.trim().toLowerCase());
+const clean = (value: string | null | undefined): number | null => {
+  if (isMissingObservation(value)) return null;
+  const number = Number(value!.trim());
+  if (!Number.isFinite(number)) throw new ToolError("UPSTREAM_DOWN", "Met Éireann returned a malformed measurement.", { retryable: false });
+  return number;
 };
+const observationText = (value: string | undefined) => isMissingObservation(value) ? null : value!.trim();
 
-const measurementSchema = z.string().refine((value) => {
-  const text = value.trim();
-  return text === "" || text === "-" || text === "n/a" || Number.isFinite(Number(text));
-});
+const measurementSchema = z.string().nullable().refine((value) =>
+  isMissingObservation(value) || Number.isFinite(Number(value?.trim()))
+);
 const observationDate = z.string().regex(/^\d{2}-\d{2}-\d{4}$/).refine((value) => {
   const [day, month, year] = value.split("-").map(Number);
   const date = new Date(Date.UTC(year!, month! - 1, day!));
@@ -192,16 +199,24 @@ export async function observationsAt(ctx: ToolContext, station: Station) {
       }
     }
   });
-  const rows = result.value;
+  // The provider can return newest first. Keep chronological order so the last
+  // item is the newest observation for callers that expose a latest reading.
+  const rows = [...result.value].sort((a, b) => {
+    const timestamp = (row: RawObservation) => {
+      const [day, month, year] = row.date!.split("-");
+      return `${year}-${month}-${day}T${row.reportTime}`;
+    };
+    return timestamp(a).localeCompare(timestamp(b));
+  });
   const observations = rows.map((r) => {
     const [d, m, y] = (r.date ?? "").split("-");
     return {
       time: y && r.reportTime ? `${y}-${m}-${d}T${r.reportTime}` : null,
       temperature_c: clean(r.temperature),
-      weather: r.weatherDescription ?? null,
+      weather: observationText(r.weatherDescription),
       wind_speed_kmh: clean(r.windSpeed),
       wind_gust_kmh: clean(r.windGust),
-      wind_direction: r.cardinalWindDirection ?? null,
+      wind_direction: observationText(r.cardinalWindDirection),
       humidity_pct: clean(r.humidity),
       rainfall_mm: clean(r.rainfall),
       pressure_hpa: clean(r.pressure)
@@ -296,8 +311,14 @@ const observationsTool = defineTool({
       throw new ToolError("NOT_FOUND", `Unknown Met Éireann station '${station}'.`, { hint: `Use one of: ${STATIONS.map((s) => s.name).join(", ")}.` });
     }
     const r = await observationsAt(ctx, found);
+    const latest = r.observations.at(-1) ?? null;
+    const measurementFields = ["temperature_c", "wind_speed_kmh", "wind_gust_kmh", "humidity_pct", "rainfall_mm", "pressure_hpa"] as const;
+    const missing = latest ? measurementFields.filter((field) => latest[field] === null) : [];
     return envelope(metInfo, {
-      data: { station: found.name, lat: found.lat, lon: found.lon, latest: r.observations.at(-1) ?? null, observations: r.observations },
+      data: {
+        station: found.name, lat: found.lat, lon: found.lon, latest, observations: r.observations,
+        ...(missing.length ? { note: `The newest observation (${latest!.time}) has missing measurements: ${missing.join(", ")}. Missing values are null; earlier observations are retained.` } : {})
+      },
       url: r.url,
       cached: r.cached,
       stale: r.stale

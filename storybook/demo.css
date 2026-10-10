@@ -1,3 +1,6 @@
-.source-card h4 {
-  font-size: 1.35rem;
+/* Stable snapshots: previews never animate, fetch data or load video. */
+html { scroll-behavior: auto; }
+*, *::before, *::after {
+  animation: none !important;
+  transition: none !important;
 }
