@@ -14,10 +14,31 @@ app="${FUNCTION_APP:-$(azd env get-value SERVICE_API_NAME)}"
 stage="$(mktemp -d)"
 trap 'rm -rf "$stage"' EXIT
 
+# Record both sides of the build. Runtime environment settings cannot provide package identity.
+revision_before="$(git rev-parse --verify HEAD 2>/dev/null || true)"
+status_before="$(git status --porcelain --untracked-files=normal 2>/dev/null || printf git-status-unavailable)"
 npm ci
 npm run build
+revision_after="$(git rev-parse --verify HEAD 2>/dev/null || true)"
+status_after="$(git status --porcelain --untracked-files=normal 2>/dev/null || printf git-status-unavailable)"
+release=""
+if [[ "$revision_before" =~ ^[a-f0-9]{40}$ ]] && [[ "$revision_before" == "$revision_after" ]] && [[ -z "$status_before" ]] && [[ -z "$status_after" ]]; then
+  release="$revision_before"
+fi
+# CI requires the actual built checkout to match its selected commit before any upload.
+if [[ -n "${IRELAND_MCP_EXPECTED_REVISION:-}" ]] && [[ "$release" != "$IRELAND_MCP_EXPECTED_REVISION" ]]; then
+  echo "Deployment stopped: the build is not a clean checkout of the expected Git revision." >&2
+  exit 1
+fi
 cp -R dist host.json package.json package-lock.json "$stage/"
 rm -rf "$stage/dist/test"
+mkdir -p "$stage/dist/src/gateway"
+if [[ -n "$release" ]]; then
+  printf 'export const PACKAGED_RELEASE = "%s";\n' "$release" > "$stage/dist/src/gateway/release.js"
+else
+  printf 'export const PACKAGED_RELEASE = undefined;\n' > "$stage/dist/src/gateway/release.js"
+  echo "Package release identity omitted: source is dirty or Git provenance is unavailable." >&2
+fi
 (
   cd "$stage/"
   npm ci --omit=dev --ignore-scripts

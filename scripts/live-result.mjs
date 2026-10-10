@@ -5,12 +5,22 @@ const object = (value) => value !== null && typeof value === "object" && !Array.
 const nonempty = (value) => typeof value === "string" && value.trim().length > 0;
 const array = (value) => Array.isArray(value);
 
-export function assessResult(result, label = "") {
+// Typed tools omit operation tags. Only their explicit callers can waive that requirement.
+export function assessResult(result, label = "", { requireOperationTag = true } = {}) {
   let body;
   try { body = JSON.parse(result?.content?.find((part) => part.type === "text")?.text ?? ""); }
   catch { return { status: "FAIL", body: {}, reason: "Missing or invalid JSON tool result." }; }
   const fail = (reason) => ({ status: "FAIL", body, reason });
   if (!object(body)) return fail("Tool result must be a JSON object.");
+  const [requestedSource, requestedOperation] = label.includes("/") ? label.split("/") : [];
+  if (requestedOperation && body.operation !== undefined && body.operation !== requestedOperation) {
+    return fail("Result does not identify the requested operation.");
+  }
+  for (const [field, expected] of [["ireland/source", requestedSource], ["ireland/operation", requestedOperation]]) {
+    if (expected && result._meta?.[field] !== undefined && result._meta[field] !== expected) {
+      return fail(`Conflicting result metadata: ${field}.`);
+    }
+  }
   if (result.isError) {
     const code = body.error?.code;
     if (label.startsWith("nta/") && code === "NOT_CONFIGURED") return { status: "NOT_CONFIGURED", body };
@@ -41,10 +51,13 @@ export function assessResult(result, label = "") {
   }
   if (!Number.isFinite(Date.parse(body.retrieved_at))) return fail("Invalid retrieval timestamp.");
   if (typeof body.cached !== "boolean" || typeof body.truncated !== "boolean") return fail("Missing cache/truncation flags.");
-  if (label.includes("/") && body.operation !== label.split("/")[1]) return fail("Result does not identify the requested operation.");
+  if (body.stale !== undefined && typeof body.stale !== "boolean") return fail("Invalid stale flag.");
+  if (requestedOperation && requireOperationTag && body.operation === undefined) {
+    return fail("Result does not identify the requested operation.");
+  }
   const data = body.data;
   if (!array(data) && (!object(data) || Object.keys(data).length === 0)) return fail("Missing domain data.");
-  const operation = body.operation ?? (label === "nearby" ? "nearby" : undefined);
+  const operation = body.operation ?? (!requireOperationTag ? requestedOperation : undefined) ?? (label === "nearby" ? "nearby" : undefined);
   const check = Object.hasOwn(operationContracts, operation) ? operationContracts[operation] : undefined;
   if (!check || !check(data)) return fail(`Domain sample failed its acceptance check: ${operation ?? "unknown operation"}.`);
   if (["nearby", "ireland_snapshot"].includes(operation) && Object.values(data).some((value) => object(value) && value.error)) {

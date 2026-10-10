@@ -53,8 +53,25 @@ const pick = (o: unknown, snake: string): unknown => {
 };
 const str = (v: unknown) => (v === undefined || v === null || v === "" ? null : String(v));
 const int = (v: unknown) => (v === undefined || v === null || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
+const object = (value: unknown): value is Raw => value !== null && typeof value === "object" && !Array.isArray(value);
+
+/** Reject error documents before they can become cached empty feeds. */
+function assertFeedEnvelope(raw: unknown): void {
+  const header = pick(raw, "header");
+  const version = pick(header, "gtfs_realtime_version");
+  const timestamp = pick(header, "timestamp");
+  const seconds = typeof timestamp === "number" || (typeof timestamp === "string" && /^\d+$/.test(timestamp))
+    ? Number(timestamp) : NaN;
+  const entities = pick(raw, "entity");
+  if (!object(raw) || !object(header) || typeof version !== "string" || !["1.0", "2.0"].includes(version)
+    || !Number.isSafeInteger(seconds) || seconds < 0 || seconds > 8_640_000_000_000
+    || (entities !== undefined && (!Array.isArray(entities) || !entities.every(object)))) {
+    throw new ToolError("UPSTREAM_DOWN", "NTA returned a malformed GTFS-Realtime feed.", { retryable: false });
+  }
+}
 
 export function normaliseFeed(raw: unknown): Feed {
+  assertFeedEnvelope(raw);
   const entities = pick(raw, "entity");
   const header = pick(raw, "header");
   const ts = int(pick(header, "timestamp"));

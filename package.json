@@ -57,7 +57,10 @@
     "test:storybook": "playwright test --config storybook/playwright.config.ts",
     "chromatic": "chromatic --storybook-build-dir=storybook-static",
     "typecheck:storybook": "tsc -p storybook/tsconfig.json",
-    "test:storybook-mcp": "node scripts/check-storybook-mcp.mjs"
+    "test:storybook-mcp": "node scripts/check-storybook-mcp.mjs",
+    "check:mcp": "node scripts/check-mcp.mjs",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build && node --test test/infra-arm.mjs test/deploy-zip.mjs test/status-checkout.mjs && npm run check:mcp",
+    "check:ui": "npm run typecheck:storybook && npm run test:storybook-mcp && npm run build-storybook && npm run test:e2e && npm run test:storybook"
   },
   "dependencies": {
     "@azure/data-tables": "^13.3.2",

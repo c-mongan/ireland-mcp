@@ -6,6 +6,28 @@ Each call is a real MCP client round trip. By default it goes through
 `ireland_call` on the lean surface; `EVAL_TOOLSETS=all npm run live:sanity` calls
 the typed tools directly instead.
 
+## Acceptance policy
+
+Each sample first uses the shared `assessResult` checks. A PASS requires valid
+evidence fields, cache flags, a domain contract, and the source-specific sample
+check. A stale response or an unavailable section in a combined response fails
+the smoke run. Typed tools can omit the operation tag. A conflicting tag fails
+on either surface.
+
+NTA checks the real summary fields: `feed_timestamp`, `trips`, `cancelled`,
+`added`, and `routes`. A valid feed with no updates can pass. A missing
+`NTA_API_KEY` is SKIP. An invalid HTTP-200 feed is a typed `UPSTREAM_DOWN` error
+and is not cached as an empty feed.
+
+Only the exact marked tool error `UPSTREAM_DOWN: Kohesio returned HTTP 403.`
+can become WARN for the known cloud-runner restriction. Wrong data, stale data,
+other HTTP errors, and timeouts remain FAIL. One WARN is tolerated; any FAIL or
+more than one WARN makes the process exit with code 1.
+
+These checks prove response structure and selected consistency rules. They do
+not prove publisher accuracy or completeness. Historical tables below record
+their dated runs; they are not evidence of current provider availability.
+
 ## 2026-10-05, combined ArcGIS + TED + bikes (`feat/sources-ted-bikes`), local run
 
 Default surface (7 tools listed, every case through `ireland_call`): 23 PASS,
