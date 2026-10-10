@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef } from "react";
 import { sectionDocument } from "./sectionFixture.js";
 
 export interface SectionPreviewProps {
-  /** Production section ID. The preview reads its markup from web/index.html. */
-  section: "top" | "install" | "directory" | "playground" | "status";
+  /** Production section or dialog ID. The preview reads its markup from web/index.html. */
+  section: "top" | "install" | "directory" | "playground" | "status" | "demo-dialog";
   /** Fixed website colour theme. Both themes have reviewed visual baselines. */
   theme: "dark" | "light";
   /** Fixed sample response or health state. No provider request runs here. */
@@ -11,7 +11,7 @@ export interface SectionPreviewProps {
 }
 
 /**
- * Review-only frame for real Ireland MCP website sections and fixed sample data.
+ * Review-only frame for real website sections, fixed sample data and the recorded demo poster.
  * Edit web/index.html and web/styles.css to change the product. This wrapper is
  * only a Storybook adapter. Scripts, network access and external actions are blocked.
  * Query states apply to playground; health states apply to status.

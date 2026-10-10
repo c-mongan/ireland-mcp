@@ -1,0 +1,27 @@
+WEBVTT
+
+NOTE Edited still captures; timing is editorial, not measured latency.
+
+1
+00:00:00.000 --> 00:00:04.000
+Connect your assistant to Irish public data, or try a read-only request in your browser.
+
+2
+00:00:04.000 --> 00:00:10.000
+The selected example asks for Galway City two-bed apartments in 2025 Q4.
+
+3
+00:00:10.000 --> 00:00:15.000
+This real request returned a cached response. The edited timing does not show query latency.
+
+4
+00:00:15.000 --> 00:00:25.000
+CSO RIQ02 reports €1,672.57 for this period and dwelling type. This is not a current asking rent.
+
+5
+00:00:25.000 --> 00:00:31.000
+Source: CSO RIQ02. The table shows 14 May 2026 as its update date; retrieval was 10 October 2026.
+
+6
+00:00:31.000 --> 00:00:35.000
+Choose a sample and run it at irishopendata.ie. Check its period, source, licence and cache state.

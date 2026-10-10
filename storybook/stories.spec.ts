@@ -5,7 +5,7 @@ import { expect, test } from "@playwright/test";
 
 const axeSource = readFileSync(createRequire(import.meta.url).resolve("axe-core/axe.min.js"), "utf8");
 
-const sections = ["hero", "installer", "directory", "playground-idle", "playground-loading", "playground-success", "playground-empty", "playground-error", "playground-truncated", "playground-weather", "playground-transport", "playground-rent", "playground-cached-stale", "status-healthy", "status-degraded", "status-stale", "status-loading", "status-unreachable"];
+const sections = ["hero", "demo-player", "installer", "directory", "playground-idle", "playground-loading", "playground-success", "playground-empty", "playground-error", "playground-truncated", "playground-weather", "playground-transport", "playground-rent", "playground-cached-stale", "status-healthy", "status-degraded", "status-stale", "status-loading", "status-unreachable"];
 
 for (const section of sections) {
   for (const theme of ["dark", "light"]) {
@@ -27,7 +27,33 @@ for (const section of sections) {
       await expect(frame.locator("html")).toHaveAttribute("data-theme", theme);
       await expect(frame.locator("html")).toHaveCSS("background-color", theme === "dark" ? "rgb(12, 23, 18)" : "rgb(244, 248, 245)");
       await expect(frame.locator("body > [role=note]")).toContainText("Storybook fixture");
-      await expect(frame.locator("main > section")).toBeVisible();
+      await expect(frame.locator(section === "demo-player" ? "main > dialog" : "main > section")).toBeVisible();
+      if (section === "demo-player") {
+        const dialog = frame.getByRole("dialog", { name: "A historical rent query, from request to source." });
+        await expect(dialog).toHaveJSProperty("open", true);
+        await expect(dialog).toHaveAccessibleDescription(/edited still captures.*cached CSO response.*does not show query latency.*Run the live query/);
+        await expect(frame.locator("body > [role=note]")).toContainText("playback, links and close actions are disabled");
+        const poster = dialog.getByRole("img", { name: "Poster for the recorded historical rent query demo" });
+        await expect(poster).toBeVisible();
+        await expect(poster).toHaveAttribute("src", /^data:image\/jpeg;base64,/);
+        await expect.poll(() => poster.evaluate((node) => (node as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+        await expect(dialog.locator("video, source, track")).toHaveCount(0);
+        await expect(dialog.locator("#demo-close")).toBeHidden();
+        await expect(dialog.locator(".demo-links a")).toHaveText(["Open the video", "View CSO table RIQ02", "Try it live"]);
+        const transcript = dialog.locator("#demo-transcript");
+        await expect(transcript).toHaveJSProperty("open", true);
+        await expect(transcript).toContainText("€1,672.57");
+        await expect(transcript).toContainText("2025Q4");
+        await expect(transcript).toContainText("not current asking rents");
+        await expect(transcript).toContainText("returned a cached response");
+        await expect(transcript).toContainText("timing does not show query latency");
+        const summary = transcript.locator("summary");
+        await summary.focus();
+        await summary.press("Space");
+        await expect(transcript.locator("p").first()).toBeHidden();
+        await summary.press("Enter");
+        await expect(transcript.locator("p").first()).toBeVisible();
+      }
       if (section === "installer") {
         await expect(frame.getByRole("tab", { selected: true })).toHaveText("Copilot CLI");
         await expect(frame.locator("#install-panel")).toContainText("copilot mcp add");

@@ -34,7 +34,11 @@ not a real Irish location. No new remote imagery or font dependencies are needed
   receives a raw-response fallback. Missing values never become zero.
 - The rent example shows historical registered-tenancy statistics, not current
   asking rents. In RIQ02, zero means insufficient published data. Preserve that
-  distinction. The frontend must not contain a fixed rent value.
+  distinction. Live result rendering must not contain a fixed rent value.
+- A separate 35-second rent demo shows edited still captures of the actual interface
+  from 10 October 2026. Its transcript contains the recorded value and period,
+  and distinguishes registered tenancies from asking rents. It does not replace
+  the live response. The original hero background stays in place.
 - Sources use a scannable directory. Subject navigation comes from the returned
   catalogue and links to the existing domain heading IDs. Do not add fixed links
   that assume every subject is present in the live catalogue.
@@ -117,3 +121,17 @@ Verify with `npm run test:e2e`, desktop and 320px mobile inspection in both them
 and one live browser query on an allowed origin. Browser tests use mock data and
 do not prove upstream availability. Social-preview metadata should reference only
 real shipped assets.
+
+## Recorded demo player
+
+The hero control opens a native dialog. The recording has native playback
+controls, English captions and a plain transcript. It never autoplays. Assign
+video, poster and caption URLs only on first open; use `preload="none"`. Escape
+and Close pause playback and restore focus to the opener. Try it live closes the
+dialog, loads the rent example and focuses the playground selector without
+submitting a request. If a query is pending, leave its settings unchanged.
+
+Without JavaScript or native dialog support, the panel stays inline. Its direct
+video link, transcript and source link remain available. The modal scrolls
+within the viewport at 320px. Media failure gives a visible message and leaves
+the transcript and live-query link available. No demo action sends analytics.

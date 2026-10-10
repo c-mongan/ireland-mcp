@@ -1,3 +1,4 @@
+import { initDemoPlayer } from "./demo-player.js?v=20261010-demo";
 import { createAnalytics } from "./analytics.js?v=20261010-first-use";
 import { buildResultView, decodeToolPayload, renderResultView } from "./result-view.js?v=20261010-first-use";
 
@@ -597,6 +598,7 @@ $("playground-form").addEventListener("submit", async (event) => {
 
 renderInstallers();
 renderExamples();
+initDemoPlayer();
 initLiveStats();
 initStatus();
 
