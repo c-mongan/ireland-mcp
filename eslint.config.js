@@ -12,7 +12,7 @@ export default tseslint.config(
     }
   },
   {
-    files: ["storybook/*.stories.js"],
+    files: ["storybook/**/*.js", "storybook/**/*.tsx"],
     languageOptions: { globals: { document: "readonly", DOMParser: "readonly", ResizeObserver: "readonly" } }
   }
 );
