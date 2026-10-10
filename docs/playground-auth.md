@@ -4,7 +4,17 @@ The [website playground](https://irishopendata.ie/#playground) sends read-only M
 
 ## Use Ireland MCP in ChatGPT
 
-Add `https://mcp.irishopendata.ie/mcp` as a no-authentication developer connector in ChatGPT when developer mode is available for your account. See the [installation guide](../README.md#install) and the [OpenAI plugin quickstart](https://developers.openai.com/plugins/build/app-quickstart) for the current ChatGPT test route. The connector lets ChatGPT call the server with the user's own ChatGPT session. A website cannot assume that it can use that session.
+Use the [OpenAI plugin quickstart](https://developers.openai.com/plugins/quickstart), checked on 10 October 2026:
+
+1. Open **Plugins** in ChatGPT on the web. If **Ireland Open Data** is already installed, use that plugin.
+2. If it is absent, select **+** → **Add custom MCP server**. Name it **Ireland Open Data**, enter `https://mcp.irishopendata.ie/mcp` as the Server URL and select **No authentication**. Review the warning, select **I understand and want to continue**, then **Create as a plugin**.
+3. Install the resulting plugin from your personal plugins. Switch the ChatGPT homepage to **Work**, start a new chat, type `@` and select **Ireland Open Data**. See the [OpenAI plugin quickstart](https://developers.openai.com/plugins/quickstart).
+
+Workspace permissions and security restrictions can limit custom MCP access. Ireland MCP uses public Streamable HTTP and requires no client key or OAuth setup. ChatGPT calls it through the user's ChatGPT session; the website playground cannot assume access to that session.
+
+**Verified on 10 October 2026:** the plugin was already installed. ChatGPT reported 39 seconds of work for a new Work query. Its answer gave a retrieval time of `18:54:03.960 UTC` and reported **€1,672.57** for a **two-bed apartment in Galway City, Q4 2025**, with a cached result, [CSO table RIQ02](https://data.cso.ie/table/RIQ02) and CC BY 4.0 attribution. This is a historical quarterly RTB registered-tenancy average, not a current asking rent.
+
+The inspected Work trace showed three **“Used Ireland Open Data integration”** entries. No raw JSON inspection control was found in that UI. This proves plugin use and the displayed answer; it does not expose the exact ChatGPT tool arguments or raw response.
 
 ## Sign in with ChatGPT
 

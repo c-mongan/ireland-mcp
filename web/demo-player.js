@@ -18,9 +18,9 @@ export function initDemoPlayer(root = document) {
   opener.addEventListener("click", () => {
     returnFocus = opener;
     if (!loaded) {
-      video.poster = "media/rent-demo-poster.jpg";
-      video.src = "media/rent-demo.mp4";
-      video.querySelector("track").src = "media/rent-demo.vtt";
+      video.poster = "media/chatgpt-demo-poster.jpg";
+      video.src = "media/chatgpt-demo.mp4";
+      video.querySelector("track").src = "media/chatgpt-demo.vtt";
       loaded = true;
     }
     dialog.showModal();

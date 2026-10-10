@@ -46,12 +46,13 @@ Or write `~/.copilot/mcp-config.json`:
 
 ## ChatGPT
 
-1. Open Settings → Apps & Connectors → Advanced settings.
-2. Enable Developer Mode connectors if available on the account.
-3. Create an MCP connector named `Ireland MCP`.
-4. Use URL `https://mcp.irishopendata.ie/mcp`.
-5. Choose no authentication.
-6. Prefer `search`, `fetch`, `ireland_catalogue` and `ireland_call` for compact use.
+1. Open **Plugins** in ChatGPT on the web. Reuse **Ireland Open Data** if it is already installed.
+2. If it is absent, select **+** → **Add custom MCP server**. Name it **Ireland Open Data** and enter `https://mcp.irishopendata.ie/mcp` as the Server URL.
+3. Select **No authentication**. Review the warning, select **I understand and want to continue**, then **Create as a plugin**.
+4. Install the plugin from your personal plugins. Switch to **Work**, start a new chat, type `@` and select **Ireland Open Data**.
+5. Prefer `search`, `fetch`, `ireland_catalogue` and `ireland_call` for compact use.
+
+Account and workspace policies apply. See the [OpenAI plugin quickstart](https://developers.openai.com/plugins/quickstart).
 
 ## Cursor
 

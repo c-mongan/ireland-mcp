@@ -35,10 +35,11 @@ not a real Irish location. No new remote imagery or font dependencies are needed
 - The rent example shows historical registered-tenancy statistics, not current
   asking rents. In RIQ02, zero means insufficient published data. Preserve that
   distinction. Live result rendering must not contain a fixed rent value.
-- A separate 35-second rent demo shows edited still captures of the actual interface
-  from 10 October 2026. Its transcript contains the recorded value and period,
+- The main 35-second demo shows edited real ChatGPT Work screenshots
+  from 10 October 2026, with the Ireland Open Data plugin selected. Its transcript contains the recorded value and period,
   and distinguishes registered tenancies from asking rents. It does not replace
-  the live response. The original hero background stays in place.
+  the live response. The original hero background stays in place. A separate link retains the
+  earlier website playground demo and its VTT captions.
 - Sources use a scannable directory. Subject navigation comes from the returned
   catalogue and links to the existing domain heading IDs. Do not add fixed links
   that assume every subject is present in the live catalogue.
@@ -124,7 +125,7 @@ real shipped assets.
 
 ## Recorded demo player
 
-The hero control opens a native dialog. The recording has native playback
+The hero control opens a native dialog. The ChatGPT video has native playback
 controls, English captions and a plain transcript. It never autoplays. Assign
 video, poster and caption URLs only on first open; use `preload="none"`. Escape
 and Close pause playback and restore focus to the opener. Try it live closes the
@@ -135,3 +136,11 @@ Without JavaScript or native dialog support, the panel stays inline. Its direct
 video link, transcript and source link remain available. The modal scrolls
 within the viewport at 320px. Media failure gives a visible message and leaves
 the transcript and live-query link available. No demo action sends analytics.
+
+The transcript describes the natural-language question, the visible “Used
+integration” status and the historical rent answer. It names CSO RIQ02, CC BY
+4.0, the 10 October 2026 retrieval time and cached response. Do not imply that
+ChatGPT Work exposes raw JSON, identifies an exact tool function or shows
+continuous playback. The video is silent and captioned. The website installer
+uses the current Plugins → Add custom MCP server → Install → Work → @plugin
+flow and links to the official OpenAI quickstart.

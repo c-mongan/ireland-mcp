@@ -2,7 +2,7 @@ import pageHtml from "../web/index.html?raw";
 import siteCss from "../web/styles.css?raw";
 import demoCss from "./demo.css?raw";
 import { buildResultView, renderResultView } from "../web/result-view.js";
-import demoPoster from "../web/media/rent-demo-poster.jpg?inline";
+import demoPoster from "../web/media/chatgpt-demo-poster.jpg?inline";
 
 function required(root, selector) {
   const element = root.querySelector(selector);
@@ -140,7 +140,7 @@ export function sectionDocument({ section: sectionId, theme, state = "idle" }) {
     poster.id = video.id;
     poster.className = video.className;
     poster.src = demoPoster;
-    poster.alt = "Poster for the recorded historical rent query demo";
+    poster.alt = "Poster for the ChatGPT historical rent query demo";
     poster.setAttribute("aria-describedby", "demo-description");
     video.replaceWith(poster);
     required(section, "#demo-close").hidden = true;

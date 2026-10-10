@@ -1,0 +1,23 @@
+WEBVTT
+
+NOTE Edited still captures; timing is editorial, not measured latency.
+
+1
+00:00:00.000 --> 00:00:06.000
+Ask for the historical average monthly registered rent in Galway City: two-bed apartments, Q4 2025.
+
+2
+00:00:06.000 --> 00:00:12.000
+This view shows integration entries, not raw tool arguments. Edited timing does not measure latency.
+
+3
+00:00:12.000 --> 00:00:25.000
+CSO RIQ02: €1,672.57/month. This is historical rent.
+
+4
+00:00:25.000 --> 00:00:31.000
+Open the cited RIQ02 table to check its source and published period. The recorded update date is 14 May 2026.
+
+5
+00:00:31.000 --> 00:00:35.000
+Connect your assistant for natural questions, or try a read-only request in the website playground.

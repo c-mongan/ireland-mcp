@@ -1,12 +1,36 @@
 # Product demonstration videos
 
+The website provides two distinct demonstrations: a real ChatGPT integration and the website playground. Both use edited actual browser still captures from 10 October 2026. They are not continuous screen recordings, and their 35-second edit durations do not measure model or request latency. Neither video has audio, invented interface states or synthetic data.
+
+## ChatGPT integration edit
+
+`web/media/chatgpt-demo.mp4` shows a natural-language question with the existing **Ireland Open Data** integration selected in ChatGPT Work, the actual expanded integration entries, and the returned answer. The current interface shows generic integration rows. It does not expose raw tool arguments or JSON in these captures. The edit does not invent tool names or add a replacement tool panel.
+
+The real answer reports **€1,672.57 per month** for a two-bedroom apartment in Galway City in **Q4 2025**. It cites [CSO RIQ02 — RTB Average Monthly Rent Report](https://data.cso.ie/table/RIQ02), **CC BY 4.0**, retrieval at **10 October 2026, 18:54:03.960 UTC**, and **`cached: true`**. These are historical registered-tenancy statistics, not current asking rents. The source and its published period still need checking when using the answer.
+
+| Time | Actual capture or editorial card | Meaning |
+| --- | --- | --- |
+| 0–6 seconds | ChatGPT question, cropped | Ireland Open Data selected; natural-language rent request |
+| 6–12 seconds | Expanded integration entries, cropped | The real integration was used; raw arguments are not visible |
+| 12–25 seconds | Actual answer and source table, cropped | Amount, location, period, source, licence, retrieval and cache state |
+| 25–31 seconds | Official CSO table, cropped | RIQ02 source and recorded update date |
+| 31–35 seconds | Editorial end card | Connect an assistant or try the website playground |
+
+The crops remove the account avatar, application sidebars and unrelated controls. They preserve the actual captured interface pixels. The official-source shot reuses the checked CSO table capture from the same day, which showed an update date of 14 May 2026. Attribution: Central Statistics Office, Ireland, licensed under CC BY 4.0, as stated in the answer and source evidence.
+
+Full English captions are separate in `web/media/chatgpt-demo.vtt`; they are not burned into the video. `web/media/chatgpt-demo-poster.jpg` is a frame from the real answer sequence. Keep native captions and the transcript available. The website supplies controls and must not auto-play or preload the full video before a user chooses it. The figure belongs to this dated demonstration and must not become a fixed value in the live frontend.
+
+The result caption is short: “CSO RIQ02: €1,672.57/month. This is historical rent.” The full licence, retrieval and cache facts remain in the captured answer and transcript. This VTT-only correction leaves the MP4 and poster unchanged. The original render receipt is preserved; a separate caption revision receipt records the changed VTT hash and unchanged media hashes. Native caption placement still needs browser playback checks.
+
+## Website playground edit
+
 The public `web/media/rent-demo.mp4` is a 35-second edit of actual browser still captures from 10 October 2026. It is not a continuous screen recording. Its edit duration does not measure query latency. It has no audio, generated interface, synthetic result, or generative-model footage.
 
 The clip shows a real hosted request for CSO table [RIQ02 — RTB Average Monthly Rent Report](https://data.cso.ie/table/RIQ02). The selected row is Galway City, two bedrooms, apartment, 2025Q4. It reports **€1,672.57 per month**. These are historical registered-tenancy statistics. They are not current asking rents or a measure of every rental property.
 
 Attribution: Central Statistics Office, Ireland (`www.cso.ie`), licensed under **CC BY 4.0**, as stated in the returned evidence. The underlying table is the RTB Average Monthly Rent Report. The official table showed an update date of **14 May 2026**. The site displayed retrieval at **10 October 2026, 18:19 UTC** and a cached response. Publication, statistical period, retrieval and capture dates have different meanings.
 
-## Public edit
+### Playground sequence
 
 | Time | Actual capture or editorial card | Meaning |
 | --- | --- | --- |
@@ -56,4 +80,4 @@ Only copy reviewed public assets into `web/media/`. The renderer checks 1280×72
 
 Run the path-safety regression tests with `python3 -B -S -m unittest discover -s test -p render_site_demo_test.py`. These tests use only Python's standard library. They check symbolic-link, case and Unicode path aliases, scratch collisions and existing-file preservation before any renderer dependency or executable runs. Pillow is imported only when a frame is composed.
 
-Keep raw captures, manifests, receipts, contact sheets and the engineering edit in the checked external artifact directory. The committed video is the dated public demonstration only. A future refresh needs new source checks and browser captures; changing an overlay alone does not refresh the evidence.
+Keep raw captures, manifests, receipts, contact sheets and the engineering edit in the checked external artifact directory. The committed videos are the two dated public demonstrations only. A future refresh needs new source checks and browser captures; changing an overlay alone does not refresh the evidence.
