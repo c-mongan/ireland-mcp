@@ -73,6 +73,11 @@ export function createAnalytics({ operations = new Map(), fetch: send = window.f
     });
   }
   async function init(button) {
+    if (button) {
+      button.disabled = true;
+      button.setAttribute("aria-pressed", "false");
+      button.textContent = "Loading usage metrics…";
+    }
     try {
       const response = await send("/analytics-config.json", {
         credentials: "omit", cache: "no-store", referrerPolicy: "no-referrer", signal: AbortSignal.timeout(2000)

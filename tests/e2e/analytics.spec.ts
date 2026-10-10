@@ -25,6 +25,35 @@ async function optIn(page: Page) {
   await expect(page.locator("#analytics-toggle")).toHaveAttribute("aria-pressed", "true");
 }
 
+test("metrics control stays disabled while configuration is loading and works when ready", async ({ page }) => {
+  const captures = await fixtures(page);
+  let release!: () => void;
+  const delayed = new Promise<void>((resolve) => { release = resolve; });
+  await page.route("**/analytics-config.json", async (route) => {
+    await delayed;
+    await route.fulfill({ json: { enabled: true, token: "test-public-token", host: "https://eu.i.posthog.com" } });
+  });
+  const requested = page.waitForRequest("**/analytics-config.json");
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await requested;
+  const toggle = page.locator("#analytics-toggle");
+  try {
+    await expect(toggle).toBeDisabled();
+    await expect(toggle).toHaveText("Loading usage metrics…");
+    await expect(toggle).toHaveAttribute("aria-pressed", "false");
+    await toggle.evaluate((button: HTMLButtonElement) => button.click());
+    await page.locator("#theme-toggle").click();
+    expect(captures).toEqual([]);
+    await expect(toggle).toHaveAttribute("aria-pressed", "false");
+  } finally {
+    release();
+  }
+  await optIn(page);
+  await page.locator("#theme-toggle").click();
+  await expect.poll(() => captures.length).toBe(1);
+  expect(captures[0]!.event).toBe("ireland_theme_changed");
+});
+
 test("usage capture stays off until opt-in and stops after opt-out", async ({ page, context }) => {
   const captures = await fixtures(page);
   await page.goto("/");

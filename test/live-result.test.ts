@@ -50,6 +50,9 @@ it("rejects a station latest reading that is older than the observation series",
   expect(operationContracts.met_get_observations({ ...data, latest: oldest })).toBe(false);
   expect(operationContracts.met_get_observations({ ...data, latest: newest })).toBe(true);
   expect(operationContracts.met_get_observations({ ...data, latest: { ...newest, temperature_c: 10 } })).toBe(false);
+  const missingNewest = { ...newest, temperature_c: null };
+  expect(operationContracts.met_get_observations({ ...data, observations: [missingNewest, oldest], latest: missingNewest })).toBe(true);
+  expect(operationContracts.met_get_observations({ ...data, observations: [missingNewest, oldest], latest: oldest })).toBe(false);
   expect(operationContracts.met_get_observations({ station: "Dublin Airport", observations: [], latest: null })).toBe(true);
 });
 
