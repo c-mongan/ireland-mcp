@@ -54,6 +54,20 @@ describe("deterministic result previews", () => {
     const result = view("irish-rail", "rail_get_departures", { station: { name: "Connolly" }, departures: [{ destination: "Howth", due_in_min: 4, expected_departure: "12:34", status: "En Route" }] });
     expect(result.tables[0].rows[0]).toEqual(["Howth", "4 min", "12:34", "En Route"]);
   });
+  it("uses the raw fallback for a train-code-only departure instead of an empty preview row", () => {
+    const result = view("irish-rail", "rail_get_departures", { station: { name: "Connolly" }, count: 1, departures: [{ train_code: "E123" }] });
+    expect(result.tables).toEqual([]);
+    expect(result.notices.join(" ")).toContain("unexpected format");
+    expect(result.description).toContain("Inspect the raw response");
+  });
+  it.each([
+    { departure: { due_in_min: 0 }, expected: ["Not reported", "0 min", "Not reported", "Not reported"] },
+    { departure: { status: "En Route" }, expected: ["Not reported", "Not reported", "Not reported", "En Route"] }
+  ])("retains a departure with only a displayed field: $departure", ({ departure, expected }) => {
+    const result = view("irish-rail", "rail_get_departures", { station: { name: "Connolly" }, count: 1, departures: [departure] });
+    expect(result.tables[0].rows[0]).toEqual(expected);
+    expect(result.notices).toEqual([]);
+  });
   it("shows grid measurement times and distinguishes zero wind from absent demand", () => {
     const result = view("eirgrid", "grid_get_status", { region: "ALL", demand_mw: null, wind_mw: 0, wind_time: "2025-12-01T12:00:00", wind_share_pct: null, co2_g_per_kwh: 42 });
     expect(result.tables[0].rows[0][1]).toBe("Not reported");

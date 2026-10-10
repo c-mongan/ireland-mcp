@@ -79,7 +79,7 @@ export function buildResultView(payload, { source, operation, isError = false } 
     model.title = data.warnings.length ? "Weather warnings in this response" : "No warning entries in this preview";
     model.description = "Check the publisher for full warning details, affected areas and current advice.";
     if (typeof data.count === "number" && data.count !== data.warnings.length) model.notices.push("The reported warning count differs from the entries included. This preview may be incomplete. Inspect the source and raw response.");
-  } else if (key === "irish-rail/rail_get_departures" && record(data) && table("Train departures", ["Destination", "Due in", "Expected", "Status"], data.departures, (item) => [text(item.destination), number(item.due_in_min, " min"), text(item.expected_departure), text(item.status)], ["destination", "train_code", "expected_departure"])) {
+  } else if (key === "irish-rail/rail_get_departures" && record(data) && table("Train departures", ["Destination", "Due in", "Expected", "Status"], data.departures, (item) => [text(item.destination), number(item.due_in_min, " min"), text(item.expected_departure), text(item.status)], ["destination", "due_in_min", "expected_departure", "status"])) {
     model.title = `Train departures${record(data.station) && typeof data.station.name === "string" ? ` from ${text(data.station.name)}` : ""}`;
     model.description = "Departures returned for the requested station and time window. Check the operator before travel.";
   } else if (key === "eirgrid/grid_get_status" && record(data) && ["demand_mw", "wind_mw", "wind_share_pct", "co2_g_per_kwh"].some((field) => typeof data[field] === "number" && Number.isFinite(data[field]))) {
