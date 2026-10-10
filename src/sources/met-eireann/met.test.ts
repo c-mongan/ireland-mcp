@@ -44,6 +44,25 @@ describe("Met Éireann module", () => {
     expect(unknown.body.error.hint).toContain("Valentia");
   });
 
+  it.each([
+    ["12:00", "11:00", "00:00"],
+    ["00:00", "11:00", "12:00"],
+    ["11:00", "12:00", "00:00"]
+  ])("selects the newest station reading regardless of upstream order: %j", async (...times) => {
+    // The real observations feed returned newest first on 10 October 2026.
+    const { ok, body } = await callTool(mod, "met_get_observations", { station: "Dublin Airport" }, fakeFetch([
+      { match: /observations/, body: JSON.stringify(times.map((reportTime) => ({
+        name: "Dublin Airport", date: "10-10-2026", reportTime,
+        temperature: reportTime === "12:00" ? "12" : "10"
+      }))) }
+    ]));
+    expect(ok).toBe(true);
+    expect(body.data.latest).toMatchObject({ time: "2026-10-10T12:00", temperature_c: 12 });
+    expect(body.data.observations.map((row: { time: string }) => row.time)).toEqual([
+      "2026-10-10T00:00", "2026-10-10T11:00", "2026-10-10T12:00"
+    ]);
+  });
+
   it.each([null, { error: "busy" }, [null], [{}], [{ name: "Dublin Airport", date: "bad", reportTime: "09:00" }],
     [{ name: "Dublin Airport", date: "31-02-2026", reportTime: "09:00" }],
     [{ name: "Dublin Airport", date: "07-10-2026", reportTime: "29:99" }],

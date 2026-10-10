@@ -1,5 +1,5 @@
-// Minimum result contracts for every catalogue operation. These check data structure;
-// they do not certify the publisher's real-world accuracy or completeness.
+// Minimum result contracts for every catalogue operation. These check data structure
+// and selected internal consistency rules, not publisher accuracy or completeness.
 const object = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
 const text = (v) => typeof v === "string" && v.trim().length > 0;
 const number = (v) => typeof v === "number" && Number.isFinite(v);
@@ -12,6 +12,13 @@ const datastore = shape({ total: number, fields: records, records });
 const searchDatasets = shape({ total: number, datasets: records });
 const geographicPoint = shape({ lat: number, lon: number });
 const nullableNumber = (v) => v === null || number(v);
+const observation = (row) => object(row) && text(row.time) && nullableNumber(row.temperature_c);
+const stationObservations = (data) => {
+  if (!shape({ station: text, observations: records })(data) || !data.observations.every(observation)) return false;
+  if (data.observations.length === 0) return data.latest === null;
+  const latest = data.observations.reduce((a, b) => a.time >= b.time ? a : b);
+  return observation(data.latest) && data.latest.time === latest.time && data.latest.temperature_c === latest.temperature_c;
+};
 
 export const operationContracts = {
   cso_search_tables: (data) => records(data) && data.every((row) => text(row.code) && text(row.title)),
@@ -41,7 +48,7 @@ export const operationContracts = {
   bikes_networks: collection("networks"),
   bikes_stations_near: shape({ stations: records, networks_considered: Array.isArray }),
   met_get_forecast: (data) => shape({ forecast: records })(data) && data.forecast.length > 0 && data.forecast.every((row) => text(row.time) && nullableNumber(row.temperature_c)),
-  met_get_observations: (data) => shape({ station: text, observations: records })(data) && data.observations.every((row) => text(row.time) && nullableNumber(row.temperature_c)),
+  met_get_observations: stationObservations,
   met_get_warnings: (data) => shape({ count: number, warnings: records })(data) && data.count === data.warnings.length && data.warnings.every((row) => text(row.category) && text(row.level)),
   marine_get_buoys: shape({ count: number, buoys: records }),
   water_find_stations: shape({ count: number, stations: records }),

@@ -1,3 +1,5 @@
+import { createAnalytics } from "./analytics.js";
+
 const MCP_URL = "https://mcp.irishopendata.ie/mcp";
 const STATUS_URL = "https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json";
 
@@ -91,6 +93,10 @@ const EXAMPLES = [
 ];
 
 const $ = (id) => document.getElementById(id);
+const analytics = createAnalytics({
+  operations: new Map(SOURCE_FALLBACK.flatMap((group) => group.sources.map((source) => [source.id, new Set(source.operations)])))
+});
+void analytics.init($("analytics-toggle"));
 
 function initTheme() {
   const toggle = $("theme-toggle");
@@ -122,6 +128,7 @@ function initTheme() {
   toggle?.addEventListener("click", () => {
     chosenTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
     renderTheme();
+    analytics.capture("ireland_theme_changed", { theme: chosenTheme });
     try {
       localStorage.setItem(storageKey, chosenTheme);
     } catch (error) {
@@ -259,9 +266,13 @@ function renderInstallers() {
       event.preventDefault();
       const next = event.key === "Home" ? 0 : event.key === "End" ? INSTALLERS.length - 1 : (index + (event.key === "ArrowRight" ? 1 : -1) + INSTALLERS.length) % INSTALLERS.length;
       selectInstaller(INSTALLERS[next].id);
+      analytics.capture("ireland_install_action", { client: INSTALLERS[next].id, action: "select" });
       tabs.querySelectorAll("button")[next].focus();
     });
-    button.addEventListener("click", () => selectInstaller(item.id));
+    button.addEventListener("click", () => {
+      selectInstaller(item.id);
+      analytics.capture("ireland_install_action", { client: item.id, action: "select" });
+    });
     return button;
   }));
   function selectInstaller(id) {
@@ -284,6 +295,7 @@ function renderInstallers() {
       link.className = "btn primary";
       link.href = action.href;
       link.textContent = action.text;
+      link.dataset.analyticsClient = item.id;
       actions.append(link);
     }
     const copy = document.createElement("button");
@@ -291,6 +303,7 @@ function renderInstallers() {
     copy.className = "btn secondary";
     copy.textContent = "Copy Config";
     copy.dataset.copy = item.copy;
+    copy.dataset.analyticsClient = item.id;
     actions.append(copy);
     const pre = document.createElement("pre");
     pre.tabIndex = 0;
@@ -318,19 +331,24 @@ async function copyText(text) {
       if (!document.execCommand("copy")) throw new Error("Clipboard access is unavailable.");
     } catch {
       $("copy-status").textContent = "Copy unavailable. Select the configuration and copy it manually.";
-      return;
+      return false;
     } finally {
       area.remove();
       focused?.focus({ preventScroll: true });
     }
   }
   $("copy-status").textContent = "Copied.";
+  return true;
 }
 
-document.addEventListener("click", (event) => {
+document.addEventListener("click", async (event) => {
+  const installLink = event.target.closest("a[data-analytics-client]");
+  if (installLink) analytics.capture("ireland_install_action", { client: installLink.dataset.analyticsClient, action: "open" });
   const target = event.target.closest("[data-copy], [data-copy-endpoint]");
   if (!target) return;
-  copyText(target.dataset.copy || endpoint);
+  if (await copyText(target.dataset.copy || endpoint)) {
+    analytics.capture("ireland_install_action", { client: target.dataset.analyticsClient || "endpoint", action: "copy" });
+  }
 });
 
 function normaliseCatalogue(result) {
@@ -344,6 +362,8 @@ function normaliseCatalogue(result) {
 
 function renderSources(domains) {
   const directory = $("source-directory");
+  const navigation = $("source-nav");
+  navigation?.replaceChildren();
   directory.replaceChildren(...domains.map((group) => {
     const section = document.createElement("section");
     section.className = "domain-group";
@@ -351,6 +371,12 @@ function renderSources(domains) {
     const heading = document.createElement("h3");
     heading.id = `domain-${group.domain.replace(/[^a-z0-9]+/gi, "-")}`;
     heading.textContent = ({ stats: "Statistics", economy: "Economy", energy: "Energy", "law/politics": "Law and politics", "places/property": "Places and property", transport: "Transport", environment: "Environment", geography: "Places", government: "Government", property: "Property", cross: "Across sources" })[group.domain] || group.domain;
+    if (navigation) {
+      const link = document.createElement("a");
+      link.href = `#${heading.id}`;
+      link.textContent = heading.textContent;
+      navigation.append(link);
+    }
     const grid = document.createElement("div");
     grid.className = "source-grid";
     grid.append(...(group.sources || []).map((source) => {
@@ -392,8 +418,19 @@ function renderExamples() {
     $("pg-source").value = example.source;
     $("pg-operation").value = example.operation;
     $("pg-args").value = jsonBlock(example.args);
+    for (const button of document.querySelectorAll("[data-example-index]")) {
+      button.setAttribute("aria-pressed", String(button.dataset.exampleIndex === select.value));
+    }
   }
   select.addEventListener("change", apply);
+  for (const button of document.querySelectorAll("[data-example-index]")) {
+    button.addEventListener("click", () => {
+      select.value = button.dataset.exampleIndex;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      select.scrollIntoView({ block: "center", behavior: "instant" });
+      select.focus({ preventScroll: true });
+    });
+  }
   apply();
 }
 
@@ -484,8 +521,12 @@ $("playground-form").addEventListener("submit", async (event) => {
   status.textContent = "Running…";
   output.classList.remove("error");
   const started = performance.now();
+  const source = $("pg-source").value.trim();
+  const operation = $("pg-operation").value.trim();
+  let outcome = "error";
   try {
-    const result = await rpc("tools/call", { name: "ireland_call", arguments: { source: $("pg-source").value.trim(), operation: $("pg-operation").value.trim(), args, limit: 5, max_tokens: 1400 } });
+    const result = await rpc("tools/call", { name: "ireland_call", arguments: { source, operation, args, limit: 5, max_tokens: 1400 } });
+    outcome = result?.isError ? "error" : "ok";
     output.textContent = payloadFromToolResult(result);
     output.classList.toggle("error", Boolean(result?.isError));
     status.textContent = `${new Intl.NumberFormat("en-IE").format(Math.round(performance.now() - started))} ms`;
@@ -494,6 +535,7 @@ $("playground-form").addEventListener("submit", async (event) => {
     output.classList.add("error");
     status.textContent = "Query failed. You can try again.";
   } finally {
+    analytics.capture("ireland_query_completed", { source, operation, outcome, duration_ms: performance.now() - started });
     submit.disabled = false;
   }
 });

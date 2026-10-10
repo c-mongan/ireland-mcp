@@ -192,7 +192,15 @@ export async function observationsAt(ctx: ToolContext, station: Station) {
       }
     }
   });
-  const rows = result.value;
+  // The provider can return newest first. Keep chronological order so the last
+  // item is the newest observation for callers that expose a latest reading.
+  const rows = [...result.value].sort((a, b) => {
+    const timestamp = (row: RawObservation) => {
+      const [day, month, year] = row.date!.split("-");
+      return `${year}-${month}-${day}T${row.reportTime}`;
+    };
+    return timestamp(a).localeCompare(timestamp(b));
+  });
   const observations = rows.map((r) => {
     const [d, m, y] = (r.date ?? "").split("-");
     return {

@@ -12,6 +12,13 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("../registry.js", () => ({
   createAppServer: mocks.createAppServer,
+  appModules: () => ({
+    modules: [
+      { info: { id: "demo" }, tools: [{ name: "demo" }] },
+      { info: { id: "cross" }, tools: [{ name: "nearby" }] }
+    ],
+    extraTools: [{ name: "search" }, { name: "fetch" }]
+  }),
   sourceModules: [{ info: { id: "demo" } }]
 }));
 vi.mock("../gateway/otel.js", async (importOriginal) => ({

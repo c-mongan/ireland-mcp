@@ -1,3 +1,5 @@
+import { capturePostHog } from "./posthog.js";
+
 export interface ToolCallEvent {
   tool: string;
   source: string;
@@ -17,6 +19,7 @@ export type TelemetrySink = (event: ToolCallEvent) => void;
 export const consoleSink: TelemetrySink = (event) => {
   if (process.env.IRELAND_MCP_TELEMETRY === "off") return;
   console.error(JSON.stringify({ type: "tool_call", ...event }));
+  capturePostHog(event);
 };
 
 export const noopSink: TelemetrySink = () => undefined;
