@@ -21,6 +21,8 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test:coverage
+      - name: Validate renderer output safety
+        run: npm run test:media
       - name: Validate Azure deployment ordering and ZIP packaging
         run: node --test test/infra-arm.mjs test/deploy-zip.mjs test/status-checkout.mjs
       - run: npm run build

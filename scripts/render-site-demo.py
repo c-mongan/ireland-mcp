@@ -6,12 +6,37 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+import unicodedata
 
-from PIL import Image, ImageDraw, ImageFont
+
+def path_component_key(path):
+    """Use a conservative key for case and canonical Unicode filename aliases."""
+    return tuple(unicodedata.normalize("NFC", part).casefold() for part in path.parts)
+
+
+def path_keys_overlap(first, second):
+    return first == second[:len(first)] or second == first[:len(second)]
 
 
 def run(command, cwd=None):
     subprocess.run(command, cwd=cwd, check=True)
+
+
+def preflight_paths(output, captions, poster, scratch):
+    """Resolve and check path relationships without writing to the filesystem."""
+    finals = tuple(Path(path).resolve() for path in (output, captions, poster))
+    scratch = Path(scratch).resolve()
+    final_keys = tuple(path_component_key(path) for path in finals)
+    scratch_key = path_component_key(scratch)
+    if len(set(final_keys)) != 3:
+        raise ValueError("The video, captions and poster paths must be distinct.")
+    for index, key in enumerate(final_keys):
+        if path_keys_overlap(key, scratch_key):
+            raise ValueError("Final outputs and scratch must not overlap.")
+        for other in final_keys[index + 1:]:
+            if path_keys_overlap(key, other):
+                raise ValueError("Final output paths must not contain one another.")
+    return (*finals, scratch)
 
 
 def stamp(seconds):
@@ -38,6 +63,8 @@ def wrapped(text, font, width):
 
 
 def compose(step, capture, font_path, provenance, burned_captions):
+    from PIL import Image, ImageDraw, ImageFont
+
     frame = Image.new("RGB", (1280, 720), "#08130d")
     draw = ImageDraw.Draw(frame)
     title_font = ImageFont.truetype(str(font_path), 28)
@@ -95,6 +122,17 @@ def main():
     parser.add_argument("--ffprobe", default="ffprobe")
     parser.add_argument("--max-bytes", type=int, default=5000000)
     args = parser.parse_args()
+    output, captions, poster, scratch = preflight_paths(
+        args.output, args.captions, args.poster, args.scratch
+    )
+    for path in (output, captions, poster):
+        if path.exists():
+            raise ValueError(f"Output already exists; choose a new path: {path}")
+    if scratch.exists():
+        if not scratch.is_dir():
+            raise ValueError("The scratch path exists and is not a directory.")
+        if any(scratch.iterdir()):
+            raise ValueError("Use a new, empty scratch directory to preserve prior work.")
     manifest_path = args.manifest.resolve()
     manifest = json.loads(manifest_path.read_text())
     steps = manifest["steps"]
@@ -119,17 +157,6 @@ def main():
             source_paths.append(path)
         else:
             source_paths.append(None)
-    scratch = args.scratch.resolve()
-    if scratch.exists() and any(scratch.iterdir()):
-        raise ValueError("Use a new, empty scratch directory to preserve prior work.")
-    scratch.mkdir(parents=True, exist_ok=True)
-    output = args.output.resolve()
-    captions = args.captions.resolve()
-    poster = args.poster.resolve()
-    for path in (output, captions, poster):
-        if path.exists():
-            raise ValueError(f"Output already exists; choose a new path: {path}")
-        path.parent.mkdir(parents=True, exist_ok=True)
     candidates = [args.font] if args.font else [
         Path("/System/Library/Fonts/Supplemental/Arial.ttf"),
         Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"),
@@ -137,6 +164,9 @@ def main():
     font = next((path for path in candidates if path and path.is_file()), None)
     if font is None:
         raise ValueError("Provide an installed font with --font; no font is downloaded.")
+    scratch.mkdir(parents=True, exist_ok=True)
+    for path in (output, captions, poster):
+        path.parent.mkdir(parents=True, exist_ok=True)
     vtt = ["WEBVTT", "", "NOTE Edited still captures; timing is editorial, not measured latency.", ""]
     elapsed = 0.0
     receipts = []

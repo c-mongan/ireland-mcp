@@ -39,7 +39,7 @@ The telemetry views are editorial text summaries of the checked receipt and safe
 
 A manifest has `duration`, `captured_at`, `poster_at`, `provenance`, and an ordered `steps` array. Set the boolean `burned_captions` to `false` for the public clip and `true` for the standalone engineering clip. Each step has positive `seconds`, a `label`, and a `caption`. A capture step names an actual image path and may specify a crop as `[x, y, width, height]` in source pixels. A step without a capture is an editorial card. Its optional `body` is explicit editorial text. The declared duration must equal the sum of the step durations. At least one real capture is required.
 
-Before a render, check `agent-storage status`. Use verified external storage for the manifest, captures and a new empty scratch directory. The renderer refuses existing output paths and nonempty scratch directories so it preserves earlier work. Do not put private screenshots or receipts in the public repository.
+Before a render, check `agent-storage status`. Use verified external storage for the manifest, captures and a new empty scratch directory. The video, captions and poster must have distinct paths outside scratch. These paths must not contain one another, and scratch must not sit below a final output. The renderer resolves symbolic links, then compares Unicode-normalized, case-folded path components before it creates a directory or writes a file. It conservatively rejects case and canonical Unicode aliases even on a case-sensitive host. It also refuses existing outputs and nonempty scratch directories so it preserves earlier work. Do not put private screenshots or receipts in the public repository.
 
 ```bash
 agent-storage run -- /absolute/path/to/python3 scripts/render-site-demo.py \
@@ -53,5 +53,7 @@ agent-storage run -- /absolute/path/to/python3 scripts/render-site-demo.py \
 ```
 
 Only copy reviewed public assets into `web/media/`. The renderer checks 1280×720 H.264, YUV 4:2:0, duration and a 5,000,000-byte budget. It uses 24 frames per second and the `faststart` container flag. It performs a full decode and saves metadata, capture hashes, crop coordinates and an output hash in a private scratch receipt. It also creates a six-frame contact sheet for visual inspection. Browser playback, captions and lazy loading need separate website verification.
+
+Run the path-safety regression tests with `python3 -B -S -m unittest discover -s test -p render_site_demo_test.py`. These tests use only Python's standard library. They check symbolic-link, case and Unicode path aliases, scratch collisions and existing-file preservation before any renderer dependency or executable runs. Pillow is imported only when a frame is composed.
 
 Keep raw captures, manifests, receipts, contact sheets and the engineering edit in the checked external artifact directory. The committed video is the dated public demonstration only. A future refresh needs new source checks and browser captures; changing an overlay alone does not refresh the evidence.
