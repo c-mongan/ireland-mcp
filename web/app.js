@@ -1,4 +1,4 @@
-import { initDemoPlayer } from "./demo-player.js?v=20261010-demo";
+import { initDemoPlayer } from "./demo-player.js?v=20261010-chatgpt-demo";
 import { createAnalytics } from "./analytics.js?v=20261010-first-use";
 import { buildResultView, decodeToolPayload, renderResultView } from "./result-view.js?v=20261010-first-use";
 
@@ -231,8 +231,9 @@ const INSTALLERS = [
     code: `claude mcp add --transport http ireland ${endpoint}\n\nclaude.ai → Settings → Connectors → Add custom connector\nName: Ireland MCP\nURL: ${endpoint}\nAuthentication: None`
   },
   {
-    id: "chatgpt", label: "ChatGPT", title: "ChatGPT Developer Mode Connector", body: "Enable Developer Mode connectors, create a new MCP connector, choose no authentication and paste the endpoint. Availability depends on plan and region.",
-    copy: endpoint, code: `Settings → Apps & Connectors → Advanced → Developer Mode\nCreate MCP connector\nName: Ireland MCP\nURL: ${endpoint}\nAuthentication: None\nRecommended tools: search, fetch, ireland_catalogue, ireland_call`
+    id: "chatgpt", label: "ChatGPT", title: "ChatGPT Work plugin", body: "Open ChatGPT Plugins, select +, then Add custom MCP server. Enter the endpoint and choose No authentication. Review the warning, create the plugin and install it. Start a Work chat, type @ and select your plugin. Account and workspace policies apply.",
+    actions: [{ text: "Official ChatGPT setup guide", href: "https://developers.openai.com/plugins/quickstart" }],
+    copy: endpoint, code: `ChatGPT → Plugins → + → Add custom MCP server\nName: Ireland Open Data\nServer URL: ${endpoint}\nAuthentication: No authentication\nReview the warning → Create as a plugin → Install\nNew Work chat → type @ → select Ireland Open Data\nAsk a question about Irish public data`
   },
   {
     id: "copilot", label: "Copilot CLI", title: "Copilot CLI", body: "Run the command below, or save the JSON snippet to ~/.copilot/mcp-config.json.",

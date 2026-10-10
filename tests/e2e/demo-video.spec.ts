@@ -15,7 +15,7 @@ async function isolate(page: Page) {
 test("demo media is lazy and user controlled, with captions and a dated transcript", async ({ page }) => {
   await isolate(page);
   const requests: string[] = [];
-  page.on("request", (request) => { if (request.url().includes("/media/rent-demo")) requests.push(request.url()); });
+  page.on("request", (request) => { if (request.url().includes("/media/chatgpt-demo")) requests.push(request.url()); });
   await page.goto("/");
   const video = page.locator("#demo-video");
   await expect(page.locator("#demo-dialog")).not.toHaveAttribute("open");
@@ -23,15 +23,15 @@ test("demo media is lazy and user controlled, with captions and a dated transcri
   await expect(video).not.toHaveAttribute("poster");
   await expect(video.locator("track")).not.toHaveAttribute("src");
   expect(requests).toEqual([]);
-  await page.getByRole("button", { name: "Watch the 35-second demo" }).click();
+  await page.getByRole("button", { name: "Watch the ChatGPT demo" }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
-  await expect(video).toHaveAttribute("src", "media/rent-demo.mp4");
-  await expect(video).toHaveAttribute("poster", "media/rent-demo-poster.jpg");
+  await expect(video).toHaveAttribute("src", "media/chatgpt-demo.mp4");
+  await expect(video).toHaveAttribute("poster", "media/chatgpt-demo-poster.jpg");
   await expect(video).toHaveAttribute("preload", "none");
   await expect(video).toHaveAttribute("controls");
   await expect(video).not.toHaveAttribute("autoplay");
   expect(await video.evaluate((node: HTMLVideoElement) => node.paused)).toBe(true);
-  await expect(video.locator("track")).toHaveAttribute("src", "media/rent-demo.vtt");
+  await expect(video.locator("track")).toHaveAttribute("src", "media/chatgpt-demo.vtt");
   await expect(video.locator("track")).toHaveAttribute("kind", "captions");
   await expect(video.locator("track")).toHaveAttribute("srclang", "en");
   await page.getByText("Read the transcript", { exact: true }).click();
@@ -40,14 +40,31 @@ test("demo media is lazy and user controlled, with captions and a dated transcri
   await expect(transcript).toContainText("2025Q4");
   await expect(transcript).toContainText("historical registered-tenancy statistics");
   await expect(transcript).toContainText("not current asking rents");
+  await expect(transcript).toContainText("Ireland Open Data plugin selected");
+  await expect(transcript).toContainText("Used Ireland Open Data integration");
+  await expect(transcript).toContainText("does not expose the raw JSON or an exact tool function");
+  await expect(transcript).toContainText("18:54:03.960 UTC");
+  await expect(transcript).toContainText("cached=true");
+  await expect(transcript).not.toContainText("Open the raw response");
+  await expect(page.getByRole("link", { name: "Website playground demo", exact: true })).toHaveAttribute("href", "media/rent-demo.mp4");
+  await expect(page.getByRole("link", { name: "Website playground captions", exact: true })).toHaveAttribute("href", "media/rent-demo.vtt");
   await expect(page.locator("#demo-description")).toContainText("10 October 2026");
+  await expect(page.locator("#demo-description")).toContainText("real ChatGPT Work conversation");
+  await expect(page.locator("#demo-description")).toContainText("silent video with English captions");
   await expect(page.getByRole("link", { name: "View CSO table RIQ02" })).toHaveAttribute("href", "https://data.cso.ie/table/RIQ02");
+  await page.getByRole("button", { name: "Close demo" }).click();
+  await page.getByRole("tab", { name: "ChatGPT", exact: true }).click();
+  await expect(page.locator("#install-panel")).toContainText("ChatGPT Work plugin");
+  await expect(page.locator("#install-panel pre")).toContainText("Plugins → + → Add custom MCP server");
+  await expect(page.locator("#install-panel pre")).toContainText("Authentication: No authentication");
+  await expect(page.locator("#install-panel pre")).toContainText("New Work chat → type @ → select Ireland Open Data");
+  await expect(page.getByRole("link", { name: "Official ChatGPT setup guide" })).toHaveAttribute("href", "https://developers.openai.com/plugins/quickstart");
 });
 
 test("native keyboard focus stays in the dialog; Escape and Close pause and restore focus", async ({ page }) => {
   await isolate(page);
   await page.goto("/");
-  const opener = page.getByRole("button", { name: "Watch the 35-second demo" });
+  const opener = page.getByRole("button", { name: "Watch the ChatGPT demo" });
   await opener.focus();
   await page.keyboard.press("Enter");
   await expect(page.getByRole("button", { name: "Close demo" })).toBeFocused();
@@ -77,7 +94,7 @@ test("Try it live loads the rent request, closes the recording and does not subm
   let submitted = 0;
   page.on("request", (request) => { if (request.postData()?.includes('"name":"ireland_call"')) submitted++; });
   await page.goto("/");
-  await page.getByRole("button", { name: "Watch the 35-second demo" }).click();
+  await page.getByRole("button", { name: "Watch the ChatGPT demo" }).click();
   await page.getByRole("link", { name: "Try it live", exact: true }).click();
   await expect(page.locator("#demo-dialog")).not.toHaveAttribute("open");
   await expect(page.locator("#example-select")).toHaveValue("6");
@@ -100,7 +117,7 @@ test("Try it live leaves a pending request unchanged and focuses the playground 
   await page.goto("/");
   await page.getByRole("button", { name: "Run live query" }).click();
   await expect(page.locator("#example-select")).toBeDisabled();
-  await page.getByRole("button", { name: "Watch the 35-second demo" }).click();
+  await page.getByRole("button", { name: "Watch the ChatGPT demo" }).click();
   await page.getByRole("link", { name: "Try it live", exact: true }).click();
   await expect(page.locator("#demo-dialog")).not.toHaveAttribute("open");
   await expect(page.locator("#example-select")).toHaveValue("0");
@@ -116,7 +133,7 @@ for (const theme of ["dark", "light"]) {
     await page.setViewportSize({ width: 320, height: 700 });
     await page.goto("/");
     await page.evaluate((mode) => { document.documentElement.dataset.theme = mode; }, theme);
-    await page.getByRole("button", { name: "Watch the 35-second demo" }).click();
+    await page.getByRole("button", { name: "Watch the ChatGPT demo" }).click();
     await page.getByText("Read the transcript", { exact: true }).click();
     const size = await page.locator("#demo-dialog").evaluate((node) => ({ width: node.scrollWidth, client: node.clientWidth, right: node.getBoundingClientRect().right, height: node.getBoundingClientRect().height }));
     expect(size.width).toBeLessThanOrEqual(size.client + 1);
@@ -130,9 +147,9 @@ for (const theme of ["dark", "light"]) {
 
 test("a missing recording leaves a clear error and the transcript available", async ({ page }) => {
   await isolate(page);
-  await page.route("**/media/rent-demo.mp4", (route) => route.abort());
+  await page.route("**/media/chatgpt-demo.mp4", (route) => route.abort());
   await page.goto("/");
-  await page.getByRole("button", { name: "Watch the 35-second demo" }).click();
+  await page.getByRole("button", { name: "Watch the ChatGPT demo" }).click();
   await page.locator("#demo-video").evaluate((node: HTMLVideoElement) => node.play().catch(() => {}));
   await expect(page.locator("#demo-media-status")).toContainText("The video could not load");
   await page.getByText("Read the transcript", { exact: true }).click();
@@ -147,7 +164,7 @@ test("without JavaScript the inline panel has a native player, transcript and so
   await expect(page.locator("#demo-dialog")).toBeVisible();
   await expect(page.locator("#demo-open")).toBeHidden();
   await expect(page.locator("#demo-dialog noscript video")).toHaveAttribute("controls");
-  await expect(page.getByRole("link", { name: "Open the video", exact: true })).toHaveAttribute("href", "media/rent-demo.mp4");
+  await expect(page.getByRole("link", { name: "Open the video", exact: true })).toHaveAttribute("href", "media/chatgpt-demo.mp4");
   await page.locator("#demo-transcript summary").focus();
   await page.keyboard.press("Enter");
   await expect(page.locator("#demo-transcript p").first()).toBeVisible();
@@ -156,10 +173,10 @@ test("without JavaScript the inline panel has a native player, transcript and so
 });
 
 test("the actual recording plays, has captions, and pauses when the dialog closes", async ({ page }) => {
-  for (const file of ["rent-demo.mp4", "rent-demo.vtt", "rent-demo-poster.jpg"]) expect(existsSync(resolve(`web/media/${file}`)), `Missing demo asset: ${file}`).toBe(true);
+  for (const file of ["chatgpt-demo.mp4", "chatgpt-demo.vtt", "chatgpt-demo-poster.jpg"]) expect(existsSync(resolve(`web/media/${file}`)), `Missing demo asset: ${file}`).toBe(true);
   await isolate(page);
   await page.goto("/");
-  await page.getByRole("button", { name: "Watch the 35-second demo" }).click();
+  await page.getByRole("button", { name: "Watch the ChatGPT demo" }).click();
   const video = page.locator("#demo-video");
   await video.evaluate((node: HTMLVideoElement) => node.play());
   await expect.poll(() => video.evaluate((node: HTMLVideoElement) => node.currentTime)).toBeGreaterThan(0.2);

@@ -6,9 +6,10 @@ name: Status feed
 #   https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json
 #   https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/history.json
 # Override the endpoint with the repository variable STATUS_HEALTH_URL.
+# Offset scheduled runs from the start of each hour to reduce contention.
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "7,37 * * * *"
   workflow_dispatch:
 
 permissions:
