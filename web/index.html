@@ -26,7 +26,7 @@
   <link rel="alternate icon" href="/favicon.ico" type="image/x-icon">
   <link rel="preconnect" href="https://mcp.irishopendata.ie">
   <link rel="preconnect" href="https://raw.githubusercontent.com">
-  <link rel="stylesheet" href="styles.css?v=20261010-first-use">
+  <link rel="stylesheet" href="styles.css?v=20261010-demo">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to Content</a>
@@ -56,6 +56,8 @@
           <div class="hero-actions" aria-label="Primary actions">
             <a class="btn primary" href="#install">Connect your assistant <span aria-hidden="true">↗</span></a>
             <a class="btn secondary" href="#playground">Try it in your browser</a>
+            <button class="btn secondary" id="demo-open" type="button" aria-haspopup="dialog" aria-controls="demo-dialog" hidden>Watch the 35-second demo</button>
+            <a class="btn secondary" id="demo-fallback" href="#demo-dialog">Watch the 35-second demo</a>
           </div>
           <p class="hero-reassurance">No sign-up. No API key. Open source.</p>
           <div class="agent-hint" role="note">
@@ -209,6 +211,29 @@
     </section>
   </main>
 
+  <dialog class="demo-dialog" id="demo-dialog" open aria-labelledby="demo-title" aria-describedby="demo-description">
+    <div class="demo-heading">
+      <h2 id="demo-title">A historical rent query, from request to source.</h2>
+      <button class="btn secondary" id="demo-close" type="button" autofocus hidden>Close demo</button>
+    </div>
+    <p id="demo-description">35 seconds of edited still captures from the actual interface on 10 October 2026. This video shows a real, cached CSO response. The edited timing does not show query latency. Run the live query to check the response now.</p>
+    <video class="demo-video" id="demo-video" controls playsinline preload="none" aria-label="Historical rent query demo" aria-describedby="demo-description" hidden>
+      <track kind="captions" srclang="en" label="English captions" default>
+    </video>
+    <p id="demo-media-status" class="muted" role="status" hidden></p>
+    <p class="demo-links"><a href="media/rent-demo.mp4">Open the video</a><a href="https://data.cso.ie/table/RIQ02" target="_blank" rel="noopener noreferrer">View CSO table RIQ02</a><a id="demo-try-live" href="#playground">Try it live</a></p>
+    <details class="demo-transcript" id="demo-transcript">
+      <summary>Read the transcript</summary>
+      <p>Connect your assistant to Irish public data, or try a read-only request in your browser.</p>
+      <p>The selected example asks for Galway City two-bed apartments in 2025Q4.</p>
+      <p>This real request returned a cached response. The video is an edited sequence of still captures. Its timing does not show query latency.</p>
+      <p>CSO table RIQ02 reports an average monthly rent of €1,672.57 for this period and dwelling type. These are historical registered-tenancy statistics, not current asking rents or a measure of every rental property.</p>
+      <p>The source is CSO RIQ02, the RTB Average Monthly Rent Report. The table shows 14 May 2026 as its update date. The data was retrieved on 10 October 2026. Retrieval time shows when the data was fetched; the quarter identifies the period of the statistics.</p>
+      <p>Choose a sample and run it at irishopendata.ie. Check its period, source, CC BY 4.0 licence and cache state. Open the raw response to check the returned fields.</p>
+    </details>
+    <noscript><video class="demo-video" controls playsinline preload="none" src="media/rent-demo.mp4" aria-label="Historical rent query demo"><track kind="captions" src="media/rent-demo.vtt" srclang="en" label="English captions" default></video><p>JavaScript is off. Play the video above, use “Open the video”, or read the transcript. The live playground requires JavaScript.</p></noscript>
+  </dialog>
+
   <footer class="site-footer wrap">
     <div class="footer-heading"><a class="brand" href="#top"><span class="mark" aria-hidden="true">✦</span><span>Ireland MCP</span></a><a href="https://github.com/c-mongan/ireland-mcp">Explore the code on GitHub <span aria-hidden="true">↗</span></a></div>
     <p>Open source under the MIT licence. Data remains under each publisher’s licence — see <a href="https://github.com/c-mongan/ireland-mcp/blob/main/NOTICE">NOTICE</a>.</p>
@@ -217,6 +242,6 @@
     <div class="analytics-choice"><button class="btn secondary" id="analytics-toggle" type="button" aria-pressed="false">Enable usage metrics</button><p>Optional metrics count actions and query timings. Query text and results are not sent.</p></div>
   </footer>
 
-  <script src="app.js?v=20261010-first-use" type="module"></script>
+  <script src="app.js?v=20261010-demo" type="module"></script>
 </body>
 </html>
