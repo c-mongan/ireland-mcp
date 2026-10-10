@@ -180,7 +180,7 @@ select { text-overflow: ellipsis; }
 .result-table { width: 100%; border-collapse: collapse; font-size: .85rem; line-height: 1.5; }
 .result-table caption { padding-bottom: .7rem; color: var(--fg); font-size: .9rem; font-weight: 650; text-align: left; }
 .result-table th, .result-table td { min-width: 5rem; padding: .75rem .5rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
-.result-table th { color: var(--muted); font-weight: 600; }
+.result-table th { color: var(--muted); font-weight: 600; white-space: nowrap; }
 .result-table td { overflow-wrap: anywhere; }
 .result-provenance { display: grid; gap: .65rem; margin: 1.3rem 0 .6rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: .85rem; }
 .result-provenance > div { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: .75rem; }

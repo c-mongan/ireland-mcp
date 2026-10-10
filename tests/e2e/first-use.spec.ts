@@ -45,6 +45,23 @@ test("upstream strings cannot create elements or executable source links", async
   await expect(result).toContainText("No safe source URL was supplied");
 });
 
+test("long CSO titles keep headings on one line and preserve local scrolling at 320px", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  await mockPage(page, { structuredContent: { ...envelope, data: [{ code: "F1001", title: "Population statistics for counties, local authorities and census areas across Ireland".repeat(3), released: "2025-11-01" }] } });
+  await page.goto("/#playground");
+  await page.getByRole("button", { name: "Run live query" }).click();
+  const heading = page.getByRole("columnheader", { name: "Released" });
+  const lines = await heading.evaluate((node) => {
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    return range.getClientRects().length;
+  });
+  expect(lines).toBe(1);
+  const scroll = page.locator("#pg-result .result-table-scroll");
+  await expect(scroll).toHaveCSS("overflow-x", "auto");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320);
+});
+
 test("a delayed request cannot be relabelled, and changing a sample clears the previous result", async ({ page }) => {
   await mockPage(page);
   let release = () => {};
