@@ -4,7 +4,7 @@ The [website playground](https://irishopendata.ie/#playground) sends read-only M
 
 ## Use Ireland MCP in ChatGPT
 
-Use the [current OpenAI custom MCP server route](https://developers.openai.com/api/docs/guides/custom-mcp-server), checked on 10 October 2026:
+Use the [OpenAI plugin quickstart](https://developers.openai.com/plugins/quickstart), checked on 10 October 2026:
 
 1. Open **Plugins** in ChatGPT on the web. If **Ireland Open Data** is already installed, use that plugin.
 2. If it is absent, select **+** → **Add custom MCP server**. Name it **Ireland Open Data**, enter `https://mcp.irishopendata.ie/mcp` as the Server URL and select **No authentication**. Review the warning, select **I understand and want to continue**, then **Create as a plugin**.

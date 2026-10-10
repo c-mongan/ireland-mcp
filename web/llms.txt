@@ -11,7 +11,7 @@ Full surface: use ?toolsets=all only when a client needs all typed tools listed
 
 Install:
 - Claude connector: add a custom connector named Ireland MCP with the endpoint URL and no authentication.
-- ChatGPT: enable Developer Mode connectors, create an MCP connector, use the endpoint URL and no authentication.
+- ChatGPT: in ChatGPT on the web, open Plugins → + → Add custom MCP server. Name it Ireland Open Data, use the endpoint URL and select No authentication. Review the warning, create and install the plugin. Switch to Work, start a new chat, type @ and select Ireland Open Data. Reuse the installed plugin if present. Account and workspace policies apply. See the [OpenAI plugin quickstart](https://developers.openai.com/plugins/quickstart).
 - VS Code: vscode:mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fmcp.irishopendata.ie%2Fmcp%22%7D
 - VS Code Insiders: vscode-insiders:mcp/install?%7B%22name%22%3A%22ireland%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fmcp.irishopendata.ie%2Fmcp%22%7D
 - Cursor: cursor://anysphere.cursor-deeplink/mcp/install?name=ireland&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vbWNwLmlyaXNob3BlbmRhdGEuaWUvbWNwIn0=
