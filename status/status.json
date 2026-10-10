@@ -1,72 +1,72 @@
 {
   "status": "degraded",
-  "checked_at": "2026-10-10T14:52:28.199Z",
+  "checked_at": "2026-10-10T15:01:07.824Z",
   "cached": false,
   "sources": [
     {
       "source": "cso",
       "status": "up",
-      "latencyMs": 267,
+      "latencyMs": 764,
       "httpStatus": 200
     },
     {
       "source": "world-bank",
       "status": "up",
-      "latencyMs": 213,
+      "latencyMs": 152,
       "httpStatus": 200
     },
     {
       "source": "eurostat",
       "status": "up",
-      "latencyMs": 130,
+      "latencyMs": 128,
       "httpStatus": 200
     },
     {
       "source": "ecb",
       "status": "up",
-      "latencyMs": 163,
+      "latencyMs": 206,
       "httpStatus": 200
     },
     {
       "source": "pobal",
       "status": "up",
-      "latencyMs": 200,
+      "latencyMs": 147,
       "httpStatus": 200
     },
     {
       "source": "oireachtas",
       "status": "up",
-      "latencyMs": 171,
+      "latencyMs": 103,
       "httpStatus": 200
     },
     {
       "source": "geohive",
       "status": "up",
-      "latencyMs": 1153,
+      "latencyMs": 1104,
       "httpStatus": 200
     },
     {
       "source": "wikidata",
       "status": "up",
-      "latencyMs": 987,
+      "latencyMs": 3645,
       "httpStatus": 200
     },
     {
       "source": "data-gov-ie",
       "status": "up",
-      "latencyMs": 205,
+      "latencyMs": 243,
       "httpStatus": 200
     },
     {
       "source": "ncse",
       "status": "up",
-      "latencyMs": 332,
+      "latencyMs": 282,
       "httpStatus": 200
     },
     {
       "source": "cro",
       "status": "up",
-      "latencyMs": 372,
+      "latencyMs": 334,
       "httpStatus": 200
     },
     {
@@ -78,13 +78,13 @@
     {
       "source": "smart-dublin",
       "status": "up",
-      "latencyMs": 319,
+      "latencyMs": 365,
       "httpStatus": 200
     },
     {
       "source": "met-eireann",
       "status": "up",
-      "latencyMs": 246,
+      "latencyMs": 263,
       "httpStatus": 200
     },
     {
@@ -96,31 +96,31 @@
     {
       "source": "legislation",
       "status": "up",
-      "latencyMs": 257,
+      "latencyMs": 291,
       "httpStatus": 200
     },
     {
       "source": "ppr",
       "status": "up",
-      "latencyMs": 278,
+      "latencyMs": 309,
       "httpStatus": 200
     },
     {
       "source": "irish-rail",
       "status": "up",
-      "latencyMs": 319,
+      "latencyMs": 341,
       "httpStatus": 200
     },
     {
       "source": "luas",
       "status": "up",
-      "latencyMs": 616,
+      "latencyMs": 391,
       "httpStatus": 200
     },
     {
       "source": "eirgrid",
       "status": "up",
-      "latencyMs": 648,
+      "latencyMs": 441,
       "httpStatus": 200
     },
     {
@@ -132,61 +132,163 @@
     {
       "source": "opw-water",
       "status": "up",
-      "latencyMs": 764,
+      "latencyMs": 758,
       "httpStatus": 200
     },
     {
       "source": "planning",
       "status": "up",
-      "latencyMs": 337,
+      "latencyMs": 410,
       "httpStatus": 200
     },
     {
       "source": "census-areas",
       "status": "up",
-      "latencyMs": 423,
+      "latencyMs": 398,
       "httpStatus": 200
     },
     {
       "source": "epa",
       "status": "up",
-      "latencyMs": 401,
+      "latencyMs": 410,
       "httpStatus": 200
     },
     {
       "source": "heritage",
       "status": "up",
-      "latencyMs": 421,
+      "latencyMs": 431,
       "httpStatus": 200
     },
     {
       "source": "environment-sites",
       "status": "up",
-      "latencyMs": 357,
+      "latencyMs": 386,
       "httpStatus": 200
     },
     {
       "source": "ted",
       "status": "up",
-      "latencyMs": 407,
+      "latencyMs": 446,
       "httpStatus": 200
     },
     {
       "source": "bikes",
       "status": "up",
-      "latencyMs": 470,
+      "latencyMs": 498,
       "httpStatus": 200
     }
   ],
   "name": "ireland-mcp",
   "version": "1.1.4",
   "breakers": {
+    "cso": {
+      "state": "closed",
+      "consecutiveFailures": 0,
+      "active": 0,
+      "queued": 0
+    },
+    "legislation": {
+      "state": "closed",
+      "consecutiveFailures": 0,
+      "active": 0,
+      "queued": 0
+    },
+    "oireachtas": {
+      "state": "closed",
+      "consecutiveFailures": 0,
+      "active": 0,
+      "queued": 0
+    },
+    "smart-dublin": {
+      "state": "closed",
+      "consecutiveFailures": 0,
+      "active": 0,
+      "queued": 0
+    },
+    "opendata.cro.ie": {
+      "state": "closed",
+      "consecutiveFailures": 0,
+      "active": 0,
+      "queued": 0
+    },
+    "ncse": {
+      "state": "closed",
+      "consecutiveFailures": 0,
+      "active": 0,
+      "queued": 0
+    },
+    "ted": {
+      "state": "closed",
+      "consecutiveFailures": 0,
+      "active": 0,
+      "queued": 0
+    },
+    "data-gov-ie": {
+      "state": "closed",
+      "consecutiveFailures": 0,
+      "active": 0,
+      "queued": 0
+    },
+    "eurostat": {
+      "state": "closed",
+      "consecutiveFailures": 0,
+      "active": 0,
+      "queued": 0
+    },
     "met-eireann": {
+      "state": "closed",
+      "consecutiveFailures": 0,
+      "active": 0,
+      "queued": 0
+    },
+    "irish-rail": {
+      "state": "closed",
+      "consecutiveFailures": 0,
+      "active": 0,
+      "queued": 0
+    },
+    "luas": {
+      "state": "closed",
+      "consecutiveFailures": 0,
+      "active": 0,
+      "queued": 0
+    },
+    "bikes": {
+      "state": "closed",
+      "consecutiveFailures": 0,
+      "active": 0,
+      "queued": 0
+    },
+    "marine": {
+      "state": "closed",
+      "consecutiveFailures": 1,
+      "active": 0,
+      "queued": 0
+    },
+    "opw-water": {
+      "state": "closed",
+      "consecutiveFailures": 0,
+      "active": 0,
+      "queued": 0
+    },
+    "epa": {
+      "state": "closed",
+      "consecutiveFailures": 0,
+      "active": 0,
+      "queued": 0
+    },
+    "eirgrid": {
+      "state": "closed",
+      "consecutiveFailures": 0,
+      "active": 0,
+      "queued": 0
+    },
+    "data360api.worldbank.org": {
       "state": "closed",
       "consecutiveFailures": 0,
       "active": 0,
       "queued": 0
     }
   },
-  "fetched_at": "2026-10-10T14:52:17.776Z"
+  "fetched_at": "2026-10-10T15:00:57.263Z"
 }
