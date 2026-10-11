@@ -60,7 +60,23 @@ under `umask 077`. The test substitutes only npm and Azure CLI boundaries, so it
 does not install dependencies or write to Azure. CI runs it alongside the
 domain-deployment ordering regression.
 
-## Existing Function App: legal pilot rollout
+## GitHub Actions (OIDC)
+
+`.github/workflows/deploy.yml` runs only on manual dispatch.
+
+### Irish legal service rollout
+
+`.github/workflows/deploy-legal.yml` updates the existing Function App without provisioning resources. A change to that workflow on `main` triggers a rollout; subsequent rollouts can use manual dispatch from `main`. The production job grants OIDC access only for a `main` push or a manual dispatch with `refs/heads/main`; dispatches from other refs are skipped. Pull requests run the existing CI workflows and cannot trigger this deployment workflow or obtain its production OIDC token.
+
+On 2026-10-11, the owner authorized making PR #76 ready, iterating on Copilot review, merging the reviewed change and deploying the existing app with its first source refresh. This supersedes the original draft-only implementation scope. The workflow uses the same `production` OIDC identity and `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` variables as the existing deploy workflow. Set `AZURE_RESOURCE_GROUP`/`AZURE_FUNCTION_APP_NAME` if the deployed resource names differ from the documented production app. The 2026-10-11 production run (38167109074) received none of the three Azure login inputs and failed before authentication. Inspect their configured scope and values before rerunning; the log does not establish whether the IDs are absent from GitHub settings or stored only as secrets. No successful deployment is implied by the workflow's presence or CI passing.
+
+The rollout enables `LEGAL_ENABLED` and `LEGAL_SYNC_ENABLED`, keeps Revised Acts storage disabled, configures the Azure/MCP host origins, deploys a prebuilt package from a checked clean revision, invokes the first source refresh using the Function host's admin API, and verifies source coverage and a cited annual-leave answer. It fails if Azure credentials, source access, ingestion or chat evidence is unavailable. Source refresh observes the same robots/licence boundaries as local sync. The host key is held only in memory and is never printed. Azure OpenAI deployment creation is not part of this rollout.
+
+The rollout waits for a distinct completed refresh whose start time is at or after its admin request, then rejects failed refreshes, old required-source observations and stale chat citations. This check assumes synchronized UTC clocks on the GitHub runner and Function worker; clock skew fails verification instead of accepting an older refresh. The deployment receipt includes the refresh ID, timestamps and counts. Also verify that the live MCP catalogue exposes `irish-legal` and `citizens-info`.
+
+For this existing-app rollout, the identity needs permission to read and configure the Function App, deploy its package and retrieve its host key. Role-assignment permissions are required by the infrastructure provisioning workflow below, not by the legal rollout.
+
+#### Authentication preflight
 
 Use `.github/workflows/deploy-legal.yml` to update the existing
 `func-ireland-mcp-aofsjpwgy4hva` in `rg-ireland-mcp`. This path does not provision
@@ -89,29 +105,6 @@ Before rerunning the rollout:
    job-scoped `id-token: write`, and production environment branch restrictions.
    Once the configuration is ready, rerun the failed production job or manually
    dispatch `deploy-legal.yml` from `main`.
-
-The rollout validates source, deploys the prebuilt package, enables the legal
-modules, requests a controlled source refresh and checks fresh eISB/Citizens
-Information coverage. Success requires the newly completed refresh plus the legal
-chat page and non-stale versioned Citizens Information citations with supporting
-passages. A successful `/healthz` response alone does not establish legal rollout
-success. Also check the MCP catalogue exposes `irish-legal` and `citizens-info`.
-
-## GitHub Actions (OIDC)
-
-`.github/workflows/deploy.yml` runs only on manual dispatch.
-
-### Irish legal service rollout
-
-`.github/workflows/deploy-legal.yml` updates the existing Function App without provisioning resources. A change to that workflow on `main` triggers a rollout; subsequent rollouts can use manual dispatch from `main`. The production job grants OIDC access only for a `main` push or a manual dispatch with `refs/heads/main`; dispatches from other refs are skipped. Pull requests run the existing CI workflows and cannot trigger this deployment workflow or obtain its production OIDC token.
-
-On 2026-10-11, the owner authorized making PR #76 ready, iterating on Copilot review, merging the reviewed change and deploying the existing app with its first source refresh. This supersedes the original draft-only implementation scope. The workflow uses the same `production` OIDC identity and `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` variables as the existing deploy workflow. Set `AZURE_RESOURCE_GROUP`/`AZURE_FUNCTION_APP_NAME` if the deployed resource names differ from the documented production app. The production identity variables are currently missing; deployment remains blocked until they are configured. No successful deployment is implied by the workflow's presence or CI passing.
-
-The rollout enables `LEGAL_ENABLED` and `LEGAL_SYNC_ENABLED`, keeps Revised Acts storage disabled, configures the Azure/MCP host origins, deploys a prebuilt package from a checked clean revision, invokes the first source refresh using the Function host's admin API, and verifies source coverage and a cited annual-leave answer. It fails if Azure credentials, source access, ingestion or chat evidence is unavailable. Source refresh observes the same robots/licence boundaries as local sync. The host key is held only in memory and is never printed. Azure OpenAI deployment creation is not part of this rollout.
-
-The rollout waits for a distinct completed refresh whose start time is at or after its admin request, then rejects failed refreshes, old required-source observations and stale chat citations. This check assumes synchronized UTC clocks on the GitHub runner and Function worker; clock skew fails verification instead of accepting an older refresh. The deployment receipt includes the refresh ID, timestamps and counts.
-
-For this existing-app rollout, the identity needs permission to read and configure the Function App, deploy its package and retrieve its host key. Role-assignment permissions are required by the infrastructure provisioning workflow below, not by the legal rollout.
 
 ### Initial infrastructure provisioning
 
