@@ -75,7 +75,7 @@ export async function syncSources(repository, manifest, options = {}) {
     }
     if (!robotsAllows(robots.get(url.origin), url.pathname + url.search)) throw new Error('Path disallowed by robots.txt.');
   };
-  const loadPage = async (seed, depth = 0) => {
+  const loadPage = async (seed, depth = 0, aliases = []) => {
     if (depth > 3) throw new Error('Too many source redirects.');
     const url = assertSourceUrl(seed.url, seed.source);
     const policy = sourcePolicy(seed.source, options.permissions);
@@ -86,10 +86,10 @@ export async function syncSources(repository, manifest, options = {}) {
       const location = result.response.headers.get('location');
       if (!location) throw new Error('Source redirect has no destination.');
       const redirected = assertSourceUrl(new URL(location, url).href, seed.source);
-      return loadPage({ ...seed, url: redirected.href }, depth + 1);
+      return loadPage({ ...seed, url: redirected.href }, depth + 1, [...aliases, url.href]);
     }
     if (!result.response.ok) throw new Error(`Source HTTP ${result.response.status}.`);
-    return { body: result.body, url: url.href };
+    return { body: result.body, url: url.href, aliases };
   };
   const seeds = [...(manifest.seeds ?? [])];
   for (const sitemap of manifest.sitemaps ?? []) {
@@ -114,8 +114,9 @@ export async function syncSources(repository, manifest, options = {}) {
   report.skipped = Math.max(0, unique.length - maxPages);
   for (const seed of unique.slice(0, maxPages)) {
     try {
-      const { body, url } = await loadPage(seed);
-      const documents = parseSource({ source: seed.source, url, body, fetchedAt: now() });
+      const { body, url, aliases } = await loadPage(seed);
+      const documents = parseSource({ source: seed.source, url, body, fetchedAt: now() }).map(doc => ({ ...doc,
+        source_urls: [...new Set([doc.source_url, ...aliases.map(alias => alias.replace(/\/xml$/, '/html'))])] }));
       await repository.commit(documents, body);
       report.succeeded++;
       report.documents += documents.length;

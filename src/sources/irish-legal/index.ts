@@ -22,24 +22,28 @@ function shape(rule: SchemaRule): z.ZodType {
 }
 const defaultService = () => createService(legalRepositoryFromEnv());
 
+function legalToolError(error: unknown): ToolError {
+  const message = error instanceof Error ? error.message : "Evidence lookup failed.";
+  if (/^BAD_ARGS:/.test(message)) return new ToolError("BAD_ARGS", message);
+  if (/^NOT_FOUND:|^HISTORICAL_UNAVAILABLE:/.test(message)) return new ToolError("NOT_FOUND", message);
+  return new ToolError("UPSTREAM_DOWN", "Stored legal evidence is temporarily unavailable.");
+}
+
 export function createLegalModules(getService: () => CoreService = defaultService): SourceModule[] {
   return [legalInfo, citizenInfo].map(info => {
     const citizen = info.id === "citizens-info";
     const tools = TOOLS.filter(tool => tool.name.startsWith(citizen ? "citizens_info_" : "irish_legal_")).map(tool => defineTool({
       name: tool.name, title: tool.name.replace(/_/g, " "), description: tool.description,
       inputSchema: Object.fromEntries(Object.entries(tool.inputSchema.properties).map(([key, rule]) => {
-        const field = shape(rule);
-        return [key, tool.inputSchema.required.includes(key) ? field : field.optional()];
+        const field = tool.inputSchema.required.includes(key) ? shape(rule) : shape(rule).optional();
+        return [key, rule.description ? field.describe(rule.description) : field];
       })),
       handler: async (args, ctx) => {
         try {
           const result = await getService().call(tool.name, args);
           return envelope(info, { data: result, url: info.homepage, retrievedAt: ctx.now() });
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Evidence lookup failed.";
-          if (/^BAD_ARGS:/.test(message)) throw new ToolError("BAD_ARGS", message);
-          if (/^NOT_FOUND:|^HISTORICAL_UNAVAILABLE:/.test(message)) throw new ToolError("NOT_FOUND", message);
-          throw new ToolError("UPSTREAM_DOWN", "Stored legal evidence is temporarily unavailable.");
+          throw legalToolError(error);
         }
       }
     }));
@@ -52,9 +56,13 @@ export function createLegalModules(getService: () => CoreService = defaultServic
         return (result.hits as CoreDocument[]).map(doc => ({ id: citizen ? doc.id : `irish-legal:${doc.id}`, title: doc.title, url: doc.canonical_url }));
       },
       async fetchById(key): Promise<FetchedDocument> {
-        const doc = await getService().call(citizen ? "citizens_info_get_article" : "irish_legal_fetch", { id: citizen ? `citizens-info:${key}` : key }) as CoreDocument;
-        const { id, title, text, canonical_url, ...metadata } = doc;
-        return { id: citizen ? id : `irish-legal:${id}`, title, text, url: canonical_url, metadata };
+        try {
+          const doc = await getService().call(citizen ? "citizens_info_get_article" : "irish_legal_fetch", { id: citizen ? `citizens-info:${key}` : key }) as CoreDocument;
+          const { id, title, text, canonical_url, ...metadata } = doc;
+          return { id: citizen ? id : `irish-legal:${id}`, title, text, url: canonical_url, metadata };
+        } catch (error) {
+          throw legalToolError(error);
+        }
       }
     };
   });

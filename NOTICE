@@ -101,6 +101,23 @@ Irish Statute Book (eISB) — https://www.irishstatutebook.ie
   Attribution: Contains Irish Statute Book data © Office of the Attorney
   General. Not an official version of the legislation.
 
+Citizens Information Board — https://www.citizensinformation.ie
+  Licence: CC BY 4.0; third-party material excluded.
+  Attribution: Contains information from the Citizens Information Board,
+  licensed under CC BY 4.0.
+  Terms: https://www.citizensinformation.ie/en/about/reuse-psi/
+  Optional pilot: indexed explanatory guidance from ingested pages only;
+  verify the underlying legal provisions and their versions.
+
+Law Reform Commission Revised Acts — https://revisedacts.lawreform.ie
+  Licence: source-specific permission required for indexing and redistribution.
+  Attribution: Law Reform Commission Revised Acts.
+  Terms: https://www.lawreform.ie/revised-acts/
+  Storage is disabled by default. LEGAL_REVISED_ACTS_PERMISSION records an
+  operator's permission attestation; it does not grant publisher reuse rights.
+  Administrative consolidations retain their cutoff and editorial warnings;
+  they do not certify that all operative changes are incorporated or current.
+
 Residential Property Price Register — https://www.propertypriceregister.ie
   Licence: PSI General Licence / CC BY 4.0
   Attribution: Property Services Regulatory Authority, Residential Property
@@ -152,3 +169,4 @@ CityBikes API / PyBikes — https://api.citybik.es/v2/
 EPA bathing water open data — https://data.epa.ie/api-list/bathing-water-open-data/
   Licence: CC BY 4.0
   Attribution: Bathing water open data © Environmental Protection Agency Ireland.
+

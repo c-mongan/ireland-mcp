@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { assessResult } from "../scripts/live-result.mjs";
 // @ts-expect-error Operational script has no generated declaration file.
 import { operationContracts } from "../scripts/live-contracts.mjs";
+import { TOOLS as legalTools } from "../packages/irish-legal-mcp/src/service.mjs";
 const result = (body: unknown, isError = false) => ({ content: [{ type: "text", text: JSON.stringify(body) }], isError });
 const envelope = { operation: "met_get_warnings", data: { count: 0, warnings: [] }, source: "Met Éireann", url: "https://www.met.ie/", licence: "CC BY 4.0", attribution: "Met Éireann", retrieved_at: "2026-10-07T08:00:00Z", cached: false, truncated: false };
 
@@ -56,7 +57,9 @@ it.each(listOperations(appModules().modules).map(({ source, tool }) => [source, 
 
 
 it("requires a contract for every catalogue operation", () => {
-  expect(Object.keys(operationContracts).sort()).toEqual(listOperations(appModules().modules).map(({ tool }) => tool.name).sort());
+  const registered = listOperations(appModules().modules).map(({ tool }) => tool.name);
+  const optional = legalTools.map(({ name }: { name: string }) => name);
+  expect(Object.keys(operationContracts).sort()).toEqual([...new Set([...registered, ...optional])].sort());
 });
 
 it("validates NTA fixture summary fields without requiring invented entities", () => {
@@ -87,3 +90,4 @@ it("permits property statistics with no matching sales", () => {
 it("rejects inherited operation names", () => {
   expect(assessResult(result({ ...envelope, operation: "constructor", data: { garbage: true } }), "cross/constructor").status).toBe("FAIL");
 });
+

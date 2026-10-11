@@ -7,7 +7,8 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createContext } from "../dist/src/gateway/context.js";
 import { createAppServer } from "../dist/src/registry.js";
-import { assessSmokeResult, exitCode, ntaSummarySample } from "./live-sanity-policy.mjs";
+import { assessSmokeResult, exitCode, ntaSummarySample, optionalLegalCases } from "./live-sanity-policy.mjs";
+import { assessResult } from "./live-result.mjs";
 
 const year = new Date().getUTCFullYear();
 const CASES = [
@@ -60,6 +61,9 @@ await server.connect(serverSide);
 const client = new Client({ name: "live-sanity", version: "1.0.0" });
 await client.connect(clientSide);
 const listed = new Set((await client.listTools()).tools.map((t) => t.name));
+const catalogue = assessResult(await client.callTool({ name: "ireland_catalogue", arguments: {} }), "ireland_catalogue");
+if (catalogue.status !== "PASS") throw new Error(catalogue.reason ?? "Source catalogue unavailable.");
+const cases = [...CASES, ...optionalLegalCases(catalogue.body.domains, process.env.LEGAL_ENABLED)];
 // Typed tools listed on this surface are called directly; everything else goes through ireland_call.
 const call = (source, name, args) =>
   listed.has(name)
@@ -67,7 +71,7 @@ const call = (source, name, args) =>
     : client.callTool({ name: "ireland_call", arguments: { source, operation: name, args } });
 const results = [];
 
-for (const [source, name, args, ok, opts = {}] of CASES) {
+for (const [source, name, args, ok, opts = {}] of cases) {
   if (opts.needsEnv && !process.env[opts.needsEnv]) {
     results.push({ source, tool: name, status: "SKIP", ms: 0, note: `${opts.needsEnv} not set` });
     continue;
@@ -98,3 +102,4 @@ else {
   if (warned.length) console.log(`\nWARN: ${warned.length} known-flaky upstream failure(s) reported but not failing the run.`);
 }
 process.exit(exitCode(results));
+

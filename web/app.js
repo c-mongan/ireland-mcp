@@ -40,7 +40,9 @@ const SOURCE_FALLBACK = [
   ] },
   { domain: "law/politics", sources: [
     { id: "oireachtas", name: "Houses of the Oireachtas Open Data API", summary: "Members, bills, debates, parliamentary questions and votes.", operations: ["oireachtas_search_members", "oireachtas_search_bills", "oireachtas_get_debates", "oireachtas_search_questions", "oireachtas_get_votes"] },
-    { id: "legislation", name: "Irish Statute Book via ELI", summary: "Acts of the Oireachtas by year, contents and section text.", operations: ["legislation_list_acts", "legislation_get_act", "legislation_get_section"] }
+    { id: "legislation", name: "Irish Statute Book via ELI", summary: "Acts of the Oireachtas by year, contents and section text.", operations: ["legislation_list_acts", "legislation_get_act", "legislation_get_section"] },
+    { id: "irish-legal", name: "Irish legal evidence corpus", optional: true, summary: "Optional pilot of indexed source versions and Act sections, seeded with annual leave and working time. Current law is unverified; Revised Acts indexing requires explicit publisher reuse permission.", operations: ["irish_legal_catalogue", "irish_legal_search", "irish_legal_fetch", "irish_legal_get_provision", "irish_legal_get_changes", "irish_legal_research"] },
+    { id: "citizens-info", name: "Citizens Information", optional: true, summary: "Optional pilot of indexed explanatory guidance, limited to ingested pages; verify the underlying legal provisions and source versions.", operations: ["citizens_info_search", "citizens_info_get_article"] }
   ] },
   { domain: "places/property", sources: [
     { id: "geohive", name: "Tailte Éireann GeoHive boundaries", summary: "County, constituency, electoral division, small-area and layer queries.", operations: ["geohive_boundaries_at_point", "geohive_locate", "geohive_list_layers", "geohive_query_layer"] },
@@ -51,6 +53,8 @@ const SOURCE_FALLBACK = [
     { id: "cross", name: "Ireland MCP combined sources", summary: "Cross-source source list, nearby and one-call place snapshot.", operations: ["list_sources", "ireland_snapshot", "nearby"] }
   ] }
 ];
+// Static availability is the default profile; optional cards appear only when advertised by the live catalogue.
+const DEFAULT_SOURCE_FALLBACK = SOURCE_FALLBACK.map((group) => ({ ...group, sources: group.sources.filter((source) => !source.optional) }));
 
 const SOURCE_DETAILS = {
   ncse: { licence: "Creative Commons Attribution", example: "Find published special-education allocations for schools in Galway." },
@@ -77,6 +81,8 @@ const SOURCE_DETAILS = {
   eirgrid: { licence: "Attribution required (EirGrid disclaimer)", example: "What is the current wind share on the grid?" },
   oireachtas: { licence: "Oireachtas (Open Data) PSI Licence", example: "Find recent bills mentioning housing." },
   legislation: { licence: "PSI General Licence / CC BY 4.0", example: "Show section 1 of a 2024 Act." },
+  "irish-legal": { licence: "Per-document publisher licence", coverage: "Optional pilot: only ingested pages, seeded with annual leave and working time. Current law is unverified. Revised Acts indexing requires explicit publisher reuse permission.", example: "Retrieve the indexed enacted annual-leave section with its version and currentness warnings." },
+  "citizens-info": { licence: "CC BY 4.0; third-party material excluded", coverage: "Optional pilot: indexed explanatory guidance from ingested pages only; verify the underlying legal provisions and their versions.", example: "Find indexed Citizens Information annual-leave guidance and cite its source version." },
   geohive: { licence: "CC BY 4.0", example: "Which constituency contains 53.27,-9.05?" },
   wikidata: { licence: "CC0 1.0", example: "Tell me about Ballymun from Wikidata." },
   ppr: { licence: "PSI General Licence / CC BY 4.0", example: "Median Galway home price last year?" },
@@ -361,9 +367,9 @@ function normaliseCatalogue(result) {
   const contentText = result?.content?.find?.((item) => item.type === "text")?.text;
   if (result?.structuredContent?.domains) return result.structuredContent.domains;
   if (contentText) {
-    try { return JSON.parse(contentText).domains || SOURCE_FALLBACK; } catch { return SOURCE_FALLBACK; }
+    try { return JSON.parse(contentText).domains || DEFAULT_SOURCE_FALLBACK; } catch { return DEFAULT_SOURCE_FALLBACK; }
   }
-  return SOURCE_FALLBACK;
+  return DEFAULT_SOURCE_FALLBACK;
 }
 
 function renderSources(domains) {
@@ -392,7 +398,7 @@ function renderSources(domains) {
       const h = document.createElement("h4");
       h.textContent = source.name;
       const summary = document.createElement("p");
-      summary.textContent = source.summary || "Public Irish dataset exposed through Ireland MCP.";
+      summary.textContent = [source.summary || "Public Irish dataset exposed through Ireland MCP.", details.coverage].filter(Boolean).join(" ");
       const meta = document.createElement("div");
       meta.className = "source-meta";
       const ops = document.createElement("span");
@@ -490,7 +496,7 @@ async function initLiveStats() {
   } catch {
     $("live-label").textContent = "Using Static Fallback";
     document.querySelector(".live-dot")?.classList.add("down");
-    renderSources(SOURCE_FALLBACK);
+    renderSources(DEFAULT_SOURCE_FALLBACK);
   }
 }
 
@@ -626,3 +632,4 @@ motionQuery.addEventListener("change", () => {
 });
 document.addEventListener("visibilitychange", syncVideo);
 syncVideo();
+

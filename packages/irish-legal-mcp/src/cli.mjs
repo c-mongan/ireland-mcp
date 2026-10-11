@@ -30,8 +30,6 @@ export async function runCli(args, { stdin = process.stdin, stdout = process.std
       if (!['--store','--manifest','--port','--host'].includes(args[i]) || !args[i+1]) throw new Error('Invalid command option. Use help.');
       options[args[i].slice(2)] = args[i+1];
     }
-    const port = Number(options.port ?? env.LEGAL_PORT ?? 4173);
-    if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid port.');
     if (command === 'help') { stdout.write(HELP); return 0; }
     const repository = createRepository(new FileBackend(resolve(options.store ?? env.LEGAL_STORE_DIR ?? '.irish-legal-cache')));
     if (command === 'status') { stdout.write(JSON.stringify(await repository.status()) + '\n'); return 0; }
@@ -43,6 +41,8 @@ export async function runCli(args, { stdin = process.stdin, stdout = process.std
     }
     const service = createService(repository);
     if (command === 'mcp') { await runStdio(service, stdin, stdout); return 0; }
+    const port = Number(options.port ?? env.LEGAL_PORT ?? 4173);
+    if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid port.');
     const generate = env.AZURE_OPENAI_ENDPOINT && env.AZURE_OPENAI_DEPLOYMENT ? createAzureGenerator({ endpoint: env.AZURE_OPENAI_ENDPOINT,
       deployment: env.AZURE_OPENAI_DEPLOYMENT, apiKey: env.AZURE_OPENAI_API_KEY }) : undefined;
     const server = createHttpServer(service, { bearerToken: env.LEGAL_BEARER_TOKEN,

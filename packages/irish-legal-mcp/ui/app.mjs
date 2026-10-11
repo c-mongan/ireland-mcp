@@ -1,3 +1,4 @@
+/* global matchMedia */
 const form = document.querySelector('#chat-form');
 const question = document.querySelector('#question');
 const status = document.querySelector('#status');
@@ -15,17 +16,21 @@ async function coverage() {
   } catch (error) { status.textContent = error.message; }
 }
 token.addEventListener('change', coverage);
-document.querySelectorAll('[data-question]').forEach(button => button.addEventListener('click', () => { question.value = button.dataset.question; question.focus(); }));
+form.addEventListener('input', () => { results.hidden = true; });
+form.addEventListener('change', () => { results.hidden = true; });
+document.querySelectorAll('[data-question]').forEach(button => button.addEventListener('click', () => { question.value = button.dataset.question; results.hidden = true; question.focus(); }));
 form.addEventListener('submit', async event => {
   event.preventDefault();
-  if (!form.reportValidity()) return;
   const button = document.querySelector('#ask');
-  button.disabled = true;
+  if (button.disabled || !form.reportValidity()) return;
+  const data = new FormData(form);
+  const request = { question: data.get('question'), mode: data.get('mode'), ...(data.get('as_of') ? { as_of: data.get('as_of') } : {}) };
+  const controls = [...form.querySelectorAll('input, textarea, button'), ...document.querySelectorAll('[data-question]')].filter(control => !control.disabled);
+  controls.forEach(control => { control.disabled = true; });
+  results.hidden = true;
   results.setAttribute('aria-busy', 'true');
   status.textContent = 'Finding matching source evidence…';
   try {
-    const data = new FormData(form);
-    const request = { question: data.get('question'), mode: data.get('mode'), ...(data.get('as_of') ? { as_of: data.get('as_of') } : {}) };
     const response = await fetch(new URL('api/chat', import.meta.url), { method: 'POST', headers: headers(), body: JSON.stringify(request), signal: AbortSignal.timeout(30000) });
     const answer = await response.json();
     if (!response.ok) throw new Error(answer.error ?? 'Unable to retrieve evidence.');
@@ -51,8 +56,8 @@ form.addEventListener('submit', async event => {
     }
     results.hidden = false;
     status.textContent = `${answer.citations.length} cited sources. Current law has not been fully verified.`;
-    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  } catch (error) { status.textContent = error.name === 'TimeoutError' ? 'The request timed out. Try again.' : error.message; }
-  finally { button.disabled = false; results.setAttribute('aria-busy', 'false'); }
+    results.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  } catch (error) { results.hidden = true; status.textContent = error.name === 'TimeoutError' ? 'The request timed out. Try again.' : error.message; }
+  finally { controls.forEach(control => { control.disabled = false; }); results.setAttribute('aria-busy', 'false'); }
 });
 await coverage();

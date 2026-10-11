@@ -41,11 +41,12 @@ export function validateArguments(definition, args) {
 }
 
 export function createService(repository, { now = () => new Date().toISOString() } = {}) {
-  const fetch = async (id, options = {}) => {
-    const doc = describeEvidence(await repository.get(id, options), { now: now(), as_of: options.as_of });
+  const evidence = (selected, options = {}) => {
+    const doc = describeEvidence(selected, { now: now(), as_of: options.as_of });
     if (doc.text.length > 20000) return { ...doc, text: doc.text.slice(0,20000), text_truncated: true, warnings: [...doc.warnings, 'Text truncated for transport; consult the canonical source for the complete provision.'] };
     return { ...doc, text_truncated: false };
   };
+  const fetch = async (id, options = {}) => evidence(await repository.get(id, options), options);
   return {
     tools: TOOLS,
     async call(name, args = {}) {
@@ -71,11 +72,9 @@ export function createService(repository, { now = () => new Date().toISOString()
       const documents = [];
       const warnings = result.historical_unavailable_count ? [`${result.historical_unavailable_count} indexed documents have no compatible publisher-dated version for this historical request.`] : [];
       for (const hit of result.hits) {
-        try { const doc = await fetch(hit.id, { as_of: args.as_of }); documents.push(doc); warnings.push(...doc.warnings); }
-        catch (error) {
-          if (!/HISTORICAL_UNAVAILABLE/.test(error.message)) throw error;
-          warnings.push(`${hit.title}: ${error.message}`);
-        }
+        const doc = evidence(hit, { as_of: args.as_of });
+        documents.push(doc);
+        warnings.push(...doc.warnings);
       }
       return { documents, coverage: result.coverage, warnings: [...new Set(warnings)], current_law_verified: false, requested_as_of: args.as_of ?? null };
     }

@@ -63,7 +63,11 @@ The initial manifest covers annual leave and working time, the Organisation of W
 
 See [seeds.json](seeds.json) for the actual manifest shape and [source policies](../../docs/irish-legal-source-policies.md) before adding a publisher. Ingestion applies host/path boundaries, robots checks, request pacing, timeouts, response limits and same-source redirects. A failed refresh retains evidence and marks the source and derived sections stale. Raw bytes and parsed versions are immutable; index publication is conditional and atomic. Concurrent refresh conflicts require retrying from the latest index.
 
+The index stores compact snapshot references and dates; complete text lives only in immutable document objects. Existing version-1 indexes remain readable and migrate on a successful commit. Refreshes that omit previously indexed provisions are rejected as incomplete. Moved Citizens Information pages retain redirect aliases, retire the old search entry and preserve old exact-version citations.
+
 `as_of` selects a stored publisher-dated snapshot, then ranks that historical text. It does not reconstruct the law operative on that date. Undated/enacted documents without a known compatible version are excluded and reported. Download/check/serve timestamps are separate from consolidation cutoffs. Enacted text does not establish current amended law or commencement. Revised Acts never silently falls back to enacted text. Text longer than 20,000 characters is explicitly marked truncated; consult the publisher for the complete text. Missing results establish only limited indexed coverage.
+
+If different stored texts share a publisher date, historical selection uses the newest retrieved snapshot and warns about the ambiguity. The shared date does not prove which wording applied on the requested date.
 
 ## Azure integration
 

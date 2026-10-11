@@ -19,6 +19,18 @@ const stationObservations = (data) => {
   const latest = data.observations.reduce((a, b) => a.time >= b.time ? a : b);
   return observation(data.latest) && data.latest.time === latest.time && data.latest.temperature_c === latest.temperature_c;
 };
+const legalEvidence = (doc) => shape({
+  id: text, title: text, canonical_url: text, source_id: text, source_type: text,
+  version: (value) => typeof value === "string" && /^[a-f0-9]{64}$/.test(value),
+  source_fetched_at: (value) => text(value) && Number.isFinite(Date.parse(value)),
+  licence: text, attribution: text, currentness: text,
+  current_law_verified: (value) => value === false,
+  warnings: (value) => Array.isArray(value) && value.every(text),
+  citation: shape({ id: text, version: text, url: text, licence: text, attribution: text })
+})(doc) && doc.stale !== true && doc.citation.id === doc.id && doc.citation.version === doc.version && doc.citation.url === doc.canonical_url;
+const legalDocument = (data) => legalEvidence(data) && text(data.text);
+const legalCoverage = shape({ document_count: (value) => Number.isInteger(value) && value >= 0, sources: object, note: text });
+const legalSearch = (data) => shape({ hits: records, coverage: legalCoverage })(data) && data.hits.every(legalEvidence);
 
 export const operationContracts = {
   cso_search_tables: (data) => records(data) && data.every((row) => text(row.code) && text(row.title)),
@@ -81,6 +93,16 @@ export const operationContracts = {
   legislation_list_acts: shape({ year: number, acts: records }),
   legislation_get_act: shape({ title: text, sections: records, eli: text }),
   legislation_get_section: shape({ text, eli: text }),
+  irish_legal_catalogue: (data) => shape({ sources: records, coverage: legalCoverage })(data) && data.sources.length > 0
+    && data.sources.every(shape({ id: text, publisher: text, type: text, licence: text, attribution: text, terms: text, storage_allowed: (value) => typeof value === "boolean" })),
+  irish_legal_search: legalSearch,
+  irish_legal_fetch: legalDocument,
+  irish_legal_get_provision: (data) => legalDocument(data) && text(data.section) && data.source_type === "legislation",
+  irish_legal_get_changes: (data) => legalDocument(data) && data.source_type === "effects" && records(data.effects),
+  irish_legal_research: (data) => shape({ documents: records, coverage: legalCoverage,
+    warnings: (value) => Array.isArray(value) && value.every(text), current_law_verified: (value) => value === false })(data) && data.documents.every(legalDocument),
+  citizens_info_search: (data) => legalSearch(data) && data.hits.every((hit) => hit.source_id === "citizens-info" && hit.source_type === "guidance"),
+  citizens_info_get_article: (data) => legalDocument(data) && data.source_id === "citizens-info" && data.source_type === "guidance",
   geohive_boundaries_at_point: (data) => geographicPoint(data) && Object.hasOwn(data, "county"),
   geohive_locate: shape({ count: number, places: records }),
   geohive_list_layers: shape({ total: number, services: records }),
@@ -96,3 +118,4 @@ export const operationContracts = {
   ireland_snapshot: shape({ place: text, population: object, boundaries: object, forecast: (v) => records(v) || object(v), national_warnings: (v) => records(v) || object(v) }),
   nearby: (data) => geographicPoint(data) && object(data.boundaries) && Object.hasOwn(data, "forecast") && Array.isArray(data.sources)
 };
+

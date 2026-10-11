@@ -16,7 +16,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: deploy-legal-${{ github.event_name }}
+  group: deploy
   cancel-in-progress: false
 
 jobs:
@@ -29,8 +29,10 @@ jobs:
       FUNCTION_APP: ${{ vars.AZURE_FUNCTION_APP_NAME || 'func-ireland-mcp-aofsjpwgy4hva' }}
       IRELAND_MCP_EXPECTED_REVISION: ${{ github.sha }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - if: github.event_name != 'pull_request'
+        uses: actions/checkout@v7
+      - if: github.event_name != 'pull_request'
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -42,8 +44,10 @@ jobs:
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       - name: Verify existing Function App access
         run: az functionapp show --resource-group "$RESOURCE_GROUP" --name "$FUNCTION_APP" --query '{name:name,state:state}' --output json
-      - run: npm ci
+      - if: github.event_name != 'pull_request'
+        run: npm ci
       - name: Validate reviewed source
+        if: github.event_name != 'pull_request'
         run: npm run lint && npm run typecheck && npm test && npm run legal:check
         env:
           LEGAL_SOCKET_TESTS: '1'

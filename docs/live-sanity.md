@@ -6,6 +6,19 @@ Each call is a real MCP client round trip. By default it goes through
 `ireland_call` on the lean surface; `EVAL_TOOLSETS=all npm run live:sanity` calls
 the typed tools directly instead.
 
+The default source profile stays unchanged. If `LEGAL_ENABLED=true` or the
+root MCP catalogue advertises `irish-legal` or `citizens-info`, the run adds a
+stored-corpus check for each enabled/advertised pilot module: enacted section
+19 of the Organisation of Working Time Act 1997, and an annual-leave guidance
+search. These checks require an ingested corpus. Missing registration or an
+empty enabled corpus fails; disabled optional sources add no calls.
+
+Legal pilot checks require dated source evidence, immutable version citations,
+currentness warnings and `current_law_verified: false`. Stale stored documents
+fail. A PASS demonstrates retrieval of the selected stored evidence, not a
+fresh publisher fetch, complete coverage or verified current law. Revised Acts
+indexing remains disabled until explicit publisher reuse permission.
+
 ## Acceptance policy
 
 Each sample first uses the shared `assessResult` checks. A PASS requires valid
@@ -105,3 +118,4 @@ New source checks passed: `eurostat_get_data`, `ecb_exchange_rate`,
    The listing parser now tolerates whitespace between table cells.
 
 Both fixes have regression tests with recorded fixtures.
+

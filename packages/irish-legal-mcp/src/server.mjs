@@ -48,7 +48,11 @@ export function createWebHandler(service, { maxBodyBytes = 32 * 1024, requestsPe
         } finally { reader.releaseLock(); }
       }
       let body;
-      try { body = JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { return send(400, { error: 'Invalid JSON.' }); }
+      try { body = JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch {
+        return send(400, url.pathname === '/mcp'
+          ? { jsonrpc: '2.0', id: null, error: { code: -32700, message: 'Parse error.' } }
+          : { error: 'Invalid JSON.' });
+      }
       const minute = Math.floor(Date.now() / 60000);
       for (const [key, value] of clients) if (value.minute < minute) clients.delete(key);
       const previous = clients.get(clientAddress) ?? { minute, count: 0 };
