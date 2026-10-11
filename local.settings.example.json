@@ -4,6 +4,12 @@
     "FUNCTIONS_WORKER_RUNTIME": "node",
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "NTA_API_KEY": "",
-    "RATE_LIMIT_PER_MINUTE": "60"
+    "RATE_LIMIT_PER_MINUTE": "60",
+    "LEGAL_ENABLED": "false",
+    "LEGAL_SYNC_ENABLED": "false",
+    "LEGAL_REVISED_ACTS_PERMISSION": "false",
+    "LEGAL_STORE_DIR": ".irish-legal-cache",
+    "LEGAL_ALLOWED_ORIGINS": "http://localhost:7071,http://127.0.0.1:7071"
   }
 }
+

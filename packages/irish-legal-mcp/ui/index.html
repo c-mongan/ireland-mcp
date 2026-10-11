@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Irish law and citizen information</title><link rel="stylesheet" href="/styles.css"><script type="module" src="/app.mjs"></script></head>
+<body>
+  <header><a class="wordmark" href="/">Ireland / Information</a><span class="tag">Sources you can inspect</span></header>
+  <main>
+    <section class="intro"><p class="eyebrow">Irish law &amp; public guidance</p><h1>Find the source.<br>Understand your rights.</h1><p class="lede">Explore Citizens Information and Irish legislation together, with citations, source dates and clear gaps in coverage.</p></section>
+    <section class="workspace" aria-label="Ask about Irish law">
+      <form id="chat-form">
+        <fieldset><legend>How would you like to explore?</legend><label><input type="radio" name="mode" value="citizen" checked> Plain-language guidance</label><label><input type="radio" name="mode" value="lawyer"> Legal research</label></fieldset>
+        <label for="question">Your question</label><textarea id="question" name="question" maxlength="500" minlength="2" rows="3" required placeholder="What are my annual leave rights?"></textarea>
+        <div class="form-row"><label for="as-of">Historical source date <span class="optional">(optional)</span><input type="date" id="as-of" name="as_of"></label><button type="submit" id="ask">Find evidence <span aria-hidden="true">↗</span></button></div>
+        <details><summary>Access token for a protected server</summary><label for="token">Bearer token <input type="password" id="token" autocomplete="off"></label><p>Used only for requests from this page; kept in memory.</p></details>
+      </form>
+      <div class="examples" aria-label="Example questions"><button type="button" data-question="annual leave">Annual leave</button><button type="button" data-question="working time">Working time</button><button type="button" data-question="employment rights">Employment rights</button></div>
+      <p id="status" role="status" aria-live="polite">Checking indexed coverage…</p>
+      <section id="results" aria-live="polite" aria-busy="false" hidden><div class="result-heading"><h2>Evidence for your question</h2><span id="answer-kind" class="tag"></span></div><div id="answer"></div><div id="warnings" class="warnings"></div><h3>Supporting passages &amp; sources</h3><div id="citations"></div></section>
+    </section>
+    <aside class="about"><h2>Read with the source in view.</h2><p>Guidance explains the rules. Legislative text shows the provisions. An enacted Act may have been amended, and a consolidation may have outstanding changes. Each result shows what is available and what remains unchecked.</p><p>This service searches its indexed pages. A missing result does not establish that a law or right does not exist.</p></aside>
+  </main>
+  <footer>Public information, with provenance. Citizens Information Board and source publishers retain their attribution and reuse terms.</footer>
+</body></html>
