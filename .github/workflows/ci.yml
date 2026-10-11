@@ -34,3 +34,6 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Production website browser contracts
         run: npm run test:e2e
+      - name: Legal chat browser and accessibility contracts
+        run: npm run legal:browser
+

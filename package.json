@@ -54,6 +54,7 @@
     "legal:sync": "node packages/irish-legal-mcp/src/cli.mjs sync",
     "legal:serve": "node packages/irish-legal-mcp/src/cli.mjs serve",
     "legal:stdio": "node packages/irish-legal-mcp/src/cli.mjs mcp",
+    "legal:browser": "playwright test --config packages/irish-legal-mcp/playwright.config.mjs",
     "eval": "node scripts/eval.mjs",
     "prepublishOnly": "npm run build",
     "skills:package": "node scripts/package-skills.mjs",
