@@ -28,7 +28,7 @@ describe("Irish legal gateway review regressions", () => {
           expect(error).toBeInstanceOf(ToolError);
           expect(toToolError(error).code).toBe(code);
         }
-        expect(errors[1].message).toBe(errors[0].message);
+        expect((errors[1] as ToolError).message).toBe((errors[0] as ToolError).message);
       });
     }
   }
