@@ -48,7 +48,7 @@ export class FileBackend {
     let lock;
     const lockPath = join(this.path, 'index.lock');
     try { lock = await open(lockPath, 'wx'); } catch (error) {
-      if (error.code === 'EEXIST') throw new Error('CONFLICT: another writer owns the index lock.');
+      if (error.code === 'EEXIST') throw new Error('CONFLICT: another writer owns the index lock.', { cause: error });
       throw error;
     }
     const temporary = join(this.path, `index-${randomUUID()}.tmp`);
@@ -72,7 +72,7 @@ export class FileBackend {
       try { await file.writeFile(bytes); await file.sync(); } finally { await file.close(); }
       try { await link(temporary, path); } catch (error) {
         if (error.code !== 'EEXIST') throw error;
-        if (await readFile(path, 'utf8') !== bytes) throw new Error('Snapshot integrity mismatch: existing immutable bytes are corrupt.');
+        if (await readFile(path, 'utf8') !== bytes) throw new Error('Snapshot integrity mismatch: existing immutable bytes are corrupt.', { cause: error });
       }
     } finally { await unlink(temporary).catch(error => { if (error.code !== 'ENOENT') throw error; }); }
   }
@@ -97,7 +97,7 @@ export class ObjectBackend {
     try { await this.objects.put(key, text, { ifNoneMatch: '*' }); }
     catch (error) {
       if (error.code !== 'ALREADY_EXISTS') throw error;
-      if ((await this.objects.get(key))?.text !== text) throw new Error('Snapshot integrity mismatch: existing immutable bytes are corrupt.');
+      if ((await this.objects.get(key))?.text !== text) throw new Error('Snapshot integrity mismatch: existing immutable bytes are corrupt.', { cause: error });
     }
   }
   async readSnapshot(key) {
