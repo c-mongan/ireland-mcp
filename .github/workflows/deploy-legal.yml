@@ -1,0 +1,52 @@
+name: Deploy Irish legal MCP
+
+# A reviewed change to this release workflow triggers the requested rollout.
+# PR runs verify access only; they never change Azure. Future rollouts can use manual dispatch.
+on:
+  pull_request:
+    branches: [main]
+    paths: ['.github/workflows/deploy-legal.yml', 'scripts/deploy-legal.mjs']
+  push:
+    branches: [main]
+    paths: ['.github/workflows/deploy-legal.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-legal-${{ github.event_name }}
+  cancel-in-progress: false
+
+jobs:
+  rollout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: production
+    env:
+      RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP || 'rg-ireland-mcp' }}
+      FUNCTION_APP: ${{ vars.AZURE_FUNCTION_APP_NAME || 'func-ireland-mcp-aofsjpwgy4hva' }}
+      IRELAND_MCP_EXPECTED_REVISION: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - name: Azure login using existing deployment identity
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Verify existing Function App access
+        run: az functionapp show --resource-group "$RESOURCE_GROUP" --name "$FUNCTION_APP" --query '{name:name,state:state}' --output json
+      - run: npm ci
+      - name: Validate reviewed source
+        run: npm run lint && npm run typecheck && npm test && npm run legal:check
+        env:
+          LEGAL_SOCKET_TESTS: '1'
+      - name: Deploy, ingest and verify live legal chat
+        if: github.event_name != 'pull_request'
+        run: node scripts/deploy-legal.mjs

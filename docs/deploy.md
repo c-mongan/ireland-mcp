@@ -64,6 +64,12 @@ domain-deployment ordering regression.
 
 `.github/workflows/deploy.yml` runs only on manual dispatch.
 
+### Irish legal service rollout
+
+`.github/workflows/deploy-legal.yml` updates the existing Function App without provisioning resources. A change to that workflow on `main` triggers a rollout; subsequent rollouts can use manual dispatch. Its PR run verifies Azure login and read access only. It uses the same `production` OIDC identity and `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` variables as the existing deploy workflow. Set `AZURE_RESOURCE_GROUP`/`AZURE_FUNCTION_APP_NAME` if the deployed resource names differ from the documented production app.
+
+The rollout enables `LEGAL_ENABLED` and `LEGAL_SYNC_ENABLED`, keeps Revised Acts storage disabled, configures the Azure/MCP host origins, deploys a prebuilt package from a checked clean revision, invokes the first source refresh using the Function host's admin API, and verifies source coverage and a cited annual-leave answer. It fails if Azure credentials, source access, ingestion or chat evidence is unavailable. Source refresh observes the same robots/licence boundaries as local sync. The host key is held only in memory and is never printed. Azure OpenAI deployment creation is not part of this rollout.
+
 1. Create an Entra app registration or user-assigned identity.
    Add a federated credential: issuer `https://token.actions.githubusercontent.com`,
    subject `repo:c-mongan/ireland-mcp:environment:production`.
@@ -115,3 +121,4 @@ duplicated. A 31-day month adds about EUR 8.93 instead of EUR 8.64. Retry
 executions, Function invocations, and telemetry ingestion can add usage charges;
 the existing EUR 20 budget is an alert, not a spending cap. Keep the Function
 scale cap, application rate limit, cache policy, and Log Analytics daily cap.
+
