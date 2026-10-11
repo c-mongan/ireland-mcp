@@ -8,7 +8,7 @@ const execute = promisify(execFile);
 const command = async (file, args, options = {}) => (await execute(file, args, { ...options, timeout: 12 * 60000, maxBuffer: 2 * 1024 * 1024 })).stdout.trim();
 
 /** Existing-app rollout only. Credentials remain in the Azure CLI/HTTPS boundaries. */
-export async function deployLegal({ resourceGroup, functionApp, expectedRevision, run = command, fetch: fetcher = globalThis.fetch, wait = pause, maxAttempts = 36 }) {
+export async function deployLegal({ resourceGroup, functionApp, expectedRevision, run = command, fetch: fetcher = globalThis.fetch, wait = pause, now = Date.now, maxAttempts = 36 }) {
   if (!/^[A-Za-z0-9._()-]{1,90}$/.test(resourceGroup ?? '') || !/^[a-z0-9-]{2,60}$/.test(functionApp ?? '') || !/^[a-f0-9]{40}$/.test(expectedRevision ?? '')) throw new Error('An explicit existing resource group, Function App and checked Git revision are required.');
   const target = ['--resource-group', resourceGroup, '--name', functionApp];
   const site = JSON.parse(await run('az', ['functionapp','show', ...target, '--output','json']));
@@ -36,21 +36,36 @@ export async function deployLegal({ resourceGroup, functionApp, expectedRevision
   });
   const key = await run('az', ['functionapp','keys','list', ...target, '--query','masterKey','--output','tsv']);
   if (!key) throw new Error('Function host key is unavailable for initial source refresh.');
+  const previous = await poll(async () => {
+    const response = await get('/legal/api/status');
+    return response.ok ? response.json() : false;
+  });
+  const invokedAt = now();
   const refresh = await get('/admin/functions/legalSourceSync', { method: 'POST', headers: { 'content-type': 'application/json', 'x-functions-key': key }, body: JSON.stringify({ input: null }) });
   if (!refresh.ok) throw new Error(`Initial source refresh was refused: HTTP ${refresh.status}.`);
   const coverage = await poll(async () => {
     const response = await get('/legal/api/status');
     if (!response.ok) return false;
     const status = await response.json();
-    return status.document_count > 0 && ['eisb','citizens-info'].every(id => status.sources?.[id]?.last_success_at) ? status : false;
+    const sync = status.last_sync;
+    const startedAt = Date.parse(sync?.started_at);
+    const finishedAt = Date.parse(sync?.finished_at);
+    return typeof sync?.run_id === 'string' && sync.run_id.length > 0 && sync.run_id !== previous.last_sync?.run_id &&
+      Number.isFinite(startedAt) && Number.isFinite(finishedAt) && startedAt >= invokedAt && finishedAt >= startedAt ? status : false;
   });
+  if (coverage.last_sync.failed !== 0) throw new Error('Initial source refresh failed; prior snapshots cannot establish deployment success.');
+  if (!(coverage.document_count > 0) || !['eisb','citizens-info'].every(id => {
+    const checkedAt = Date.parse(coverage.sources?.[id]?.last_success_at);
+    return Number.isFinite(checkedAt) && checkedAt >= Date.parse(coverage.last_sync.started_at);
+  })) throw new Error('Initial source refresh did not provide fresh required source coverage.');
   const page = await get('/legal');
   if (!page.ok || !page.headers.get('content-type')?.includes('text/html')) throw new Error('Legal chat page is unavailable.');
   const response = await get('/legal/api/chat', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ question: 'annual leave', mode: 'citizen' }) });
   if (!response.ok) throw new Error(`Legal chat smoke check failed: HTTP ${response.status}.`);
   const answer = await response.json();
-  if (!answer.citations?.some(c => c.source_type === 'guidance' && /^[a-f0-9]{64}$/.test(c.version ?? '') && c.url?.startsWith('https://www.citizensinformation.ie/')) || !answer.supporting_quotes?.some(q => q.quote?.length > 20)) throw new Error('Legal chat did not return versioned guidance and supporting passages.');
-  return { revision: expectedRevision, chat_url: `${base}/legal`, mcp_url: `${base}/mcp`, document_count: coverage.document_count, sources: Object.keys(coverage.sources) };
+  if (!answer.citations?.some(c => c.source_type === 'guidance' && /^[a-f0-9]{64}$/.test(c.version ?? '') && c.url?.startsWith('https://www.citizensinformation.ie/')) ||
+      !answer.citations.every(c => c.stale !== true) || !answer.supporting_quotes?.some(q => q.quote?.length > 20)) throw new Error('Legal chat did not return non-stale versioned guidance and supporting passages.');
+  return { revision: expectedRevision, chat_url: `${base}/legal`, mcp_url: `${base}/mcp`, document_count: coverage.document_count, sources: Object.keys(coverage.sources), refresh: coverage.last_sync };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

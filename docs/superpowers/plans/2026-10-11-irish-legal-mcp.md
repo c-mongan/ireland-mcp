@@ -73,4 +73,4 @@
 - [ ] Implement source modules, registry, managed-identity Blob adapter and configuration docs.
 - [ ] Run package checks and all available root checks; record any environment limitations.
 - [ ] Obtain an independent code review; fix important findings through RED→GREEN.
-- [ ] Publish a new branch and draft PR; verify CI if available. Leave deployment and production ingestion for separately authorized work.
+- [ ] Publish a new branch and PR; verify CI if available. The latest owner instruction authorizes making PR #76 ready, iterating on Copilot review, merging and deploying the existing app with its first controlled production refresh. Deploy only from reviewed `main` using the production OIDC identity; missing production identity variables remain a specific execution blocker.

@@ -109,9 +109,65 @@ test('re-observed immutable text wins a same-publisher-date tie without changing
   await repo.commit([original], 'original');
   await repo.commit([document({ text: 'Corrected annual leave wording.', publisher_updated_at: '2025-08-14', source_fetched_at: '2026-10-12T00:00:00.000Z' })], 'corrected');
   await repo.commit([{ ...original, source_fetched_at: '2026-10-13T00:00:00.000Z', source_checked_at: '2026-10-13T00:00:00.000Z' }], 'original');
+  await repo.commit([document({ text: 'Future annual leave wording.', publisher_updated_at: '2027-01-01', source_fetched_at: '2026-10-14T00:00:00.000Z' })], 'future');
   const selected = await repo.get(original.id, { as_of: '2025-09-01' });
   assert.equal(selected.text, original.text);
   assert.equal(selected.source_fetched_at, original.source_fetched_at);
+});
+test('search ranks compact metadata before reading only the requested snapshots', async t => {
+  const { repo, backend } = await setup(t);
+  const docs = Array.from({ length: 20 }, (_, i) => document({ id: `citizens-info:/en/employment/topic-${i}/`,
+    title: `Topic ${i}`, text: i === 7 ? 'A distinctive unicorn leave entitlement.' : `Generic leave information for workers number ${i}.` }));
+  await repo.commit(docs, 'batch');
+  let reads = 0;
+  const readSnapshot = backend.readSnapshot.bind(backend);
+  backend.readSnapshot = async key => { reads++; return readSnapshot(key); };
+  const unique = await repo.search('unicorn');
+  assert.equal(unique.hits[0].id, docs[7].id);
+  assert.equal(reads, 1);
+  reads = 0;
+  assert.equal((await repo.search('leave', { limit: 2 })).hits.length, 2);
+  assert.equal(reads, 2);
+  assert.equal('search' in unique.hits[0], false, 'Internal lexical metadata must not leak into returned evidence');
+});
+test('source sync publishes completion only after every manifest page finishes', async t => {
+  const { repo } = await setup(t);
+  const secondUrl = guidanceUrl.replace('annual-leave/', 'working-time/');
+  let reached, release;
+  const secondReached = new Promise(resolve => { reached = resolve; });
+  const secondReady = new Promise(resolve => { release = resolve; });
+  const syncing = syncSources(repo, { seeds: [{ source: 'citizens-info', url: guidanceUrl }, { source: 'citizens-info', url: secondUrl }] }, {
+    delayMs: 0, now: () => fetchedAt,
+    fetch: async url => {
+      if (url.endsWith('robots.txt')) return new Response('');
+      if (url === secondUrl) { reached(); await secondReady; }
+      return new Response(guidanceHtml);
+    }
+  });
+  await secondReached;
+  try {
+    assert.equal((await repo.status()).document_count, 1);
+    assert.equal((await repo.status()).last_sync, null);
+  } finally { release(); }
+  const report = await syncing;
+  const status = await repo.status();
+  assert.equal(status.last_sync.failed, 0);
+  assert.equal(status.last_sync.succeeded, 2);
+  assert.equal(status.last_sync.documents, report.documents);
+  assert.ok(status.last_sync.run_id);
+  assert.equal(status.last_sync.finished_at, fetchedAt);
+});
+test('failed source sync records completed failure while retaining prior coverage', async t => {
+  const { repo } = await setup(t);
+  await repo.commit([document()], 'old');
+  await syncSources(repo, { seeds: [{ source: 'citizens-info', url: guidanceUrl }] }, {
+    delayMs: 0, now: () => fetchedAt, fetch: async url => new Response('', { status: url.endsWith('robots.txt') ? 200 : 503 })
+  });
+  const status = await repo.status();
+  assert.equal(status.document_count, 1);
+  assert.equal(status.last_sync.failed, 1);
+  assert.equal(status.last_sync.succeeded, 0);
+  assert.equal(status.last_sync.finished_at, fetchedAt);
 });
 test('historical search discloses publisher-date ambiguity across moved identities', async t => {
   const { repo } = await setup(t);

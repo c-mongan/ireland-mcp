@@ -15,6 +15,7 @@ export interface Repository {
   get(id: string, options?: { version?: string; as_of?: string }): Promise<CoreDocument>;
   search(query: string, options?: { limit?: number; source?: string; source_type?: string; as_of?: string }): Promise<{ hits: CoreDocument[]; coverage: Record<string, unknown>; historical_unavailable_count: number }>;
   status(): Promise<Record<string, unknown>>;
+  recordSync(completion: { run_id: string; started_at: string; finished_at: string; succeeded: number; failed: number; skipped: number; documents: number }): Promise<void>;
   noteFailure(source: string, url: string, details: { checked_at: string; reason: string }): Promise<void>;
 }
 export interface SchemaRule { type: string; minLength?: number; maxLength?: number; minimum?: number; maximum?: number; pattern?: string; enum?: string[]; description?: string }

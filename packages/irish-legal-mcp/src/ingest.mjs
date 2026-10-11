@@ -1,6 +1,7 @@
 import { sourcePolicy, assertSourceUrl } from './policy.mjs';
 import { parseSource } from './sources.mjs';
 import { tree, findAll, text } from './html.mjs';
+import { randomUUID } from 'node:crypto';
 
 const AGENT = 'IrelandLegalMCP';
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -127,6 +128,8 @@ export async function syncSources(repository, manifest, options = {}) {
       await repository.noteFailure(seed.source, seed.url.replace(/\/xml$/, '/html'), { checked_at: now(), reason });
     }
   }
+  await repository.recordSync({ run_id: randomUUID(), started_at: report.checked_at, finished_at: now(),
+    succeeded: report.succeeded, failed: report.failed, skipped: report.skipped, documents: report.documents });
   report.coverage = await repository.status();
   return report;
 }

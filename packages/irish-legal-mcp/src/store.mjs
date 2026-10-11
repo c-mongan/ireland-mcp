@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { mkdir, readFile, writeFile, rename, unlink, open, link } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import { rank } from './index.mjs';
+import { rank, buildSearchMetadata } from './index.mjs';
 import { assertSourceUrl } from './policy.mjs';
 
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -40,10 +40,19 @@ function historical(record, as_of) {
   const date = selected.metadata.consolidated_to ?? selected.metadata.publisher_updated_at;
   return { ...selected, ambiguous: candidates.filter(v => (v.metadata.consolidated_to ?? v.metadata.publisher_updated_at) === date).length > 1 };
 }
-function compact(index) {
+async function compact(index, backend) {
   for (const record of Object.values(index.documents)) {
     record.latest = latestReference(record);
-    record.versions = record.versions.map(reference);
+    record.versions = await mapBounded(record.versions, async stored => {
+      const entry = reference(stored);
+      if (!entry.metadata.search) {
+        const doc = stored.document ?? JSON.parse(await backend.readSnapshot(entry.snapshot));
+        entry.metadata = { ...entry.metadata, search: buildSearchMetadata(doc) };
+      }
+      return entry;
+    });
+    record.latest.metadata = { ...record.latest.metadata,
+      search: record.versions.find(v => v.version === record.latest.version).metadata.search };
   }
   index.schema = 2;
 }
@@ -152,12 +161,13 @@ export class ObjectBackend {
 }
 
 export function createRepository(backend) {
-  const coverage = index => ({ document_count: Object.values(index.documents).filter(r => !r.retired_to).length, sources: index.sources, updated_at: index.updated_at,
+  const coverage = index => ({ document_count: Object.values(index.documents).filter(r => !r.retired_to).length, sources: index.sources, updated_at: index.updated_at, last_sync: index.last_sync ?? null,
     note: 'Coverage is limited to indexed source pages; no search result does not establish that a law or right does not exist.' });
   const decorate = (doc, index, record) => ({ ...doc, stale: sourceUrls({ ...doc,
     source_urls: [...(doc.source_urls ?? []), ...(latestReference(record)?.metadata.source_urls ?? [])] }).some(url => Boolean(index.failed_urls[url])) });
   const hydrate = async entry => {
-    const doc = { ...JSON.parse(await backend.readSnapshot(entry.snapshot)), ...entry.metadata };
+    const publicMetadata = { ...entry.metadata }; delete publicMetadata.search;
+    const doc = { ...JSON.parse(await backend.readSnapshot(entry.snapshot)), ...publicMetadata };
     if (entry.ambiguous) doc.warnings = [...(doc.warnings ?? []), 'Multiple stored texts share this publisher date; the newest retrieved snapshot is selected. Historical wording is not verified.'];
     return doc;
   };
@@ -173,7 +183,7 @@ export function createRepository(backend) {
         const missing = Object.entries(index.documents).filter(([id, record]) => !record.retired_to && id.startsWith(whole.id + '/s') && !incoming.has(id));
         if (missing.length) throw new Error(`INCOMPLETE: refresh omits ${missing.length} previously indexed provisions; prior instrument retained.`);
       }
-      compact(index);
+      await compact(index, backend);
       const raw_hash = hash(raw);
       await backend.writeSnapshot(`raw/${raw_hash}.txt`, raw);
       const versions = [];
@@ -194,9 +204,11 @@ export function createRepository(backend) {
           }
         }
         const snapshot = `documents/${hash(document.id + ':' + version)}.json`;
+        const search = prior?.metadata.search ?? buildSearchMetadata(doc);
         if (!prior) await backend.writeSnapshot(snapshot, JSON.stringify(doc));
-        if (!prior) record.versions.push({ version, snapshot, metadata: metadata(doc) });
-        record.latest = { version, snapshot, metadata: metadata(doc) };
+        if (!prior) record.versions.push({ version, snapshot, metadata: { ...metadata(doc), search } });
+        else prior.metadata = { ...prior.metadata, source_checked_at: doc.source_checked_at };
+        record.latest = { version, snapshot, metadata: { ...metadata(doc), search } };
         delete record.retired_to;
         index.documents[document.id] = record;
         const source = index.sources[doc.source_id] ?? {};
@@ -263,10 +275,26 @@ export function createRepository(backend) {
           return { ...chosen, entry: { ...chosen.entry, ambiguous } };
         });
       } else selected = Object.values(index.documents).filter(r => !r.retired_to).map(record => ({ record, entry: latestReference(record) }));
-      const documents = await mapBounded(selected.filter(d => d.entry), async ({ entry, record }) => decorate(await hydrate(entry), index, record));
-      return { hits: rank(documents, query, options), coverage: coverage(index), historical_unavailable_count: selected.filter(d => !d.entry).length };
+      const candidates = await mapBounded(selected.filter(d => d.entry), async ({ entry, record }) => {
+        // Older indexes remain readable until the next successful commit migrates their lexical metadata.
+        const search = entry.metadata.search ?? buildSearchMetadata(await hydrate(entry));
+        return { ...entry.metadata, search, entry, record };
+      });
+      const hits = await mapBounded(rank(candidates, query, options), async ({ entry, record, score, snippet }) => ({
+        ...decorate(await hydrate(entry), index, record), score, snippet
+      }));
+      return { hits, coverage: coverage(index), historical_unavailable_count: selected.filter(d => !d.entry).length };
     },
     async status() { return coverage((await backend.readIndex()).index); },
+    async recordSync(completion) {
+      if (typeof completion.run_id !== 'string' || !/^[a-zA-Z0-9-]{8,64}$/.test(completion.run_id) ||
+          !Number.isFinite(Date.parse(completion.started_at)) || !Number.isFinite(Date.parse(completion.finished_at)) ||
+          Date.parse(completion.finished_at) < Date.parse(completion.started_at) ||
+          !['succeeded','failed','skipped','documents'].every(key => Number.isInteger(completion[key]) && completion[key] >= 0)) throw new Error('Invalid source sync completion.');
+      const { index, revision } = await backend.readIndex();
+      index.last_sync = { ...completion };
+      await backend.writeIndex(index, revision);
+    },
     async noteFailure(source, url, { checked_at, reason }) {
       const { index, revision } = await backend.readIndex();
       index.failed_urls[url] = { checked_at, reason };

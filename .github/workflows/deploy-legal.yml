@@ -1,11 +1,8 @@
 name: Deploy Irish legal MCP
 
 # A reviewed change to this release workflow triggers the requested rollout.
-# PR runs verify access only; they never change Azure. Future rollouts can use manual dispatch.
+# Production credentials are available only to main. Future rollouts can use manual dispatch.
 on:
-  pull_request:
-    branches: [main]
-    paths: ['.github/workflows/deploy-legal.yml', 'scripts/deploy-legal.mjs']
   push:
     branches: [main]
     paths: ['.github/workflows/deploy-legal.yml']
@@ -13,7 +10,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 concurrency:
   group: deploy
@@ -21,18 +17,20 @@ concurrency:
 
 jobs:
   rollout:
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     timeout-minutes: 25
     environment: production
+    permissions:
+      contents: read
+      id-token: write
     env:
       RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP || 'rg-ireland-mcp' }}
       FUNCTION_APP: ${{ vars.AZURE_FUNCTION_APP_NAME || 'func-ireland-mcp-aofsjpwgy4hva' }}
       IRELAND_MCP_EXPECTED_REVISION: ${{ github.sha }}
     steps:
-      - if: github.event_name != 'pull_request'
-        uses: actions/checkout@v7
-      - if: github.event_name != 'pull_request'
-        uses: actions/setup-node@v7
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -44,13 +42,10 @@ jobs:
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       - name: Verify existing Function App access
         run: az functionapp show --resource-group "$RESOURCE_GROUP" --name "$FUNCTION_APP" --query '{name:name,state:state}' --output json
-      - if: github.event_name != 'pull_request'
-        run: npm ci
+      - run: npm ci
       - name: Validate reviewed source
-        if: github.event_name != 'pull_request'
         run: npm run lint && npm run typecheck && npm test && npm run legal:check
         env:
           LEGAL_SOCKET_TESTS: '1'
       - name: Deploy, ingest and verify live legal chat
-        if: github.event_name != 'pull_request'
         run: node scripts/deploy-legal.mjs
