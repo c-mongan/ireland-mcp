@@ -11,7 +11,8 @@ const command = async (file, args, options = {}) => (await execute(file, args, {
 export async function deployLegal({ resourceGroup, functionApp, expectedRevision, run = command, fetch: fetcher = globalThis.fetch, wait = pause, maxAttempts = 36 }) {
   if (!/^[A-Za-z0-9._()-]{1,90}$/.test(resourceGroup ?? '') || !/^[a-z0-9-]{2,60}$/.test(functionApp ?? '') || !/^[a-f0-9]{40}$/.test(expectedRevision ?? '')) throw new Error('An explicit existing resource group, Function App and checked Git revision are required.');
   const target = ['--resource-group', resourceGroup, '--name', functionApp];
-  const host = await run('az', ['functionapp','show', ...target, '--query','properties.defaultHostName','--output','tsv']);
+  const site = JSON.parse(await run('az', ['functionapp','show', ...target, '--output','json']));
+  const host = site.defaultHostName ?? site.properties?.defaultHostName;
   if (!/^[a-z0-9-]+\.azurewebsites\.net$/.test(host)) throw new Error('Unexpected Function App hostname.');
   const base = `https://${host}`;
   await run('az', ['functionapp','config','appsettings','set', ...target, '--settings',

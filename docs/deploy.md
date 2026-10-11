@@ -70,6 +70,10 @@ domain-deployment ordering regression.
 
 The rollout enables `LEGAL_ENABLED` and `LEGAL_SYNC_ENABLED`, keeps Revised Acts storage disabled, configures the Azure/MCP host origins, deploys a prebuilt package from a checked clean revision, invokes the first source refresh using the Function host's admin API, and verifies source coverage and a cited annual-leave answer. It fails if Azure credentials, source access, ingestion or chat evidence is unavailable. Source refresh observes the same robots/licence boundaries as local sync. The host key is held only in memory and is never printed. Azure OpenAI deployment creation is not part of this rollout.
 
+For this existing-app rollout, the identity needs permission to read and configure the Function App, deploy its package and retrieve its host key. Role-assignment permissions are required by the infrastructure provisioning workflow below, not by the legal rollout.
+
+### Initial infrastructure provisioning
+
 1. Create an Entra app registration or user-assigned identity.
    Add a federated credential: issuer `https://token.actions.githubusercontent.com`,
    subject `repo:c-mongan/ireland-mcp:environment:production`.

@@ -7,12 +7,12 @@ async function deploy() {
 }
 const revision = 'a'.repeat(40);
 const host = 'func-ireland-mcp-test.azurewebsites.net';
-function boundaries({ failUpload = false, populated = true } = {}) {
+function boundaries({ failUpload = false, populated = true, nestedSite = false } = {}) {
   const commands = [], requests = [];
   return { commands, requests,
     run: async (command, args, options) => {
       commands.push({ command, args, options });
-      if (args.includes('show')) return host;
+      if (args.includes('show')) return JSON.stringify(nestedSite ? { properties: { defaultHostName: host } } : { defaultHostName: host });
       if (args.includes('deploy:zip') && failUpload) throw new Error('Upload failed');
       if (args.includes('keys')) return 'private-host-key';
       return '';
@@ -51,4 +51,9 @@ test('empty or incompatible coverage cannot be reported as a successful deployme
   const boundary = boundaries({ populated: false });
   await assert.rejects(runDeployment({ ...boundary, resourceGroup: 'rg-ireland-mcp', functionApp: 'func-ireland-mcp-test', expectedRevision: revision, maxAttempts: 2 }), /coverage|ingestion|sources/i);
   assert.ok(!boundary.requests.some(r => r.url.endsWith('/api/chat')));
+});
+test('deployment accepts the nested ARM site representation as well as the flattened CLI output', async () => {
+  const runDeployment = await deploy();
+  const result = await runDeployment({ ...boundaries({ nestedSite: true }), resourceGroup: 'rg-ireland-mcp', functionApp: 'func-ireland-mcp-test', expectedRevision: revision });
+  assert.equal(result.chat_url, `https://${host}/legal`);
 });
