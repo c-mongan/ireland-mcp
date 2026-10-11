@@ -3,7 +3,8 @@ import { describeEvidence } from './evidence.mjs';
 
 const string = { type: 'string', minLength: 1, maxLength: 500 };
 const query = { ...string, description: 'Words to find in the indexed Irish sources.' };
-const id = { ...string, description: 'Exact document identity returned by search.' };
+const id = { ...string, pattern: '^[a-z][a-z-]*:(?:/en/[a-z0-9/_-]+|\\d{4}/(?:act|si)/\\d+(?:/s\\d+[A-Z]*)?)$',
+  description: 'Exact document identity returned by search.' };
 const limit = { type: 'integer', minimum: 1, maximum: 50 };
 const as_of = { type: 'string', pattern: '^\\d{4}-\\d{2}-\\d{2}$', description: 'Requested publisher version date; unavailable historical versions are reported explicitly.' };
 const version = { type: 'string', pattern: '^[a-f0-9]{64}$', description: 'Exact immutable version returned by a previous lookup.' };

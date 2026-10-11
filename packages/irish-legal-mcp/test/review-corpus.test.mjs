@@ -10,6 +10,21 @@ async function setup(t) {
   const backend = new FileBackend(await temporary(t));
   return { backend, repo: createRepository(backend) };
 }
+test('successful recovery clears the old source error and advances its attempt timestamp', async t => {
+  const { repo } = await setup(t);
+  await repo.commit([document()], 'raw');
+  const failedAt = '2026-10-12T00:00:00.000Z';
+  const recoveredAt = '2026-10-13T00:00:00.000Z';
+  await repo.noteFailure('citizens-info', guidanceUrl, { checked_at: failedAt, reason: 'HTTP 503' });
+  assert.equal((await repo.status()).sources['citizens-info'].last_error, 'HTTP 503');
+  assert.equal((await repo.get(document().id)).stale, true);
+  await repo.commit([document({ source_fetched_at: recoveredAt, source_checked_at: recoveredAt })], 'raw');
+  const source = (await repo.status()).sources['citizens-info'];
+  assert.equal(source.last_attempt_at, recoveredAt);
+  assert.equal(source.last_success_at, recoveredAt);
+  assert.equal(Object.hasOwn(source, 'last_error'), false);
+  assert.equal((await repo.get(document().id)).stale, false);
+});
 test('index stores compact references while exact large historical text remains retrievable', async t => {
   const { repo, backend } = await setup(t);
   const text = 'unique long statutory wording '.repeat(5000);

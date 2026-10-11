@@ -212,7 +212,8 @@ export function createRepository(backend) {
         delete record.retired_to;
         index.documents[document.id] = record;
         const source = index.sources[doc.source_id] ?? {};
-        index.sources[doc.source_id] = { ...source, last_success_at: doc.source_checked_at };
+        index.sources[doc.source_id] = { ...source, last_attempt_at: doc.source_checked_at, last_success_at: doc.source_checked_at };
+        delete index.sources[doc.source_id].last_error;
         for (const url of sourceUrls(doc)) delete index.failed_urls[url];
         index.updated_at = doc.source_checked_at;
         versions.push(version);

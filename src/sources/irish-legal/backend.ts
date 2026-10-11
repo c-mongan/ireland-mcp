@@ -10,10 +10,12 @@ export function legalRepositoryFromEnv(env: Record<string, string | undefined> =
   if (!/^[a-z0-9]{3,24}$/.test(account)) throw new Error("Invalid legal storage account name.");
   const containerName = env.LEGAL_BLOB_CONTAINER ?? "irish-legal";
   if (!/^[a-z0-9](?:[a-z0-9]|-(?=[a-z0-9])){1,61}[a-z0-9]$/.test(containerName)) throw new Error("Invalid legal storage container name.");
-  const container = async () => {
+  const createContainer = async () => {
     const [{ BlobServiceClient }, { DefaultAzureCredential }] = await Promise.all([import("@azure/storage-blob"), import("@azure/identity")]);
     return new BlobServiceClient(`https://${account}.blob.core.windows.net`, new DefaultAzureCredential()).getContainerClient(containerName);
   };
+  let containerClientPromise: ReturnType<typeof createContainer> | undefined;
+  const container = () => containerClientPromise ??= createContainer();
   return createRepository(new ObjectBackend({
     async get(key) {
       try {

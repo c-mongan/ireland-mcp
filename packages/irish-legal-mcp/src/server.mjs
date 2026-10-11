@@ -29,7 +29,10 @@ export function createWebHandler(service, { maxBodyBytes = 32 * 1024, requestsPe
         const expected = Buffer.from(`Bearer ${bearerToken}`);
         if (actual.length !== expected.length || !timingSafeEqual(actual, expected)) return send(401, { error: 'Authorization required.' }, undefined, { 'www-authenticate': 'Bearer' });
       }
-      if (url.pathname === '/api/status' && request.method === 'GET') return send(200, (await service.call('irish_legal_catalogue', {})).coverage);
+      if (url.pathname === '/api/status') {
+        if (request.method !== 'GET') return send(405, { error: 'Use GET for source status.' }, undefined, { allow: 'GET' });
+        return send(200, (await service.call('irish_legal_catalogue', {})).coverage);
+      }
       if (request.method !== 'POST') return send(405, { error: 'Use POST; this stateless server does not provide a GET event stream.' }, undefined, { allow: 'POST' });
       if (!request.headers.get('content-type')?.toLowerCase().startsWith('application/json')) return send(415, { error: 'Expected application/json.' });
       if (Number(request.headers.get('content-length') ?? 0) > maxBodyBytes) return send(413, { error: 'Request body too large.' });

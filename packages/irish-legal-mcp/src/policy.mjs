@@ -18,8 +18,8 @@ export const SOURCES = Object.freeze({
 });
 
 export function sourcePolicy(source, permissions = {}) {
+  if (!Object.hasOwn(SOURCES, source)) throw new Error(`Unsupported or blocked source: ${source}`);
   const policy = SOURCES[source];
-  if (!policy) throw new Error(`Unsupported or blocked source: ${source}`);
   return { ...policy, storage_allowed: policy.storage_allowed || permissions[source] === true };
 }
 

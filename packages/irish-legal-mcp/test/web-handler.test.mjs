@@ -51,3 +51,14 @@ test('Web handler rejects unrecognized hosts and reports malformed chat argument
   const request = await setup(t);
   assert.equal((await request('/api/chat', post({ question: 'annual leave', ignored: 'unsafe' }))).status, 400);
 });
+test('status rejects non-GET methods before dispatching a JSON-RPC body', async t => {
+  const request = await setup(t);
+  for (const method of ['POST', 'PUT', 'DELETE', 'HEAD']) {
+    const response = await request('/api/status', method === 'HEAD' ? { method } : {
+      ...post({ jsonrpc: '2.0', id: 1, method: 'ping' }), method
+    });
+    assert.equal(response.status, 405, `${method} must not dispatch RPC on the status route`);
+    assert.equal(response.headers.get('allow'), 'GET');
+  }
+  assert.equal((await request('/api/status')).status, 200);
+});
