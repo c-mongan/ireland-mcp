@@ -6,10 +6,14 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    languageOptions: { globals: { console: "readonly", process: "readonly", URL: "readonly", fetch: "readonly", Buffer: "readonly", Headers: "readonly", Request: "readonly", Response: "readonly", AbortSignal: "readonly" } },
+    languageOptions: { globals: { console: "readonly", process: "readonly", URL: "readonly", fetch: "readonly", Buffer: "readonly", Headers: "readonly", Request: "readonly", Response: "readonly" } },
     rules: {
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }]
     }
+  },
+  {
+    files: ["scripts/deploy-legal.mjs"],
+    languageOptions: { globals: { AbortSignal: "readonly" } }
   },
   {
     files: ["packages/irish-legal-mcp/**/*.mjs"],
