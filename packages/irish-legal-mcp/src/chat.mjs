@@ -1,9 +1,10 @@
 import { words } from './index.mjs';
 
 function excerpt(doc, question) {
+  if (doc.content_kind === 'provision' && doc.text.length <= 700) return doc.text;
   const terms = words(question);
   const passages = doc.text.split(/\n\s*\n/).filter(s => s.trim().length > 15);
-  const ranked = passages.map(text => ({ text, score: terms.filter(t => text.toLowerCase().includes(t)).length })).sort((a,b) => b.score - a.score);
+  const ranked = passages.map(text => ({ text, score: terms.filter(t => text.toLowerCase().includes(t)).length })).sort((a,b) => b.score - a.score || b.text.length - a.text.length);
   return (ranked[0]?.text ?? doc.text).slice(0, 700);
 }
 export async function answerQuestion(service, question, { mode = 'citizen', as_of, generate } = {}) {

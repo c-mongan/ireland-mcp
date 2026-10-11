@@ -84,3 +84,11 @@ test('invalid JSON-RPC identifiers are reported with a null response identifier'
   const handleRpc = await feature('protocol', 'handleRpc');
   assert.equal((await handleRpc(service, { jsonrpc: '2.0', method: 'ping', id: { bad: true } })).id, null);
 });
+test('short provision chat excerpts retain operative text and conditions rather than only headings', async t => {
+  const { service } = await makeService(t);
+  const answerQuestion = await feature('chat', 'answerQuestion');
+  const result = await answerQuestion(service, 'annual leave', { mode: 'lawyer' });
+  const quote = result.supporting_quotes.find(q => q.citation_id === 'eisb:1997/act/20/s19').quote;
+  assert.match(quote, /An employee shall be entitled to paid annual leave/);
+  assert.match(quote, /Subject to the conditions in this section/);
+});
