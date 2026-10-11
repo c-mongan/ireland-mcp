@@ -18,3 +18,5 @@ test-results/
 playwright-report/
 graphify-out/
 storybook-static/
+
+.irish-legal-cache/

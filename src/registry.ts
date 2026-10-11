@@ -32,6 +32,7 @@ import { epaModule } from "./sources/epa/index.js";
 import { kohesioModule } from "./sources/kohesio/index.js";
 import { pobalModule } from "./sources/pobal/index.js";
 import { worldBankModule } from "./sources/world-bank/index.js";
+import { createLegalModules } from "./sources/irish-legal/index.js";
 
 export const sourceModules: SourceModule[] = [
   csoModule,
@@ -62,7 +63,8 @@ export const sourceModules: SourceModule[] = [
   heritageModule,
   environmentSitesModule,
   tedModule,
-  bikesModule
+  bikesModule,
+  ...(process.env.LEGAL_ENABLED === "true" ? createLegalModules() : [])
 ];
 
 /**
@@ -91,3 +93,4 @@ export function createAppServer(context: ToolContext, telemetry?: TelemetrySink,
     ...(toolsets ? { toolsets } : {})
   });
 }
+

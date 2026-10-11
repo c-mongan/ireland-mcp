@@ -12,7 +12,16 @@ export default tseslint.config(
     }
   },
   {
+    files: ["scripts/deploy-legal.mjs"],
+    languageOptions: { globals: { AbortSignal: "readonly" } }
+  },
+  {
+    files: ["packages/irish-legal-mcp/**/*.mjs"],
+    languageOptions: { globals: { document: "readonly", FormData: "readonly", AbortSignal: "readonly", AbortController: "readonly", setTimeout: "readonly", clearTimeout: "readonly" } }
+  },
+  {
     files: ["storybook/**/*.js", "storybook/**/*.tsx"],
     languageOptions: { globals: { document: "readonly", DOMParser: "readonly", ResizeObserver: "readonly" } }
   }
 );
+

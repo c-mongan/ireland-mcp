@@ -1,0 +1,21 @@
+name: Irish legal MCP
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  legal-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Offline core and loopback transport contracts
+        run: npm run legal:check
+        env:
+          LEGAL_SOCKET_TESTS: '1'
+      - name: Browser module syntax
+        run: node --check packages/irish-legal-mcp/ui/app.mjs

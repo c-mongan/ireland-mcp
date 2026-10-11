@@ -11,6 +11,7 @@
   },
   "files": [
     "dist/src",
+    "dist/packages/irish-legal-mcp",
     "!dist/src/**/*.test.js",
     "README.md",
     "LICENSE",
@@ -49,6 +50,11 @@
     "measure:tools": "node scripts/measure-tools.mjs",
     "counts": "npm run build && node scripts/counts.mjs",
     "ppr:build": "node dist/src/sources/ppr/buildIndexCli.js",
+    "legal:check": "npm --prefix packages/irish-legal-mcp run check",
+    "legal:sync": "node packages/irish-legal-mcp/src/cli.mjs sync",
+    "legal:serve": "node packages/irish-legal-mcp/src/cli.mjs serve",
+    "legal:stdio": "node packages/irish-legal-mcp/src/cli.mjs mcp",
+    "legal:browser": "playwright test --config packages/irish-legal-mcp/playwright.config.mjs",
     "eval": "node scripts/eval.mjs",
     "prepublishOnly": "npm run build",
     "skills:package": "node scripts/package-skills.mjs",
@@ -98,3 +104,4 @@
     "vitest": "^5.0.3"
   }
 }
+

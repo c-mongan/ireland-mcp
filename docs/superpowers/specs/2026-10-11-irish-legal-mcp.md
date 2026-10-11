@@ -1,0 +1,17 @@
+# Irish legal and citizen-information MCP
+
+Build a working addition to `c-mongan/ireland-mcp`, retaining its read-only gateway. Supply a dependency-free core so ingestion, durable storage, research and transport tests run without downloading packages.
+
+The release includes Citizens Information article parsing and seeded/sitemap ingestion, enacted eISB provisions, an opt-in Revised Acts adapter, a legal-effects parser, immutable source snapshots, atomic versioned indexes, keyword search, exact document/version retrieval, currentness evidence, and research bundles. Historical requests never silently substitute today's text. Preserve tables, hyperlinks, annotations and publisher currency warnings. Source fetch, successful check, serve and legal version dates are separate. Missing coverage and timestamps remain explicit.
+
+Offer standard MCP stdio and stateless Streamable HTTP access, source resources, a responsive accessible citizen/lawyer chat page, extractive cited answers, and an optional Azure OpenAI summary provider with validated citation identifiers. Public MCP tools never trigger writes. Source text is untrusted and cannot supply executable instructions. No assertion of current law or judgment precedent validity without adequate evidence.
+
+Support local atomic file storage and Azure Blob storage through an injected adapter. Azure Functions routes and scheduled ingestion use the existing project dependencies and managed identity. Include runnable local commands, seed manifests, source reuse policy, deployment/configuration documentation and CI checks. Never bundle fabricated source material as live law.
+
+Default ingestion: explicitly listed Citizens Information and eISB sources with attribution. Check robots rules and restrict crawl scope, redirects, size, rate and time. Revised Acts and judgments need source-specific permission before ingestion; BAILII and unrestricted arbitrary websites are disabled. New seeds and categories are configurable; employment is the initial seeded subject, not a restriction on the tools.
+
+Tests use Node's built-in runner, temporary directories and loopback HTTP servers. Keep external services at injectable boundaries. Exercise real parsing, persistence, protocol round trips and browser-facing HTTP/chat endpoints. The original implementation scope ended at a feature branch and draft PR. On 2026-10-11, the owner's latest instruction superseded that boundary: make PR #76 ready, iterate on Copilot review, merge the reviewed change and deploy the existing Function App with its first controlled production source refresh. Creating additional paid resources is outside this rollout. Missing production OIDC variables are an execution blocker, not a reason to request the same deployment authorization again.
+
+The legal deployment workflow must run only for its own reviewed file changing on `main` or manual dispatch from `main`. Its production job guards both the event and `refs/heads/main`, and grants OIDC permission at that job. Pull request CI validates proposed source without access to the deployment workflow's production credentials.
+
+Environment constraint: shell HTTP proxy is unreachable and no package cache exists. Restore repository text via GitHub connector; run the independent package checks locally. Obtain the existing TypeScript gateway checks through GitHub Actions if possible, and report unavailable checks honestly. Azure identity is not configured in this workspace.

@@ -1,6 +1,17 @@
 // Exit policy for the live smoke run. Kept separate from live-sanity.mjs so it can be unit-tested without network.
 import { assessResult } from "./live-result.mjs";
 
+/** Optional stored-corpus probes. Enabling the integration must not silently skip missing registration. */
+export function optionalLegalCases(domains, legalEnabled) {
+  const advertised = new Set(domains.flatMap((domain) => (domain.sources ?? []).map((source) => source.id)));
+  return [
+    ["irish-legal", "irish_legal_get_provision", { year: 1997, number: 20, section: "19", version_type: "enacted" },
+      (data) => data.id === "eisb:1997/act/20/s19" && data.source_id === "eisb" && data.version_type === "enacted" && data.text.length > 50 && data.warnings.length > 0],
+    ["citizens-info", "citizens_info_search", { query: "annual leave", limit: 2 },
+      (data) => data.hits.length > 0 && data.hits.every((hit) => hit.source_id === "citizens-info" && hit.source_type === "guidance" && hit.warnings.length > 0)]
+  ].filter(([source]) => legalEnabled === "true" || advertised.has(source));
+}
+
 /** A timestamped empty NTA feed is valid. No invented entity counters are required. */
 export const ntaSummarySample = (data) => typeof data.feed_timestamp === "string"
   && Number.isFinite(Date.parse(data.feed_timestamp))
@@ -52,3 +63,4 @@ export function exitCode(results, maxTolerated = MAX_TOLERATED_FLAKY) {
   if (results.some((r) => r.status === "FAIL")) return 1;
   return results.filter((r) => r.status === "WARN").length > maxTolerated ? 1 : 0;
 }
+

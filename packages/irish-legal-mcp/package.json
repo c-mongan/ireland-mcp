@@ -1,0 +1,14 @@
+{
+  "name": "@ireland-mcp/irish-legal",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.12" },
+  "scripts": {
+    "test": "node --test --experimental-test-isolation=none test/*.test.mjs",
+    "check": "node --test --experimental-test-isolation=none test/*.test.mjs && node scripts/check.mjs",
+    "start": "node src/cli.mjs serve",
+    "stdio": "node src/cli.mjs mcp",
+    "sync": "node src/cli.mjs sync"
+  }
+}

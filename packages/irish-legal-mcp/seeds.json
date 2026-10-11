@@ -1,0 +1,10 @@
+{
+  "max_pages": 30,
+  "seeds": [
+    { "source": "citizens-info", "url": "https://www.citizensinformation.ie/en/employment/employment-rights-and-conditions/leave-and-holidays/annual-leave/" },
+    { "source": "citizens-info", "url": "https://www.citizensinformation.ie/en/employment/employment-rights-and-conditions/hours-of-work/working-hours/" },
+    { "source": "eisb", "url": "https://www.irishstatutebook.ie/eli/1997/act/20/enacted/en/xml" },
+    { "source": "legislation-effects", "url": "https://www.irishstatutebook.ie/eli/isbc/1997_20.html" }
+  ],
+  "sitemaps": []
+}
