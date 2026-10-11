@@ -1,6 +1,6 @@
 {
-  "status": "ok",
-  "checked_at": "2026-10-11T08:42:13.043Z",
+  "status": "degraded",
+  "checked_at": "2026-10-11T15:35:38.474Z",
   "cached": false,
   "sources": [
     {
@@ -12,61 +12,61 @@
     {
       "source": "world-bank",
       "status": "up",
-      "latencyMs": 511,
+      "latencyMs": 299,
       "httpStatus": 200
     },
     {
       "source": "eurostat",
       "status": "up",
-      "latencyMs": 163,
+      "latencyMs": 252,
       "httpStatus": 200
     },
     {
       "source": "ecb",
       "status": "up",
-      "latencyMs": 202,
+      "latencyMs": 295,
       "httpStatus": 200
     },
     {
       "source": "pobal",
       "status": "up",
-      "latencyMs": 396,
+      "latencyMs": 295,
       "httpStatus": 200
     },
     {
       "source": "oireachtas",
       "status": "up",
-      "latencyMs": 162,
+      "latencyMs": 251,
       "httpStatus": 200
     },
     {
       "source": "geohive",
       "status": "up",
-      "latencyMs": 1177,
+      "latencyMs": 1212,
       "httpStatus": 200
     },
     {
       "source": "wikidata",
       "status": "up",
-      "latencyMs": 325,
+      "latencyMs": 1008,
       "httpStatus": 200
     },
     {
       "source": "data-gov-ie",
       "status": "up",
-      "latencyMs": 214,
+      "latencyMs": 333,
       "httpStatus": 200
     },
     {
       "source": "ncse",
       "status": "up",
-      "latencyMs": 293,
+      "latencyMs": 432,
       "httpStatus": 200
     },
     {
       "source": "cro",
       "status": "up",
-      "latencyMs": 360,
+      "latencyMs": 501,
       "httpStatus": 200
     },
     {
@@ -78,13 +78,13 @@
     {
       "source": "smart-dublin",
       "status": "up",
-      "latencyMs": 292,
+      "latencyMs": 499,
       "httpStatus": 200
     },
     {
       "source": "met-eireann",
       "status": "up",
-      "latencyMs": 400,
+      "latencyMs": 561,
       "httpStatus": 200
     },
     {
@@ -96,90 +96,90 @@
     {
       "source": "legislation",
       "status": "up",
-      "latencyMs": 297,
+      "latencyMs": 475,
       "httpStatus": 200
     },
     {
       "source": "ppr",
       "status": "up",
-      "latencyMs": 338,
+      "latencyMs": 484,
       "httpStatus": 200
     },
     {
       "source": "irish-rail",
       "status": "up",
-      "latencyMs": 353,
+      "latencyMs": 510,
       "httpStatus": 200
     },
     {
       "source": "luas",
       "status": "up",
-      "latencyMs": 431,
+      "latencyMs": 497,
       "httpStatus": 200
     },
     {
       "source": "eirgrid",
       "status": "up",
-      "latencyMs": 2263,
+      "latencyMs": 715,
       "httpStatus": 200
     },
     {
       "source": "marine",
       "status": "up",
-      "latencyMs": 516,
+      "latencyMs": 577,
       "httpStatus": 200
     },
     {
       "source": "opw-water",
       "status": "up",
-      "latencyMs": 894,
+      "latencyMs": 1052,
       "httpStatus": 200
     },
     {
       "source": "planning",
       "status": "up",
-      "latencyMs": 446,
+      "latencyMs": 561,
       "httpStatus": 200
     },
     {
       "source": "census-areas",
       "status": "up",
-      "latencyMs": 484,
+      "latencyMs": 699,
       "httpStatus": 200
     },
     {
       "source": "epa",
-      "status": "up",
-      "latencyMs": 555,
-      "httpStatus": 200
+      "status": "down",
+      "latencyMs": 5001,
+      "error": "timeout"
     },
     {
       "source": "heritage",
       "status": "up",
-      "latencyMs": 481,
+      "latencyMs": 616,
       "httpStatus": 200
     },
     {
       "source": "environment-sites",
       "status": "up",
-      "latencyMs": 441,
+      "latencyMs": 568,
       "httpStatus": 200
     },
     {
       "source": "ted",
       "status": "up",
-      "latencyMs": 523,
+      "latencyMs": 629,
       "httpStatus": 200
     },
     {
       "source": "bikes",
       "status": "up",
-      "latencyMs": 595,
+      "latencyMs": 748,
       "httpStatus": 200
     }
   ],
   "name": "ireland-mcp",
   "version": "1.1.4",
   "breakers": {},
-  "fetched_at": "2026-10-11T08:42:10.309Z"
+  "fetched_at": "2026-10-11T15:35:27.821Z"
 }
