@@ -608,28 +608,3 @@ renderExamples();
 initDemoPlayer();
 initLiveStats();
 initStatus();
-
-// Keep the original video, with an explicit pause control and reduced-motion support.
-const video = $("hero-video");
-const motionToggle = $("motion-toggle");
-const motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
-let motionPaused = motionQuery.matches;
-function syncVideo() {
-  motionToggle.textContent = motionPaused ? "Play video" : "Pause video";
-  if (motionPaused || document.hidden) video.pause();
-  else video.play().catch(() => {
-    motionPaused = true;
-    motionToggle.textContent = "Play video";
-  });
-}
-motionToggle.addEventListener("click", () => {
-  motionPaused = !motionPaused;
-  syncVideo();
-});
-motionQuery.addEventListener("change", () => {
-  motionPaused = motionQuery.matches;
-  syncVideo();
-});
-document.addEventListener("visibilitychange", syncVideo);
-syncVideo();
-

@@ -1,5 +1,13 @@
 # Real-client demo evidence
 
+## Latest product demos (10 October 2026)
+
+Start with the [35-second ChatGPT demonstration](../../web/media/chatgpt-demo.mp4) or the [website playground demonstration](../../web/media/rent-demo.mp4). Both show actual browser captures and a cited historical rent result. The ChatGPT recording uses the Ireland Open Data integration in ChatGPT Work.
+
+These are edited still captures, not continuous screen recordings or latency measurements. The result is a cached CSO RIQ02 response for Galway City two-bedroom apartments in Q4 2025; it is not a current asking-rent quote. [Source, captions and capture provenance](../demo-video.md) explain the evidence and its limits.
+
+[Try the request live](https://irishopendata.ie/#playground) to inspect a new response and its source metadata. The older client checks below are dated receipts, not current availability guarantees.
+
 ## v1.1.1 QA re-run (7 October 2026, commit `d64cc20`)
 
 | Client | Question | Result | Citation checked |
@@ -40,4 +48,4 @@ Files:
 
 The Ennis answer from VS Code and Copilot CLI agreed: 27,923 people (13,377 male, 14,546 female), average age 38.9.
 
-Not tested: Claude Desktop (not installed on the test machine) and ChatGPT developer-mode connectors (these need the account owner to enable Developer mode in ChatGPT web settings). The setup steps for both are in the main [README](../../README.md#install).
+At the time of the v1.0 run, Claude Desktop and ChatGPT developer-mode connectors were not tested. The later ChatGPT Work integration demonstration is listed at the top of this page. See the current [installation guide](../../README.md#install) for supported setup routes.
