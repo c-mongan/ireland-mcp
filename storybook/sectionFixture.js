@@ -150,7 +150,6 @@ export function sectionDocument({ section: sectionId, theme, state = "idle" }) {
   for (const element of section.querySelectorAll("script, noscript, video")) element.remove();
   if (sectionId === "top") {
     required(section, "#live-label").textContent = "Sample Server Online";
-    required(section, "#motion-toggle").textContent = "Video paused in Storybook";
   }
   if (sectionId === "install") populateInstaller(section, required(source, 'meta[name="mcp-endpoint"]').content);
   if (sectionId === "directory") populateDirectory(section);
