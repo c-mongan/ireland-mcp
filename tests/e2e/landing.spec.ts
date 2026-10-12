@@ -167,16 +167,21 @@ test("installer commands and JSON use the documented primary endpoint", async ({
   });
 });
 
-test("video respects reduced motion and has a working pause control", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
+test("the static hero offers one primary live-query path without background media", async ({ page }) => {
+  const mediaRequests: string[] = [];
+  page.on("request", (request) => { if (request.url().includes("hero-bg.mp4")) mediaRequests.push(request.url()); });
+  await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/");
-  await expect(page.locator("#hero-video")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Play video" })).not.toHaveAttribute("aria-pressed");
-  expect(await page.locator("#hero-video").evaluate((el) => (el as HTMLVideoElement).paused)).toBe(true);
-  await page.getByRole("button", { name: "Play video" }).click();
-  await expect(page.getByRole("button", { name: "Pause video" })).toBeVisible();
-  await page.getByRole("button", { name: "Pause video" }).click();
-  expect(await page.locator("#hero-video").evaluate((el) => (el as HTMLVideoElement).paused)).toBe(true);
+  await expect(page.locator("#top video")).toHaveCount(0);
+  await expect(page.locator(".hero-actions .primary")).toHaveCount(1);
+  await expect(page.locator(".hero-actions .primary")).toHaveAttribute("href", "#playground");
+  expect((await page.locator("#playground").boundingBox())!.y).toBeLessThan(800);
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect((await page.locator("#playground").boundingBox())!.y).toBeLessThan(1000);
+  await expect(page.locator(".hero-actions .primary")).toBeInViewport();
+  await page.locator(".hero-actions .primary").click();
+  await expect(page.getByRole("button", { name: "Run live query" })).toBeInViewport();
+  expect(mediaRequests).toEqual([]);
 });
 
 test("Gemini copies its displayed configuration and tabs support arrow keys", async ({ page, context }) => {

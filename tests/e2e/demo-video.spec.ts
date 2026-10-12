@@ -156,10 +156,10 @@ test("a missing recording leaves a clear error and the transcript available", as
   await expect(page.locator("#demo-transcript p").first()).toBeVisible();
 });
 
-test("without JavaScript the inline panel has a native player, transcript and source", async ({ browser }) => {
+test("without JavaScript the inline panel has a native player, transcript and source", async ({ browser, baseURL }) => {
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 320, height: 800 } });
   const page = await context.newPage();
-  await page.goto("http://127.0.0.1:4173/");
+  await page.goto(baseURL!);
   await page.locator("#demo-fallback").click();
   await expect(page.locator("#demo-dialog")).toBeVisible();
   await expect(page.locator("#demo-open")).toBeHidden();
