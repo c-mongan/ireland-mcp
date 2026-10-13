@@ -60,7 +60,7 @@ h2 { font-size: clamp(1.9rem, 3.5vw, 3.1rem); line-height: 1.14; letter-spacing:
 h3 { font-size: 1.2rem; letter-spacing: -.01em; }
 h4 { font-size: 1.05rem; }
 p { max-width: 70ch; text-wrap: pretty; }
-.hero { position: relative; isolation: isolate; padding: clamp(2rem, 3vw, 3rem) 0 1rem; background: #07110e; color: var(--hero-ink); }
+.hero { position: relative; isolation: isolate; padding: 1.5rem 0 1rem; background: #07110e; color: var(--hero-ink); }
 .hero-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4rem); align-items: center; }
 .hero-copy { min-width: 0; }
 .hero h1 span { color: #a4e8bf; }
@@ -94,7 +94,7 @@ html[data-theme="light"] .btn.primary:hover { background: #174c2b; border-color:
 .live-dot { display: flex; align-items: center; gap: .65rem; font-size: .85rem; }
 .live-dot span { flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; background: #a4e8bf; box-shadow: 0 0 8px rgba(164, 232, 191, .45); }
 .live-dot.down span { background: #ffb9ac; box-shadow: 0 0 8px rgba(255, 185, 172, .45); }
-.hero-summary { display: flex; align-items: center; justify-content: space-between; gap: 2rem; margin-top: 2rem; padding-block: 1.15rem; border-block: 1px solid #2d4536; }
+.hero-summary { display: flex; align-items: center; justify-content: space-between; gap: 2rem; margin-top: 1rem; padding-block: .8rem; border-block: 1px solid #2d4536; }
 .hero-stats { display: flex; gap: clamp(1.5rem, 5vw, 4.5rem); margin: 0; }
 .hero-stats > div { display: flex; flex-direction: column-reverse; gap: .25rem; }
 .hero-stats dt { color: var(--hero-muted); font-size: .75rem; line-height: 1.4; text-transform: uppercase; letter-spacing: .04em; }
