@@ -8,14 +8,14 @@ and curious. This is a community-built read-only connector, not an official
 government service or an AI answer engine.
 
 The visual reference is a public-data observatory: a green, cinematic opening
-followed by clear, inspectable documentation. An interactive Irish tricolour cube sits beside the headline without a card.
-The real ChatGPT demo has a visible poster preview. No remote imagery or font
+followed by clear, inspectable documentation. An interactive Irish tricolour cube sits beside the headline without a card, rotating continuously through 360 degrees in ~18 seconds, with drag and arrow-key controls for rotation and tilt.
+The real ChatGPT demo has a visible, clickable poster preview in a separate proof row beside the live service summary. No remote imagery or font
 dependencies are needed.
 
 ## Layout and hierarchy
 
-- The hero explains the connection to Irish public data in plain language.
-  The cube is decorative, not a signal of live data. Its server summary and
+- The hero explains the connection to Irish public data in plain language with an editorial two-line headline.
+  The cube is decorative, unboxed, not a signal of live data. Its server summary and
   compact counts sit in a separate strip.
 - The live playground follows the hero, so visitors can inspect data before
   installation. Static VS Code and Cursor links still provide quick entry in
@@ -81,9 +81,9 @@ decorative shadows and glass panels are unnecessary.
   At 320px, headline sizing and code wrapping must stay within the viewport.
 - Horizontal scrolling is local to the install tabs and code blocks. Tab padding
   leaves space for focus outlines.
-- The cube rotates slowly by default, supports drag and arrow keys, and stops
+- The cube rotates continuously through 360 degrees in approximately 18 seconds (ROTATION_PERIOD_MS = 18000), supports free yaw dragging and bounded pitch adjustment (-1.0 to 0.2 rad), arrow key navigation (left/right yaw, up/down pitch), and stops
   offscreen or in hidden tabs. A compact icon provides pause/resume, with an
-  accessible name and tooltip. Reduced motion starts still. The video remains
+  accessible name and tooltip. Reduced motion starts still and permits discrete steps. The video remains
   user-controlled. Content is visible without entrance animation.
 - No-JavaScript installation fallback links to the existing agent guide.
 - Keep advanced arguments in Query settings. Always show the result and request
@@ -146,3 +146,7 @@ ChatGPT Work exposes raw JSON, identifies an exact tool function or shows
 continuous playback. The video is silent and captioned. The website installer
 uses the current Plugins → Add custom MCP server → Install → Work → @plugin
 flow and links to the official OpenAI quickstart.
+
+## October 2026 reference study
+
+Reviewed Resend, Vapi, Supabase, Firecrawl and PostHog homepages. Apply their clear product explanation, strong visual hierarchy, direct product trial and distinct identity. Do not copy assets or add unverified social proof. The header and hero share a dark foundation; the tricolour cube is the main visual object. A larger real-video preview and service summary share a proof row. Keep motion details out of product copy; the cube hint only explains the interaction.

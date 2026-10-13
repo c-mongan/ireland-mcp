@@ -7,11 +7,11 @@ export function rotate(x, y, z, yaw, pitch) {
 const corners = [[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]];
 const faces = [[0,1,2,3],[4,7,6,5],[0,4,5,1],[3,2,6,7],[1,5,6,2],[0,3,7,4]];
 const palette = ["#73c99a", "#e7eee8", "#efa768"];
-export function cubeFaces(yaw = -.55) {
+export function cubeFaces(yaw = -.55, pitch = -.4) {
   const result = [];
   for (let x = 0; x < 6; x++) for (let y = 0; y < 6; y++) for (let z = 0; z < 6; z++) {
     if (![x,y,z].some(n => n === 0 || n === 5)) continue;
-    const points = corners.map(([a,b,c]) => rotate(x - 2.5 + a * .43, y - 2.5 + b * .43, z - 2.5 + c * .43, yaw, -.4));
+    const points = corners.map(([a,b,c]) => rotate(x - 2.5 + a * .43, y - 2.5 + b * .43, z - 2.5 + c * .43, yaw, pitch));
     for (const face of faces) {
       const ps = face.map(i => points[i]);
       // Keep outward faces, then paint distant faces first.

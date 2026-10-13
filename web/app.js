@@ -1,4 +1,4 @@
-import { initIrelandCube } from "./ireland-cube.js?v=20261013-cube-release";
+import { initIrelandCube } from "./ireland-cube.js?v=20261013-redesign-v2";
 import { initDemoPlayer } from "./demo-player.js?v=20261013-preview";
 import { createAnalytics } from "./analytics.js?v=20261010-first-use";
 import { buildResultView, decodeToolPayload, renderResultView } from "./result-view.js?v=20261010-first-use";
