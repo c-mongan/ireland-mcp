@@ -23,6 +23,16 @@ dependencies are needed.
 - A three-step ordered diagram explains the discovery/call/citation flow.
   Retrieval time is explicitly distinguished from publication time.
 - Machine-readable documentation keeps all existing URLs and its section anchor.
+- Agent setup shows a copyable request beside a three-step guide. The request asks
+  the coding agent to read the client guide, preserve existing configuration and
+  verify with a real catalogue call. Keep it visible without JavaScript. The copy
+  action has its own live status and sends no analytics. Codex has a client tab
+  with separate add, configuration check and connection check instructions.
+  The static installer contains a Codex command before scripts load.
+- New source examples use the existing result tables: Galway tourism listings,
+  Heuston static stops and a Dublin groundwater point. Keep their publisher dates,
+  download dates, source scope and unknown values visible. Static stops must not
+  imply current services; groundwater categories must not imply engineering approval.
 - The live playground comes before the source directory. Sample buttons load
   real request settings. They do not run the request. Their selected state follows
   the example selector, and keyboard focus moves to that selector after loading.

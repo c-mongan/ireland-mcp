@@ -5,7 +5,7 @@ import { expect, test } from "@playwright/test";
 
 const axeSource = readFileSync(createRequire(import.meta.url).resolve("axe-core/axe.min.js"), "utf8");
 
-const sections = ["hero", "demo-player", "installer", "directory", "playground-idle", "playground-loading", "playground-success", "playground-empty", "playground-error", "playground-truncated", "playground-weather", "playground-transport", "playground-rent", "playground-cached-stale", "status-healthy", "status-degraded", "status-stale", "status-loading", "status-unreachable"];
+const sections = ["hero", "demo-player", "installer", "agent-setup", "directory", "playground-idle", "playground-loading", "playground-success", "playground-empty", "playground-error", "playground-truncated", "playground-weather", "playground-transport", "playground-rent", "playground-cached-stale", "playground-tourism", "playground-static-stops", "playground-groundwater", "status-healthy", "status-degraded", "status-stale", "status-loading", "status-unreachable"];
 
 for (const section of sections) {
   for (const theme of ["dark", "light"]) {
@@ -60,6 +60,12 @@ for (const section of sections) {
         await expect(frame.locator("#install-panel")).toContainText("copilot mcp add");
         await expect(frame.locator("#install-panel")).toContainText("https://mcp.irishopendata.ie/mcp");
       }
+      if (section === "agent-setup") {
+        await expect(frame.locator("#agent-install-prompt")).toContainText("ireland_catalogue");
+        await expect(frame.getByRole("button", { name: "Copy agent request", exact: true })).toBeDisabled();
+        await page.setViewportSize({ width: 320, height: 800 });
+        await expect.poll(() => frame.locator("html").evaluate((node) => node.scrollWidth <= (node.ownerDocument.defaultView?.innerWidth || 0))).toBe(true);
+      }
       if (section === "directory") {
         const subjects = frame.getByRole("navigation", { name: "Source subjects" });
         await expect(subjects.locator("a")).toHaveCount(1);
@@ -72,7 +78,12 @@ for (const section of sections) {
       if (section.startsWith("playground")) {
         await expect(frame.locator(".request-heading h3")).toHaveText("Try a live request");
         await expect(frame.locator("#response-title")).toHaveText("Sample response");
-        const source = section === "playground-weather" ? "met-eireann" : section === "playground-transport" ? "luas" : "cso";
+        const newSources: Record<string, { id: string; publisher: string; url: string }> = {
+          "playground-tourism": { id: "failte-ireland", publisher: "Fáilte Ireland", url: "https://www.failteireland.ie/en/info/open-data" },
+          "playground-static-stops": { id: "tfi-static", publisher: "Transport for Ireland NaPTAN stop records", url: "https://www.transportforireland.ie/transitData/PT_Data.html" },
+          "playground-groundwater": { id: "gsi", publisher: "Geological Survey Ireland", url: "https://data.gov.ie/dataset/groundwater-vulnerability-140000-ireland-roi-itm" }
+        };
+        const source = newSources[section]?.id ?? (section === "playground-weather" ? "met-eireann" : section === "playground-transport" ? "luas" : "cso");
         await expect(frame.locator("#pg-source")).toHaveValue(source);
         if (section !== "playground-idle") await expect(frame.locator("#pg-request-label")).toContainText(`Sample request: ${source}`);
         await expect(frame.locator("#response-area")).toHaveAttribute("aria-busy", String(section === "playground-loading"));
@@ -93,7 +104,7 @@ for (const section of sections) {
           await expect(preview.locator(".result-provenance")).toContainText("Licence");
           await expect(preview.locator(".result-provenance")).toContainText("Retrieved");
           if (section !== "playground-error") {
-            await expect(preview.locator(".result-provenance")).toContainText(source === "met-eireann" ? "Met Éireann" : source === "luas" ? "Luas Forecasting API" : "CSO PxStat");
+            await expect(preview.locator(".result-provenance")).toContainText(newSources[section]?.publisher ?? (source === "met-eireann" ? "Met Éireann" : source === "luas" ? "Luas Forecasting API" : "CSO PxStat"));
             await expect(preview.locator(".result-provenance")).toContainText("CC BY 4.0");
             await expect(preview.locator(".result-provenance")).toContainText("1 Jan 2026, 12:00 UTC");
           }
@@ -102,7 +113,7 @@ for (const section of sections) {
             await expect(preview).toContainText("No safe source URL was supplied.");
           } else {
             const sourceLink = preview.locator("a[data-source-url]");
-            const expectedUrl = section === "playground-weather" ? "https://www.met.ie/warnings" : section === "playground-transport" ? "https://luas.ie/" : section === "playground-rent" ? "https://data.cso.ie/table/RIQ02" : "https://data.cso.ie/search?q=population";
+            const expectedUrl = newSources[section]?.url ?? (section === "playground-weather" ? "https://www.met.ie/warnings" : section === "playground-transport" ? "https://luas.ie/" : section === "playground-rent" ? "https://data.cso.ie/table/RIQ02" : "https://data.cso.ie/search?q=population");
             await expect(sourceLink).toHaveText(expectedUrl);
             await expect(sourceLink).toHaveAttribute("aria-label", "Open the source response");
             await expect(sourceLink).toHaveAttribute("rel", "noreferrer");
@@ -131,6 +142,20 @@ for (const section of sections) {
           await expect(preview).toContainText("2025Q4");
           await expect(preview.locator(".result-description").first()).toContainText("registered");
           await expect(preview.locator(".result-description").first()).toContainText("asking");
+        }
+        if (section === "playground-tourism") {
+          await expect(preview.getByRole("table", { name: "Tourism listings" })).toContainText("Sample Galway attraction");
+          await expect(preview).toContainText("Source update date: Not reported");
+        }
+        if (section === "playground-static-stops") {
+          await expect(preview.getByRole("table", { name: "Static transport stops" })).toContainText("SAMPLE-ATCO-001");
+          await expect(preview).toContainText("not live services");
+          await expect(preview).toContainText("Stale response.");
+        }
+        if (section === "playground-groundwater") {
+          await expect(preview.getByRole("table", { name: "Groundwater vulnerability areas" })).toContainText("SAMPLE-AREA");
+          await expect(preview).toContainText("site investigation");
+          await expect(preview).toContainText("Truncated response.");
         }
         if (section === "playground-cached-stale") {
           await expect(preview.locator(".result-notices")).toContainText("Cached response.");

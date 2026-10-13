@@ -1,5 +1,10 @@
 # Ranked dataset and app opportunities
 
+Implementation update, 13 October 2026: GSI point lookup, Fáilte listings and TFI
+static stop discovery are implemented; Logainm has a tested adapter that requires
+an operator key. See [current source access and limits](public-source-additions.md).
+The dated research below remains the 10 October record.
+
 Checked on **10 October 2026**. This is a research record. It distinguishes current source support from proposed additions. The source registry has 29 providers. No new provider account, paid service, connector, or app was created for this review.
 
 | Rank | User task | Data route | Current status | Next bounded change |

@@ -1,5 +1,5 @@
 const HOSTS = new Set(["https://eu.i.posthog.com", "https://us.i.posthog.com"]);
-const CLIENTS = new Set(["vscode", "cursor", "claude", "chatgpt", "copilot", "gemini", "windsurf", "generic", "endpoint"]);
+const CLIENTS = new Set(["vscode", "cursor", "codex", "claude", "chatgpt", "copilot", "gemini", "windsurf", "generic", "endpoint"]);
 const RESULT_ACTIONS = new Set(["inspect_raw", "open_source", "connect"]);
 
 function privacyBlocked() {

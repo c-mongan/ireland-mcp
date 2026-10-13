@@ -7,6 +7,9 @@ const labels = { source: "cso", operation: "cso_search_tables" };
 const privateFields = { args: { query: "private-query" }, result: "private-result", url: "https://private.example", error: "private-error", token: "private-token", distinct_id: "private-person", release_commit: "private-release", surface: "private-surface", schema_version: 999 };
 
 describe("first-use analytics property projection", () => {
+  it("records only finite labels for Codex installation", () => {
+    expect(safeProperties("ireland_install_action", { client: "codex", action: "copy", ...privateFields }, operations)).toEqual({ client: "codex", action: "copy" });
+  });
   it("records only finite labels for a query attempt", () => {
     expect(safeProperties("ireland_query_started", { ...labels, ...privateFields, outcome: "ok", duration_ms: 50 }, operations)).toEqual(labels);
   });

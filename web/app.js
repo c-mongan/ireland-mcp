@@ -1,7 +1,7 @@
 import { initIrelandCube } from "./ireland-cube.js?v=20261013-redesign-v2";
 import { initDemoPlayer } from "./demo-player.js?v=20261013-preview";
-import { createAnalytics } from "./analytics.js?v=20261010-first-use";
-import { buildResultView, decodeToolPayload, renderResultView } from "./result-view.js?v=20261010-first-use";
+import { createAnalytics } from "./analytics.js?v=20261013-codex";
+import { buildResultView, decodeToolPayload, renderResultView } from "./result-view.js?v=20261013-sources";
 
 const MCP_URL = "https://mcp.irishopendata.ie/mcp";
 const STATUS_URL = "https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json";
@@ -24,12 +24,14 @@ const SOURCE_FALLBACK = [
     { id: "ted", name: "EU Tenders Electronic Daily", summary: "Irish and EU public-procurement notices from TED.", operations: ["ted_search_tenders", "ted_get_notice"] }
   ] },
   { domain: "transport", sources: [
+    { id: "tfi-static", name: "Transport for Ireland NaPTAN stops", summary: "Static stop names, identifiers and coordinates; not live services or verified GTFS stop IDs.", operations: ["tfi_static_search_stops"] },
     { id: "nta", name: "National Transport Authority GTFS-Realtime", summary: "Live public transport cancellations and delays; server-side NTA key only.", operations: ["nta_get_realtime_summary", "nta_get_trip_updates"] },
     { id: "irish-rail", name: "Iarnród Éireann realtime API", summary: "Station lookup and live DART, Commuter and Intercity departures.", operations: ["rail_find_station", "rail_get_departures"] },
     { id: "luas", name: "Luas Forecasting API", summary: "Live Luas arrivals and stop list for the Red and Green lines.", operations: ["luas_get_forecast", "luas_list_stops"] },
     { id: "bikes", name: "Irish bike-share availability", summary: "City bike networks and nearby station availability.", operations: ["bikes_networks", "bikes_stations_near"] }
   ] },
   { domain: "environment", sources: [
+    { id: "gsi", name: "Geological Survey Ireland", summary: "Groundwater vulnerability point lookup at map scale 1:40000; screening only.", operations: ["groundwater_vulnerability_at"] },
     { id: "met-eireann", name: "Met Éireann", summary: "Point forecasts, station observations and active weather warnings.", operations: ["met_get_forecast", "met_get_observations", "met_get_warnings"] },
     { id: "marine", name: "Marine Institute Weather Buoy Network", summary: "Live wind, wave and sea-temperature readings from offshore buoys.", operations: ["marine_get_buoys"] },
     { id: "opw-water", name: "OPW Hydrometric Network", summary: "Live water levels and temperatures from about 460 gauges.", operations: ["water_find_stations", "water_get_level"] },
@@ -46,6 +48,8 @@ const SOURCE_FALLBACK = [
     { id: "citizens-info", name: "Citizens Information", optional: true, summary: "Optional pilot of indexed explanatory guidance, limited to ingested pages; verify the underlying legal provisions and source versions.", operations: ["citizens_info_search", "citizens_info_get_article"] }
   ] },
   { domain: "places/property", sources: [
+    { id: "failte-ireland", name: "Fáilte Ireland", summary: "Published accommodation and attractions CSV listings; not availability or a complete business inventory.", operations: ["failte_search"] },
+    { id: "logainm", name: "Logainm placenames", summary: "Bilingual placenames and coordinate accuracy; server-side Gaois key required.", operations: ["logainm_search_places"] },
     { id: "geohive", name: "Tailte Éireann GeoHive boundaries", summary: "County, constituency, electoral division, small-area and layer queries.", operations: ["geohive_boundaries_at_point", "geohive_locate", "geohive_list_layers", "geohive_query_layer"] },
     { id: "wikidata", name: "Wikidata Query Service", summary: "Irish place and entity facts from Wikidata.", operations: ["wikidata_place", "wikidata_entity"] },
     { id: "ppr", name: "Residential Property Price Register", summary: "Residential sale prices and median prices by area.", operations: ["ppr_search_sales", "ppr_price_stats"] },
@@ -58,6 +62,10 @@ const SOURCE_FALLBACK = [
 const DEFAULT_SOURCE_FALLBACK = SOURCE_FALLBACK.map((group) => ({ ...group, sources: group.sources.filter((source) => !source.optional) }));
 
 const SOURCE_DETAILS = {
+  "failte-ireland": { licence: "CC BY 4.0", example: "Find published attractions in Galway; listings do not show availability." },
+  "tfi-static": { licence: "CC BY 4.0", example: "Find static stop names and AtcoCodes near Heuston." },
+  gsi: { licence: "CC BY 4.0", example: "Show the groundwater vulnerability category at a Dublin point; screening only." },
+  logainm: { licence: "CC BY 4.0", example: "Find official Irish and English placenames after the operator configures a Gaois key." },
   ncse: { licence: "Creative Commons Attribution", example: "Find published special-education allocations for schools in Galway." },
   cso: { licence: "CC BY 4.0", example: "What was Galway’s population in Census 2022?" },
   "world-bank": { licence: "CC BY 4.0", example: "Show Ireland’s population trend from World Bank." },
@@ -99,7 +107,10 @@ const EXAMPLES = [
   { question: "Irish Rail departures from Connolly", source: "irish-rail", operation: "rail_get_departures", args: { station: "Dublin Connolly" } },
   { question: "Electricity grid status", source: "eirgrid", operation: "grid_get_status", args: {} },
   { question: "Property price stats for Galway", source: "ppr", operation: "ppr_price_stats", args: { county: "Galway" } },
-  { question: "Historical registered rents: Galway City two-bed apartments, 2025Q4", source: "cso", operation: "cso_get_data", args: { table_code: "RIQ02", filters: { STATISTIC: ["RIQ02"], "TLIST(Q1)": ["20254"], C02970V03592: ["02"], C02969V03591: ["04"], C03004V03625: ["141600"] }, limit: 5 } }
+  { question: "Historical registered rents: Galway City two-bed apartments, 2025Q4", source: "cso", operation: "cso_get_data", args: { table_code: "RIQ02", filters: { STATISTIC: ["RIQ02"], "TLIST(Q1)": ["20254"], C02970V03592: ["02"], C02969V03591: ["04"], C03004V03625: ["141600"] }, limit: 5 } },
+  { question: "Tourism attractions in Galway", source: "failte-ireland", operation: "failte_search", args: { dataset: "attractions", county: "Galway", limit: 5 } },
+  { question: "Static transport stops named Heuston", source: "tfi-static", operation: "tfi_static_search_stops", args: { name: "Heuston", limit: 5 } },
+  { question: "Groundwater vulnerability at a Dublin point", source: "gsi", operation: "groundwater_vulnerability_at", args: { lat: 53.3498, lon: -6.2603 } }
 ];
 
 const $ = (id) => document.getElementById(id);
@@ -233,6 +244,12 @@ const INSTALLERS = [
     actions: [{ text: "Install in Cursor", href: cursorLink }], copy: cursorLink, code: cursorLink
   },
   {
+    id: "codex", label: "Codex", title: "Codex", body: "Run the add command once. Then check the saved server with codex mcp get ireland. Start a new session and ask Codex to call ireland_catalogue to verify the connection.",
+    actions: [{ text: "Official Codex setup guide", href: "https://developers.openai.com/codex/mcp" }],
+    copy: `codex mcp add ireland --url ${endpoint}`,
+    code: `codex mcp add ireland --url ${endpoint}\n\n# Check the saved configuration\ncodex mcp get ireland\n\n# In a new Codex session, ask:\nCall ireland_catalogue and report the available sources.`
+  },
+  {
     id: "claude", label: "Claude", title: "Claude Web & Claude Code", body: "For claude.ai, add a custom connector with no authentication and paste the endpoint. For Claude Code, run the command below.",
     copy: `claude mcp add --transport http ireland ${endpoint}`,
     code: `claude mcp add --transport http ireland ${endpoint}\n\nclaude.ai → Settings → Connectors → Add custom connector\nName: Ireland MCP\nURL: ${endpoint}\nAuthentication: None`
@@ -328,7 +345,7 @@ function renderInstallers() {
   selectInstaller(INSTALLERS[0].id);
 }
 
-async function copyText(text) {
+async function copyText(text, status = $("copy-status")) {
   try {
     await navigator.clipboard.writeText(text);
   } catch {
@@ -343,18 +360,22 @@ async function copyText(text) {
       area.select();
       if (!document.execCommand("copy")) throw new Error("Clipboard access is unavailable.");
     } catch {
-      $("copy-status").textContent = "Copy unavailable. Select the configuration and copy it manually.";
+      status.textContent = "Copy unavailable. Select the text and copy it manually.";
       return false;
     } finally {
       area.remove();
       focused?.focus({ preventScroll: true });
     }
   }
-  $("copy-status").textContent = "Copied.";
+  status.textContent = "Copied.";
   return true;
 }
 
 document.addEventListener("click", async (event) => {
+  if (event.target.closest("#copy-agent-request")) {
+    await copyText($("agent-install-prompt").textContent, $("agent-copy-status"));
+    return;
+  }
   const installLink = event.target.closest("a[data-analytics-client]");
   if (installLink) analytics.capture("ireland_install_action", { client: installLink.dataset.analyticsClient, action: "open" });
   const target = event.target.closest("[data-copy], [data-copy-endpoint]");
@@ -363,6 +384,8 @@ document.addEventListener("click", async (event) => {
     analytics.capture("ireland_install_action", { client: target.dataset.analyticsClient || "endpoint", action: "copy" });
   }
 });
+
+$("copy-agent-request").hidden = false;
 
 function normaliseCatalogue(result) {
   const contentText = result?.content?.find?.((item) => item.type === "text")?.text;

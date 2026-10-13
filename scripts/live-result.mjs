@@ -23,7 +23,7 @@ export function assessResult(result, label = "", { requireOperationTag = true } 
   }
   if (result.isError) {
     const code = body.error?.code;
-    if (label.startsWith("nta/") && code === "NOT_CONFIGURED") return { status: "NOT_CONFIGURED", body };
+    if (["nta", "logainm"].includes(requestedSource) && code === "NOT_CONFIGURED") return { status: "NOT_CONFIGURED", body };
     if (label.startsWith("kohesio/") && code === "UPSTREAM_DOWN" && /HTTP 403/.test(body.error?.message ?? "")) {
       return { status: "HOSTED_BLOCKED", body };
     }
@@ -62,6 +62,9 @@ export function assessResult(result, label = "", { requireOperationTag = true } 
   if (!check || !check(data)) return fail(`Domain sample failed its acceptance check: ${operation ?? "unknown operation"}.`);
   if (["nearby", "ireland_snapshot"].includes(operation) && Object.values(data).some((value) => object(value) && value.error)) {
     return { status: "DEGRADED", body, reason: "A combined-source section is unavailable." };
+  }
+  if (operation === "groundwater_vulnerability_at" && (data.status === "incomplete" || body.truncated === true)) {
+    return { status: "DEGRADED", body, reason: "GSI transfer limits do not prove complete point coverage." };
   }
   if (body.stale === true) return { status: "DEGRADED", body, reason: "Stale cache is not fresh live proof." };
   return { status: "PASS", body };

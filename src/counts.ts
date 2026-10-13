@@ -1,11 +1,15 @@
 import { appModules, sourceModules } from "./registry.js";
 
 /**
- * Sources that do not work on the hosted Azure endpoint, and why. Kept here so every published
+ * Sources whose hosted access is blocked or not yet verified, and why. Kept here so every published
  * "N of M sources work hosted" number comes from one place (see docs/counts.json and src/counts.test.ts).
  */
 export const HOSTED_LIMITS: Record<string, string> = {
-  nta: "NTA realtime needs an operator key that the hosted service does not have."
+  nta: "NTA realtime needs an operator key that the hosted service does not have.",
+  "failte-ireland": "Fáilte exports passed local upstream checks; hosted access has not yet been verified.",
+  "tfi-static": "TFI static stops passed a local upstream check; hosted access has not yet been verified.",
+  gsi: "GSI lookup passed a local upstream check; hosted access has not yet been verified.",
+  logainm: "Logainm needs a Gaois operator account and LOGAINM_API_KEY; live access is unverified."
 };
 
 /** ireland_catalogue, ireland_describe, ireland_call, ireland_about. */

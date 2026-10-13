@@ -1,13 +1,17 @@
 {
-  "sources": 29,
+  "sources": 33,
   "hosted_working": 28,
   "hosted_limited": [
-    "nta"
+    "nta",
+    "failte-ireland",
+    "tfi-static",
+    "gsi",
+    "logainm"
   ],
-  "operations": 74,
-  "source_operations": 71,
+  "operations": 78,
+  "source_operations": 75,
   "cross_operations": 3,
   "default_tools": 7,
-  "all_tools": 80,
+  "all_tools": 84,
   "prompts": 3
 }

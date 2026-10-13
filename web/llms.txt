@@ -17,6 +17,7 @@ Install:
 - Cursor: cursor://anysphere.cursor-deeplink/mcp/install?name=ireland&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vbWNwLmlyaXNob3BlbmRhdGEuaWUvbWNwIn0=
 - Copilot CLI: copilot mcp add --transport http ireland https://mcp.irishopendata.ie/mcp
 - Claude Code: claude mcp add --transport http ireland https://mcp.irishopendata.ie/mcp
+- Codex: codex mcp add ireland --url https://mcp.irishopendata.ie/mcp. Check with codex mcp get ireland; start a new session and call ireland_catalogue.
 - Local stdio: npm package target `npx -y ireland-mcp` after npm publication; today use `npm ci && npm run build && node dist/src/cli.js` from source.
 
 Default tools:
@@ -36,6 +37,12 @@ Toolsets:
 Source domains: stats, law/politics, places/property, environment, transport, energy and economy. Data remains under each publisher licence; responses include source and licence metadata where available.
 
 ## Documentation
+
+For agent installation, read https://irishopendata.ie/AGENTS.md for the current
+client instructions. Preserve all existing servers and settings. Reuse a matching
+connection. Verify by calling ireland_catalogue through the installed connection.
+Saved configuration alone does not prove that the connection works. If client
+policy blocks setup, report the exact step and required user action.
 
 - [Agent installation guide](https://irishopendata.ie/AGENTS.md): client configuration, compact tool workflow and citation guidance.
 - [MCP server card](https://irishopendata.ie/.well-known/mcp/server-card.json): machine-readable service metadata.

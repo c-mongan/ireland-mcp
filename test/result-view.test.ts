@@ -89,6 +89,37 @@ describe("deterministic result previews", () => {
     expect(view("cso", "cso_get_data", { ...data, rows: [{ ...data.rows[0], value: null }] }).tables[0].rows[0][2]).toBe("Not reported");
     expect(view("cso", "cso_get_data", { ...data, code: "OTHER" }).tables).toEqual([]);
   });
+  it("shows tourism listings with unknown update dates and missing fields", () => {
+    const result = view("failte-ireland", "failte_search", { dataset: "attractions", source_updated_at: null, records: [{ name: "Sample Galway museum", county: "Galway", category: null, address: null }] }, { truncated: true });
+    expect(result.tables[0].rows[0]).toEqual(["Sample Galway museum", "Galway", "Not reported", "Not reported"]);
+    expect(result.description).toMatch(/opening hours/i);
+    expect(result.notices.join(" ")).toContain("Source update date: Not reported");
+    expect(result.notices.join(" ")).toContain("Truncated response");
+  });
+  it("keeps static stop identifiers and snapshot dates distinct from fetched time", () => {
+    const result = view("tfi-static", "tfi_static_search_stops", { snapshot_modified_at: "2026-01-01T11:00:00", fetched_at: "2026-01-02T12:00:00Z", stops: [{ name: "Heuston Station", atco_code: "SAMPLE01", plate_code: null, status: "active" }] });
+    expect(result.tables[0].rows[0]).toEqual(["Heuston Station", "SAMPLE01", "Not reported", "active"]);
+    expect(result.description).toContain("not live services");
+    expect(result.notices.join(" ")).toContain("2026-01-01T11:00:00");
+    expect(result.notices.join(" ")).toContain("time zone is not supplied");
+    expect(result.notices.join(" ")).toContain("2026-01-02");
+  });
+  it("shows groundwater screening categories without implying engineering approval", () => {
+    const result = view("gsi", "groundwater_vulnerability_at", { status: "matched", map_scale: "1:40000", dataset_revision: null, areas: [{ id: "SAMPLE1", category: "H", description: "High" }] }, { stale: true });
+    expect(result.tables[0].rows[0]).toEqual(["SAMPLE1", "H", "High"]);
+    expect(result.description).toContain("1:40000");
+    expect(result.description).toContain("site investigation");
+    expect(result.notices.join(" ")).toContain("Dataset revision: Not reported");
+    expect(result.notices.join(" ")).toContain("Stale response");
+    expect(view("gsi", "groundwater_vulnerability_at", { status: "outside_coverage", areas: [] }).title).toBe("No mapped area in this response");
+  });
+  it.each([
+    ["failte-ireland", "failte_search", { records: [{ unexpected: true }] }],
+    ["tfi-static", "tfi_static_search_stops", { stops: [{ lat: 53 }] }],
+    ["gsi", "groundwater_vulnerability_at", { areas: [{ geometry: {} }] }]
+  ])("uses raw fallback for unfamiliar %s shapes", (source, operation, data) => {
+    expect(view(source as string, operation as string, data).tables).toEqual([]);
+  });
   it("never shows a data preview for a tool error even when it contains data", () => {
     const result = buildResultView({ ...metadata, data: [{ title: "Table" }] }, { source: "cso", operation: "cso_search_tables", isError: true });
     expect(result.tables).toEqual([]);

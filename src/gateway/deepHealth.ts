@@ -46,7 +46,14 @@ const USER_AGENT = "ireland-mcp-healthcheck/1.0 (+https://github.com/c-mongan/ir
 /** One cheap, real request per source: small documents or metadata endpoints only. */
 export function defaultProbes(env: Record<string, string | undefined>): Probe[] {
   const ntaKey = env.NTA_API_KEY;
+  const logainmKey = env.LOGAINM_API_KEY?.trim();
   return [
+    { source: "failte-ireland", url: "https://failteireland.azure-api.net/opendata-api/v2/accommodation/csv" },
+    { source: "tfi-static", url: "https://www.transportforireland.ie/transitData/Data/NaPTAN.json" },
+    { source: "gsi", url: "https://gsi.geodata.gov.ie/server/rest/services/Groundwater/IE_GSI_Groundwater_Vulnerability_40K_IE26_ITM/MapServer/0?f=json" },
+    logainmKey
+      ? { source: "logainm", url: "https://www.logainm.ie/api/v1.0/?Query=Gaillimh&PerPage=1", headers: { "X-Api-Key": logainmKey } }
+      : { source: "logainm", url: "https://www.logainm.ie/api/v1.0/", skip: "LOGAINM_API_KEY not set" },
     { source: "cso", url: `${CSO_REST}/PxStat.Data.Cube_API.ReadMetadata/F1001/JSON-stat/2.0/en` },
     { source: "world-bank", url: "https://data360api.worldbank.org/data360/data?DATABASE_ID=WB_WDI&INDICATOR=WB_WDI_SP_POP_TOTL&REF_AREA=IRL&top=1" },
     { source: "eurostat", url: "https://ec.europa.eu/eurostat/api/dissemination/catalogue/toc/txt?lang=en" },
