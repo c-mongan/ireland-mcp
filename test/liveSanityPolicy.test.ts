@@ -6,7 +6,7 @@ import { fixturePath } from "./helpers/callTool.js";
 import { fakeFetch } from "./helpers/fakeFetch.js";
 import { connectClient } from "./helpers/mcpClient.js";
 // @ts-expect-error -- plain ESM script without type declarations
-import { assessSmokeResult, classify, exitCode, KNOWN_FLAKY, ntaSummarySample } from "../scripts/live-sanity-policy.mjs";
+import { assessSmokeResult, classify, exitCode, KNOWN_FLAKY, ntaSummarySample, publicSourceCases } from "../scripts/live-sanity-policy.mjs";
 
 type Result = { source: string; tool: string; status: string; ms: number; note: string };
 const row = (source: string, status: string, note = ""): Result => ({ source, tool: "t", status, ms: 1, note });
@@ -115,4 +115,19 @@ describe("live smoke policy", () => {
     expect(exitCode([row("cso", "FAIL"), row("kohesio", "WARN")])).toBe(1);
     expect(exitCode([row("kohesio", "WARN"), row("kohesio", "WARN")])).toBe(1);
   });
+});
+
+it("new public-source smoke cases are bounded and Logainm is key gated", async () => {
+  const cases = publicSourceCases as [string, string, { limit: number }, (data: Record<string, unknown>) => boolean, { needsEnv: string }?][];
+  expect(cases.map(([source]) => source)).toEqual(["failte-ireland", "tfi-static", "gsi", "logainm"]);
+  for (const [, , args, check] of cases) {
+    expect(args.limit).toBeGreaterThan(0);
+    expect(args.limit).toBeLessThanOrEqual(10);
+    expect(check({})).toBeFalsy();
+  }
+  expect(cases[3]![4]).toEqual({ needsEnv: "LOGAINM_API_KEY" });
+  expect(cases[0]![3]({ records: [{ name: "Test" }] })).toBe(true);
+  expect(cases[1]![3]({ stops: [{ atco_code: "TEST", name: "Test" }] })).toBe(true);
+  expect(cases[2]![3]({ status: "matched", areas: [{ category: "L" }] })).toBe(true);
+  expect(cases[3]![3]({ places: [{ id: 1, names: [{ wording: "Test" }] }] })).toBe(true);
 });

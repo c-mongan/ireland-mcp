@@ -4,12 +4,13 @@ export function mergeGate(receipt, state) {
   if (receipt?.status !== 'complete' || receipt?.reviewer !== 'codex' || !Array.isArray(receipt?.findings) || receipt.findings.length !== 0) reasons.push('Review is incomplete or has findings.');
   if (!/^[a-f0-9]{40}$/.test(receipt?.base ?? '') || !/^[a-f0-9]{40}$/.test(receipt?.head ?? '') || receipt.head !== state?.head || receipt.head !== state?.localHead || receipt.base !== state?.base) reasons.push('Review does not match the current base and head.');
   if (!Array.isArray(receipt?.checks) || receipt.checks.length === 0 || receipt.checks.some(c => c.passed !== true || c.head !== receipt.head)) reasons.push('Local checks have not passed at the reviewed head.');
+  if (![null, '', 'APPROVED'].includes(state?.reviewDecision)) reasons.push('GitHub review approval is missing, blocking, or unknown.');
   if (state?.dirty !== false || state?.sameRepository !== true || state?.draft !== false || state?.mergeable !== true || state?.requiredChecksPassed !== true || state?.unresolvedThreads !== 0 || state?.changesRequested !== false) reasons.push('PR state is not ready to merge.');
   return { allowed: reasons.length === 0, reasons };
 }
 
-function safePath(path) {
-  return typeof path === 'string' && path.length > 0 && !path.startsWith('/') && !path.includes('\\') && !path.split('/').some(p => p === '..' || p === '.' || p === '.git' || p === '') && ![...path].some(character => character.charCodeAt(0) < 32);
+export function safePath(path) {
+  return typeof path === 'string' && path.length > 0 && !path.startsWith('/') && !path.includes(':') && !path.includes('\\') && !path.split('/').some(p => p === '..' || p === '.' || p === '.git' || p === '') && ![...path].some(character => character.charCodeAt(0) < 32);
 }
 function scope(paths, allowed) {
   return Array.isArray(paths) && paths.every(p => safePath(p) && allowed.includes(p));

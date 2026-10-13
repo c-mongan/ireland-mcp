@@ -4,7 +4,7 @@ import { mergeGate } from '../scripts/review-loop/coordinator.mjs';
 const sha = 'a'.repeat(40);
 const base = 'b'.repeat(40);
 const receipt = { base, head: sha, status: 'complete', findings: [], reviewer: 'codex', checks: [{ name: 'test', passed: true, head: sha }] };
-const state = { worktreeDigest: 'fixture-tree', base, head: sha, localHead: sha, dirty: false, sameRepository: true, draft: false, mergeable: true, requiredChecksPassed: true, unresolvedThreads: 0, changesRequested: false };
+const state = { worktreeDigest: 'fixture-tree', base, head: sha, localHead: sha, dirty: false, sameRepository: true, draft: false, mergeable: true, requiredChecksPassed: true, unresolvedThreads: 0, changesRequested: false, reviewDecision: null };
 test('clean review of the exact PR commit permits a merge plan', () => {
   assert.deepEqual(mergeGate(receipt, state), { allowed: true, reasons: [] });
 });
@@ -184,8 +184,111 @@ test('a repair that restores base content keeps the same tested digest after com
     assert.equal(committed.worktreeDigest, tested.worktreeDigest);
     writeFileSync(source, 'export const value = 99;\n');
     assert.notEqual((await runner.snapshot()).worktreeDigest, tested.worktreeDigest);
+    // Exercise real process boundaries using a local fake CLI, never a paid call.
+    const { localReview } = await import('../scripts/review-loop/local-review.mjs');
+    writeFileSync(source, 'export const value = 0;\n');
+    const currentHead = git(['rev-parse', 'HEAD']);
+    writeFileSync(join(cwd, '.git', 'info', 'exclude'), '.env\nnode_modules/\n');
+    mkdirSync(join(cwd, 'node_modules'));
+    writeFileSync(join(cwd, '.env'), 'original');
+    const observed = join(fixture, 'observed.json');
+    const oldKey = process.env.OPENAI_API_KEY;
+    const oldCloud = process.env.AZURE_CLIENT_SECRET;
+    try {
+      process.env.OPENAI_API_KEY = 'synthetic-paid-key';
+      process.env.AZURE_CLIENT_SECRET = 'synthetic-cloud-key';
+      writeFileSync(join(bin, 'codex'), `#!/usr/bin/env node
+import { writeFileSync } from 'node:fs';
+const args = process.argv.slice(2);
+writeFileSync(${JSON.stringify(observed)}, JSON.stringify(process.env));
+writeFileSync(args[args.indexOf('--output-last-message') + 1], ${JSON.stringify(JSON.stringify({ base, head: currentHead, status: 'complete', reviewer: 'codex', findings: [] }))});
+`, { mode: 0o700 });
+      localReview({ cwd, base, head: currentHead, output: join(fixture, 'local-receipt.json'), allowedPaths: ['src/tool.js'] });
+      const { readFileSync } = await import('node:fs');
+      const env = JSON.parse(readFileSync(observed, 'utf8'));
+      assert.equal(env.OPENAI_API_KEY, undefined);
+      assert.equal(env.AZURE_CLIENT_SECRET, undefined);
+      for (const target of ['.env', 'node_modules/dependency.js']) {
+        writeFileSync(join(bin, 'codex'), `#!/usr/bin/env node
+import { writeFileSync } from 'node:fs';
+writeFileSync(${JSON.stringify(join(cwd, target))}, 'outside-scope');
+`, { mode: 0o700 });
+        const guarded = createRunner({ pr: '85', scope, receipts: join(fixture, 'guarded'), apply: true, push: true }, cwd);
+        await assert.rejects(guarded.repair({ review: { findings: [] }, state: { head: currentHead } }), /protected files/);
+        await assert.rejects(guarded.check({ head: currentHead }), /protected files/);
+        await assert.rejects(guarded.publish({ state: {} }), /protected files/);
+        if (target === '.env') writeFileSync(join(cwd, target), 'original');
+        else rmSync(join(cwd, target));
+      }
+    } finally {
+      if (oldKey === undefined) delete process.env.OPENAI_API_KEY; else process.env.OPENAI_API_KEY = oldKey;
+      if (oldCloud === undefined) delete process.env.AZURE_CLIENT_SECRET; else process.env.AZURE_CLIENT_SECRET = oldCloud;
+    }
+
   } finally {
     process.env.PATH = oldPath;
     rmSync(fixture, { recursive: true, force: true });
+  }
+});
+
+for (const reviewDecision of ['REVIEW_REQUIRED', 'CHANGES_REQUESTED', 'UNKNOWN', undefined]) {
+  test(`merge gate blocks GitHub review decision ${reviewDecision}`, () => {
+    assert.equal(mergeGate(receipt, { ...state, reviewDecision }).allowed, false);
+  });
+}
+test('Windows absolute review inputs and outside receipt directories are accepted', async () => {
+  const { reviewCommand } = await import('../scripts/review-loop/commands.mjs');
+  const { win32 } = await import('node:path');
+  const command = reviewCommand({ base, head: sha, cwd: 'C:/repo', schema: 'C:/private/schema.json', output: 'C:/private/review.json', paths: win32 });
+  assert.ok(command.args.includes('C:/repo'));
+  const safety = await import('../scripts/review-loop/run.mjs');
+  assert.equal(typeof safety.isOutsideRepository, 'function');
+  assert.equal(safety.isOutsideRepository('C:/repo', 'C:/receipts', win32), true);
+  assert.equal(safety.isOutsideRepository('C:/repo', 'D:/receipts', win32), true);
+  for (const output of ['C:/repo', 'C:/repo/receipts']) assert.equal(safety.isOutsideRepository('C:/repo', output, win32), false);
+});
+test('Codex environment drops paid authentication and cloud credentials on both runners', async () => {
+  const safety = await import('../scripts/review-loop/run.mjs');
+  assert.equal(typeof safety.codexEnvironment, 'function');
+  const env = safety.codexEnvironment({ PATH: '/bin', HOME: '/user', SystemRoot: 'C:/Windows', TEMP: 'C:/tmp', OPENAI_API_KEY: 'secret', AZURE_CLIENT_SECRET: 'secret', GH_TOKEN: 'secret', NODE_OPTIONS: '--require evil.js' });
+  assert.deepEqual(env, { PATH: '/bin', HOME: '/user', SystemRoot: 'C:/Windows', TEMP: 'C:/tmp' });
+  const { readFileSync } = await import('node:fs');
+  const local = readFileSync(new URL('../scripts/review-loop/local-review.mjs', import.meta.url), 'utf8');
+  assert.match(local, /env: codexEnvironment\(\)/);
+});
+test('protected digest detects ignored edits, creation, deletion, mode and symlink changes', async () => {
+  const safety = await import('../scripts/review-loop/run.mjs');
+  assert.equal(typeof safety.protectedDigest, 'function');
+  const { mkdtempSync, mkdirSync, writeFileSync, rmSync, chmodSync, symlinkSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const root = mkdtempSync(join(tmpdir(), 'protected-review-'));
+  try {
+    mkdirSync(join(root, '.git')); mkdirSync(join(root, 'node_modules'));
+    writeFileSync(join(root, 'task.js'), 'task');
+    writeFileSync(join(root, '.env'), 'original');
+    const original = safety.protectedDigest(root, ['task.js']);
+    writeFileSync(join(root, 'task.js'), 'repair');
+    writeFileSync(join(root, '.git', 'index'), 'host staging');
+    assert.equal(safety.protectedDigest(root, ['task.js']), original);
+    writeFileSync(join(root, '.env'), 'changed');
+    assert.notEqual(safety.protectedDigest(root, ['task.js']), original);
+    writeFileSync(join(root, '.env'), 'original');
+    const dependency = join(root, 'node_modules', 'dependency.js');
+    writeFileSync(dependency, 'malicious');
+    assert.notEqual(safety.protectedDigest(root, ['task.js']), original);
+    rmSync(dependency); chmodSync(join(root, '.env'), 0o700);
+    assert.notEqual(safety.protectedDigest(root, ['task.js']), original);
+    rmSync(join(root, '.env'));
+    assert.notEqual(safety.protectedDigest(root, ['task.js']), original);
+    symlinkSync('/tmp', join(root, 'task.js.link'));
+    assert.throws(() => safety.protectedDigest(root, ['task.js']), /symlink/i);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('repair scope rejects Windows drives, alternate data streams and absolute paths', async () => {
+  const { runLoop } = await import('../scripts/review-loop/coordinator.mjs');
+  for (const path of ['C:/outside.js', 'C:outside.js', 'src/file.js:secret', '//host/share/file.js']) {
+    await assert.rejects(runLoop({ allowedPaths: [path] }, {}), /Invalid loop scope/);
   }
 });

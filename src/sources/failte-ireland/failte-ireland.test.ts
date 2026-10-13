@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { createContext, HOUR } from "../../gateway/context.js";
 import { describe, expect, it } from "vitest";
@@ -96,4 +97,11 @@ describe("Fáilte Ireland public CSV", () => {
     expect(result.ok).toBe(false);
     expect(result.body.error).toMatchObject({code:"UPSTREAM_DOWN",message:"Fáilte Ireland returned an invalid CSV export."});
   });
+});
+
+it("captured accommodation owners are synthetic and documented", () => {
+  const fixture = readFileSync(new URL('./fixtures/accommodation.csv', import.meta.url), 'utf8');
+  const rows = fixture.trim().split('\n').slice(1);
+  for (const row of rows) expect(row.split(',')[10]).toBe('"Synthetic Owner"');
+  expect(readFileSync(new URL('./fixtures/README.md', import.meta.url), 'utf8')).toContain('synthetic');
 });

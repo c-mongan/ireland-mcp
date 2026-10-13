@@ -84,3 +84,29 @@ node --test test/review-loop.mjs
 ```
 
 The deterministic tests prove the coordinator's state transitions and merge refusals. They do not prove a live Codex response, GitHub setting, PR publication, push, or merge. Run one fresh local CLI review and one representative hosted review to establish those separate integration results.
+
+## Repair boundaries and required approvals
+
+Both local review entry points pass the same minimal process environment to
+Codex. API keys, GitHub tokens, cloud secrets and executable injection variables
+are not inherited. The existing CLI account login remains required; these tests
+use a fake CLI and do not establish real subscription authentication.
+
+Before repair, the host fingerprints all non-task workspace files, including
+ignored configuration, dependencies and generated output. It also fingerprints
+Git config and hooks. A change, addition, deletion or mode change outside scope
+stops the loop before checks or publication. Internal symlinks are covered by
+traversal of their targets; external, dangling and task-file symlinks are refused.
+This verifies modifications after repair; it does not roll them back. Inspect and
+restore a rejected workspace before retrying. Use a standalone checkout.
+
+During host validation, only `dist`, `storybook-static`, `test-results`,
+`playwright-report` and `coverage` may be regenerated outside task scope.
+Configuration and dependencies remain fingerprinted after each check. After
+successful checks, the full fingerprint is refreshed for publication. The runner
+still requires a fresh review of each published commit.
+
+GitHub `REVIEW_REQUIRED`, `CHANGES_REQUESTED` and unknown decisions block merge
+readiness. `APPROVED` or an explicit empty/null decision for a repository without
+required reviews must also satisfy every existing check and thread condition.
+Windows drive paths and receipt containment use platform path semantics.

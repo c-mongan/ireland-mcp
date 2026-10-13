@@ -1,6 +1,7 @@
-export function reviewCommand({ base, head, schema, output, cwd }) {
+import path from 'node:path';
+export function reviewCommand({ base, head, schema, output, cwd, paths = path }) {
   if (![base, head].every(s => /^[a-f0-9]{40}$/.test(s ?? ''))) throw new Error('Use full 40-character Git commit hashes.');
-  if (![schema, output, cwd].every(s => typeof s === 'string' && s.startsWith('/'))) throw new Error('Use absolute workspace, schema, and receipt paths.');
+  if (![schema, output, cwd].every(s => typeof s === 'string' && paths.isAbsolute(s))) throw new Error('Use absolute workspace, schema, and receipt paths.');
   return {
     file: 'codex',
     args: ['exec', '--ignore-user-config', '--ephemeral', '-c', 'approval_policy="never"', '--sandbox', 'read-only', '--cd', cwd, '--output-schema', schema, '--output-last-message', output, '-'],

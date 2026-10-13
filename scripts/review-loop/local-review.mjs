@@ -1,8 +1,9 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync, mkdirSync, existsSync, chmodSync } from 'node:fs';
-import { dirname, resolve, relative, isAbsolute } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { reviewCommand } from './commands.mjs';
+import { codexEnvironment, isOutsideRepository } from './safety.mjs';
 import { validateReview } from './coordinator.mjs';
 
 function git(cwd, args) {
@@ -19,8 +20,7 @@ export function localReview({ cwd, base, head, output, allowedPaths }) {
   const root = git(cwd, ['rev-parse', '--show-toplevel']);
   cwd = resolve(root);
   output = resolve(output);
-  const outputRelative = relative(cwd, output);
-  if (!outputRelative.startsWith(`..${process.platform === 'win32' ? '\\' : '/'}`) && !isAbsolute(outputRelative)) throw new Error('Keep review receipts outside the repository.');
+  if (!isOutsideRepository(cwd, output)) throw new Error('Keep review receipts outside the repository.');
   if (existsSync(output)) throw new Error('Use a fresh receipt path. Do not reuse a previous review.');
   const schema = fileURLToPath(new URL('./review.schema.json', import.meta.url));
   const command = reviewCommand({ cwd, base, head, schema, output });
@@ -30,7 +30,7 @@ export function localReview({ cwd, base, head, output, allowedPaths }) {
   const paths = git(cwd, ['diff', '--name-only', '-z', `${base}...${head}`]).split('\0').filter(Boolean);
   if (paths.some(path => !allowedPaths.includes(path))) throw new Error('PR contains a path outside the allowed scope.');
   mkdirSync(dirname(output), { recursive: true, mode: 0o700 });
-  const result = spawnSync(command.file, command.args, { cwd, input: command.input, stdio: ['pipe', 'ignore', 'ignore'], timeout: 15 * 60_000 });
+  const result = spawnSync(command.file, command.args, { cwd, env: codexEnvironment(), input: command.input, stdio: ['pipe', 'ignore', 'ignore'], timeout: 15 * 60_000 });
   if (result.status !== 0) throw new Error('Codex did not complete. Receipt is not a review pass.');
   const after = snapshot(cwd);
   if (after.head !== head || after.dirty) throw new Error('Checkout changed during review.');

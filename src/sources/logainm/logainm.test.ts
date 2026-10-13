@@ -158,4 +158,27 @@ describe("Logainm search", () => {
     }
     expect(fetch.calls).toHaveLength(2);
   });
+  it.each([
+    { TotalCount: 5, TotalPages: 3, CurrentPage: 1, CountPerPage: 2, Results: [place] },
+    { TotalCount: 5, TotalPages: 3, CurrentPage: 2, CountPerPage: 2, Results: [place] },
+    { TotalCount: 6, TotalPages: 3, CurrentPage: 3, CountPerPage: 2, Results: [place] },
+    { TotalCount: 5, TotalPages: 3, CurrentPage: 3, CountPerPage: 2, Results: [place, place] },
+    { TotalCount: 5, TotalPages: 3, CurrentPage: 4, CountPerPage: 2, Results: [place] }
+  ])("rejects incomplete or overfilled pages without caching: %j", async payload => {
+    const fetch = fakeFetch([{ match: /api\/v1/, body: JSON.stringify(payload) }]);
+    const ctx = createContext({ fetch, env });
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const result = await callTool(mod, "logainm_search_places", { query: "Dublin", page: payload.CurrentPage, limit: 2 }, ctx);
+      expect(result.ok).toBe(false);
+      expect(result.body.error.code).toBe("UPSTREAM_DOWN");
+    }
+    expect(fetch.calls).toHaveLength(2);
+  });
+  it.each([3, 4])("accepts exact final and beyond-final page sizes: page %i", async requested => {
+    const payload = { TotalCount: 5, TotalPages: 3, CurrentPage: requested, CountPerPage: 2, Results: requested === 3 ? [place] : [] };
+    const result = await callTool(mod, "logainm_search_places", { query: "Dublin", page: requested, limit: 2 }, fakeFetch([{ match: /api\/v1/, body: JSON.stringify(payload) }]), env);
+    expect(result.ok).toBe(true);
+    expect(result.body.data.next_page).toBeNull();
+  });
+
 });

@@ -71,7 +71,7 @@ export const logainmModule: SourceModule = {
       url.searchParams.set("Page", String(page));
       url.searchParams.set("PerPage", String(limit));
       if (place_id !== undefined) url.searchParams.set("PlaceID", String(place_id));
-      const r = await ctx.cache.getOrLoad(`logainm:places:v2:${url}`, DAY, async () => {
+      const r = await ctx.cache.getOrLoad(`logainm:places:v3:${url}`, DAY, async () => {
         let raw: unknown;
         try {
           raw = await ctx.http.json(url.toString(), {
@@ -90,7 +90,7 @@ export const logainmModule: SourceModule = {
         const result = pageSchema.safeParse(dictionaryKeys(raw));
         if (!result.success || result.data.CurrentPage !== page || result.data.CountPerPage !== limit
           || result.data.TotalPages !== Math.ceil(result.data.TotalCount / limit)
-          || (result.data.TotalCount > 0 && result.data.CurrentPage <= result.data.TotalPages && result.data.Results.length === 0)
+          || (result.data.Results.length !== Math.max(0, Math.min(limit, result.data.TotalCount - (page - 1) * limit)))
           || result.data.Results.length > limit || result.data.Results.length > result.data.TotalCount) throw new ToolError("UPSTREAM_DOWN", "Logainm returned malformed place data.", { retryable: false });
         return { ...result.data, retrievedAt: ctx.now().toISOString() };
       });
