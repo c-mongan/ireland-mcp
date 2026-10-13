@@ -142,3 +142,50 @@ test('required checks must succeed and cannot replace baseline hosted jobs', asy
   assert.equal(checksPassed(required, green.filter(c => c.name !== 'storybook')), false);
   assert.equal(checksPassed(required, [...green, { __typename: 'CheckRun', name: 'required-security-check', status: 'COMPLETED', conclusion: 'SUCCESS' }]), true);
 });
+
+test('a repair that restores base content keeps the same tested digest after commit', async () => {
+  const { createRunner } = await import('../scripts/review-loop/run.mjs');
+  const { mkdtempSync, mkdirSync, writeFileSync, rmSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const { execFileSync } = await import('node:child_process');
+  const fixture = mkdtempSync(join(tmpdir(), 'ireland-review-regression-'));
+  const cwd = join(fixture, 'repo');
+  const bin = join(fixture, 'bin');
+  const oldPath = process.env.PATH;
+  const git = args => execFileSync('git', ['-c', 'core.hooksPath=/dev/null', '-c', 'commit.gpgSign=false', ...args], { cwd, encoding: 'utf8' }).trim();
+  try {
+    mkdirSync(cwd); mkdirSync(bin); mkdirSync(join(cwd, 'src'));
+    git(['init', '-b', 'fixture-owner-branch']);
+    const source = join(cwd, 'src/tool.js');
+    writeFileSync(source, 'export const value = 0;\n');
+    git(['add', '--', 'src/tool.js']);
+    git(['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '-m', 'base']);
+    const base = git(['rev-parse', 'HEAD']);
+    writeFileSync(source, 'export const value = 1;\n');
+    git(['add', '--', 'src/tool.js']);
+    git(['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '-m', 'bug']);
+    const head = git(['rev-parse', 'HEAD']);
+    git(['remote', 'add', 'origin', 'https://github.com/c-mongan/ireland-mcp.git']);
+    const pr = { baseRefOid: base, headRefOid: head, headRefName: 'fixture-owner-branch', headRepositoryOwner: { login: 'c-mongan' }, state: 'OPEN', isCrossRepository: false, isDraft: false, mergeable: 'MERGEABLE', reviewDecision: '', statusCheckRollup: ['build', 'storybook', 'legal-contracts'].map(name => ({ __typename: 'CheckRun', name, status: 'COMPLETED', conclusion: 'SUCCESS' })) };
+    const responses = { repository: 'c-mongan/ireland-mcp', pr, threads: { data: { repository: { pullRequest: { reviewThreads: { nodes: [], pageInfo: { hasNextPage: false } } } } } } };
+    writeFileSync(join(bin, 'gh'), `#!/usr/bin/env node\nconst responses = ${JSON.stringify(responses)};\nconst args = process.argv.slice(2);\nif (args[0] === 'repo') console.log(responses.repository);\nelse if (args[0] === 'api') console.log(JSON.stringify(responses.threads));\nelse if (args[1] === 'checks') console.log('[]');\nelse console.log(JSON.stringify(responses.pr));\n`, { mode: 0o700 });
+    process.env.PATH = `${bin}:${oldPath}`;
+    const scope = join(fixture, 'scope.json');
+    writeFileSync(scope, JSON.stringify(['src/tool.js']));
+    const runner = createRunner({ pr: '85', scope, receipts: join(fixture, 'receipts') }, cwd);
+    writeFileSync(source, 'export const value = 0;\n');
+    const tested = await runner.snapshot();
+    assert.deepEqual(tested.changedPaths, ['src/tool.js']);
+    git(['add', '--', 'src/tool.js']);
+    git(['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '-m', 'restore base content']);
+    const committed = await runner.snapshot();
+    assert.deepEqual(committed.changedPaths, []);
+    assert.equal(committed.worktreeDigest, tested.worktreeDigest);
+    writeFileSync(source, 'export const value = 99;\n');
+    assert.notEqual((await runner.snapshot()).worktreeDigest, tested.worktreeDigest);
+  } finally {
+    process.env.PATH = oldPath;
+    rmSync(fixture, { recursive: true, force: true });
+  }
+});

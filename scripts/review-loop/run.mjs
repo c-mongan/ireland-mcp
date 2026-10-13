@@ -56,6 +56,8 @@ export function createRunner(options, cwd = process.cwd()) {
   if (!['https://github.com/c-mongan/ireland-mcp.git', 'https://github.com/c-mongan/ireland-mcp', 'git@github.com:c-mongan/ireland-mcp.git'].includes(origin)) throw new Error('Origin is not the supported repository.');
   const allowedPaths = JSON.parse(readFileSync(resolve(options.scope), 'utf8'));
   if (!Array.isArray(allowedPaths) || allowedPaths.length === 0 || allowedPaths.some(p => typeof p !== 'string' || p.startsWith('/') || p.split('/').some(v => ['', '.', '..', '.git'].includes(v)) || p.includes('\\'))) throw new Error('Use exact safe repository paths in scope JSON.');
+  // Keep the tested content set stable when a repair removes a path from the PR diff.
+  const digestPaths = [...new Set(allowedPaths)].sort();
   const receipts = resolve(options.receipts);
   const rel = relative(cwd, receipts);
   if (!rel.startsWith('../') && !isAbsolute(rel)) throw new Error('Receipts must be outside the repository.');
@@ -77,6 +79,8 @@ export function createRunner(options, cwd = process.cwd()) {
     const digest = createHash('sha256');
     for (const path of changedPaths) {
       if (!allowedPaths.includes(path)) throw new Error(`Changed path outside scope: ${path}`);
+    }
+    for (const path of digestPaths) {
       try {
         const metadata = lstatSync(resolve(cwd, path));
         if (!metadata.isFile()) throw new Error('Only regular task files are supported.');

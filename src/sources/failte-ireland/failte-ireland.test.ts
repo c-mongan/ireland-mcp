@@ -11,7 +11,9 @@ const attractions = '\uFEFF"Name","Url","Telephone","Latitude","Longitude","Addr
 
 describe("Fáilte Ireland public CSV", () => {
   it("searches accommodation by name and county with public source evidence", async () => {
-    const fetch = fakeFetch([{ match: /^https:\/\/failteireland.azure-api.net\/opendata-api\/v2\/accommodation\/csv$/, body: accommodation }]);
+    const endpoint = /^https:\/\/failteireland\.azure-api\.net\/opendata-api\/v2\/accommodation\/csv$/;
+    expect(endpoint.test("https://failteirelandXazure-apiYnet/opendata-api/v2/accommodation/csv")).toBe(false);
+    const fetch = fakeFetch([{ match: endpoint, body: accommodation }]);
     const r = await callTool<{data: {records: unknown[]; total: number}; licence: string; url: string}>(failteIreland, "failte_search", { dataset: "accommodation", query: "harbour", county: "Galway" }, fetch);
     expect(r.ok).toBe(true);
     expect(r.body.data.records).toEqual([{name:"Harbour Hotel",county:"Galway",category:"Hotel",registration_number:"H1",rating:"4 Star",address:"Quay",town:"Galway",eircode:"H91 ABCD",latitude:53.27,longitude:-9.05,total_units:12}]);
