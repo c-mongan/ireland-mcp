@@ -59,6 +59,12 @@ test("cube keyboard rotation pauses motion and offscreen animation stops", async
   const before = await pixels();
   await canvas.press("ArrowLeft");
   expect(await pixels()).not.toBe(before);
+  const untilted = await pixels();
+  await canvas.press("ArrowUp");
+  expect(await pixels()).not.toBe(untilted);
+  const tilted = await pixels();
+  await canvas.press("ArrowDown");
+  expect(await pixels()).not.toBe(tilted);
   await page.getByRole("button", { name: "Rotate cube" }).click();
   await page.locator("#install").scrollIntoViewIfNeeded();
   await page.waitForTimeout(150);
