@@ -336,6 +336,9 @@ select { text-overflow: ellipsis; }
 .cube-accent button:hover, .cube-accent button:focus-visible { background: #14271d; border-color: #385744; text-decoration: none; }
 @media (max-width: 760px) {
   .hero-grid { gap: .5rem; min-height: 0; }
+  .hero .hero-kicker { margin-bottom: .75rem; }
+  .hero .lede { margin-block: .85rem 1.1rem; }
+  .hero .hero-reassurance { margin-top: .6rem; }
   .hero-proof { grid-template-columns: minmax(0, 1fr); gap: 1rem; margin-top: .5rem; padding-block: 1rem; }
   .demo-preview-media { width: 136px; height: 77px; }
   .demo-shortcut .text-link { font-size: .95rem; }
