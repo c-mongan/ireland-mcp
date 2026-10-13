@@ -63,7 +63,7 @@ p { max-width: 70ch; text-wrap: pretty; }
 .hero { position: relative; isolation: isolate; padding: 1.5rem 0 1rem; background: #07110e; color: var(--hero-ink); }
 .hero-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 1.5rem; min-height: 380px; align-items: center; }
 .hero-copy { min-width: 0; }
-.site-header { width: 100%; padding-inline: max(2rem, calc((100% - 1200px) / 2)); background: #07110e; border-bottom: 1px solid #203528; }
+.site-header.wrap { width: 100%; padding-inline: max(2rem, calc((100% - 1200px) / 2)); background: #07110e; border-bottom: 1px solid #203528; }
 .site-header .brand, .site-header .theme-toggle { color: #f0f6f2; }
 .site-header .mark { color: #a4e8bf; }
 .site-header .nav-links a { color: #c8ded0; }
