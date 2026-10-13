@@ -154,6 +154,11 @@ describe("UpstreamBudgets", () => {
 });
 
 describe("sourceForUrl", () => {
+  it("applies separate provider budgets to the new public sources", () => {
+    expect(sourceForUrl("https://failteireland.azure-api.net/opendata-api/v2/accommodation/csv")).toBe("failte-ireland");
+    expect(sourceForUrl("https://www.transportforireland.ie/transitData/test.json")).toBe("tfi-static");
+    expect(sourceForUrl("https://gsi.geodata.gov.ie/server/rest/services/Groundwater/test/query")).toBe("gsi");
+  });
   it("maps upstream hosts to source ids", () => {
     expect(sourceForUrl("https://ws.cso.ie/public/api.jsonrpc")).toBe("cso");
     expect(sourceForUrl("https://opendata.ncse.ie/api/test")).toBe("ncse");

@@ -73,6 +73,9 @@ function populatePlayground(section, state) {
     weather: { source: "met-eireann", operation: "met_get_warnings", args: {}, label: "Sample weather warnings", payload: { ...cso, source: "Met Éireann", url: "https://www.met.ie/warnings", attribution: "Met Éireann. Fixed sample warning for visual review.", data: { count: 1, warnings: [{ headline: "Sample heavy rain warning", level: "Yellow", onset: "2026-01-01T06:00:00Z", expiry: "2026-01-01T18:00:00Z" }] } } },
     transport: { source: "luas", operation: "luas_get_forecast", args: { stop: "HEU" }, label: "Sample Luas arrivals", payload: { ...cso, source: "Luas Forecasting API", url: "https://luas.ie/", attribution: "Luas. Fixed sample arrivals for visual review.", data: { stop: { name: "Heuston" }, message: "Sample forecast. Check the operator before travel.", inbound: [{ destination: "The Point", due_in_min: 4 }], outbound: [{ destination: "Tallaght", due_in_min: 7 }] } } },
     rent: { operation: "cso_get_data", args: { table_code: "RIQ02", filters: { STATISTIC: ["RIQ02"], "TLIST(Q1)": ["20254"], C02970V03592: ["02"], C02969V03591: ["04"], C03004V03625: ["141600"] }, limit: 5 }, label: "Sample historical registered-tenancy rent", payload: { ...cso, url: "https://data.cso.ie/table/RIQ02", data: { code: "RIQ02", title: "RTB Average Monthly Rent Report", rows: [{ STATISTIC: "RTB Average Monthly Rent Report", Quarter: "2025Q4", "Number of Bedrooms": "Two bed", "Property Type": "Apartment", Location: "Galway City", value: 1672.57, unit: "Euro" }], total_rows: 1 } } },
+    tourism: { source: "failte-ireland", operation: "failte_search", args: { dataset: "attractions", county: "Galway", limit: 5 }, label: "Sample Galway tourism listings", payload: { ...cso, source: "Fáilte Ireland", url: "https://www.failteireland.ie/en/info/open-data", attribution: "Fáilte Ireland. Synthetic listings for visual review.", data: { dataset: "attractions", source_updated_at: null, records: [{ name: "Sample Galway attraction", county: "Galway", category: "Museum", address: null }] } } },
+    "static-stops": { source: "tfi-static", operation: "tfi_static_search_stops", args: { name: "Heuston", limit: 5 }, label: "Sample static transport stops", payload: { ...cso, source: "Transport for Ireland NaPTAN stop records", url: "https://www.transportforireland.ie/transitData/PT_Data.html", attribution: "National Transport Authority. Synthetic stop record for visual review.", cached: true, stale: true, data: { snapshot_modified_at: "2025-12-01T10:00:00", fetched_at: "2026-01-01T12:00:00Z", stops: [{ name: "Sample Heuston stop", atco_code: "SAMPLE-ATCO-001", plate_code: null, status: "active" }] } } },
+    groundwater: { source: "gsi", operation: "groundwater_vulnerability_at", args: { lat: 53.3498, lon: -6.2603 }, label: "Sample groundwater screening", payload: { ...cso, source: "Geological Survey Ireland", url: "https://data.gov.ie/dataset/groundwater-vulnerability-140000-ireland-roi-itm", attribution: "Geological Survey Ireland. Synthetic category for visual review; not a Dublin map result.", truncated: true, data: { status: "matched", map_scale: "1:40000", dataset_revision: null, areas: [{ id: "SAMPLE-AREA", category: "H", description: "High" }] } } },
     error: { payload: { error: { code: "UPSTREAM_ERROR", message: "Sample error: The source is temporarily unavailable. Please try again." } } }
   };
   const fixture = states[state];
@@ -85,7 +88,7 @@ function populatePlayground(section, state) {
   required(section, "#pg-source").setAttribute("value", source);
   required(section, "#pg-operation").setAttribute("value", operation);
   required(section, "#pg-args").textContent = JSON.stringify(fixture.args || { query: "population", limit: 5 }, null, 2);
-  const exampleIndex = { weather: "2", transport: "1", rent: "6" }[state] || "0";
+  const exampleIndex = { weather: "2", transport: "1", rent: "6", tourism: "7", "static-stops": "8", groundwater: "9" }[state] || "0";
   for (const button of section.querySelectorAll(".sample-request")) button.setAttribute("aria-pressed", String(button.dataset.exampleIndex === exampleIndex));
   required(section, "#pg-request-label").textContent = state === "idle" ? "No sample request has run yet." : `Sample request: ${source} · ${operation}`;
   required(section, "#response-area").setAttribute("aria-busy", String(state === "loading"));
@@ -156,6 +159,7 @@ export function sectionDocument({ section: sectionId, theme, state = "idle" }) {
     if (previewImg) previewImg.src = demoPoster;
   }
   if (sectionId === "install") populateInstaller(section, required(source, 'meta[name="mcp-endpoint"]').content);
+  if (sectionId === "agent-docs") required(section, "#copy-agent-request").hidden = false;
   if (sectionId === "directory") populateDirectory(section);
   if (sectionId === "playground") populatePlayground(section, state);
   if (sectionId === "status") populateStatus(section, state);

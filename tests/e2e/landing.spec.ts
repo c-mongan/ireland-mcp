@@ -71,12 +71,42 @@ test("serves llms.txt, AGENTS.md and server card", async ({ request }) => {
   const instructions = await agents.text();
   expect(instructions).toContain("claude mcp add --transport http ireland https://mcp.irishopendata.ie/mcp");
   expect(instructions).toContain("copilot mcp add --transport http ireland https://mcp.irishopendata.ie/mcp");
+  expect(instructions).toContain("codex mcp add ireland --url https://mcp.irishopendata.ie/mcp");
+  expect(instructions).toContain("Preserve all existing servers");
   const card = await request.get("/.well-known/mcp.json");
   await expect(card).toBeOK();
   expect((await card.json()).transports[0].url).toBe("https://mcp.irishopendata.ie/mcp");
   const serverCard = await request.get("/.well-known/mcp/server-card.json");
   await expect(serverCard).toBeOK();
   expect(await serverCard.text()).toContain("https://mcp.irishopendata.ie/mcp");
+});
+
+test("Codex setup and agent handoff can be copied and verified", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto("/#install");
+  await page.getByRole("tab", { name: "Codex", exact: true }).click();
+  await expect(page.locator("#install-panel pre")).toContainText("codex mcp add ireland --url https://mcp.irishopendata.ie/mcp");
+  await expect(page.locator("#install-panel pre")).toContainText("codex mcp get ireland");
+  await page.getByRole("button", { name: "Copy Config", exact: true }).click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("codex mcp add ireland --url https://mcp.irishopendata.ie/mcp");
+  const handoff = page.locator("#agent-install-prompt");
+  await expect(handoff).toBeVisible();
+  await expect(handoff).toContainText("https://irishopendata.ie/AGENTS.md");
+  await expect(handoff).toContainText("Preserve all existing servers");
+  await expect(handoff).toContainText("ireland_catalogue");
+  await page.getByRole("button", { name: "Copy agent request", exact: true }).click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(await handoff.innerText());
+});
+
+test("agent handoff and Codex command remain readable without JavaScript", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 320, height: 800 } });
+  const page = await context.newPage();
+  await page.goto("/#agent-docs");
+  await expect(page.locator("#agent-install-prompt")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Copy agent request", exact: true })).toBeHidden();
+  await expect(page.locator("#install")).toContainText("codex mcp add ireland --url https://mcp.irishopendata.ie/mcp");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await context.close();
 });
 
 test("playground calls ireland_call against mocked MCP route", async ({ page }) => {

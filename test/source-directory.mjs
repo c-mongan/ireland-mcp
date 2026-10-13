@@ -11,6 +11,7 @@ class Element {
   setAttribute() {}
 }
 const app = readFileSync(new URL("../web/app.js", import.meta.url), "utf8");
+const counts = JSON.parse(readFileSync(new URL("../docs/counts.json", import.meta.url), "utf8"));
 const data = app.slice(app.indexOf("const SOURCE_FALLBACK ="), app.indexOf("const EXAMPLES ="));
 const renderer = app.slice(app.indexOf("function normaliseCatalogue("), app.indexOf("function renderExamples("));
 function render(domains) {
@@ -24,7 +25,8 @@ const contents = (node) => [node.textContent, ...node.children.map(contents)].jo
 
 test("the static directory keeps the default source profile when legal availability is unknown", () => {
   const cards = render();
-  assert.equal(cards.length, 30, "29 default sources plus the cross-source combiner");
+  assert.equal(cards.length, counts.sources + 1, "Default sources plus the cross-source combiner");
+  for (const name of ["Fáilte Ireland", "NaPTAN", "Geological Survey Ireland", "Logainm"]) assert.ok(cards.some(card => contents(card).includes(name)), `${name} is discoverable in the static fallback`);
   assert.ok(cards.every((card) => !/optional pilot/i.test(contents(card))));
 });
 

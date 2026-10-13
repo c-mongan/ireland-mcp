@@ -20,6 +20,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
+      - run: npm run test:review-loop
       - run: npm run test:coverage
       - name: Validate renderer output safety
         run: npm run test:media

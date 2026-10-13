@@ -33,6 +33,10 @@ import { kohesioModule } from "./sources/kohesio/index.js";
 import { pobalModule } from "./sources/pobal/index.js";
 import { worldBankModule } from "./sources/world-bank/index.js";
 import { createLegalModules } from "./sources/irish-legal/index.js";
+import { failteIreland } from "./sources/failte-ireland/index.js";
+import { tfiStaticModule } from "./sources/tfi-static/index.js";
+import { gsiModule } from "./sources/gsi/index.js";
+import { logainmModule } from "./sources/logainm/index.js";
 
 export const sourceModules: SourceModule[] = [
   csoModule,
@@ -64,6 +68,10 @@ export const sourceModules: SourceModule[] = [
   environmentSitesModule,
   tedModule,
   bikesModule,
+  failteIreland,
+  tfiStaticModule,
+  gsiModule,
+  logainmModule,
   ...(process.env.LEGAL_ENABLED === "true" ? createLegalModules() : [])
 ];
 

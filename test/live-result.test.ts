@@ -10,6 +10,10 @@ const result = (body: unknown, isError = false) => ({ content: [{ type: "text", 
 const envelope = { operation: "met_get_warnings", data: { count: 0, warnings: [] }, source: "Met Éireann", url: "https://www.met.ie/", licence: "CC BY 4.0", attribution: "Met Éireann", retrieved_at: "2026-10-07T08:00:00Z", cached: false, truncated: false };
 
 describe("live result acceptance", () => {
+  it("does not count an incomplete empty GSI response as healthy coverage", () => {
+    const body = { ...envelope, operation: "groundwater_vulnerability_at", truncated: true, data: { status: "incomplete", areas: [], map_scale: "1:40000", limitation: "Screening only" } };
+    expect(assessResult(result(body), "gsi/groundwater_vulnerability_at").status).toBe("DEGRADED");
+  });
   it.each([{}, { data: {} }, { ...envelope, data: {} }, { ...envelope, source: "" }, { ...envelope, data: { count: 1 } }])("rejects malformed successful payloads", (body) => {
     expect(assessResult(result(body), "met-eireann/met_get_warnings").status).toBe("FAIL");
   });
