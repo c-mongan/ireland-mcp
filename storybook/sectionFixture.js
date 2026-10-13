@@ -1,3 +1,4 @@
+import cubePoster from "../web/ireland-cube.svg?inline";
 import pageHtml from "../web/index.html?raw";
 import siteCss from "../web/styles.css?raw";
 import demoCss from "./demo.css?raw";
@@ -150,6 +151,9 @@ export function sectionDocument({ section: sectionId, theme, state = "idle" }) {
   for (const element of section.querySelectorAll("script, noscript, video")) element.remove();
   if (sectionId === "top") {
     required(section, "#live-label").textContent = "Sample Server Online";
+    required(section, "#cube-poster").src = cubePoster;
+    const previewImg = section.querySelector(".demo-preview-media img");
+    if (previewImg) previewImg.src = demoPoster;
   }
   if (sectionId === "install") populateInstaller(section, required(source, 'meta[name="mcp-endpoint"]').content);
   if (sectionId === "directory") populateDirectory(section);

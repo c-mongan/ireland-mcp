@@ -15,8 +15,9 @@ export function initDemoPlayer(root = document) {
   if (fallback) fallback.hidden = true;
   close.hidden = false;
   video.hidden = false;
-  opener.addEventListener("click", () => {
-    returnFocus = opener;
+  const previewMedia = root.querySelector(".demo-preview-media");
+  function openDemo(trigger) {
+    returnFocus = trigger;
     if (!loaded) {
       video.poster = "media/chatgpt-demo-poster.jpg";
       video.src = "media/chatgpt-demo.mp4";
@@ -24,6 +25,11 @@ export function initDemoPlayer(root = document) {
       loaded = true;
     }
     dialog.showModal();
+  }
+  opener.addEventListener("click", () => openDemo(opener));
+  previewMedia?.addEventListener("click", (event) => {
+    event.preventDefault();
+    openDemo(previewMedia);
   });
   close.addEventListener("click", () => dialog.close());
   dialog.addEventListener("close", () => {

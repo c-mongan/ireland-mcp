@@ -22,7 +22,7 @@ test("demo media is lazy and user controlled, with captions and a dated transcri
   await expect(video).not.toHaveAttribute("src");
   await expect(video).not.toHaveAttribute("poster");
   await expect(video.locator("track")).not.toHaveAttribute("src");
-  expect(requests).toEqual([]);
+  expect(requests.filter(url => !url.endsWith("chatgpt-demo-poster.jpg"))).toEqual([]);
   await page.getByRole("button", { name: "Watch the ChatGPT demo" }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(video).toHaveAttribute("src", "media/chatgpt-demo.mp4");
