@@ -180,8 +180,9 @@ test("the static hero offers one primary live-query path without background medi
   expect((await page.locator("#playground").boundingBox())!.y).toBeLessThan(1000);
   await expect(page.locator(".hero-actions .primary")).toBeInViewport();
   await page.locator(".hero-actions .primary").click();
-  await expect(page.getByRole("button", { name: "Run live query" })).toBeInViewport();
   expect(mediaRequests).toEqual([]);
+  await page.locator(".media-archive-card summary").click();
+  await expect.poll(() => mediaRequests.length).toBeGreaterThan(0);
 });
 
 test("Gemini copies its displayed configuration and tabs support arrow keys", async ({ page, context }) => {

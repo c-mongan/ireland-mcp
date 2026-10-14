@@ -31,31 +31,60 @@ export function initIrelandCube() {
 
   function draw() {
     context.clearRect(0, 0, 360, 216);
+
+    // Subtle elliptical depth pedestal beneath the cube
+    context.save();
+    context.beginPath();
+    context.ellipse(180, 202, 110, 10, 0, 0, Math.PI * 2);
+    context.fillStyle = "rgba(10, 24, 18, 0.4)";
+    context.fill();
+    context.restore();
+
     for (const face of cubeFaces(yaw, pitch)) {
       context.beginPath();
       face.points.forEach((p, i) => i ? context.lineTo(p.x, p.y) : context.moveTo(p.x, p.y));
       context.closePath();
-      context.fillStyle = "#102219";
+      context.fillStyle = "#0e1e16";
       context.fill();
-      context.globalAlpha = .45 + (face.detail % 4) * .12;
+
+      // Face color with depth modulation for 3D realism
+      const depthBoost = Math.max(0.4, Math.min(0.95, 0.55 + face.depth * 0.08));
+      context.globalAlpha = Math.min(0.9, (.42 + (face.detail % 4) * .12) * depthBoost);
       context.fillStyle = face.color;
       context.fill();
       context.globalAlpha = 1;
+
+      // Outer face border
       context.strokeStyle = face.color;
-      context.lineWidth = .65;
+      context.lineWidth = .75;
       context.stroke();
+
       const detail = faceDetail(face);
-      context.fillStyle = "#132920";
+
+      // Microchip sub-panels
+      context.fillStyle = "#11261d";
       for (const panel of detail.panels) {
         context.beginPath();
         panel.forEach((p, i) => i ? context.lineTo(p.x, p.y) : context.moveTo(p.x, p.y));
         context.closePath();
         context.fill();
       }
+
+      // Glowing circuit trace data bus
       context.beginPath();
       detail.trace.forEach((p, i) => i ? context.lineTo(p.x, p.y) : context.moveTo(p.x, p.y));
-      context.lineWidth = .35;
+      context.strokeStyle = face.color;
+      context.lineWidth = .55;
       context.stroke();
+
+      // Micro data node at the circuit trace junction
+      const node = detail.trace[1];
+      if (node) {
+        context.beginPath();
+        context.arc(node.x, node.y, 1.2, 0, Math.PI * 2);
+        context.fillStyle = face.color;
+        context.fill();
+      }
     }
   }
 
