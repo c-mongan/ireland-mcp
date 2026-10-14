@@ -1,72 +1,72 @@
 {
   "status": "ok",
-  "checked_at": "2026-10-14T07:30:06.776Z",
+  "checked_at": "2026-10-14T13:03:56.319Z",
   "cached": false,
   "sources": [
     {
       "source": "cso",
       "status": "up",
-      "latencyMs": 679,
+      "latencyMs": 249,
       "httpStatus": 200
     },
     {
       "source": "world-bank",
       "status": "up",
-      "latencyMs": 481,
+      "latencyMs": 249,
       "httpStatus": 200
     },
     {
       "source": "eurostat",
       "status": "up",
-      "latencyMs": 210,
+      "latencyMs": 175,
       "httpStatus": 200
     },
     {
       "source": "ecb",
       "status": "up",
-      "latencyMs": 295,
+      "latencyMs": 244,
       "httpStatus": 200
     },
     {
       "source": "pobal",
       "status": "up",
-      "latencyMs": 253,
+      "latencyMs": 354,
       "httpStatus": 200
     },
     {
       "source": "oireachtas",
       "status": "up",
-      "latencyMs": 199,
+      "latencyMs": 186,
       "httpStatus": 200
     },
     {
       "source": "geohive",
       "status": "up",
-      "latencyMs": 1351,
+      "latencyMs": 1267,
       "httpStatus": 200
     },
     {
       "source": "wikidata",
       "status": "up",
-      "latencyMs": 490,
+      "latencyMs": 1168,
       "httpStatus": 200
     },
     {
       "source": "data-gov-ie",
       "status": "up",
-      "latencyMs": 302,
+      "latencyMs": 221,
       "httpStatus": 200
     },
     {
       "source": "ncse",
       "status": "up",
-      "latencyMs": 357,
+      "latencyMs": 275,
       "httpStatus": 200
     },
     {
       "source": "cro",
       "status": "up",
-      "latencyMs": 454,
+      "latencyMs": 342,
       "httpStatus": 200
     },
     {
@@ -78,13 +78,13 @@
     {
       "source": "smart-dublin",
       "status": "up",
-      "latencyMs": 379,
+      "latencyMs": 354,
       "httpStatus": 200
     },
     {
       "source": "met-eireann",
       "status": "up",
-      "latencyMs": 426,
+      "latencyMs": 372,
       "httpStatus": 200
     },
     {
@@ -96,90 +96,90 @@
     {
       "source": "legislation",
       "status": "up",
-      "latencyMs": 379,
+      "latencyMs": 342,
       "httpStatus": 200
     },
     {
       "source": "ppr",
       "status": "up",
-      "latencyMs": 395,
+      "latencyMs": 365,
       "httpStatus": 200
     },
     {
       "source": "irish-rail",
       "status": "up",
-      "latencyMs": 425,
+      "latencyMs": 371,
       "httpStatus": 200
     },
     {
       "source": "luas",
       "status": "up",
-      "latencyMs": 396,
+      "latencyMs": 583,
       "httpStatus": 200
     },
     {
       "source": "eirgrid",
       "status": "up",
-      "latencyMs": 427,
+      "latencyMs": 468,
       "httpStatus": 200
     },
     {
       "source": "marine",
       "status": "up",
-      "latencyMs": 542,
+      "latencyMs": 537,
       "httpStatus": 200
     },
     {
       "source": "opw-water",
       "status": "up",
-      "latencyMs": 1414,
+      "latencyMs": 969,
       "httpStatus": 200
     },
     {
       "source": "planning",
       "status": "up",
-      "latencyMs": 411,
+      "latencyMs": 430,
       "httpStatus": 200
     },
     {
       "source": "census-areas",
       "status": "up",
-      "latencyMs": 577,
+      "latencyMs": 483,
       "httpStatus": 200
     },
     {
       "source": "epa",
       "status": "up",
-      "latencyMs": 460,
+      "latencyMs": 498,
       "httpStatus": 200
     },
     {
       "source": "heritage",
       "status": "up",
-      "latencyMs": 484,
+      "latencyMs": 479,
       "httpStatus": 200
     },
     {
       "source": "environment-sites",
       "status": "up",
-      "latencyMs": 432,
+      "latencyMs": 430,
       "httpStatus": 200
     },
     {
       "source": "ted",
       "status": "up",
-      "latencyMs": 505,
+      "latencyMs": 586,
       "httpStatus": 200
     },
     {
       "source": "bikes",
       "status": "up",
-      "latencyMs": 620,
+      "latencyMs": 535,
       "httpStatus": 200
     }
   ],
   "name": "ireland-mcp",
   "version": "1.1.4",
   "breakers": {},
-  "fetched_at": "2026-10-14T07:30:04.666Z"
+  "fetched_at": "2026-10-14T13:03:49.513Z"
 }
