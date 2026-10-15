@@ -207,7 +207,7 @@ The default profile registers 29 source modules in `src/registry.ts`. The defaul
 
 - `GET /healthz` is fast liveness; `GET /healthz?deep=1` performs one cheap check per source.
 - A status workflow publishes [`status/status.json`](https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json) and 7-day history.
-- OpenTelemetry can export MCP semantic-convention spans and operation-duration metrics to Azure Monitor.
+- OpenTelemetry can export MCP semantic-convention spans and operation-duration metrics to Azure Monitor. Optional Datadog export adds the same traces and correlated structured error events; see [observability](docs/observability.md).
 - Tool logs and telemetry avoid argument values and IP addresses. See [PRIVACY.md](PRIVACY.md).
 - Optional PostHog usage metrics and Chromatic visual checks are described in [observability](docs/observability.md) and the [quality loop](docs/quality-loop.md).
 - Browser CORS is restricted by `MCP_ALLOWED_ORIGINS`; non-browser MCP clients are unaffected.

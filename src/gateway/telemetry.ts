@@ -1,4 +1,5 @@
 import { capturePostHog } from "./posthog.js";
+import { recordDatadogError } from "./datadog.js";
 
 export interface ToolCallEvent {
   tool: string;
@@ -19,6 +20,7 @@ export type TelemetrySink = (event: ToolCallEvent) => void;
 export const consoleSink: TelemetrySink = (event) => {
   if (process.env.IRELAND_MCP_TELEMETRY === "off") return;
   console.error(JSON.stringify({ type: "tool_call", ...event }));
+  if (event.outcome === "error") recordDatadogError("tool_call", { ...event });
   capturePostHog(event);
 };
 
@@ -33,4 +35,5 @@ export function reportHandlerError(handler: "healthResponse" | "mcpHandler" | "h
   if (error instanceof SyntaxError) errorType = "SyntaxError";
   if (error instanceof RangeError) errorType = "RangeError";
   console.error(JSON.stringify({ type: "handler_error", handler, errorType }));
+  recordDatadogError("handler_error", { handler, errorType });
 }

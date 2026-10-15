@@ -8,6 +8,30 @@ Browser opt-in   → known action      → bounded capture → PostHog dashboard
 Storybook state  → screenshot        → Chromatic visual review
 ```
 
+## Optional Datadog traces and errors
+
+Datadog can receive the existing manual MCP and upstream spans. A failed tool call also emits a structured error event with its trace and span IDs. This gives a request path from the MCP method to the source, cache and upstream HTTP call. Error spans include the error type and stack frames with code locations. Exception messages, prompts, argument values, result bodies and raw console logs are excluded. Device log collection and browser RUM are separate and are not enabled by this exporter.
+
+| Setting | Value |
+| --- | --- |
+| `IRELAND_MCP_DATADOG` | `on` enables export; the default is off. |
+| `DD_API_KEY` | Ingestion key from the existing secret configuration. Never put it in Git or browser settings. |
+| `DD_SITE` | Datadog site, such as `datadoghq.com`. |
+| `DD_SERVICE` | Service name; default `ireland-mcp`. |
+| `DD_ENV` | Environment; default `development`. Set `production` only on the hosted service. |
+| `DD_VERSION` | Optional deployed revision. |
+| `IRELAND_MCP_AZURE_RESOURCE_ID` | Optional Azure Function resource ID for serverless attribution. |
+
+Export uses Datadog's HTTPS OTLP ingest endpoint. Azure Monitor can remain enabled; both exporters use the same spans. No Datadog Agent is required in the Function. `IRELAND_MCP_OTEL=off` disables both exporters. `IRELAND_MCP_TELEMETRY=off` also suppresses structured tool and handler error events. Remove the Datadog opt-in to stop Datadog export without changing Azure Monitor.
+
+The trace and error queues each hold at most 512 records and export batches of at most 32. The handler allows up to 1.5 seconds for Datadog export before it returns. Export is best effort: a timeout, queue limit or worker reset can lose records. An exporter failure must not change the tool result. No durable log queue or raw log capture is added.
+
+The optional `IRELAND_MCP_DATADOG_OTLP_ENDPOINT` override accepts HTTP loopback addresses only. It is for local transport tests. Do not set it on a hosted Function.
+
+Before rollout, run the integration tests, then send a known synthetic failure to the intended sandbox. Confirm that the root span, upstream spans and error event share a trace ID. Local transport tests do not prove Datadog ingestion or production deployment. Follow the configured Datadog retention and access controls; sandbox users with access can read these records.
+
+Reference: [Datadog serverless OTLP ingest](https://docs.datadoghq.com/opentelemetry/setup/otlp_ingest/serverless/).
+
 ## PostHog setup
 
 Use a dedicated Ireland MCP project. Enable **Discard IP data** in that project. The event payload also sets `$geoip_disable: true`, `$ip: "0.0.0.0"`, and `$process_person_profile: false`. No person profiles or user accounts are identified.

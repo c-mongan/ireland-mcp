@@ -77,6 +77,12 @@
     "@azure/storage-blob": "^12.34.0",
     "@modelcontextprotocol/sdk": "^1.32.1",
     "@opentelemetry/api": "1.9.1",
+    "@opentelemetry/exporter-logs-otlp-http": "0.221.0",
+    "@opentelemetry/exporter-trace-otlp-http": "0.221.0",
+    "@opentelemetry/resources": "2.11.0",
+    "@opentelemetry/sdk-logs": "0.221.0",
+    "@opentelemetry/sdk-trace-base": "2.11.0",
+    "@opentelemetry/sdk-trace-node": "2.11.0",
     "fast-xml-parser": "^5.11.2",
     "lru-cache": "^11.5.3",
     "zod": "^4.6.5"
@@ -86,7 +92,6 @@
     "@eslint/js": "^10.0.1",
     "@opentelemetry/context-async-hooks": "2.11.0",
     "@opentelemetry/sdk-metrics": "2.11.0",
-    "@opentelemetry/sdk-trace-base": "2.11.0",
     "@playwright/test": "^1.63.0",
     "@storybook/addon-mcp": "^10.6.1",
     "@storybook/react-vite": "^10.6.1",
@@ -104,4 +109,3 @@
     "vitest": "^5.0.3"
   }
 }
-

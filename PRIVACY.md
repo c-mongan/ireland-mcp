@@ -14,6 +14,8 @@ no personal data. This page lists exactly what the hosted endpoint records.
 | Upstream calls: source id, host name, HTTP method, status, cache hit/stale | Client spans (`ireland_mcp.source.id`), `http.client.request.duration` | Same |
 | MCP session id, if a client sends one | Span attribute `mcp.session.id` (the server is stateless and issues none) | Same |
 
+When explicitly enabled, Datadog also receives the manual spans and structured tool or handler error events. These records include error types and stack frames with code locations, but exclude exception messages and request or result content. Retention follows the Datadog organisation settings. Users with access to that organisation can read the records. See [setup and controls](docs/observability.md#optional-datadog-traces-and-errors).
+
 ## What is never recorded
 
 - **Argument values.** Search terms, place names, coordinates, Eircodes and table codes
@@ -46,9 +48,6 @@ and latency to the public `status` branch. It contains no client data.
 
 ## Turning telemetry off
 
-Telemetry export only runs when `APPLICATIONINSIGHTS_CONNECTION_STRING` is set. Set
-`IRELAND_MCP_OTEL=off` to disable it on a deployment that has one, and
-`IRELAND_MCP_TELEMETRY=off` to silence the stderr tool-call lines. Local stdio use sends
-nothing anywhere.
+Azure export runs when `APPLICATIONINSIGHTS_CONNECTION_STRING` is set. Datadog export requires both `IRELAND_MCP_DATADOG=on` and `DD_API_KEY`. Set `IRELAND_MCP_OTEL=off` to disable both exporters. Set `IRELAND_MCP_TELEMETRY=off` to silence stderr tool-call lines and structured error events. Local stdio use sends nothing anywhere.
 
 Questions or concerns: open an issue, or see [SECURITY.md](SECURITY.md) for private reports.

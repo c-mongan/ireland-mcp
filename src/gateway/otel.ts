@@ -10,6 +10,7 @@ import {
   type Span,
   type Tracer
 } from "@opentelemetry/api";
+import { createDatadogRuntime } from "./datadog.js";
 
 const SCOPE = "ireland-mcp";
 
@@ -59,7 +60,14 @@ export async function withSpan<T>(
     try {
       return await fn(span);
     } catch (error) {
-      span.setAttribute("error.type", errorType(error));
+      const type = errorType(error);
+      span.setAttribute("error.type", type);
+      if (error instanceof Error) span.recordException({
+        name: type,
+        message: type,
+        // Stack frames identify code locations without copying the exception message.
+        stack: error.stack?.split("\n").filter((line) => /^\s+at /.test(line)).join("\n").slice(0, 8192)
+      });
       span.setStatus({ code: SpanStatusCode.ERROR });
       throw error;
     } finally {
@@ -83,24 +91,35 @@ let started: Promise<boolean> | undefined;
  * is off: all spans come from this codebase, which keeps URLs, IPs and arguments out.
  */
 export function initTelemetry(env: Record<string, string | undefined> = process.env): Promise<boolean> {
-  started ??= start(env).catch((error: unknown) => {
-    console.warn(`[ireland-mcp] telemetry disabled: ${error instanceof Error ? error.message : String(error)}`);
+  started ??= start(env).catch(() => {
+    console.warn("[ireland-mcp] telemetry disabled");
     return false;
   });
   return started;
 }
 
 async function start(env: Record<string, string | undefined>): Promise<boolean> {
-  if (!telemetryEnabled(env)) return false;
+  if (env.IRELAND_MCP_OTEL === "off") return false;
+  // An optional Datadog failure must not disable the existing Azure exporter.
+  const datadog = await createDatadogRuntime(env).catch(() => {
+    console.warn("[ireland-mcp] Datadog telemetry disabled");
+    return undefined;
+  });
+  if (!env.APPLICATIONINSIGHTS_CONNECTION_STRING) {
+    if (!datadog) return false;
+    const { NodeTracerProvider } = await import("@opentelemetry/sdk-trace-node");
+    new NodeTracerProvider({ resource: datadog.resource, spanProcessors: [datadog.spanProcessor] }).register();
+    return true;
+  }
   env.OTEL_SERVICE_NAME ??= "ireland-mcp";
   const { useAzureMonitor } = await import("@azure/monitor-opentelemetry");
   const credential = usesEntraAuth(env) ? await managedIdentity(env) : undefined;
-  useAzureMonitor(azureMonitorOptions(env, credential));
+  useAzureMonitor({ ...azureMonitorOptions(env, credential), ...(datadog ? { spanProcessors: [datadog.spanProcessor], resource: datadog.resource } : {}) });
   return true;
 }
 
 export function telemetryEnabled(env: Record<string, string | undefined>): boolean {
-  return Boolean(env.APPLICATIONINSIGHTS_CONNECTION_STRING) && env.IRELAND_MCP_OTEL !== "off";
+  return (Boolean(env.APPLICATIONINSIGHTS_CONNECTION_STRING) || (env.IRELAND_MCP_DATADOG === "on" && Boolean(env.DD_API_KEY))) && env.IRELAND_MCP_OTEL !== "off";
 }
 
 function usesEntraAuth(env: Record<string, string | undefined>): boolean {

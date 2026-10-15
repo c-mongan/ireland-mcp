@@ -3,6 +3,7 @@ import { createContext } from "../gateway/context.js";
 import { handleMcpHttp, mcpResponseHeaders } from "../gateway/httpHandler.js";
 import { isOriginAllowed, parseAllowedOrigins } from "../gateway/origin.js";
 import { initTelemetry } from "../gateway/otel.js";
+import { flushDatadog } from "../gateway/datadog.js";
 import { limitFromEnv, RateLimiter } from "../gateway/rateLimit.js";
 import { tableStoreFromEnv } from "../gateway/tableStore.js";
 import { consoleSink, reportHandlerError } from "../gateway/telemetry.js";
@@ -23,8 +24,8 @@ configurePostHog(new Map([
   ])]
 ]));
 
-// No-op unless APPLICATIONINSIGHTS_CONNECTION_STRING is set; never blocks a request.
-void initTelemetry();
+// No-op unless an exporter is configured. Keep the first request's spans as well.
+const telemetryReady = initTelemetry();
 
 const store = tableStoreFromEnv();
 const context = createContext({ budgets: sharedBudgets(), ...(store ? { store } : {}) });
@@ -37,6 +38,7 @@ export async function mcpHandler(request: HttpRequest): Promise<HttpResponseInit
   const origin = request.headers.get("origin");
   const headers = mcpResponseHeaders(origin, allowedOrigins);
   try {
+    await telemetryReady;
     return await handleRequest(request, origin, headers);
   } catch (error) {
     reportHandlerError("mcpHandler", error);
@@ -46,8 +48,8 @@ export async function mcpHandler(request: HttpRequest): Promise<HttpResponseInit
       jsonBody: { jsonrpc: "2.0", error: { code: -32603, message: "Internal server error." }, id: null }
     };
   } finally {
-    // Azure can freeze a worker after the response. Flush within the invocation, with a 500 ms bound.
-    await flushPostHog();
+    // Azure can freeze a worker after the response. PostHog has a 500 ms bound; Datadog has a 1.5 s bound.
+    await Promise.all([flushPostHog(), flushDatadog()]);
   }
 }
 
