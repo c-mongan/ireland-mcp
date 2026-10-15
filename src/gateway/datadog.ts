@@ -49,7 +49,15 @@ export async function createDatadogRuntime(env: Env): Promise<DatadogRuntime | u
   ]);
   const batch = { maxQueueSize: 512, maxExportBatchSize: 32, scheduledDelayMillis: 1000, exportTimeoutMillis: 1000 };
   const resource = resourceFromAttributes(config.resourceAttributes);
-  const spanProcessor = new BatchSpanProcessor(new OTLPTraceExporter({ url: config.endpoint + "/v1/traces", headers: config.headers, timeoutMillis: 1000 }), batch);
+  const traceBatch = new BatchSpanProcessor(new OTLPTraceExporter({ url: config.endpoint + "/v1/traces", headers: config.headers, timeoutMillis: 1000 }), batch);
+  // Azure SDKs can create native spans even with automatic instrumentation off.
+  // Export only this service's manual spans; leave Azure's own processors unchanged.
+  const spanProcessor: SpanProcessor = {
+    onStart(span, parentContext) { if (span.instrumentationScope.name === "ireland-mcp") traceBatch.onStart(span, parentContext); },
+    onEnd(span) { if (span.instrumentationScope.name === "ireland-mcp") traceBatch.onEnd(span); },
+    forceFlush: () => traceBatch.forceFlush(),
+    shutdown: () => traceBatch.shutdown()
+  };
   const logProcessor = new BatchLogRecordProcessor({ exporter: new OTLPLogExporter({ url: config.endpoint + "/v1/logs", headers: config.headers, timeoutMillis: 1000 }), ...batch });
   const loggerProvider = new LoggerProvider({ resource, processors: [logProcessor] });
   const logger = loggerProvider.getLogger("ireland-mcp");

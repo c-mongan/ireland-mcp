@@ -41,6 +41,7 @@ describe("Datadog export", () => {
     const provider = new NodeTracerProvider({ spanProcessors: [runtime!.spanProcessor], resource: runtime!.resource });
     provider.register();
     try {
+      trace.getTracer("azure-sdk-fixture").startSpan("normal cache miss", { attributes: { "url.full": "https://private-cache.invalid/secret-row-key" } }).end();
       vi.spyOn(console, "error").mockImplementation(() => undefined);
       const ctx = createContext({ fetch: async () => new Response("private upstream body", { status: 503 }) });
       const response = await handleMcpHttp(new Request("http://localhost/mcp", {
@@ -68,6 +69,8 @@ describe("Datadog export", () => {
       expect(JSON.stringify(received.map((r) => r.body))).not.toContain("private caller question");
       expect(JSON.stringify(received.map((r) => r.body))).not.toContain("private upstream body");
       expect(JSON.stringify(traces.body)).toContain("exception.stacktrace");
+      expect(spans.some((span) => span.name === "normal cache miss")).toBe(false);
+      expect(JSON.stringify(traces.body)).not.toContain("private-cache.invalid");
     } finally {
       await provider.shutdown();
       await runtime!.shutdown();

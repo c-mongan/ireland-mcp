@@ -10,7 +10,7 @@ Storybook state  → screenshot        → Chromatic visual review
 
 ## Optional Datadog traces and errors
 
-Datadog can receive the existing manual MCP and upstream spans. A failed tool call also emits a structured error event with its trace and span IDs. This gives a request path from the MCP method to the source, cache and upstream HTTP call. Error spans include the error type and stack frames with code locations. Exception messages, prompts, argument values, result bodies and raw console logs are excluded. Device log collection and browser RUM are separate and are not enabled by this exporter.
+Datadog can receive the existing manual MCP and upstream spans. Native Azure SDK spans are excluded from this exporter to avoid cache-miss noise and extra volume. A failed tool call also emits a structured error event with its trace and span IDs. This gives a request path from the MCP method to the source, cache and upstream HTTP call. Error spans include the error type and stack frames with code locations. Exception messages, prompts, argument values, result bodies and raw console logs are excluded. Device log collection and browser RUM are separate and are not enabled by this exporter.
 
 | Setting | Value |
 | --- | --- |
