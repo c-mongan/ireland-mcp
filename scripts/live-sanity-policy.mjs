@@ -26,6 +26,17 @@ export function assessSmokeResult(result, { source, tool, check, raw = false, ty
   if (assessed.status !== "PASS") {
     const errorNote = result?.isError && body?.error ? `${body.error.code}: ${body.error.message}` : undefined;
     const failure = { ...base, status: "FAIL", note: assessed.reason ?? errorNote ?? `Result status: ${assessed.status}.` };
+    // Only structured transport evidence from a correctly routed error is degradation.
+    // It is still a failing live check after the HTTP client's bounded retry is exhausted.
+    const transport = body?.error?.upstream_failure;
+    const routed = (body?.operation === undefined || body.operation === tool)
+      && (result?._meta?.["ireland/source"] === undefined || result._meta["ireland/source"] === source)
+      && (result?._meta?.["ireland/operation"] === undefined || result._meta["ireland/operation"] === tool);
+    if (result?.isError && routed && body?.error?.code === "UPSTREAM_DOWN"
+      && ["timeout", "network", "http"].includes(transport?.kind)
+      && Number.isInteger(transport.attempts) && transport.attempts > 0) {
+      return { ...failure, status: "DEGRADED", note: `${failure.note} [${transport.kind}; attempts=${transport.attempts}${transport.status ? `; HTTP=${transport.status}` : ""}${transport.timeout_ms ? `; timeout_ms=${transport.timeout_ms}` : ""}]` };
+    }
     // Known outages must be actual tool errors. Successful malformed data must never become WARN.
     return result?.isError && assessed.status === "HOSTED_BLOCKED" ? classify(failure) : failure;
   }
@@ -60,7 +71,7 @@ export function classify(result, knownFlaky = KNOWN_FLAKY) {
 
 /** Returns the process exit code: 0 when everything passed or only tolerated known-flaky warnings remain. */
 export function exitCode(results, maxTolerated = MAX_TOLERATED_FLAKY) {
-  if (results.some((r) => r.status === "FAIL")) return 1;
+  if (results.some((r) => r.status === "FAIL" || r.status === "DEGRADED")) return 1;
   return results.filter((r) => r.status === "WARN").length > maxTolerated ? 1 : 0;
 }
 
