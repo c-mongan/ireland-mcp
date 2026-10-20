@@ -1,72 +1,72 @@
 {
   "status": "ok",
-  "checked_at": "2026-10-19T22:16:49.766Z",
-  "cached": true,
+  "checked_at": "2026-10-20T01:13:20.744Z",
+  "cached": false,
   "sources": [
     {
       "source": "cso",
       "status": "up",
-      "latencyMs": 252,
+      "latencyMs": 782,
       "httpStatus": 200
     },
     {
       "source": "world-bank",
       "status": "up",
-      "latencyMs": 356,
+      "latencyMs": 316,
       "httpStatus": 200
     },
     {
       "source": "eurostat",
       "status": "up",
-      "latencyMs": 172,
+      "latencyMs": 133,
       "httpStatus": 200
     },
     {
       "source": "ecb",
       "status": "up",
-      "latencyMs": 151,
+      "latencyMs": 516,
       "httpStatus": 200
     },
     {
       "source": "pobal",
       "status": "up",
-      "latencyMs": 178,
+      "latencyMs": 254,
       "httpStatus": 200
     },
     {
       "source": "oireachtas",
       "status": "up",
-      "latencyMs": 133,
+      "latencyMs": 217,
       "httpStatus": 200
     },
     {
       "source": "geohive",
       "status": "up",
-      "latencyMs": 1087,
+      "latencyMs": 1239,
       "httpStatus": 200
     },
     {
       "source": "wikidata",
       "status": "up",
-      "latencyMs": 2120,
+      "latencyMs": 320,
       "httpStatus": 200
     },
     {
       "source": "data-gov-ie",
       "status": "up",
-      "latencyMs": 273,
+      "latencyMs": 346,
       "httpStatus": 200
     },
     {
       "source": "ncse",
       "status": "up",
-      "latencyMs": 360,
+      "latencyMs": 407,
       "httpStatus": 200
     },
     {
       "source": "cro",
       "status": "up",
-      "latencyMs": 411,
+      "latencyMs": 466,
       "httpStatus": 200
     },
     {
@@ -78,13 +78,13 @@
     {
       "source": "smart-dublin",
       "status": "up",
-      "latencyMs": 438,
+      "latencyMs": 458,
       "httpStatus": 200
     },
     {
       "source": "met-eireann",
       "status": "up",
-      "latencyMs": 388,
+      "latencyMs": 491,
       "httpStatus": 200
     },
     {
@@ -96,25 +96,25 @@
     {
       "source": "legislation",
       "status": "up",
-      "latencyMs": 362,
+      "latencyMs": 409,
       "httpStatus": 200
     },
     {
       "source": "ppr",
       "status": "up",
-      "latencyMs": 377,
+      "latencyMs": 446,
       "httpStatus": 200
     },
     {
       "source": "irish-rail",
       "status": "up",
-      "latencyMs": 415,
+      "latencyMs": 468,
       "httpStatus": 200
     },
     {
       "source": "luas",
       "status": "up",
-      "latencyMs": 412,
+      "latencyMs": 496,
       "httpStatus": 200
     },
     {
@@ -126,55 +126,55 @@
     {
       "source": "marine",
       "status": "up",
-      "latencyMs": 438,
+      "latencyMs": 555,
       "httpStatus": 200
     },
     {
       "source": "opw-water",
       "status": "up",
-      "latencyMs": 963,
+      "latencyMs": 990,
       "httpStatus": 200
     },
     {
       "source": "planning",
       "status": "up",
-      "latencyMs": 444,
+      "latencyMs": 513,
       "httpStatus": 200
     },
     {
       "source": "census-areas",
       "status": "up",
-      "latencyMs": 513,
+      "latencyMs": 551,
       "httpStatus": 200
     },
     {
       "source": "epa",
       "status": "up",
-      "latencyMs": 605,
+      "latencyMs": 555,
       "httpStatus": 200
     },
     {
       "source": "heritage",
       "status": "up",
-      "latencyMs": 511,
+      "latencyMs": 584,
       "httpStatus": 200
     },
     {
       "source": "environment-sites",
       "status": "up",
-      "latencyMs": 427,
+      "latencyMs": 512,
       "httpStatus": 200
     },
     {
       "source": "ted",
       "status": "up",
-      "latencyMs": 632,
+      "latencyMs": 596,
       "httpStatus": 200
     },
     {
       "source": "bikes",
       "status": "up",
-      "latencyMs": 697,
+      "latencyMs": 693,
       "httpStatus": 200
     }
   ],
@@ -248,5 +248,5 @@
       "queued": 0
     }
   },
-  "fetched_at": "2026-10-19T22:17:09.914Z"
+  "fetched_at": "2026-10-20T01:13:18.961Z"
 }
