@@ -1,72 +1,72 @@
 {
   "status": "ok",
-  "checked_at": "2026-10-20T01:13:20.744Z",
+  "checked_at": "2026-10-20T06:32:01.121Z",
   "cached": false,
   "sources": [
     {
       "source": "cso",
       "status": "up",
-      "latencyMs": 782,
+      "latencyMs": 203,
       "httpStatus": 200
     },
     {
       "source": "world-bank",
       "status": "up",
-      "latencyMs": 316,
+      "latencyMs": 175,
       "httpStatus": 200
     },
     {
       "source": "eurostat",
       "status": "up",
-      "latencyMs": 133,
+      "latencyMs": 117,
       "httpStatus": 200
     },
     {
       "source": "ecb",
       "status": "up",
-      "latencyMs": 516,
+      "latencyMs": 115,
       "httpStatus": 200
     },
     {
       "source": "pobal",
       "status": "up",
-      "latencyMs": 254,
+      "latencyMs": 126,
       "httpStatus": 200
     },
     {
       "source": "oireachtas",
       "status": "up",
-      "latencyMs": 217,
+      "latencyMs": 64,
       "httpStatus": 200
     },
     {
       "source": "geohive",
       "status": "up",
-      "latencyMs": 1239,
+      "latencyMs": 798,
       "httpStatus": 200
     },
     {
       "source": "wikidata",
       "status": "up",
-      "latencyMs": 320,
+      "latencyMs": 343,
       "httpStatus": 200
     },
     {
       "source": "data-gov-ie",
       "status": "up",
-      "latencyMs": 346,
+      "latencyMs": 169,
       "httpStatus": 200
     },
     {
       "source": "ncse",
       "status": "up",
-      "latencyMs": 407,
+      "latencyMs": 325,
       "httpStatus": 200
     },
     {
       "source": "cro",
       "status": "up",
-      "latencyMs": 466,
+      "latencyMs": 387,
       "httpStatus": 200
     },
     {
@@ -78,13 +78,13 @@
     {
       "source": "smart-dublin",
       "status": "up",
-      "latencyMs": 458,
+      "latencyMs": 412,
       "httpStatus": 200
     },
     {
       "source": "met-eireann",
       "status": "up",
-      "latencyMs": 491,
+      "latencyMs": 387,
       "httpStatus": 200
     },
     {
@@ -96,157 +96,90 @@
     {
       "source": "legislation",
       "status": "up",
-      "latencyMs": 409,
+      "latencyMs": 345,
       "httpStatus": 200
     },
     {
       "source": "ppr",
       "status": "up",
-      "latencyMs": 446,
+      "latencyMs": 375,
       "httpStatus": 200
     },
     {
       "source": "irish-rail",
       "status": "up",
-      "latencyMs": 468,
+      "latencyMs": 382,
       "httpStatus": 200
     },
     {
       "source": "luas",
       "status": "up",
-      "latencyMs": 496,
+      "latencyMs": 495,
       "httpStatus": 200
     },
     {
       "source": "eirgrid",
       "status": "up",
-      "latencyMs": 646,
+      "latencyMs": 2425,
       "httpStatus": 200
     },
     {
       "source": "marine",
       "status": "up",
-      "latencyMs": 555,
+      "latencyMs": 506,
       "httpStatus": 200
     },
     {
       "source": "opw-water",
       "status": "up",
-      "latencyMs": 990,
+      "latencyMs": 936,
       "httpStatus": 200
     },
     {
       "source": "planning",
       "status": "up",
-      "latencyMs": 513,
+      "latencyMs": 440,
       "httpStatus": 200
     },
     {
       "source": "census-areas",
       "status": "up",
-      "latencyMs": 551,
+      "latencyMs": 612,
       "httpStatus": 200
     },
     {
       "source": "epa",
       "status": "up",
-      "latencyMs": 555,
+      "latencyMs": 467,
       "httpStatus": 200
     },
     {
       "source": "heritage",
       "status": "up",
-      "latencyMs": 584,
+      "latencyMs": 484,
       "httpStatus": 200
     },
     {
       "source": "environment-sites",
       "status": "up",
-      "latencyMs": 512,
+      "latencyMs": 420,
       "httpStatus": 200
     },
     {
       "source": "ted",
       "status": "up",
-      "latencyMs": 596,
+      "latencyMs": 503,
       "httpStatus": 200
     },
     {
       "source": "bikes",
       "status": "up",
-      "latencyMs": 693,
+      "latencyMs": 540,
       "httpStatus": 200
     }
   ],
   "name": "ireland-mcp",
   "version": "1.1.4",
-  "breakers": {
-    "oireachtas": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    },
-    "legislation": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    },
-    "cso": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    },
-    "ncse": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    },
-    "wfdapi.edenireland.ie": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    },
-    "wikidata": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    },
-    "opendata.cro.ie": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    },
-    "data-gov-ie": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    },
-    "ted": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    },
-    "smart-dublin": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    },
-    "eurostat": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    }
-  },
-  "fetched_at": "2026-10-20T01:13:18.961Z"
+  "breakers": {},
+  "fetched_at": "2026-10-20T06:31:58.080Z"
 }
