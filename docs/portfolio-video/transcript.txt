@@ -1,0 +1,7 @@
+An answer is more useful when you can check its source.
+
+I built Ireland MCP to connect AI assistants to Irish public data.
+
+Ask a question, inspect the result, and follow its source citation.
+
+This recorded example shows the tools behind the answer. Free and read-only.

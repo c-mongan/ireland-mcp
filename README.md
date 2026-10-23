@@ -7,6 +7,17 @@
 
 **Ireland MCP is a free, read-only MCP server that lets AI assistants answer questions with live Irish public data and citations.**
 
+<!-- portfolio-video:start -->
+
+## Short video overview
+
+**21 seconds.** Recorded MCP Inspector example. Figures and forecasts are historical.
+
+https://github.com/user-attachments/assets/07852aab-fe2b-40e5-b562-8d887bf644d8
+
+[Open the video](https://github.com/user-attachments/assets/07852aab-fe2b-40e5-b562-8d887bf644d8) · [Transcript](docs/portfolio-video/transcript.txt) · [Captions](docs/portfolio-video/captions.srt) · [Credits and source notes](docs/portfolio-video/README.md)
+<!-- portfolio-video:end -->
+
 The optional [Irish legal and Citizens Information pilot corpus](packages/irish-legal-mcp/README.md) adds stored source versions, exact Act sections, cited research, CLI/stdio MCP and a citizen/lawyer chat page. Start with `npm run legal:check`, `npm run legal:sync`, then `npm run legal:serve`. Its seed coverage is annual leave and working time; Azure integration requires `LEGAL_ENABLED=true` and an ingested corpus. Revised Acts indexing requires explicit publisher reuse permission. Stored enacted text, guidance and consolidation cutoffs do not certify current law or comprehensive legal coverage.
 
 Hosted endpoint: `https://mcp.irishopendata.ie/mcp` (origin fallback: `https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp`)
