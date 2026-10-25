@@ -180,9 +180,30 @@ test("the static hero offers one primary live-query path without background medi
   expect((await page.locator("#playground").boundingBox())!.y).toBeLessThan(1000);
   await expect(page.locator(".hero-actions .primary")).toBeInViewport();
   await page.locator(".hero-actions .primary").click();
-  await expect(page.getByRole("button", { name: "Run live query" })).toBeInViewport();
   expect(mediaRequests).toEqual([]);
+  await page.locator(".media-archive-card summary").click();
+  await expect.poll(() => mediaRequests.length).toBeGreaterThan(0);
 });
+
+for (const theme of ["dark", "light"] as const) {
+  test(`the live query stays near the hero with wider fallback fonts in ${theme} mode`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme: theme });
+    await page.goto("/");
+    await page.addStyleTag({ content: ":root { --sans: Verdana, sans-serif; }" });
+    await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+
+    for (const { width, height, limit } of [
+      { width: 1440, height: 1000, limit: 800 },
+      { width: 1280, height: 1000, limit: 800 },
+      { width: 390, height: 844, limit: 1000 }
+    ]) {
+      await page.setViewportSize({ width, height });
+      expect((await page.locator("#playground").boundingBox())!.y).toBeLessThan(limit);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+      await expect(page.locator(".hero-actions .primary")).toBeInViewport();
+    }
+  });
+}
 
 test("Gemini copies its displayed configuration and tabs support arrow keys", async ({ page, context }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);

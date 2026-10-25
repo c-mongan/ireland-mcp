@@ -19,6 +19,14 @@ fail. A PASS demonstrates retrieval of the selected stored evidence, not a
 fresh publisher fetch, complete coverage or verified current law. Revised Acts
 indexing remains disabled until explicit publisher reuse permission.
 
+The `wikidata_entity` sample uses Wikidata’s entity API to retrieve Q27 and
+its related labels. It does not depend on the separate SPARQL Query Service.
+Place searches still use that service. Entity summaries use preferred-rank
+statements when present and exclude deprecated statements.
+
+Manual branch runs retain receipts but do not open or close the default
+branch’s tracking issue. Only default-branch runs update that issue.
+
 ## Acceptance policy
 
 Each sample first uses the shared `assessResult` checks. A PASS requires valid
