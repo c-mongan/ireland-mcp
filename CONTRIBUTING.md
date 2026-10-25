@@ -138,6 +138,12 @@ fail it. Baselines are not automatically accepted.
    `web/index.html`, and a line to the README tool table.
 7. Run `npm run typecheck && npm run lint && npm test && npm run build && npm run inspector:check`.
 
+## Optional agent skills
+
+This repository does not vendor third-party agent skills. If you use a coding
+agent, install any optional skills you like from their upstream projects into
+your own environment; nothing in the build or CI depends on them.
+
 ## Pull requests
 
 Keep each PR to one change, and describe how you tested it. CI runs lint,

@@ -1,18 +1,48 @@
-# Working in this repository
+# Guidance for contributors and coding agents
 
-## Autonomy and approvals
+Ireland MCP is a read-only Model Context Protocol server for Irish public data.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contributor guide.
 
-The owner prefers Codex to finish authorized work without repeated permission questions. A request to investigate, fix or build authorizes the routine steps needed to deliver a concrete, reviewable result.
+## Commands
 
-- Proceed with repository reads, public-source research, local edits, tests, dependency installation, isolated branches, commits and draft pull requests when they support the requested task.
-- Make routine implementation choices and state material assumptions in a brief progress update. Ask only when missing information materially blocks progress.
-- Continue after a plan or review finding; do not add an integration menu or approval pause solely because a workflow skill suggests one. Respect the user's existing authorization.
-- Keep working on failures and review feedback until the requested result is complete or a specific external blocker remains.
-- Get explicit authorization for consequential actions outside the requested scope, such as spending cloud credits, changing production, merging to the default branch, deleting user data or sending messages to other people. Do not ask again for an action already authorized in the conversation.
-- Platform-enforced sandbox and connector access controls still apply. Do not bypass them. If one blocks progress, use a permitted alternative where possible and explain the precise blocker once.
+Node 22.12 or later.
 
-## Implementation and validation
+```bash
+npm ci
+npm run typecheck
+npm run lint
+npm test                 # unit tests replay fixtures, no network
+npm run build
+npm run inspector:check  # MCP conformance via the Inspector CLI (after build)
+npm run dev:http         # local server on http://localhost:7071
+npm run legal:check      # legal corpus package checks
+```
 
-Use TDD for new behavior: observe a meaningful failing test, implement the smallest appropriate fix, and rerun relevant checks. Preserve existing source attribution and legal-currentness warnings. Do not claim live coverage, deployment or passing checks without corresponding evidence.
+`npm run live:sanity` and `npm run live:all` call real upstream services; run
+them by hand, never in CI.
 
-For legal corpus work, run `npm run legal:check`. CI also enables `LEGAL_SOCKET_TESTS=1` and runs the root TypeScript/build checks. Missing local dependencies or socket restrictions must be reported honestly; they do not justify asking the owner to approve routine code changes.
+## Layout
+
+- `src/gateway/`: envelope, errors, caching and tool definition helpers
+- `src/sources/<id>/`: one module per upstream source, with fixtures and tests
+- `src/registry.ts`: registers source modules
+- `packages/irish-legal-mcp/`: optional legal and Citizens Information pilot corpus
+- `web/`: static site; `storybook/`: component previews
+- `skills/`: packaged user-facing skills; `infra/`: Azure infrastructure as code
+- `docs/`: deployment, operations and evidence notes
+
+## Conventions
+
+- Tools are read-only, named `{source}_{verb}`, and return an evidence envelope
+  with source, URL, licence, attribution and retrieval time.
+- Bound every list and throw `ToolError` with a hint. Never build an upstream
+  URL from a user-supplied host.
+- Write the failing test first for new behaviour.
+- Preserve source attribution and legal-currentness warnings.
+- Do not claim live coverage, deployment or passing checks without evidence.
+- Never commit secrets, tokens, subscription IDs or personal paths.
+- If a check cannot run locally (missing dependency, restricted sockets), say so
+  rather than skipping it silently.
+
+CI enables `LEGAL_SOCKET_TESTS=1` and runs lint, typecheck, tests, the build and
+the Inspector conformance check.
