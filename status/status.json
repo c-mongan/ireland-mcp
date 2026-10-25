@@ -1,72 +1,72 @@
 {
-  "status": "degraded",
-  "checked_at": "2026-10-25T05:13:24.157Z",
+  "status": "ok",
+  "checked_at": "2026-10-25T10:05:41.474Z",
   "cached": false,
   "sources": [
     {
       "source": "cso",
       "status": "up",
-      "latencyMs": 300,
+      "latencyMs": 354,
       "httpStatus": 200
     },
     {
       "source": "world-bank",
       "status": "up",
-      "latencyMs": 173,
+      "latencyMs": 238,
       "httpStatus": 200
     },
     {
       "source": "eurostat",
       "status": "up",
-      "latencyMs": 239,
+      "latencyMs": 146,
       "httpStatus": 200
     },
     {
       "source": "ecb",
       "status": "up",
-      "latencyMs": 147,
+      "latencyMs": 162,
       "httpStatus": 200
     },
     {
       "source": "pobal",
       "status": "up",
-      "latencyMs": 126,
+      "latencyMs": 160,
       "httpStatus": 200
     },
     {
       "source": "oireachtas",
       "status": "up",
-      "latencyMs": 92,
+      "latencyMs": 138,
       "httpStatus": 200
     },
     {
       "source": "geohive",
       "status": "up",
-      "latencyMs": 1161,
+      "latencyMs": 735,
       "httpStatus": 200
     },
     {
       "source": "wikidata",
       "status": "up",
-      "latencyMs": 284,
+      "latencyMs": 635,
       "httpStatus": 200
     },
     {
       "source": "data-gov-ie",
       "status": "up",
-      "latencyMs": 158,
+      "latencyMs": 166,
       "httpStatus": 200
     },
     {
       "source": "ncse",
       "status": "up",
-      "latencyMs": 299,
+      "latencyMs": 234,
       "httpStatus": 200
     },
     {
       "source": "cro",
       "status": "up",
-      "latencyMs": 324,
+      "latencyMs": 303,
       "httpStatus": 200
     },
     {
@@ -78,13 +78,13 @@
     {
       "source": "smart-dublin",
       "status": "up",
-      "latencyMs": 357,
+      "latencyMs": 312,
       "httpStatus": 200
     },
     {
       "source": "met-eireann",
       "status": "up",
-      "latencyMs": 372,
+      "latencyMs": 445,
       "httpStatus": 200
     },
     {
@@ -96,85 +96,85 @@
     {
       "source": "legislation",
       "status": "up",
-      "latencyMs": 318,
+      "latencyMs": 268,
       "httpStatus": 200
     },
     {
       "source": "ppr",
       "status": "up",
-      "latencyMs": 339,
+      "latencyMs": 294,
       "httpStatus": 200
     },
     {
       "source": "irish-rail",
       "status": "up",
-      "latencyMs": 349,
+      "latencyMs": 316,
       "httpStatus": 200
     },
     {
       "source": "luas",
       "status": "up",
-      "latencyMs": 364,
+      "latencyMs": 306,
       "httpStatus": 200
     },
     {
       "source": "eirgrid",
-      "status": "down",
-      "latencyMs": 5001,
-      "error": "timeout"
+      "status": "up",
+      "latencyMs": 410,
+      "httpStatus": 200
     },
     {
       "source": "marine",
       "status": "up",
-      "latencyMs": 447,
+      "latencyMs": 375,
       "httpStatus": 200
     },
     {
       "source": "opw-water",
       "status": "up",
-      "latencyMs": 916,
+      "latencyMs": 793,
       "httpStatus": 200
     },
     {
       "source": "planning",
       "status": "up",
-      "latencyMs": 827,
+      "latencyMs": 383,
       "httpStatus": 200
     },
     {
       "source": "census-areas",
       "status": "up",
-      "latencyMs": 433,
+      "latencyMs": 383,
       "httpStatus": 200
     },
     {
       "source": "epa",
       "status": "up",
-      "latencyMs": 625,
+      "latencyMs": 419,
       "httpStatus": 200
     },
     {
       "source": "heritage",
       "status": "up",
-      "latencyMs": 519,
+      "latencyMs": 443,
       "httpStatus": 200
     },
     {
       "source": "environment-sites",
       "status": "up",
-      "latencyMs": 443,
+      "latencyMs": 390,
       "httpStatus": 200
     },
     {
       "source": "ted",
       "status": "up",
-      "latencyMs": 501,
+      "latencyMs": 463,
       "httpStatus": 200
     },
     {
       "source": "bikes",
       "status": "up",
-      "latencyMs": 585,
+      "latencyMs": 515,
       "httpStatus": 200
     }
   ],
@@ -290,5 +290,5 @@
       "queued": 0
     }
   },
-  "fetched_at": "2026-10-25T05:13:13.730Z"
+  "fetched_at": "2026-10-25T10:05:35.217Z"
 }
