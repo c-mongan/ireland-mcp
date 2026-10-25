@@ -22,7 +22,7 @@ test("demo media is lazy and user controlled, with captions and a dated transcri
   await expect(video).not.toHaveAttribute("src");
   await expect(video).not.toHaveAttribute("poster");
   await expect(video.locator("track")).not.toHaveAttribute("src");
-  expect(requests).toEqual([]);
+  expect(requests.filter(url => !url.endsWith("chatgpt-demo-poster.jpg"))).toEqual([]);
   await page.getByRole("button", { name: "Watch the ChatGPT demo" }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(video).toHaveAttribute("src", "media/chatgpt-demo.mp4");
@@ -156,10 +156,10 @@ test("a missing recording leaves a clear error and the transcript available", as
   await expect(page.locator("#demo-transcript p").first()).toBeVisible();
 });
 
-test("without JavaScript the inline panel has a native player, transcript and source", async ({ browser }) => {
+test("without JavaScript the inline panel has a native player, transcript and source", async ({ browser, baseURL }) => {
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 320, height: 800 } });
   const page = await context.newPage();
-  await page.goto("http://127.0.0.1:4173/");
+  await page.goto(baseURL!);
   await page.locator("#demo-fallback").click();
   await expect(page.locator("#demo-dialog")).toBeVisible();
   await expect(page.locator("#demo-open")).toBeHidden();

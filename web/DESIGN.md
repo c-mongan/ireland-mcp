@@ -8,15 +8,15 @@ and curious. This is a community-built read-only connector, not an official
 government service or an AI answer engine.
 
 The visual reference is a public-data observatory: a green, cinematic opening
-followed by clear, inspectable documentation. The original city-timelapse video
-stays in the hero; it is explicitly described in the footer as AI-generated and
-not a real Irish location. No new remote imagery or font dependencies are needed.
+followed by clear, inspectable documentation. An interactive Irish tricolour cube sits beside the headline without a card, rotating continuously through 360 degrees in ~18 seconds, with drag and arrow-key controls for rotation and tilt.
+The real ChatGPT demo has a visible, clickable poster preview in a separate proof row beside the live service summary. No remote imagery or font
+dependencies are needed.
 
 ## Layout and hierarchy
 
-- The hero pairs the product promise with a question and an honest connection
-  diagram. Its server summary remains live, but counts are compact information
-  rows rather than oversized marketing metrics.
+- The hero explains the connection to Irish public data in plain language with an editorial two-line headline.
+  The cube is decorative, unboxed, not a signal of live data. Its server summary and
+  compact counts sit in a separate strip.
 - The live playground follows the hero, so visitors can inspect data before
   installation. Static VS Code and Cursor links still provide quick entry in
   the installation section; the app-generated tabs retain all setup options.
@@ -38,7 +38,7 @@ not a real Irish location. No new remote imagery or font dependencies are needed
 - The main 35-second demo shows edited real ChatGPT Work screenshots
   from 10 October 2026, with the Ireland Open Data plugin selected. Its transcript contains the recorded value and period,
   and distinguishes registered tenancies from asking rents. It does not replace
-  the live response. The original hero background stays in place. A separate link retains the
+  the live response. A separate link retains the
   earlier website playground demo and its VTT captions.
 - Sources use a scannable directory. Subject navigation comes from the returned
   catalogue and links to the existing domain heading IDs. Do not add fixed links
@@ -50,7 +50,7 @@ not a real Irish location. No new remote imagery or font dependencies are needed
 Dark is the stylesheet fallback. Light styles are scoped to
 `html[data-theme="light"]`. JavaScript owns the saved theme choice and initial
 preference. The cinematic hero keeps its own fixed dark palette in both themes to
-preserve contrast over moving imagery.
+preserve contrast around the tricolour artwork.
 
 | Role | Dark | Light |
 | --- | --- | --- |
@@ -81,9 +81,10 @@ decorative shadows and glass panels are unnecessary.
   At 320px, headline sizing and code wrapping must stay within the viewport.
 - Horizontal scrolling is local to the install tabs and code blocks. Tab padding
   leaves space for focus outlines.
-- The video has an explicit pause/play control. JavaScript respects reduced
-  motion and pauses in hidden tabs; CSS disables entrance motion and smooth
-  scrolling when requested. Content is visible without entrance animation.
+- The cube rotates continuously through 360 degrees in approximately 18 seconds (ROTATION_PERIOD_MS = 18000), supports free yaw dragging and bounded pitch adjustment (-1.0 to 0.2 rad), arrow key navigation (left/right yaw, up/down pitch), and stops
+  offscreen or in hidden tabs. A compact icon provides pause/resume, with an
+  accessible name and tooltip. Reduced motion starts still and permits discrete steps. The video remains
+  user-controlled. Content is visible without entrance animation.
 - No-JavaScript installation fallback links to the existing agent guide.
 - Keep advanced arguments in Query settings. Always show the result and request
   status, with distinct errors.
@@ -127,7 +128,8 @@ real shipped assets.
 
 The hero control opens a native dialog. The ChatGPT video has native playback
 controls, English captions and a plain transcript. It never autoplays. Assign
-video, poster and caption URLs only on first open; use `preload="none"`. Escape
+video and caption URLs only on first open; use `preload="none"`. The small
+poster preview can load before playback. Escape
 and Close pause playback and restore focus to the opener. Try it live closes the
 dialog, loads the rent example and focuses the playground selector without
 submitting a request. If a query is pending, leave its settings unchanged.
@@ -144,3 +146,7 @@ ChatGPT Work exposes raw JSON, identifies an exact tool function or shows
 continuous playback. The video is silent and captioned. The website installer
 uses the current Plugins → Add custom MCP server → Install → Work → @plugin
 flow and links to the official OpenAI quickstart.
+
+## October 2026 reference study
+
+Reviewed Resend, Vapi, Supabase, Firecrawl and PostHog homepages. Apply their clear product explanation, strong visual hierarchy, direct product trial and distinct identity. Do not copy assets or add unverified social proof. The header and hero share a dark foundation; the tricolour cube is the main visual object. A larger real-video preview and service summary share a proof row. Keep motion details out of product copy; the cube hint only explains the interaction.

@@ -1,4 +1,5 @@
-import { initDemoPlayer } from "./demo-player.js?v=20261010-chatgpt-demo";
+import { initIrelandCube } from "./ireland-cube.js?v=20261013-redesign-v2";
+import { initDemoPlayer } from "./demo-player.js?v=20261013-preview";
 import { createAnalytics } from "./analytics.js?v=20261010-first-use";
 import { buildResultView, decodeToolPayload, renderResultView } from "./result-view.js?v=20261010-first-use";
 
@@ -603,33 +604,25 @@ $("playground-form").addEventListener("submit", async (event) => {
   }
 });
 
+function initArchiveMedia() {
+  const archiveDetails = document.querySelector(".media-archive-card");
+  if (!archiveDetails) return;
+  archiveDetails.addEventListener("toggle", () => {
+    if (!archiveDetails.open) return;
+    const source = archiveDetails.querySelector("source[data-src]");
+    if (source) {
+      source.src = source.dataset.src;
+      delete source.dataset.src;
+      source.parentElement?.load();
+    }
+  }, { once: true });
+}
+
 renderInstallers();
 renderExamples();
 initDemoPlayer();
+initIrelandCube();
 initLiveStats();
 initStatus();
-
-// Keep the original video, with an explicit pause control and reduced-motion support.
-const video = $("hero-video");
-const motionToggle = $("motion-toggle");
-const motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
-let motionPaused = motionQuery.matches;
-function syncVideo() {
-  motionToggle.textContent = motionPaused ? "Play video" : "Pause video";
-  if (motionPaused || document.hidden) video.pause();
-  else video.play().catch(() => {
-    motionPaused = true;
-    motionToggle.textContent = "Play video";
-  });
-}
-motionToggle.addEventListener("click", () => {
-  motionPaused = !motionPaused;
-  syncVideo();
-});
-motionQuery.addEventListener("change", () => {
-  motionPaused = motionQuery.matches;
-  syncVideo();
-});
-document.addEventListener("visibilitychange", syncVideo);
-syncVideo();
+initArchiveMedia();
 

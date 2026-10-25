@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { callTool, fixturePath } from "../../../test/helpers/callTool.js";
 import { fakeFetch } from "../../../test/helpers/fakeFetch.js";
+import { createContext, DAY } from "../../gateway/context.js";
 import { wikidataModule } from "./index.js";
 
 type WikidataBody = {
@@ -21,10 +22,70 @@ describe("wikidata source", () => {
     expect(String((call.init?.headers as Record<string, string>)["user-agent"])).toContain("templated Irish public-data lookup");
   });
 
-  it("summarises one entity by QID without accepting SPARQL", async () => {
-    const fetch = fakeFetch([{ match: /query\.wikidata\.org\/sparql/, file: fixturePath(import.meta.url, "q27.json") }]);
-    const { body } = await callTool<WikidataBody>(wikidataModule, "wikidata_entity", { qid: "Q27" }, fetch);
-    expect(body.data).toMatchObject({ qid: "Q27", label: "Ireland" });
+  it("summarises an entity without depending on the unavailable Query Service", async () => {
+    const claim = (value: unknown, rank = "normal") => ({ rank, mainsnak: { snaktype: "value", datavalue: { value } } });
+    const entity = { id: "Q27", labels: { en: { value: "Ireland" }, ga: { value: "Éire" } }, descriptions: { en: { value: "country" } }, claims: {
+      P31: [claim({ id: "Q6256" })], P17: [claim({ id: "Q27" })],
+      P1082: [claim({ amount: "+1" }, "deprecated"), claim({ amount: "+4000000" }), claim({ amount: "+5149139" }, "preferred")],
+      P625: [claim({ latitude: 53, longitude: -8, globe: "http://www.wikidata.org/entity/Q2" })], P856: [claim("http://www.gov.ie/")]
+    } };
+    const fetch = fakeFetch([
+      { match: url => new URL(url).searchParams.get("props") === "labels|descriptions|claims", body: JSON.stringify({ entities: { Q27: entity } }) },
+      { match: url => new URL(url).searchParams.get("props") === "labels", body: JSON.stringify({ entities: { Q6256: { id: "Q6256", labels: { en: { value: "country" } } }, Q27: entity } }) }
+    ]);
+    const result = await callTool(wikidataModule, "wikidata_entity", { qid: "Q27" }, fetch);
+    expect(result.ok).toBe(true);
+    expect(result.body.data).toMatchObject({ qid: "Q27", label: "Ireland", irish_name: "Éire", instance_of: "country", country: "Ireland", population: 5149139, coordinates: { lat: 53, lon: -8 }, website: "http://www.gov.ie/" });
+    expect(fetch.calls).toHaveLength(2);
+    expect(fetch.calls.every(c => new URL(c.url).hostname === "www.wikidata.org")).toBe(true);
+    expect(result.body.cached).toBe(false);
+  });
+
+  it.each([
+    [{ entities: { Q27: { id: "Q27", missing: "" } } }, "NOT_FOUND"],
+    [{ error: { code: "maxlag" } }, "UPSTREAM_DOWN"],
+    [{ entities: {} }, "UPSTREAM_DOWN"],
+    [{ entities: { Q27: { id: "Q42" } } }, "UPSTREAM_DOWN"],
+    [{ entities: { Q27: { id: "Q27", claims: { P31: "invalid" } } } }, "UPSTREAM_DOWN"]
+  ])("rejects missing or invalid entity responses: %j", async (body, code) => {
+    const fetch = fakeFetch([{ match: /www\.wikidata\.org\/w\/api.php/, body: JSON.stringify(body) }]);
+    const result = await callTool(wikidataModule, "wikidata_entity", { qid: "Q27" }, fetch);
+    expect(result.ok).toBe(false);
+    expect(result.body.error.code).toBe(code);
+  });
+
+  it("keeps absent claims null and does not resurrect normal claims behind a preferred unknown", async () => {
+    const fetch = fakeFetch([{ match: /www\.wikidata\.org\/w\/api.php/, body: JSON.stringify({ entities: { Q27: { id: "Q27", labels: { en: { value: "Ireland" } }, claims: {
+      P1082: [{ rank: "normal", mainsnak: { snaktype: "value", datavalue: { value: { amount: "+123" } } } }, { rank: "preferred", mainsnak: { snaktype: "somevalue" } }]
+    } } } }) }]);
+    const result = await callTool(wikidataModule, "wikidata_entity", { qid: "Q27" }, fetch);
+    expect(result.ok).toBe(true);
+    expect(result.body.data).toMatchObject({ population: null, coordinates: null, instance_of: null, country: null, website: null });
+    expect(fetch.calls).toHaveLength(1);
+  });
+
+  it("marks the complete summary stale when related labels cannot refresh", async () => {
+    let now = 0;
+    let failLabels = false;
+    const fetch = fakeFetch([
+      { match: url => new URL(url).searchParams.get("props") === "labels|descriptions|claims", body: JSON.stringify({ entities: { Q27: { id: "Q27", labels: { en: { value: "Ireland" } }, claims: { P31: [{ rank: "normal", mainsnak: { snaktype: "value", datavalue: { value: { id: "Q6256" } } } }] } } } }) },
+      { match: /api.php/, body: JSON.stringify({ entities: { Q6256: { id: "Q6256", labels: { en: { value: "country" } } } } }) }
+    ]);
+    const ctx = createContext({ now: () => new Date(now), fetch: async (url, init) => {
+      if (failLabels && new URL(url).searchParams.get("props") === "labels") throw new Error("upstream unavailable");
+      return fetch(url, init);
+    } });
+    const first = await callTool(wikidataModule, "wikidata_entity", { qid: "Q27" }, ctx);
+    expect(first.ok).toBe(true);
+    expect(first.body.cached).toBe(false);
+    const second = await callTool(wikidataModule, "wikidata_entity", { qid: "Q27" }, ctx);
+    expect(second.body.cached).toBe(true);
+    now = 8 * DAY;
+    failLabels = true;
+    const third = await callTool(wikidataModule, "wikidata_entity", { qid: "Q27" }, ctx);
+    expect(third.ok).toBe(true);
+    expect(third.body.stale).toBe(true);
+    expect(third.body.cached).toBe(false);
   });
 
   it("uses the fast entity-search index and ranks exact names first (uncached towns like Kilkee)", async () => {
