@@ -170,3 +170,24 @@ EPA bathing water open data — https://data.epa.ie/api-list/bathing-water-open-
   Licence: CC BY 4.0
   Attribution: Bathing water open data © Environmental Protection Agency Ireland.
 
+
+Register of Lobbying — https://www.lobbying.ie/
+  Licence: SIPO PSI reuse policy; preserve source and copyright acknowledgement.
+  Contains Register of Lobbying data © Standards in Public Office Commission.
+  https://www.lobbying.ie/about-us/our-policies/reuse-of-public-sector-information/
+
+Irish Gender Pay Gap Portal — https://paygap.ie/downloads
+  Dataset: CC0 1.0. Attribution requested by the publisher.
+  Source: PayGap.ie; original employer report links remain in each record.
+  https://github.com/zenbuffy/irishGenderPayGap
+
+Local Authority and Regional Assembly Annual Budgets —
+https://data.gov.ie/dataset/local-authority-and-regional-assembly-annual-budgets
+  Licence: CC BY-SA 4.0.
+  Source: Department of Housing, Local Government and Heritage.
+  Parsed and filtered budget rows are derived from the published workbooks.
+  These are adopted budget estimates, not actual expenditure.
+
+SheetJS Community Edition — https://sheetjs.com/
+  Apache License 2.0. Installed from the official pinned distribution.
+  Used to read the council budget XLS and XLSX workbooks.

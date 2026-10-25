@@ -1,13 +1,13 @@
 {
-  "sources": 29,
-  "hosted_working": 28,
+  "sources": 32,
+  "hosted_working": 31,
   "hosted_limited": [
     "nta"
   ],
-  "operations": 74,
-  "source_operations": 71,
+  "operations": 78,
+  "source_operations": 75,
   "cross_operations": 3,
   "default_tools": 7,
-  "all_tools": 80,
+  "all_tools": 84,
   "prompts": 3
 }

@@ -24,7 +24,11 @@ const contents = (node) => [node.textContent, ...node.children.map(contents)].jo
 
 test("the static directory keeps the default source profile when legal availability is unknown", () => {
   const cards = render();
-  assert.equal(cards.length, 30, "29 default sources plus the cross-source combiner");
+  const counts = JSON.parse(readFileSync(new URL("../docs/counts.json", import.meta.url), "utf8"));
+  assert.equal(cards.length, counts.sources + 1, "default sources plus the cross-source combiner");
+  for (const name of ["SIPO Register of Lobbying", "PayGap.ie employer reports", "Council budgets"]) {
+    assert.ok(cards.some((card) => contents(card).includes(name)), `Missing civic source ${name}`);
+  }
   assert.ok(cards.every((card) => !/optional pilot/i.test(contents(card))));
 });
 
