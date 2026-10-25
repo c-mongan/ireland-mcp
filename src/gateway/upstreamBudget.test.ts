@@ -169,6 +169,7 @@ describe("sourceForUrl", () => {
     expect(sourceForUrl("https://luasforecasts.rpa.ie/xml/get.ashx")).toBe("luas");
     expect(sourceForUrl("https://data.epa.ie/api/test")).toBe("epa");
     expect(sourceForUrl("https://unknown.example.org/a")).toBe("unknown.example.org");
+    expect(sourceForUrl("https://www.wikidata.org/w/api.php")).toBe("wikidata");
     expect(sourceForUrl("not a url")).toBe("upstream");
   });
 });

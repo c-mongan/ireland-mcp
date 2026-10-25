@@ -627,9 +627,25 @@ $("playground-form").addEventListener("submit", async (event) => {
   }
 });
 
+function initArchiveMedia() {
+  const archiveDetails = document.querySelector(".media-archive-card");
+  if (!archiveDetails) return;
+  archiveDetails.addEventListener("toggle", () => {
+    if (!archiveDetails.open) return;
+    const source = archiveDetails.querySelector("source[data-src]");
+    if (source) {
+      source.src = source.dataset.src;
+      delete source.dataset.src;
+      source.parentElement?.load();
+    }
+  }, { once: true });
+}
+
 renderInstallers();
 renderExamples();
 initDemoPlayer();
 initIrelandCube();
 initLiveStats();
 initStatus();
+initArchiveMedia();
+

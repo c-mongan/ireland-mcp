@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { entitySummary } from "./entity.js";
 import { DAY } from "../../gateway/context.js";
 import { bound, envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
@@ -128,42 +129,10 @@ const placeTool = defineTool({
 const entityTool = defineTool({
   name: "wikidata_entity",
   title: "Wikidata entity summary",
-  description: "Summarise a single Wikidata entity by QID using a safe template. Does not accept arbitrary SPARQL.",
+  description: "Summarise a single Wikidata entity by QID using the entity API. Does not accept arbitrary SPARQL.",
   example: { qid: "Q27" },
   inputSchema: { qid: z.string().regex(/^Q\d+$/).describe("Wikidata entity id, e.g. Q27 for Ireland.") },
-  handler: async ({ qid }, ctx) => {
-    const sparql = `SELECT ?item ?itemLabel ?itemDescription ?irishLabel ?instanceLabel ?countryLabel ?population ?coord ?website WHERE {
-  BIND(wd:${qid} AS ?item)
-  OPTIONAL { ?item rdfs:label ?irishLabel FILTER(LANG(?irishLabel) = "ga") }
-  OPTIONAL { ?item wdt:P31 ?instance. }
-  OPTIONAL { ?item wdt:P17 ?country. }
-  OPTIONAL { ?item wdt:P1082 ?population. }
-  OPTIONAL { ?item wdt:P625 ?coord. }
-  OPTIONAL { ?item wdt:P856 ?website. }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-}`;
-    const result = await query(ctx, sparql);
-    const row = result.value.results?.bindings?.[0];
-    if (!row) throw new ToolError("NOT_FOUND", `No Wikidata entity ${qid} was returned.`);
-    return envelope(wikidataInfo, {
-      data: {
-        qid,
-        label: row.itemLabel?.value ?? null,
-        description: row.itemDescription?.value ?? null,
-        irish_name: row.irishLabel?.value ?? null,
-        instance_of: row.instanceLabel?.value ?? null,
-        country: row.countryLabel?.value ?? null,
-        population: row.population?.value ? Number(row.population.value) : null,
-        coordinates: parsePoint(row.coord?.value),
-        website: row.website?.value ?? null,
-        url: `https://www.wikidata.org/wiki/${qid}`
-      },
-      url: result.url,
-      cached: result.cached,
-      stale: result.stale,
-      truncated: false
-    });
-  }
+  handler: async ({ qid }, ctx) => entitySummary(ctx, qid, wikidataInfo)
 });
 
 async function search(term: string, max: number, ctx: ToolContext) {
