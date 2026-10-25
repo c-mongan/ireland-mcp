@@ -1,11 +1,8 @@
 import { appModules, sourceModules } from "./registry.js";
 
-/**
- * Sources that do not work on the hosted Azure endpoint, and why. Kept here so every published
- * "N of M sources work hosted" number comes from one place (see docs/counts.json and src/counts.test.ts).
- */
+/** Known operator-key limits. These build counts do not establish hosted deployment or liveness. */
 export const HOSTED_LIMITS: Record<string, string> = {
-  nta: "NTA realtime needs an operator key that the hosted service does not have."
+  nta: "NTA realtime needs an operator key."
 };
 
 /** ireland_catalogue, ireland_describe, ireland_call, ireland_about. */
@@ -52,7 +49,7 @@ export function renderCounts(c: Counts): string {
     "| Count | Value | Definition |",
     "| --- | ---: | --- |",
     `| Data sources | ${c.sources} | Upstream public-data sources, one module each. The \`cross\` combiner is not a source. |`,
-    `| Working on the hosted endpoint | ${c.hosted_working} of ${c.sources} | ${limited} |`,
+    `| Available without an operator key | ${c.hosted_working} of ${c.sources} | ${limited} |`,
     `| Catalogue operations | ${c.operations} | ${c.source_operations} source operations plus ${c.cross_operations} cross-source ones (\`list_sources\`, \`nearby\`, \`ireland_snapshot\`), all callable through \`ireland_call\`. |`,
     `| Default tools | ${c.default_tools} | What \`tools/list\` returns: ${META_TOOLS} meta tools plus \`search\`, \`fetch\` and \`nearby\`. |`,
     `| Tools with \`?toolsets=all\` | ${c.all_tools} | Every operation as a typed tool, plus the ${META_TOOLS} meta tools, \`search\` and \`fetch\`. |`,

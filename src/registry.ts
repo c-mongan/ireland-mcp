@@ -4,6 +4,9 @@ import { crossInfo, crossSourceTools } from "./cross/index.js";
 import { buildServer } from "./gateway/server.js";
 import type { TelemetrySink } from "./gateway/telemetry.js";
 import { ncseModule } from "./sources/ncse/index.js";
+import { councilBudgetsModule } from "./sources/council-budgets/index.js";
+import { lobbyingModule } from "./sources/lobbying/index.js";
+import { paygapModule } from "./sources/paygap/index.js";
 import { csoModule } from "./sources/cso/index.js";
 import { dataGovIeModule } from "./sources/data-gov-ie/index.js";
 import { geohiveModule } from "./sources/geohive/index.js";
@@ -36,6 +39,9 @@ import { createLegalModules } from "./sources/irish-legal/index.js";
 
 export const sourceModules: SourceModule[] = [
   csoModule,
+  lobbyingModule,
+  paygapModule,
+  councilBudgetsModule,
   ncseModule,
   worldBankModule,
   eurostatModule,
