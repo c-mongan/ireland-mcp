@@ -44,7 +44,7 @@ jobs:
           npm run -s check:mcp -- --url "$MCP_URL" | tee protocol.txt
       - name: Keep the check receipts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: live-quality-${{ github.run_id }}
           path: |
