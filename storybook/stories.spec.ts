@@ -7,6 +7,26 @@ const axeSource = readFileSync(createRequire(import.meta.url).resolve("axe-core/
 
 const sections = ["hero", "demo-player", "installer", "agent-setup", "directory", "playground-idle", "playground-loading", "playground-success", "playground-empty", "playground-error", "playground-truncated", "playground-weather", "playground-transport", "playground-rent", "playground-cached-stale", "playground-tourism", "playground-static-stops", "playground-groundwater", "status-healthy", "status-degraded", "status-stale", "status-loading", "status-unreachable"];
 
+for (const theme of ["dark", "light"]) {
+  for (const width of [1280, 360, 320]) {
+    test(`truncated table keeps codes intact in ${theme} at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(`/iframe.html?id=ireland-mcp-sections--playground-truncated-${theme}&viewMode=story`);
+      const frame = page.frameLocator('iframe[title="Ireland MCP section preview"]');
+      const codes = frame.locator("#pg-result tbody td:nth-child(2)");
+      await expect(codes).toHaveText(["SAMPLE1", "SAMPLE2", "SAMPLE3", "SAMPLE4", "SAMPLE5"]);
+      const lineCounts = await codes.evaluateAll((cells) => cells.map((cell) => {
+        const range = cell.ownerDocument.createRange();
+        range.selectNodeContents(cell);
+        return new Set(Array.from(range.getClientRects(), (rect) => rect.top)).size;
+      }));
+      expect(lineCounts).toEqual([1, 1, 1, 1, 1]);
+      const overflow = await frame.locator("html").evaluate((node) => node.scrollWidth - node.clientWidth);
+      expect(overflow).toBeLessThanOrEqual(1);
+    });
+  }
+}
+
 for (const section of sections) {
   for (const theme of ["dark", "light"]) {
     test(`${section} in ${theme}`, async ({ page }) => {

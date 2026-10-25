@@ -117,10 +117,18 @@ function assertArcGisOk(body: ArcGisResponse): void {
     : new ToolError("UPSTREAM_DOWN", "GeoHive ArcGIS returned an error.");
 }
 
-async function arcgisQuery(ctx: ToolContext, service: string, params: Record<string, string>) {
+function assertFeatures(body: ArcGisResponse): void {
+  if (!body || typeof body !== "object") throw new ToolError("UPSTREAM_DOWN", "GeoHive returned an invalid feature response.", { retryable: false });
+  assertArcGisOk(body);
+  if (!Array.isArray(body.features) || body.features.some((feature) => !feature || !feature.attributes || typeof feature.attributes !== "object" || Array.isArray(feature.attributes))) {
+    throw new ToolError("UPSTREAM_DOWN", "GeoHive returned invalid feature rows.", { retryable: false });
+  }
+}
+
+async function arcgisQuery(ctx: ToolContext, service: string, params: Record<string, string>, layerId = 0) {
   const query = new URLSearchParams({ returnGeometry: "false", f: "json", ...params });
-  const url = `${ARCGIS_BASE}/${encodeURIComponent(service)}/FeatureServer/0/query?${query.toString()}`;
-  const result = await ctx.cachedJson<ArcGisResponse>(url, TTL, { label: "GeoHive ArcGIS", validate: assertArcGisOk });
+  const url = `${ARCGIS_BASE}/${encodeURIComponent(service)}/FeatureServer/${layerId}/query?${query.toString()}`;
+  const result = await ctx.cachedJson<ArcGisResponse>(url, TTL, { label: "GeoHive ArcGIS", validate: assertFeatures });
   return { url, features: result.value.features ?? [], exceeded: Boolean(result.value.exceededTransferLimit), cached: result.cached, stale: result.stale };
 }
 
@@ -170,15 +178,43 @@ const boundariesTool = defineTool({
   }
 });
 
+const serviceName = z.string().regex(/^[A-Za-z0-9_-]{3,120}$/).describe("Service name from geohive_list_layers.");
+interface ServiceLayer { id: number; name: string; type?: string }
+interface ServiceMetadata extends ArcGisResponse { layers: ServiceLayer[] }
+
+async function readServiceLayers(ctx: ToolContext, service: string) {
+  const url = `${ARCGIS_BASE}/${encodeURIComponent(service)}/FeatureServer?f=json`;
+  const result = await ctx.cachedJson<ServiceMetadata>(url, TTL, {
+    label: "GeoHive service metadata",
+    validate: (body) => {
+      if (!body || typeof body !== "object") throw new ToolError("UPSTREAM_DOWN", "GeoHive returned invalid service metadata.");
+      assertArcGisOk(body);
+      if (!Array.isArray(body.layers) || body.layers.some((layer) => !layer || !Number.isSafeInteger(layer.id) || layer.id < 0 || typeof layer.name !== "string")) {
+        throw new ToolError("UPSTREAM_DOWN", "GeoHive returned invalid service layers.", { retryable: false });
+      }
+    }
+  });
+  return { ...result, url, layers: result.value.layers.filter((layer) => !layer.type || layer.type === "Feature Layer") };
+}
+
 const listLayersTool = defineTool({
   name: "geohive_list_layers",
   title: "List GeoHive layers",
-  description: "List Tailte Éireann / GeoHive ArcGIS feature services (boundaries, placenames, map layers), optionally filtered by words in the name.",
+  description: "List Tailte Éireann / GeoHive ArcGIS feature services (boundaries, placenames, map layers), optionally filtered by words in the name. Pass service to discover its queryable layer IDs.",
   inputSchema: {
+    service: serviceName.optional(),
     query: z.string().max(80).optional().describe("Words in the service name, e.g. 'constituency 2023' or 'townlands'."),
     limit: z.number().int().min(1).max(MAX_LIMIT).default(50)
   },
-  handler: async ({ query, limit }, ctx) => {
+  handler: async ({ service, query, limit }, ctx) => {
+    if (service) {
+      const result = await readServiceLayers(ctx, service);
+      const words = (query ?? "").toLowerCase().split(/\s+/).filter(Boolean);
+      const layers = result.layers.filter((layer) => words.every((word) => layer.name.toLowerCase().includes(word)))
+        .map((layer) => ({ ...layer, url: `${ARCGIS_BASE}/${encodeURIComponent(service)}/FeatureServer/${layer.id}` }));
+      const { items, truncated } = bound(layers, limit);
+      return envelope(geohiveInfo, { data: { service, total: layers.length, layers: items }, url: result.url, cached: result.cached, stale: result.stale, truncated });
+    }
     const url = `${ARCGIS_BASE}?f=json`;
     const result = await ctx.cachedJson<{ services?: Array<{ name: string; type: string }> }>(url, TTL, { label: "GeoHive ArcGIS" });
     const words = (query ?? "").toLowerCase().split(/\s+/).filter(Boolean);
@@ -195,27 +231,36 @@ const queryLayerTool = defineTool({
   example: { service: "Counties___OSi_National_Statutory_Boundaries", where: "PROVINCE='Munster'", out_fields: "ENGLISH,PROVINCE", limit: 3 },
   title: "Query a GeoHive layer",
   description:
-    "Query attributes (no geometry) from layer 0 of a GeoHive feature service with an ArcGIS SQL where clause, e.g. service 'Counties___OSi_National_Statutory_Boundaries', where \"PROVINCE='Munster'\".",
+    "Query attributes (no geometry) from a GeoHive service. Omit layer_id to select its sole layer or layer 0; otherwise discover IDs with geohive_list_layers(service) and choose one. Use ArcGIS SQL in where.",
   inputSchema: {
-    service: z.string().regex(/^[A-Za-z0-9_-]{3,120}$/).describe("Service name from geohive_list_layers."),
+    service: serviceName,
+    layer_id: z.number().int().min(0).max(100000).optional().describe("Layer ID from geohive_list_layers with service. Omit for the sole layer or layer 0."),
     where: z.string().min(1).max(500).default("1=1").describe("ArcGIS SQL filter."),
     out_fields: z.string().regex(/^(\*|[A-Za-z0-9_]+(,[A-Za-z0-9_]+)*)$/).default("*").describe("Comma-separated field names or *."),
     order_by: z.string().regex(/^[A-Za-z0-9_]+( (ASC|DESC))?$/i).optional(),
     limit: z.number().int().min(1).max(MAX_LIMIT).default(50)
   },
-  handler: async ({ service, where, out_fields, order_by, limit }, ctx) => {
+  handler: async ({ service, layer_id, where, out_fields, order_by, limit }, ctx) => {
+    const metadata = await readServiceLayers(ctx, service);
+    if (!metadata.layers.length) throw new ToolError("NOT_FOUND", "GeoHive service has no queryable feature layers.");
+    const selected = layer_id ?? (metadata.layers.length === 1 ? metadata.layers[0]!.id : metadata.layers.find((layer) => layer.id === 0)?.id);
+    if (selected === undefined || !metadata.layers.some((layer) => layer.id === selected)) {
+      throw new ToolError("BAD_ARGS", "Choose a queryable layer from this service.", {
+        hint: `Set layer_id using geohive_list_layers({service: "${service}"}). Available IDs: ${metadata.layers.slice(0, 20).map((layer) => layer.id).join(", ")}.`
+      });
+    }
     const result = await arcgisQuery(ctx, service, {
       where,
       outFields: out_fields,
       resultRecordCount: String(limit),
       ...(order_by ? { orderByFields: order_by } : {})
-    });
+    }, selected);
     const rows = result.features.slice(0, limit).map((f) => f.attributes);
     return envelope(geohiveInfo, {
-      data: { service, count: rows.length, features: rows },
+      data: { service, layer_id: selected, count: rows.length, features: rows },
       url: result.url,
-      cached: result.cached,
-      stale: result.stale,
+      cached: metadata.cached && result.cached,
+      stale: metadata.stale || result.stale,
       truncated: result.exceeded || result.features.length > limit
     });
   }

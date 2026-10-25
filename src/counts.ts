@@ -1,15 +1,9 @@
 import { appModules, sourceModules } from "./registry.js";
 
-/**
- * Sources whose hosted access is blocked or not yet verified, and why. Kept here so every published
- * "N of M sources work hosted" number comes from one place (see docs/counts.json and src/counts.test.ts).
- */
+/** Known operator-key limits. These build counts do not establish hosted deployment or liveness. */
 export const HOSTED_LIMITS: Record<string, string> = {
-  nta: "NTA realtime needs an operator key that the hosted service does not have.",
-  "failte-ireland": "Fáilte exports passed local upstream checks; hosted access has not yet been verified.",
-  "tfi-static": "TFI static stops passed a local upstream check; hosted access has not yet been verified.",
-  gsi: "GSI lookup passed a local upstream check; hosted access has not yet been verified.",
-  logainm: "Logainm needs a Gaois operator account and LOGAINM_API_KEY; live access is unverified."
+  nta: "NTA realtime needs an operator key.",
+  logainm: "Logainm needs a Gaois operator account and API key."
 };
 
 /** ireland_catalogue, ireland_describe, ireland_call, ireland_about. */
@@ -56,7 +50,7 @@ export function renderCounts(c: Counts): string {
     "| Count | Value | Definition |",
     "| --- | ---: | --- |",
     `| Data sources | ${c.sources} | Upstream public-data sources, one module each. The \`cross\` combiner is not a source. |`,
-    `| Working on the hosted endpoint | ${c.hosted_working} of ${c.sources} | ${limited} |`,
+    `| Available without an operator key | ${c.hosted_working} of ${c.sources} | ${limited} |`,
     `| Catalogue operations | ${c.operations} | ${c.source_operations} source operations plus ${c.cross_operations} cross-source ones (\`list_sources\`, \`nearby\`, \`ireland_snapshot\`), all callable through \`ireland_call\`. |`,
     `| Default tools | ${c.default_tools} | What \`tools/list\` returns: ${META_TOOLS} meta tools plus \`search\`, \`fetch\` and \`nearby\`. |`,
     `| Tools with \`?toolsets=all\` | ${c.all_tools} | Every operation as a typed tool, plus the ${META_TOOLS} meta tools, \`search\` and \`fetch\`. |`,

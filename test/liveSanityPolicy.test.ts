@@ -15,6 +15,21 @@ const result = (body: unknown, isError = false) => ({ content: [{ type: "text", 
 const sample = { source: "met-eireann", tool: "met_get_warnings", check: (data: { warnings: unknown[] }) => Array.isArray(data.warnings) };
 
 describe("live smoke policy", () => {
+  it.each(["marine", "heritage"])("reports exhausted %s transport retries as DEGRADED and fails the run", (source) => {
+    const assessed = assessSmokeResult(result({ error: { code: "UPSTREAM_DOWN", message: "provider timed out", upstream_failure: { kind: "timeout", attempts: 2, timeout_ms: 10000 } } }, true), { ...sample, source });
+    expect(assessed.status).toBe("DEGRADED");
+    expect(assessed.note).toContain("timeout; attempts=2");
+    expect(exitCode([assessed])).toBe(1);
+  });
+  it("does not classify generic upstream errors or conflicting metadata as transport degradation", () => {
+    const error = { error: { code: "UPSTREAM_DOWN", message: "Unexpected handler failure" } };
+    expect(assessSmokeResult(result(error, true), sample).status).toBe("FAIL");
+    const timeout = { error: { code: "UPSTREAM_DOWN", message: "timeout", upstream_failure: { kind: "timeout", attempts: 2 } } };
+    expect(assessSmokeResult({ ...result(timeout, true), _meta: { "ireland/source": "wrong" } }, sample).status).toBe("FAIL");
+    expect(assessSmokeResult(result(timeout), sample).status).toBe("FAIL");
+    expect(assessSmokeResult({ ...result(timeout, true), _meta: { "ireland/source": "" } }, sample).status).toBe("FAIL");
+    expect(assessSmokeResult(result({ ...timeout, operation: null }, true), sample).status).toBe("FAIL");
+  });
   it("checks the envelope and domain contract before the sample predicate", () => {
     expect(assessSmokeResult(result(envelope), sample).status).toBe("PASS");
     for (const body of [{ ...envelope, retrieved_at: "bad date" }, { ...envelope, data: { warnings: [] } }, { ...envelope, operation: "met_get_forecast" }]) {

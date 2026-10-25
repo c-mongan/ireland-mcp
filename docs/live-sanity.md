@@ -42,8 +42,31 @@ and is not cached as an empty feed.
 
 Only the exact marked tool error `UPSTREAM_DOWN: Kohesio returned HTTP 403.`
 can become WARN for the known cloud-runner restriction. Wrong data, stale data,
-other HTTP errors, and timeouts remain FAIL. One WARN is tolerated; any FAIL or
-more than one WARN makes the process exit with code 1.
+other HTTP errors, and unclassified upstream errors remain FAIL. Structured
+transport failures (timeout, network failure, or transient HTTP exhaustion)
+are DEGRADED. DEGRADED is a failing result, not an outage exemption. One WARN
+is tolerated; any FAIL, any DEGRADED, or more than one WARN exits with code 1.
+
+ArcGIS (including heritage) and Marine Institute calls use the shared HTTP
+client: two attempts by default, each bounded to 10 seconds, with 125–250 ms
+backoff between attempts. The deadline covers headers, success/error bodies,
+and uncooperative fetch implementations. Successful recovery still must pass
+all normal envelope, domain and expected-value checks. There is no additional
+smoke-level retry, longer default timeout, or cross-run failure allowance.
+
+Transport errors include `upstream_failure` with `kind`, `attempts`, and,
+where applicable, `timeout_ms` or HTTP `status`. The Markdown receipt includes
+these details. Argument rejection, malformed JSON, oversize responses, stale
+data, and unexpected handler failures never gain this transport marker merely
+because their code is `UPSTREAM_DOWN`. A known HTTP argument rejection remains
+BAD_ARGS even when its explanatory body stalls. These diagnostics establish
+the failure boundary, not whether the provider, network or client environment
+caused it. The local source smoke and hosted protocol check remain separate.
+
+Issue #80's 12–13 October receipts show different providers exhausting the
+existing timeout budget. They do not establish a provider outage root cause.
+The corrective tests use fake time and recorded fixtures; a passing test is
+not evidence that a publisher is available now.
 
 These checks prove response structure and selected consistency rules. They do
 not prove publisher accuracy or completeness. Historical tables below record
