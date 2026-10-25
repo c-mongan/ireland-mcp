@@ -38,4 +38,3 @@ export function csvRows(input: string, label = "CSV export"): string[][] {
   if (row.length || field || closed) pushRow();
   return rows;
 }
-

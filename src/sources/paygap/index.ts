@@ -151,4 +151,3 @@ export const paygapModule: SourceModule = {
   coverage: "Combined employer report records and publication annotations supplied by PayGap.ie. Coverage and completeness are as published; records do not establish population coverage or causation.",
   tools: [searchTool]
 };
-
