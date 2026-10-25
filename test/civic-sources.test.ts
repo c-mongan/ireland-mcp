@@ -11,8 +11,8 @@ const unpack = (result: unknown) => JSON.parse((result as { content: Array<{ tex
 describe("civic sources through the MCP gateway", () => {
   it("discovers and calls lobbying and PayGap through the default lean surface", async () => {
     const client = await connectClient(createAppServer(createContext({ fetch: fakeFetch([
-      { match: /api.lobbying.ie/, file: fixture("lobbying/fixtures/search-page-1.json") },
-      { match: /paygap.ie/, file: fixture("paygap/fixtures/annotated-reports.csv") }
+      { match: (url) => new URL(url).hostname === "api.lobbying.ie", file: fixture("lobbying/fixtures/search-page-1.json") },
+      { match: (url) => new URL(url).hostname === "paygap.ie", file: fixture("paygap/fixtures/annotated-reports.csv") }
     ]) })));
     try {
       const catalogue = unpack(await client.callTool({ name: "ireland_catalogue", arguments: {} }));
@@ -30,7 +30,7 @@ describe("civic sources through the MCP gateway", () => {
   });
   it("reads a council workbook through the registered source with units and provenance", async () => {
     const client = await connectClient(createAppServer(createContext({ fetch: fakeFetch([
-      { match: /opendata.housing.gov.ie/, file: fixture("council-budgets/fixtures/budget-2026.xlsx") }
+      { match: (url) => new URL(url).hostname === "opendata.housing.gov.ie", file: fixture("council-budgets/fixtures/budget-2026.xlsx") }
     ]) })));
     try {
       const result = unpack(await client.callTool({ name: "ireland_call", arguments: { source: "council-budgets", operation: "council_budgets_get", args: { year: 2026, authority: "Carlow County Council", division: "A", limit: 1 }, max_tokens: 3000 } }));

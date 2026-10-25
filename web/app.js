@@ -19,6 +19,8 @@ const SOURCE_FALLBACK = [
     { id: "census-areas", name: "CSO Census 2022 small areas", summary: "Small-area boundary lookup for census geography.", operations: ["census_small_area_at"] }
   ] },
   { domain: "economy", sources: [
+    { id: "paygap", name: "PayGap.ie employer reports", summary: "Employer pay-gap reports with original report links and data-quality annotations.", operations: ["paygap_search_reports"] },
+    { id: "council-budgets", name: "Council budgets", summary: "Adopted council expenditure and income budgets for 2015–2026; 2017 has documented source gaps.", operations: ["council_budgets_list_years", "council_budgets_get"] },
     { id: "cro", name: "Companies Registration Office open data", summary: "Irish company-register catalogue datasets and datastore queries.", operations: ["cro_search_datasets", "cro_get_dataset", "cro_query_datastore"] },
     { id: "kohesio", name: "Kohesio EU-funded projects", summary: "EU-funded Irish projects from dated official Kohesio CSV exports (not live).", operations: ["kohesio_search_projects", "kohesio_get_project"] },
     { id: "ted", name: "EU Tenders Electronic Daily", summary: "Irish and EU public-procurement notices from TED.", operations: ["ted_search_tenders", "ted_get_notice"] }
@@ -40,6 +42,7 @@ const SOURCE_FALLBACK = [
     { id: "eirgrid", name: "EirGrid Smart Grid Dashboard", summary: "Live electricity demand, wind generation and carbon intensity.", operations: ["grid_get_status"] }
   ] },
   { domain: "law/politics", sources: [
+    { id: "lobbying", name: "SIPO Register of Lobbying", summary: "Published lobbying returns with bounded date windows and paged search.", operations: ["lobbying_search_returns"] },
     { id: "oireachtas", name: "Houses of the Oireachtas Open Data API", summary: "Members, bills, debates, parliamentary questions and votes.", operations: ["oireachtas_search_members", "oireachtas_search_bills", "oireachtas_get_debates", "oireachtas_search_questions", "oireachtas_get_votes"] },
     { id: "legislation", name: "Irish Statute Book via ELI", summary: "Acts of the Oireachtas by year, contents and section text.", operations: ["legislation_list_acts", "legislation_get_act", "legislation_get_section"] },
     { id: "irish-legal", name: "Irish legal evidence corpus", optional: true, summary: "Optional pilot of indexed source versions and Act sections, seeded with annual leave and working time. Current law is unverified; Revised Acts indexing requires explicit publisher reuse permission.", operations: ["irish_legal_catalogue", "irish_legal_search", "irish_legal_fetch", "irish_legal_get_provision", "irish_legal_get_changes", "irish_legal_research"] },
@@ -80,6 +83,9 @@ const SOURCE_DETAILS = {
   epa: { licence: "CC BY 4.0", example: "Find EPA waterbodies near the Liffey." },
   "environment-sites": { licence: "CC BY 4.0", example: "What protected sites are near this point?" },
   eirgrid: { licence: "Attribution required (EirGrid disclaimer)", example: "What is the current wind share on the grid?" },
+  lobbying: { licence: "SIPO PSI reuse policy", example: "Find published lobbying returns about housing this year." },
+  paygap: { licence: "CC0 1.0", example: "Find AIB's 2025 gender pay-gap reports." },
+  "council-budgets": { licence: "CC BY-SA 4.0", example: "Show Carlow County Council's 2026 housing budget." },
   oireachtas: { licence: "Oireachtas (Open Data) PSI Licence", example: "Find recent bills mentioning housing." },
   legislation: { licence: "PSI General Licence / CC BY 4.0", example: "Show section 1 of a 2024 Act." },
   "irish-legal": { licence: "Per-document publisher licence", coverage: "Optional pilot: only ingested pages, seeded with annual leave and working time. Current law is unverified. Revised Acts indexing requires explicit publisher reuse permission.", example: "Retrieve the indexed enacted annual-leave section with its version and currentness warnings." },
