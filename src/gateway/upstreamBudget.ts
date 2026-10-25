@@ -221,7 +221,8 @@ const HOST_SOURCES: Record<string, string> = {
   "data.epa.ie": "epa",
   "api.ted.europa.eu": "ted",
   "api.citybik.es": "bikes",
-  "query.wikidata.org": "wikidata"
+  "query.wikidata.org": "wikidata",
+  "www.wikidata.org": "wikidata"
 };
 
 /** Maps an upstream URL to its source id; unknown hosts fall back to the hostname (never the path or query). */
