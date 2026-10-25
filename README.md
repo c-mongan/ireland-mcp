@@ -166,7 +166,7 @@ The server is a stateless Azure Functions Flex app with a lean gateway in front 
 
 ## Sources
 
-The default profile registers 33 source modules in `src/registry.ts`. The default `nearby`, `search` and `fetch` shortcuts sit above these sources. The optional pilot rows require `LEGAL_ENABLED=true` and an ingested corpus; check `ireland_catalogue` for the modules available on an endpoint. See [new provider access and limits](docs/public-source-additions.md) and the [Codex review loop](docs/codex-review-loop.md).
+The default profile registers 33 source modules in `src/registry.ts`. The default `nearby`, `search` and `fetch` shortcuts sit above these sources. The optional pilot rows require `LEGAL_ENABLED=true` and an ingested corpus; check `ireland_catalogue` for the modules available on an endpoint. See [new provider access and limits](docs/public-source-additions.md).
 
 | Domain | Source id | Publisher / source | Operations | Licence |
 | --- | --- | --- | ---: | --- |
