@@ -104,7 +104,7 @@ for (const section of sections) {
             const sourceLink = preview.locator("a[data-source-url]");
             const expectedUrl = section === "playground-weather" ? "https://www.met.ie/warnings" : section === "playground-transport" ? "https://luas.ie/" : section === "playground-rent" ? "https://data.cso.ie/table/RIQ02" : "https://data.cso.ie/search?q=population";
             await expect(sourceLink).toHaveText(expectedUrl);
-            await expect(sourceLink).toHaveAttribute("aria-label", "Open the source response");
+            await expect(sourceLink).toHaveAttribute("aria-label", `${expectedUrl} (open the source response)`);
             await expect(sourceLink).toHaveAttribute("rel", "noreferrer");
             await expect(sourceLink).toHaveAttribute("data-source-url", expectedUrl);
             await expect(sourceLink).toHaveAttribute("aria-disabled", "true");
