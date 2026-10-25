@@ -68,19 +68,58 @@ domain-deployment ordering regression.
 
 `.github/workflows/deploy-legal.yml` updates the existing Function App without provisioning resources. A change to that workflow on `main` triggers a rollout; subsequent rollouts can use manual dispatch from `main`. The production job grants OIDC access only for a `main` push or a manual dispatch with `refs/heads/main`; dispatches from other refs are skipped. Pull requests run the existing CI workflows and cannot trigger this deployment workflow or obtain its production OIDC token.
 
-On 2026-10-11, the owner authorized making PR #76 ready, iterating on Copilot review, merging the reviewed change and deploying the existing app with its first source refresh. This supersedes the original draft-only implementation scope. The workflow uses the same `production` OIDC identity and `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` variables as the existing deploy workflow. Set `AZURE_RESOURCE_GROUP`/`AZURE_FUNCTION_APP_NAME` if the deployed resource names differ from the documented production app. The production identity variables are currently missing; deployment remains blocked until they are configured. No successful deployment is implied by the workflow's presence or CI passing.
+On 2026-10-11, the owner authorized making PR #76 ready, iterating on Copilot review, merging the reviewed change and deploying the existing app with its first source refresh. This supersedes the original draft-only implementation scope. The workflow uses the same `production` OIDC identity and `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` variables as the existing deploy workflow. Set `AZURE_RESOURCE_GROUP`/`AZURE_FUNCTION_APP_NAME` if the deployed resource names differ from the documented production app. The 2026-10-11 production run (38167109074) received none of the three Azure login inputs and failed before authentication. Inspect their configured scope and values before rerunning; the log does not establish whether the IDs are absent from GitHub settings or stored only as secrets. No successful deployment is implied by the workflow's presence or CI passing.
 
 The rollout enables `LEGAL_ENABLED` and `LEGAL_SYNC_ENABLED`, keeps Revised Acts storage disabled, configures the Azure/MCP host origins, deploys a prebuilt package from a checked clean revision, invokes the first source refresh using the Function host's admin API, and verifies source coverage and a cited annual-leave answer. It fails if Azure credentials, source access, ingestion or chat evidence is unavailable. Source refresh observes the same robots/licence boundaries as local sync. The host key is held only in memory and is never printed. Azure OpenAI deployment creation is not part of this rollout.
 
-The rollout waits for a distinct completed refresh whose start time is at or after its admin request, then rejects failed refreshes, old required-source observations and stale chat citations. This check assumes synchronized UTC clocks on the GitHub runner and Function worker; clock skew fails verification instead of accepting an older refresh. The deployment receipt includes the refresh ID, timestamps and counts.
+The rollout waits for a distinct completed refresh whose start time is at or after its admin request, then rejects failed refreshes, old required-source observations and stale chat citations. This check assumes synchronized UTC clocks on the GitHub runner and Function worker; clock skew fails verification instead of accepting an older refresh. The deployment receipt includes the refresh ID, timestamps and counts. Also verify that the live MCP catalogue exposes `irish-legal` and `citizens-info`.
 
 For this existing-app rollout, the identity needs permission to read and configure the Function App, deploy its package and retrieve its host key. Role-assignment permissions are required by the infrastructure provisioning workflow below, not by the legal rollout.
+
+#### Authentication preflight
+
+Use `.github/workflows/deploy-legal.yml` to update the existing
+`func-ireland-mcp-aofsjpwgy4hva` in `rg-ireland-mcp`. This path does not provision
+infrastructure or create Azure role assignments. Reuse the existing deployment
+app registration or user-assigned managed identity; do not create a client secret
+or substitute the Function App's runtime system-assigned identity.
+
+Before rerunning the rollout:
+
+1. Inspect the GitHub `production` environment's variables and inherited repository
+   variables. This workflow reads `vars.AZURE_CLIENT_ID`, `vars.AZURE_TENANT_ID`
+   and `vars.AZURE_SUBSCRIPTION_ID`; values stored only as secrets do not populate
+   these expressions. Set the three variables to the verified existing deployment
+   identity's client ID, directory tenant ID and target subscription ID.
+2. Inspect that identity's federated credentials. Match the actual GitHub token's
+   subject, issuer `https://token.actions.githubusercontent.com` and audience
+   `api://AzureADTokenExchange`. The expected default subject for this repository
+   is `repo:c-mongan@60523371/ireland-mcp@1405741576:environment:production`, as described below. Add or correct only the missing exact
+   trust on the existing identity after confirming the emitted claim.
+3. Verify its existing Azure access covers reading the Function App, updating app
+   settings, deploying the package and listing the host key for the first source
+   refresh. Do not apply the initial-provisioning subscription roles below just
+   to release code. Review any genuinely missing access at the smallest resource
+   scope needed.
+4. Preserve `environment: production`, the `main` push/manual-dispatch guard,
+   job-scoped `id-token: write`, and production environment branch restrictions.
+   Once the configuration is ready, rerun the failed production job or manually
+   dispatch `deploy-legal.yml` from `main`.
 
 ### Initial infrastructure provisioning
 
 1. Create an Entra app registration or user-assigned identity.
    Add a federated credential: issuer `https://token.actions.githubusercontent.com`,
-   subject `repo:c-mongan/ireland-mcp:environment:production`.
+   audience `api://AzureADTokenExchange`, and a subject that exactly matches
+   the workflow token. This repository was created on 2026-10-05; GitHub's default
+   for repositories created after 2026-07-15 includes immutable owner/repository IDs:
+   `repo:c-mongan@60523371/ireland-mcp@1405741576:environment:production`.
+   Check the repository's OIDC settings/subject preview or Azure Login's
+   `Federated token details` before relying on this value, because a customized
+   subject template can change the emitted claim. A legacy name-only subject or
+   a `ref:refs/heads/main` subject does not match the default `production`
+   environment subject. See [GitHub's OIDC reference](https://docs.github.com/en/actions/reference/security/oidc)
+   and [Microsoft's immutable-subject migration guide](https://learn.microsoft.com/en-us/entra/workload-id/workload-identities-github-immutable-subjects).
 2. Grant it Contributor and User Access Administrator on the subscription.
    User Access Administrator is needed because the template creates role assignments.
    Scope this to a dedicated subscription or resource group if you can.
