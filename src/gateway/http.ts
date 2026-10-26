@@ -115,9 +115,11 @@ export class HttpClient {
     let timer: ReturnType<typeof setTimeout>;
     const deadline = new Promise<never>((_resolve, reject) => {
       timer = setTimeout(() => {
-        // A known argument rejection stays strict even if its explanatory body stalls.
-        reject(receivedStatus !== undefined && CALLER_ERROR_STATUSES.has(receivedStatus)
-          ? rejectedArgs(label, receivedStatus) : timedOut());
+        // A known argument rejection, or a 403 whose quota body is being read, stays strict
+        // (and is not retried) even if its explanatory body stalls.
+        if (receivedStatus !== undefined && CALLER_ERROR_STATUSES.has(receivedStatus)) reject(rejectedArgs(label, receivedStatus));
+        else if (receivedStatus === 403 && options.detectQuota) reject(httpStatusError(label, 403));
+        else reject(timedOut());
         controller.abort();
       }, timeoutMs);
     });
@@ -171,10 +173,9 @@ export class HttpClient {
       });
     }
     if (!response.ok) {
-      const message = `${label} returned HTTP ${response.status}.`;
       const transient = TRANSIENT_STATUSES.has(response.status) || options.retryStatuses?.includes(response.status);
-      if (transient) throw new TransientUpstreamError(message, { kind: "http", status: response.status });
-      throw new ToolError("UPSTREAM_DOWN", message, { hint: hintForStatus(response.status), retryable: false, httpStatus: response.status });
+      if (transient) throw new TransientUpstreamError(`${label} returned HTTP ${response.status}.`, { kind: "http", status: response.status });
+      throw httpStatusError(label, response.status);
     }
 
     const maxBytes = options.maxBytes ?? DEFAULT_MAX_BYTES;
@@ -199,6 +200,10 @@ function rejectedArgs(label: string, status: number, reason = ""): ToolError {
   return new ToolError("BAD_ARGS", `${label} rejected the request parameters (HTTP ${status})${reason ? `: ${reason}` : "."}`, {
     hint: "Fix the arguments (check field or column names, values and formats against the tool schema or the dataset's fields) and retry."
   });
+}
+
+function httpStatusError(label: string, status: number): ToolError {
+  return new ToolError("UPSTREAM_DOWN", `${label} returned HTTP ${status}.`, { hint: hintForStatus(status), retryable: false, httpStatus: status });
 }
 
 /** Azure API Management's quota policy answers 403 "Out of bandwidth quota. Quota will be replenished in 10:35:01." */

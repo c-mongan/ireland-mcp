@@ -530,4 +530,14 @@ describe("publisher API quota", () => {
     await expect(client.text("https://example.ie/", { detectQuota: true })).rejects.toMatchObject({ code: "RATE_LIMITED", retryAfterSeconds: 600 });
     await expect(client.text("https://example.ie/")).rejects.toMatchObject({ code: "UPSTREAM_DOWN", message: "example.ie returned HTTP 403." });
   });
+
+  it("fails a 403 fast, without a retry, when its quota body stalls", async () => {
+    let calls = 0;
+    const client = new HttpClient(async () => {
+      calls += 1;
+      return new Response(new ReadableStream({ start() {} }), { status: 403 });
+    });
+    await expect(client.text("https://example.ie/", { detectQuota: true, timeoutMs: 50 })).rejects.toMatchObject({ code: "UPSTREAM_DOWN", message: "example.ie returned HTTP 403.", retryable: false });
+    expect(calls).toBe(1);
+  });
 });
