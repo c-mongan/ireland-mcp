@@ -4,7 +4,7 @@ import { TieredCache, type CacheEntry, type PersistentStore } from "./cache.js";
 import { createContext } from "./context.js";
 import { bound, envelope, MAX_LIMIT } from "./envelope.js";
 import { ToolError, toToolError } from "./errors.js";
-import { backoffMs, HttpClient } from "./http.js";
+import { backoffMs, HttpClient, quotaExhausted } from "./http.js";
 import { UpstreamBudgets } from "./upstreamBudget.js";
 import { handleMcpHttp } from "./httpHandler.js";
 import { defineTool, type SourceModule } from "./module.js";
@@ -510,5 +510,24 @@ describe("createContext", () => {
     expect(again).toEqual({ value: { n: 1 }, cached: true, stale: false });
     expect((await ctx.cachedText("https://x.ie/text", 1000)).value).toBe("hello");
     expect(fetch.calls).toHaveLength(2);
+  });
+});
+
+describe("publisher API quota", () => {
+  it("recognises Azure API Management quota messages and parses the reset time", () => {
+    expect(quotaExhausted("X", "Out of bandwidth quota. Quota will be replenished in 10:35:01.")).toMatchObject({ code: "RATE_LIMITED", retryAfterSeconds: 38101 });
+    expect(quotaExhausted("X", "Out of call volume quota. Quota will be replenished in 1.02:00:00.")).toMatchObject({ code: "RATE_LIMITED", retryAfterSeconds: 93600 });
+    const noTime = quotaExhausted("X", "Out of bandwidth quota.");
+    expect(noTime?.retryAfterSeconds).toBeUndefined();
+    expect(noTime?.hint).toContain("when the publisher's quota period resets");
+    expect(quotaExhausted("X", "Forbidden")).toBeUndefined();
+    expect(quotaExhausted("X", "")).toBeUndefined();
+  });
+
+  it("only reads a 403 body when the caller opts in", async () => {
+    const body = '{ "statusCode": 403, "message": "Out of bandwidth quota. Quota will be replenished in 00:10:00." }';
+    const client = new HttpClient(async () => new Response(body, { status: 403 }));
+    await expect(client.text("https://example.ie/", { detectQuota: true })).rejects.toMatchObject({ code: "RATE_LIMITED", retryAfterSeconds: 600 });
+    await expect(client.text("https://example.ie/")).rejects.toMatchObject({ code: "UPSTREAM_DOWN", message: "example.ie returned HTTP 403." });
   });
 });

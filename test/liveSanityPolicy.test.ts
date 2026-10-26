@@ -93,6 +93,20 @@ describe("live smoke policy", () => {
       expect(assessSmokeResult(result({ ...base, data }), nta).status).toBe("FAIL");
     }
   });
+  it("tolerates only the exact Fáilte Ireland publisher quota error", () => {
+    const failte = { source: "failte-ireland", tool: "failte_search", check: () => true };
+    const quota = { error: { code: "RATE_LIMITED", message: "Fáilte Ireland CSV is out of its publisher API quota (HTTP 403)." } };
+    const warned = assessSmokeResult(result(quota, true), failte);
+    expect(warned.status).toBe("WARN");
+    expect(warned.note).toContain("Known flaky");
+    expect(assessSmokeResult(result(quota), failte).status).toBe("FAIL");
+    expect(assessSmokeResult(result({ error: { code: "UPSTREAM_DOWN", message: "Fáilte Ireland CSV returned HTTP 403." } }, true), failte).status).toBe("FAIL");
+    expect(assessSmokeResult(result({ error: { code: "RATE_LIMITED", message: "Fáilte Ireland CSV is rate limiting requests." } }, true), failte).status).toBe("FAIL");
+    expect(assessSmokeResult({ ...result(quota, true), _meta: { "ireland/source": "nta" } }, failte).status).toBe("FAIL");
+    expect(assessSmokeResult(result({ ...quota, operation: "failte_other" }, true), failte).status).toBe("FAIL");
+    // Another source's quota error is not tolerated.
+    expect(assessSmokeResult(result(quota, true), { ...failte, source: "cso", tool: "cso_area_profile" }).status).toBe("FAIL");
+  });
   it("lists Kohesio as known flaky", () => {
     expect(KNOWN_FLAKY.kohesio).toContain("403");
   });

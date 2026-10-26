@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { createContext, HOUR } from "../../gateway/context.js";
+import { createContext, DAY } from "../../gateway/context.js";
 import { describe, expect, it } from "vitest";
 import { callTool, fixturePath } from "../../../test/helpers/callTool.js";
 import { fakeFetch } from "../../../test/helpers/fakeFetch.js";
@@ -78,7 +78,7 @@ describe("Fáilte Ireland public CSV", () => {
     const valid = await callTool(failteIreland,"failte_search",{dataset:"accommodation"},ctx);
     expect(valid.ok).toBe(true);
     expect(valid.body.cached).toBe(false);
-    now = new Date(now.getTime() + HOUR + 1);
+    now = new Date(now.getTime() + DAY + 1);
     const stale = await callTool(failteIreland,"failte_search",{dataset:"accommodation"},ctx);
     expect(stale.ok).toBe(true);
     expect(stale.body.stale).toBe(true);
@@ -96,6 +96,35 @@ describe("Fáilte Ireland public CSV", () => {
     const result = await callTool(failteIreland,"failte_search",{dataset:"accommodation"},fakeFetch([{match:/\/accommodation\/csv$/,body:new Uint8Array([0xff,0xfe,0xff])}]));
     expect(result.ok).toBe(false);
     expect(result.body.error).toMatchObject({code:"UPSTREAM_DOWN",message:"Fáilte Ireland returned an invalid CSV export."});
+  });
+  describe("publisher quota (issue #110)", () => {
+    const quota = { match: /\/accommodation\/csv$/, status: 403, file: fixturePath(import.meta.url, "quota-exhausted.json"), headers: { "content-type": "application/json" } };
+    it("reports a used-up publisher quota as RATE_LIMITED with when it resets", async () => {
+      const fetch = fakeFetch([quota]);
+      const r = await callTool(failteIreland, "failte_search", { dataset: "accommodation" }, fetch);
+      expect(r.ok).toBe(false);
+      expect(r.body.error).toMatchObject({ code: "RATE_LIMITED", message: "Fáilte Ireland CSV is out of its publisher API quota (HTTP 403).", retry_after_seconds: 38101 });
+      expect(r.body.error.hint).toContain("about 11 hour(s)");
+      // A 403 is not retried.
+      expect(fetch.calls).toHaveLength(1);
+    });
+    it("serves the earlier export flagged stale while the quota is used up", async () => {
+      let now = new Date("2026-10-26T05:00:00Z");
+      let exhausted = false;
+      const fetch = fakeFetch([{ ...quota, match: (url: string) => exhausted && quota.match.test(url) }, { match: /\/accommodation\/csv$/, body: accommodation }]);
+      const ctx = createContext({ fetch, now: () => now });
+      expect((await callTool(failteIreland, "failte_search", { dataset: "accommodation" }, ctx)).ok).toBe(true);
+      now = new Date(now.getTime() + DAY + 1);
+      exhausted = true;
+      const stale = await callTool(failteIreland, "failte_search", { dataset: "accommodation" }, ctx);
+      expect(stale.ok).toBe(true);
+      expect(stale.body.stale).toBe(true);
+      expect(stale.body.data.export_retrieved_at).toBe("2026-10-26T05:00:00.000Z");
+    });
+    it("keeps other 403s as UPSTREAM_DOWN", async () => {
+      const r = await callTool(failteIreland, "failte_search", { dataset: "accommodation" }, fakeFetch([{ match: /\/accommodation\/csv$/, status: 403, body: '{"statusCode":403,"message":"Forbidden"}' }]));
+      expect(r.body.error).toMatchObject({ code: "UPSTREAM_DOWN", message: "Fáilte Ireland CSV returned HTTP 403." });
+    });
   });
 });
 

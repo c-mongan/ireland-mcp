@@ -5,6 +5,9 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+- Fáilte Ireland `failte_search`: when the publisher's open-data API runs out of its shared bandwidth quota (HTTP 403 "Out of bandwidth quota"), the tool now returns `RATE_LIMITED` with the reset time, or an earlier export flagged stale, instead of a generic access error. The export is cached for a day instead of an hour to use less of that quota. The nightly live smoke reports this exact error as WARN (#110).
+
 ### Added
 - A "Website or docs feedback" issue template, so feedback about irishopendata.ie and the docs has a clear route.
 - The legal pilot now appears as a beta on the website and in the README, with a plain-English [assessment](docs/legal-beta-assessment.md) of coverage, licences and risks. `LEGAL_ENABLED` stays off by default.
