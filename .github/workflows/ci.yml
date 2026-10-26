@@ -29,7 +29,7 @@ jobs:
       - name: Validate renderer output safety
         run: npm run test:media
       - name: Validate Azure deployment ordering and ZIP packaging
-        run: node --test test/infra-arm.mjs test/deploy-zip.mjs test/status-checkout.mjs test/live-sanity-legal.mjs test/source-directory.mjs test/legal-workflow.mjs
+        run: node --test test/infra-arm.mjs test/deploy-zip.mjs test/status-checkout.mjs test/live-sanity-legal.mjs test/source-directory.mjs test/legal-workflow.mjs evals/multistep/multistep.test.mjs
       - run: npm run build
       - name: MCP Inspector conformance (stdio)
         run: npm run inspector:check

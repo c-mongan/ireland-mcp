@@ -16,6 +16,8 @@ All notable changes to this project are documented here. The format follows
 ### Changed
 - README opens in plain English: what you can ask, a 30-second setup, how to check an answer and a **Beta features** section near the top. Developer detail sits lower.
 
+- Hard multi-step benchmark (`npm run eval:multistep`): 40 questions across three tiers that each combine at least two sources. Reference answers are pinned and recomputed through the real tools. Each failing question is tagged with the capability that would unlock it: dataset cards, place crosswalk, server-side query or knowledge index. A nightly references-only workflow needs no model key. See `docs/evals-multistep.md`.
+
 ### Fixed
 - CKAN portals (data.gov.ie, Smart Dublin, CRO, NCSE) no longer cache a `success:false` response for the cache TTL; the next call retries upstream.
 - `fetch` now resolves the `eurostat:` and `wikidata:` ids that `search` returns; before, it answered NOT_FOUND. The NOT_FOUND hint lists only sources that can fetch, and an empty key (`cso:`) returns BAD_ARGS.
