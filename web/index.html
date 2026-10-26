@@ -241,12 +241,16 @@
         </div>
         <ul class="beta-facts">
           <li><strong>What it reads:</strong> two Citizens Information guidance pages, the Organisation of Working Time Act 1997 and the Irish Statute Book list of that Act’s later changes.</li>
-          <li><strong>Act text is as passed in 1997.</strong> It may not include later amendments. Check the cited source and its date.</li>
+          <li><strong>Act text is as passed in 1997.</strong> It may not include later amendments, and it cannot tell you whether a law is in force today. Check the cited source and its date.</li>
           <li><strong>Citizens Information currently blocks automated access,</strong> so a refresh may only update the Irish Statute Book pages. We will not disguise the pilot as a web browser. Wider coverage needs permission or an official export from the Citizens Information Board. We have asked.</li>
           <li><strong>AI summaries can be wrong.</strong> Every answer quotes its sources. Read them.</li>
         </ul>
       </div>
-      <p class="beta-howto">It is off on the hosted server. To try it on your own copy, run <code>npm run legal:sync</code> then <code>npm run legal:serve</code>, or start the main server with <code>LEGAL_ENABLED=true</code>. <a href="https://github.com/c-mongan/ireland-mcp/blob/main/docs/legal-beta-assessment.md">Read the beta assessment <span aria-hidden="true">↗</span></a></p>
+      <p class="beta-howto">It is off on the hosted server. <a href="https://github.com/c-mongan/ireland-mcp/blob/main/docs/legal-beta-assessment.md">Read what the beta covers <span aria-hidden="true">↗</span></a></p>
+      <details class="beta-run">
+        <summary>Run it yourself (for developers)</summary>
+        <p>In a copy of the code, run <code>npm run legal:sync</code> then <code>npm run legal:serve</code>, or start the main server with <code>LEGAL_ENABLED=true</code>. See the <a href="https://github.com/c-mongan/ireland-mcp/blob/main/packages/irish-legal-mcp/README.md">pilot guide</a>.</p>
+      </details>
     </section>
 
     <section id="faq" class="section wrap faq-section" aria-labelledby="faq-title">
