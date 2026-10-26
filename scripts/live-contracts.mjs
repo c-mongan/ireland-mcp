@@ -33,6 +33,14 @@ const legalCoverage = shape({ document_count: (value) => Number.isInteger(value)
 const legalSearch = (data) => shape({ hits: records, coverage: legalCoverage })(data) && data.hits.every(legalEvidence);
 
 export const operationContracts = {
+  logainm_search_places: (data) => shape({ total: number, page: positive, places: records })(data)
+    && data.places.every(shape({ id: positive, url: text, names: records, created_at: text })) && data.total >= data.places.length,
+  failte_search: (data) => shape({ dataset: (value) => ["accommodation", "attractions"].includes(value), records, total: number, export_rows: positive, export_sha256: text, export_retrieved_at: text })(data)
+    && data.records.every(shape({ name: text, latitude: nullableNumber, longitude: nullableNumber })) && data.total >= data.records.length,
+  tfi_static_search_stops: (data) => shape({ stops: records, total: number, offset: number, fetched_at: text })(data)
+    && data.stops.every(shape({ atco_code: text, name: text, lat: nullableNumber, lon: nullableNumber })) && data.total >= data.stops.length,
+  groundwater_vulnerability_at: (data) => shape({ status: (value) => ["matched", "outside_coverage", "incomplete"].includes(value), areas: records, map_scale: (value) => value === "1:40000", limitation: text })(data)
+    && data.areas.every(shape({ id: text, category: text, description: text })) && (data.status === "matched" ? data.areas.length > 0 : data.areas.length === 0),
   lobbying_search_returns: shape({ returns: records, page: number }),
   paygap_search_reports: shape({ reports: records, total_reports: number }),
   council_budgets_list_years: shape({ years: records }),

@@ -18,6 +18,10 @@ const REPORT_PATH = new URL("../docs/live-all-ops.md", import.meta.url);
 let REQUEST_DELAY_MS = 0;
 
 const SAMPLE_ARGS = {
+  "logainm/ logainm_search_places": { query: "Gaillimh", limit: 2 },
+  "failte-ireland/ failte_search": { dataset: "attractions", county: "Galway", limit: 2 },
+  "tfi-static/ tfi_static_search_stops": { name: "Heuston", limit: 2 },
+  "gsi/ groundwater_vulnerability_at": { lat: 53.3498, lon: -6.2603, limit: 10 },
   "oireachtas/ oireachtas_search_members": { name: "Harris", limit: 3 },
   "oireachtas/ oireachtas_search_bills": { query: "housing", year: "2024", limit: 3 },
   "oireachtas/ oireachtas_get_debates": { chamber: "dail", limit: 2, max_sections: 5 },

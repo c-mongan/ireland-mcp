@@ -48,6 +48,7 @@ const USER_AGENT = "ireland-mcp-healthcheck/1.0 (+https://github.com/c-mongan/ir
 /** One cheap, real request per source: small documents or metadata endpoints only. */
 export function defaultProbes(env: Record<string, string | undefined>): Probe[] {
   const ntaKey = env.NTA_API_KEY;
+  const logainmKey = env.LOGAINM_API_KEY?.trim();
   const year = new Date().getUTCFullYear();
   const lobbyingQuery = new URLSearchParams({
     currentPage: "1", pageSize: "1", queryText: "", subjectMatters: "", subjectMatterAreas: "",
@@ -55,6 +56,12 @@ export function defaultProbes(env: Record<string, string | undefined>): Probe[] 
     period: "", dpo: "", client: "", responsible: "", lobbyist: "", lobbyistId: ""
   });
   return [
+    { source: "failte-ireland", url: "https://failteireland.azure-api.net/opendata-api/v2/accommodation/csv" },
+    { source: "tfi-static", url: "https://www.transportforireland.ie/transitData/Data/NaPTAN.json" },
+    { source: "gsi", url: "https://gsi.geodata.gov.ie/server/rest/services/Groundwater/IE_GSI_Groundwater_Vulnerability_40K_IE26_ITM/MapServer/0?f=json" },
+    logainmKey
+      ? { source: "logainm", url: "https://www.logainm.ie/api/v1.0/?Query=Gaillimh&PerPage=1", headers: { "X-Api-Key": logainmKey } }
+      : { source: "logainm", url: "https://www.logainm.ie/api/v1.0/", skip: "LOGAINM_API_KEY not set" },
     { source: "lobbying", url: `https://api.lobbying.ie/api/Search?${lobbyingQuery}` },
     // The website refuses Azure; the publisher snapshot is the available fallback.
     { source: "paygap", url: PAYGAP_SNAPSHOT.source_urls[0] },

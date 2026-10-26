@@ -2,7 +2,8 @@ import { appModules, sourceModules } from "./registry.js";
 
 /** Known operator-key limits. These build counts do not establish hosted deployment or liveness. */
 export const HOSTED_LIMITS: Record<string, string> = {
-  nta: "NTA realtime needs an operator key."
+  nta: "NTA realtime needs an operator key.",
+  logainm: "Logainm needs a Gaois operator account and API key."
 };
 
 /** ireland_catalogue, ireland_describe, ireland_call, ireland_about. */

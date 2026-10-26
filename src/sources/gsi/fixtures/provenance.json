@@ -1,0 +1,13 @@
+{
+  "recorded_at": "2026-10-13",
+  "dublin_point": {
+    "url": "https://gsi.geodata.gov.ie/server/rest/services/Groundwater/IE_GSI_Groundwater_Vulnerability_40K_IE26_ITM/MapServer/0/query?f=json&where=1%3D1&geometry=-6.2603,53.3498&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=VUL40KID,VUL_CAT,VUL_DESC&returnGeometry=false&resultRecordCount=10",
+    "file": "dublin-point.json"
+  },
+  "metadata_url": "https://gsi.geodata.gov.ie/server/rest/services/Groundwater/IE_GSI_Groundwater_Vulnerability_40K_IE26_ITM/MapServer/0?f=json",
+  "licence_url": "https://data.gov.ie/en_GB/dataset/groundwater-vulnerability-140000-ireland-roi-itm?package_type=dataset",
+  "use_limits_url": "https://gsi.geodata.gov.ie/server/rest/services/Groundwater/IE_GSI_Groundwater_Vulnerability_40K_IE26_ITM/FeatureServer/0/metadata?f=html&format=default",
+  "licence": "CC BY 4.0",
+  "map_scale": "1:40000",
+  "dataset_revision": null
+}
