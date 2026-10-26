@@ -124,9 +124,9 @@ Portable Copilot / MCP JSON:
 | --- | ---: | --- |
 | Data sources | 39 | Upstream public-data sources, one module each. The `cross` combiner is not a source. |
 | Available without an operator key | 37 of 39 | NTA realtime needs an operator key. Logainm needs a Gaois operator account and API key. |
-| Catalogue operations | 92 | 89 source operations plus 3 cross-source ones (`list_sources`, `nearby`, `ireland_snapshot`), all callable through `ireland_call`. |
-| Default tools | 7 | What `tools/list` returns: 4 meta tools plus `search`, `fetch` and `nearby`. |
-| Tools with `?toolsets=all` | 98 | Every operation as a typed tool, plus the 4 meta tools, `search` and `fetch`. |
+| Catalogue operations | 93 | 89 source operations plus 4 cross-source ones (`list_sources`, `nearby`, `ireland_snapshot`, `ireland_resolve_place`), all callable through `ireland_call`. |
+| Default tools | 8 | What `tools/list` returns: 4 meta tools plus `search`, `fetch`, `nearby` and `ireland_resolve_place`. |
+| Tools with `?toolsets=all` | 99 | Every operation as a typed tool, plus the 4 meta tools, `search` and `fetch`. |
 | Prompts | 3 | `area_profile`, `commute_check`, `compare_counties`. |
 | Dataset cards | 39 of 39 | Sources with a card (topics, geography levels, time coverage, join keys) that `ireland_catalogue` filters on. See [dataset cards](docs/dataset-cards.md). |
 <!-- counts:end -->
@@ -192,7 +192,7 @@ The civic-source additions and GeoHive layer selection are described in [civic s
 
 ## Why it's lean
 
-Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **8 tools, 10,708 characters, about 2,677 tokens** (`toolsets=all` is 97 tools, about 28k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
+Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **8 tools, 10,752 characters, about 2,688 tokens** (`toolsets=all` is 99 tools, about 29k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
 
 <p align="center">
   <a href="docs/architecture/ireland-mcp-lean-surface.drawio">
