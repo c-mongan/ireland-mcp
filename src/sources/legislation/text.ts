@@ -43,9 +43,14 @@ function decodeEntities(text: string): string {
 
 /** Plain text from eISB HTML: source line breaks are layout, so whitespace collapses before block ends become new lines. */
 export function htmlText(fragment: string): string {
+  let html = fragment;
+  let before: string;
+  do {
+    before = html;
+    html = html.replace(/<(script|style)\b[\s\S]*?<\/\1\s*>/gi, "");
+  } while (html !== before);
   return toText(
-    fragment
-      .replace(/<(script|style)\b[\s\S]*?<\/\1>/gi, "")
+    html
       .replace(/\s+/g, " ")
       .replace(/<br\s*\/?>|<\/(?:tr|h[1-6]|div|li)>/gi, "$&\n")
   )

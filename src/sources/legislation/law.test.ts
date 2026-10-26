@@ -7,6 +7,7 @@ import { parseConstitution, selectArticle } from "./constitution.js";
 import { parseActEffects } from "./effects.js";
 import { legislationModule as mod, mentionsSection } from "./index.js";
 import { eliLink, parseSiListing, parseSiPage } from "./instruments.js";
+import { htmlText } from "./text.js";
 
 const f = (n: string) => fixturePath(import.meta.url, n);
 const read = (n: string) => readFileSync(f(n), "utf8");
@@ -205,5 +206,12 @@ describe("legislation law tools", () => {
     const s3 = await call("legislation_get_act_effects", { year: 2018, number: 7, section: "3" });
     expect(s3.body.data.commencement.map((r: { provision: string }) => r.provision)).toEqual(["Ss. 2-6"]);
     expect((await call("legislation_get_act_effects", { year: 2018, number: 99 })).body.error.code).toBe("NOT_FOUND");
+  });
+});
+
+describe("htmlText", () => {
+  it("drops nested script and style blocks and leaves no tag fragments", () => {
+    expect(htmlText("a<scr<script>x</script>ipt>alert(1)</script>b")).not.toMatch(/[<>]|alert/);
+    expect(htmlText("<p>one</p>\n  <p>two\n words</p><style>p{}</style>")).toBe("one\ntwo words");
   });
 });
