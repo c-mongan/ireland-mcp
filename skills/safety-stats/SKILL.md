@@ -1,6 +1,6 @@
 ---
 name: safety-stats
-description: Reports official road-safety and recorded-crime statistics for Ireland by county, Garda division or Garda station and year or quarter - persons killed and injured on roads (RSA tables published via the CSO) and recorded crime incidents by offence type (CSO, under reservation) - with population rates from the census, via the Ireland MCP server. Use when someone asks how many people died on roads in a county, how recorded crime changed in a Garda division, or wants road deaths or crime compared between areas or years.
+description: Reports official road-safety and recorded-crime statistics for Ireland by county, Garda division or Garda station and year or quarter - persons killed and injured on roads (RSA tables published via the CSO) and recorded crime incidents by offence type (CSO) - with population rates from the census, via the Ireland MCP server. Use when someone asks how many people died on roads in a county, how recorded crime changed in a Garda division, or wants road deaths or crime compared between areas or years.
 license: MIT
 ---
 
@@ -34,7 +34,7 @@ with the same `args`.
 | Persons killed and injured | ROA15 | County | Year |
 | Collisions and casualties | ROA27 | County | Year |
 | Casualties by road user, age, sex | ROA16 | State | Year |
-| Recorded crime by offence | CJQ06 | Garda division (old model) | Quarter |
+| Recorded crime by offence | CJQ06 | Garda division (old model; archived June 2026) | Quarter |
 | Recorded crime by offence | CJQ10 | Garda division (new operating model) | Quarter |
 | Recorded crime by offence | CJA07 / CJA11 | Garda station (old / new model) | Year |
 
@@ -48,7 +48,8 @@ Confirm a table is current with `cso/cso_search_tables` ("road deaths", "recorde
 2. **Fetch.** Call `cso/cso_get_data` with filters for every dimension you need, e.g. ROA15
    `{ "TLIST(A1)": ["2023","2024"], "C03867V04617": ["<county code>"] }`. Keep results under 500 rows.
    For crime, filter `TLIST(Q1)` (codes like "20251") and the Garda Division; pick headline offence
-   groups (two-digit codes such as "(01)") rather than every sub-offence.
+   groups (two-digit category codes such as "01"; their labels end in "(01)") rather than every
+   sub-offence. Prefer CJQ10 for recent quarters.
 3. **Rates (optional).** Divide by population from `cso/cso_area_profile` (county) and show per
    100,000 with the census year. Garda divisions do not match counties exactly; say so.
 4. **Compare periods.** Use full years or the same quarters year on year; quarterly crime is seasonal.
@@ -71,6 +72,7 @@ Sources
 ## Rules
 
 - Follow [../_shared/citations.md](../_shared/citations.md).
-- CSO recorded-crime statistics are published "under reservation" (quality concerns); always say so.
+- Recorded-crime figures can be revised, and fraud (offence group 09) figures before and after
+  2023Q3 are not comparable; say so when either applies.
 - Recorded crime reflects reporting and recording, not all crime. Small counts swing year to year.
 - No safety advice, no area labels like "dangerous", and no claims about causes.

@@ -37,8 +37,10 @@ with the same `args`.
 3. **Total per division.** Sum `amount` for `measure: "Expenditure"` per division. Keep Income separate;
    never add income to expenditure. Show the number of lines summed.
 4. **Per resident (optional).** Call `cso/cso_get_table_metadata` with `{ "table_code": "URLIA02" }` to find the
-   Local Authority Area code, then `cso/cso_get_data` for that area's total population. State the
-   census year; the budget year and the census year differ.
+   Local Authority Area code, then `cso/cso_get_data` with filters `"STATISTIC": ["URLIA02C01"]`,
+   `"C02199V02655": ["-"]` (both sexes) and the area code. The table has no urban/rural total, so sum
+   its six Urban/Rural Location rows. Label it "usually resident and present, Census 2022"; the budget
+   year and the census year differ.
 5. **Change over time (optional).** Repeat step 2 for an earlier supported year and show the % change
    per division. Do not adjust for inflation unless asked; if asked, use a CSO CPI table from
    `cso/cso_search_tables` and cite it.

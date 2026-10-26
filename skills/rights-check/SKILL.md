@@ -31,8 +31,10 @@ with the same `args`.
 
 1. **Restate the question** as a topic and, if known, the likely Act (e.g. tenancy notice periods →
    Residential Tenancies Act 2004).
-2. **Find the Act.** Call `search` with the topic (it covers the Irish Statute Book), or
-   `legislation/legislation_list_acts` with `{ "year", "query": "<title words>" }` when the year is known.
+2. **Find the Act.** When the year is known, call `legislation/legislation_list_acts` with
+   `{ "year", "query": "<title words>" }`. Top-level `search` only scans Acts from the last three years
+   unless the query includes a year (e.g. "residential tenancies 2004"), so add the year or use
+   `legislation/legislation_list_acts`.
 3. **Find the section.** Call `legislation/legislation_get_act` with `{ "year", "number" }` for the table of
    sections; pick the relevant section headings. Some older Acts return an empty `sections` list; then
    open the eISB link from the response to find the section number, or try likely sections directly.
