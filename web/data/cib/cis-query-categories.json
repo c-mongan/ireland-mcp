@@ -1,0 +1,679 @@
+{
+  "schema": "https://irishopendata.ie/data/cib/cis-query-categories.json#v1",
+  "title": "Citizens Information Services: queries by top-level category",
+  "description": "Table 1 of each year's CIS Query Categories report: queries per top-level category.",
+  "publisher": "Citizens Information Board",
+  "landing_page": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/",
+  "licence": "CC BY 4.0",
+  "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+  "reuse_notice": "https://www.citizensinformationboard.ie/en/notices/psi.html",
+  "attribution": "Contains Irish Public Sector Data licensed under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence. Source: Citizens Information Board, Data Hub statistical reports.",
+  "as_of": "2026-10-26",
+  "generated_at": "2026-10-26T14:12:02.636Z",
+  "generated_by": "scripts/refresh-cib.mjs (https://github.com/c-mongan/ireland-mcp)",
+  "notes": [
+    "National aggregates only. The Citizens Information Board publishes no county, local-office or CIS-company breakdown in these reports.",
+    "Figures are transcribed from the official DOCX edition of each report. The matching PDF edition is checksummed alongside it.",
+    "Published percentages are kept as printed and may not sum to exactly 100 because of rounding.",
+    "Category labels vary between years, for example 'Birth, Family & Relationships' and 'Covid 19'. Use category_key to compare years.",
+    "'Local' is a generic signposting and referral category with no published breakdown.",
+    "Only top-level categories are included. Sub-category tables are not transcribed.",
+    "The 2025 Table 1 column headed '% Sub-Category' is the share of all queries; it is stored as share_pct_published."
+  ],
+  "records": [
+    {
+      "year": 2021,
+      "total_queries": 693918,
+      "categories": [
+        {
+          "category": "Social Welfare",
+          "category_key": "social-welfare",
+          "share_pct_published": 43.33,
+          "queries": 300644
+        },
+        {
+          "category": "Housing",
+          "category_key": "housing",
+          "share_pct_published": 8.87,
+          "queries": 61577
+        },
+        {
+          "category": "Employment",
+          "category_key": "employment",
+          "share_pct_published": 8.55,
+          "queries": 59305
+        },
+        {
+          "category": "Health",
+          "category_key": "health",
+          "share_pct_published": 6.25,
+          "queries": 43372
+        },
+        {
+          "category": "Covid-19",
+          "category_key": "covid-19",
+          "share_pct_published": 5.97,
+          "queries": 41422
+        },
+        {
+          "category": "Money and Tax",
+          "category_key": "money-and-tax",
+          "share_pct_published": 5.48,
+          "queries": 38047
+        },
+        {
+          "category": "Local",
+          "category_key": "local",
+          "share_pct_published": 4.7,
+          "queries": 32636
+        },
+        {
+          "category": "Moving Country",
+          "category_key": "moving-country",
+          "share_pct_published": 3.47,
+          "queries": 24100
+        },
+        {
+          "category": "Birth, Family and Relationships",
+          "category_key": "birth-family-and-relationships",
+          "share_pct_published": 3.04,
+          "queries": 21091
+        },
+        {
+          "category": "Justice",
+          "category_key": "justice",
+          "share_pct_published": 2.79,
+          "queries": 19340
+        },
+        {
+          "category": "Travel and Recreation",
+          "category_key": "travel-and-recreation",
+          "share_pct_published": 2.58,
+          "queries": 17935
+        },
+        {
+          "category": "Education and Training",
+          "category_key": "education-and-training",
+          "share_pct_published": 1.83,
+          "queries": 12707
+        },
+        {
+          "category": "Consumer Affairs",
+          "category_key": "consumer-affairs",
+          "share_pct_published": 1.61,
+          "queries": 11199
+        },
+        {
+          "category": "Death and Bereavement",
+          "category_key": "death-and-bereavement",
+          "share_pct_published": 0.78,
+          "queries": 5413
+        },
+        {
+          "category": "Government in Ireland",
+          "category_key": "government-in-ireland",
+          "share_pct_published": 0.49,
+          "queries": 3394
+        },
+        {
+          "category": "Environment",
+          "category_key": "environment",
+          "share_pct_published": 0.25,
+          "queries": 1736
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories2021.docx",
+          "role": "query_categories_docx",
+          "format": "docx",
+          "sha256": "dc1964cdada2e964a31683856593e22a6f1f67c973ee17d4372b6a22b92b31d9",
+          "bytes": 92771,
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
+        },
+        {
+          "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories2021.pdf",
+          "role": "query_categories_pdf",
+          "format": "pdf",
+          "sha256": "c43597b5f23eabc9e4a7db1faaea5854d3bfe796f4ecd449ac2ff38b6f828f46",
+          "bytes": 519001,
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
+        }
+      ],
+      "checks": [
+        {
+          "name": "categories_sum_to_table_total",
+          "ok": true,
+          "detail": "sum 693918; published total 693918"
+        },
+        {
+          "name": "table_total_matches_narrative",
+          "ok": true,
+          "detail": "table 693918; narrative 693918"
+        }
+      ]
+    },
+    {
+      "year": 2022,
+      "total_queries": 788902,
+      "categories": [
+        {
+          "category": "Social Welfare",
+          "category_key": "social-welfare",
+          "share_pct_published": 47.1,
+          "queries": 371736
+        },
+        {
+          "category": "Housing",
+          "category_key": "housing",
+          "share_pct_published": 9.6,
+          "queries": 75414
+        },
+        {
+          "category": "Health",
+          "category_key": "health",
+          "share_pct_published": 7.2,
+          "queries": 57059
+        },
+        {
+          "category": "Employment",
+          "category_key": "employment",
+          "share_pct_published": 6.3,
+          "queries": 49667
+        },
+        {
+          "category": "Local",
+          "category_key": "local",
+          "share_pct_published": 6.1,
+          "queries": 47690
+        },
+        {
+          "category": "Moving Country",
+          "category_key": "moving-country",
+          "share_pct_published": 5.3,
+          "queries": 41824
+        },
+        {
+          "category": "Money and Tax",
+          "category_key": "money-and-tax",
+          "share_pct_published": 5.3,
+          "queries": 41561
+        },
+        {
+          "category": "Travel and Recreation",
+          "category_key": "travel-and-recreation",
+          "share_pct_published": 2.9,
+          "queries": 22462
+        },
+        {
+          "category": "Birth, Family and Relationships",
+          "category_key": "birth-family-and-relationships",
+          "share_pct_published": 2.4,
+          "queries": 18701
+        },
+        {
+          "category": "Justice",
+          "category_key": "justice",
+          "share_pct_published": 2.3,
+          "queries": 18313
+        },
+        {
+          "category": "Education and Training",
+          "category_key": "education-and-training",
+          "share_pct_published": 1.7,
+          "queries": 13417
+        },
+        {
+          "category": "Consumer Affairs",
+          "category_key": "consumer-affairs",
+          "share_pct_published": 1.5,
+          "queries": 12134
+        },
+        {
+          "category": "Covid-19",
+          "category_key": "covid-19",
+          "share_pct_published": 1,
+          "queries": 7467
+        },
+        {
+          "category": "Death and Bereavement",
+          "category_key": "death-and-bereavement",
+          "share_pct_published": 0.7,
+          "queries": 5422
+        },
+        {
+          "category": "Government in Ireland",
+          "category_key": "government-in-ireland",
+          "share_pct_published": 0.6,
+          "queries": 4566
+        },
+        {
+          "category": "Environment",
+          "category_key": "environment",
+          "share_pct_published": 0.2,
+          "queries": 1469
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2022.docx",
+          "role": "query_categories_docx",
+          "format": "docx",
+          "sha256": "590bd9c04839428e4adff191d24891aa56e17ee6fb3b16c3e3dbbfda6143f28a",
+          "bytes": 111600,
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
+        },
+        {
+          "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2022.pdf",
+          "role": "query_categories_pdf",
+          "format": "pdf",
+          "sha256": "c09513bd5553f7e571ef41348753cec94cd94e4cc583df1307bba4e08dc49ff8",
+          "bytes": 582676,
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
+        }
+      ],
+      "checks": [
+        {
+          "name": "categories_sum_to_table_total",
+          "ok": true,
+          "detail": "sum 788902; published total 788902"
+        },
+        {
+          "name": "table_total_matches_narrative",
+          "ok": true,
+          "detail": "table 788902; narrative 788902"
+        }
+      ]
+    },
+    {
+      "year": 2023,
+      "total_queries": 795278,
+      "categories": [
+        {
+          "category": "Social Welfare",
+          "category_key": "social-welfare",
+          "share_pct_published": 46.8,
+          "queries": 372085
+        },
+        {
+          "category": "Housing",
+          "category_key": "housing",
+          "share_pct_published": 10.7,
+          "queries": 85447
+        },
+        {
+          "category": "Health",
+          "category_key": "health",
+          "share_pct_published": 7.4,
+          "queries": 58529
+        },
+        {
+          "category": "Local",
+          "category_key": "local",
+          "share_pct_published": 6.3,
+          "queries": 50364
+        },
+        {
+          "category": "Money and Tax",
+          "category_key": "money-and-tax",
+          "share_pct_published": 6.1,
+          "queries": 48112
+        },
+        {
+          "category": "Employment",
+          "category_key": "employment",
+          "share_pct_published": 6,
+          "queries": 47288
+        },
+        {
+          "category": "Moving Country",
+          "category_key": "moving-country",
+          "share_pct_published": 4.7,
+          "queries": 37367
+        },
+        {
+          "category": "Justice",
+          "category_key": "justice",
+          "share_pct_published": 2.5,
+          "queries": 20061
+        },
+        {
+          "category": "Travel and Recreation",
+          "category_key": "travel-and-recreation",
+          "share_pct_published": 2.5,
+          "queries": 19820
+        },
+        {
+          "category": "Birth, Family and Relationships",
+          "category_key": "birth-family-and-relationships",
+          "share_pct_published": 2.3,
+          "queries": 18101
+        },
+        {
+          "category": "Education and Training",
+          "category_key": "education-and-training",
+          "share_pct_published": 1.8,
+          "queries": 14018
+        },
+        {
+          "category": "Consumer Affairs",
+          "category_key": "consumer-affairs",
+          "share_pct_published": 1.5,
+          "queries": 11733
+        },
+        {
+          "category": "Death and Bereavement",
+          "category_key": "death-and-bereavement",
+          "share_pct_published": 0.7,
+          "queries": 5546
+        },
+        {
+          "category": "Government in Ireland",
+          "category_key": "government-in-ireland",
+          "share_pct_published": 0.6,
+          "queries": 4885
+        },
+        {
+          "category": "Environment",
+          "category_key": "environment",
+          "share_pct_published": 0.2,
+          "queries": 1441
+        },
+        {
+          "category": "Covid-19",
+          "category_key": "covid-19",
+          "share_pct_published": 0.1,
+          "queries": 481
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2023-v3.docx",
+          "role": "query_categories_docx",
+          "format": "docx",
+          "sha256": "9737b74b3a2a195f78d96be21372f0e2e57c8e879f34aa4e176fe1457d49dbfc",
+          "bytes": 131568,
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
+        },
+        {
+          "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2023-v3.pdf",
+          "role": "query_categories_pdf",
+          "format": "pdf",
+          "sha256": "5a387fb426842971c022d2fa4a0648e61e1bdf4060a20ee0dcfe8f8e6c8da26f",
+          "bytes": 649382,
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
+        }
+      ],
+      "checks": [
+        {
+          "name": "categories_sum_to_table_total",
+          "ok": true,
+          "detail": "sum 795278; published total 795278"
+        },
+        {
+          "name": "table_total_matches_narrative",
+          "ok": true,
+          "detail": "table 795278; narrative 795278"
+        }
+      ]
+    },
+    {
+      "year": 2024,
+      "total_queries": 767168,
+      "categories": [
+        {
+          "category": "Social Welfare",
+          "category_key": "social-welfare",
+          "share_pct_published": 45.1,
+          "queries": 346054
+        },
+        {
+          "category": "Housing",
+          "category_key": "housing",
+          "share_pct_published": 11.1,
+          "queries": 85148
+        },
+        {
+          "category": "Health",
+          "category_key": "health",
+          "share_pct_published": 8.2,
+          "queries": 62496
+        },
+        {
+          "category": "Local",
+          "category_key": "local",
+          "share_pct_published": 7.2,
+          "queries": 55086
+        },
+        {
+          "category": "Money and Tax",
+          "category_key": "money-and-tax",
+          "share_pct_published": 5.8,
+          "queries": 44702
+        },
+        {
+          "category": "Employment",
+          "category_key": "employment",
+          "share_pct_published": 5.8,
+          "queries": 44326
+        },
+        {
+          "category": "Moving Country",
+          "category_key": "moving-country",
+          "share_pct_published": 4.8,
+          "queries": 36979
+        },
+        {
+          "category": "Travel and Recreation",
+          "category_key": "travel-and-recreation",
+          "share_pct_published": 2.6,
+          "queries": 19534
+        },
+        {
+          "category": "Justice",
+          "category_key": "justice",
+          "share_pct_published": 2.4,
+          "queries": 18705
+        },
+        {
+          "category": "Birth, Family & Relationships",
+          "category_key": "birth-family-and-relationships",
+          "share_pct_published": 2.1,
+          "queries": 16358
+        },
+        {
+          "category": "Education and Training",
+          "category_key": "education-and-training",
+          "share_pct_published": 1.8,
+          "queries": 13802
+        },
+        {
+          "category": "Consumer Affairs",
+          "category_key": "consumer-affairs",
+          "share_pct_published": 1.4,
+          "queries": 10717
+        },
+        {
+          "category": "Government in Ireland",
+          "category_key": "government-in-ireland",
+          "share_pct_published": 0.8,
+          "queries": 6113
+        },
+        {
+          "category": "Death and Bereavement",
+          "category_key": "death-and-bereavement",
+          "share_pct_published": 0.7,
+          "queries": 5657
+        },
+        {
+          "category": "Environment",
+          "category_key": "environment",
+          "share_pct_published": 0.2,
+          "queries": 1477
+        },
+        {
+          "category": "Covid 19",
+          "category_key": "covid-19",
+          "share_pct_published": 0,
+          "queries": 14
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2024.docx",
+          "role": "query_categories_docx",
+          "format": "docx",
+          "sha256": "ba80297c638af7d16f242a9269dd7f3ee8681d21a1d4bce4bcc684c5263ba168",
+          "bytes": 137453,
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
+        },
+        {
+          "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2024.pdf",
+          "role": "query_categories_pdf",
+          "format": "pdf",
+          "sha256": "3f08636ed9eec06fa982aaf5f6d2670224fedb046c6dc58941364ec95625a6a5",
+          "bytes": 525200,
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
+        }
+      ],
+      "checks": [
+        {
+          "name": "categories_sum_to_table_total",
+          "ok": true,
+          "detail": "sum 767168; published total 767168"
+        },
+        {
+          "name": "table_total_matches_narrative",
+          "ok": true,
+          "detail": "table 767168; narrative 767168"
+        }
+      ]
+    },
+    {
+      "year": 2025,
+      "total_queries": 708862,
+      "categories": [
+        {
+          "category": "Social Welfare",
+          "category_key": "social-welfare",
+          "share_pct_published": 44.5,
+          "queries": 315200
+        },
+        {
+          "category": "Housing",
+          "category_key": "housing",
+          "share_pct_published": 11.6,
+          "queries": 82209
+        },
+        {
+          "category": "Local",
+          "category_key": "local",
+          "share_pct_published": 7.3,
+          "queries": 51733
+        },
+        {
+          "category": "Health",
+          "category_key": "health",
+          "share_pct_published": 7.3,
+          "queries": 51513
+        },
+        {
+          "category": "Money and Tax",
+          "category_key": "money-and-tax",
+          "share_pct_published": 6.7,
+          "queries": 47635
+        },
+        {
+          "category": "Employment",
+          "category_key": "employment",
+          "share_pct_published": 5.5,
+          "queries": 39265
+        },
+        {
+          "category": "Moving Country",
+          "category_key": "moving-country",
+          "share_pct_published": 5.4,
+          "queries": 38364
+        },
+        {
+          "category": "Travel and Recreation",
+          "category_key": "travel-and-recreation",
+          "share_pct_published": 2.6,
+          "queries": 18385
+        },
+        {
+          "category": "Justice",
+          "category_key": "justice",
+          "share_pct_published": 2.5,
+          "queries": 17691
+        },
+        {
+          "category": "Birth, Family and Relationships",
+          "category_key": "birth-family-and-relationships",
+          "share_pct_published": 1.9,
+          "queries": 13653
+        },
+        {
+          "category": "Education and Training",
+          "category_key": "education-and-training",
+          "share_pct_published": 1.7,
+          "queries": 11975
+        },
+        {
+          "category": "Consumer Affairs",
+          "category_key": "consumer-affairs",
+          "share_pct_published": 1.3,
+          "queries": 9459
+        },
+        {
+          "category": "Death and Bereavement",
+          "category_key": "death-and-bereavement",
+          "share_pct_published": 0.7,
+          "queries": 5310
+        },
+        {
+          "category": "Government in Ireland",
+          "category_key": "government-in-ireland",
+          "share_pct_published": 0.7,
+          "queries": 5233
+        },
+        {
+          "category": "Environment",
+          "category_key": "environment",
+          "share_pct_published": 0.2,
+          "queries": 1237
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2025.docx",
+          "role": "query_categories_docx",
+          "format": "docx",
+          "sha256": "54c8213efe06112ed38376a60b3dc7d78f97a27508efa4b7b61c2f722d13a97e",
+          "bytes": 111749,
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
+        },
+        {
+          "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2025.pdf",
+          "role": "query_categories_pdf",
+          "format": "pdf",
+          "sha256": "367550e65eabbf69e124282863a6bf85c158f8f33f76977e9b4b4a1349cdfaf8",
+          "bytes": 654271,
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
+        }
+      ],
+      "checks": [
+        {
+          "name": "categories_sum_to_table_total",
+          "ok": true,
+          "detail": "sum 708862; published total 708862"
+        },
+        {
+          "name": "table_total_matches_narrative",
+          "ok": true,
+          "detail": "table 708862; narrative 708862"
+        }
+      ]
+    }
+  ]
+}

@@ -3,6 +3,8 @@ import { dublinDate, EIRGRID_BASE } from "../sources/eirgrid/index.js";
 import { BUDGET_RESOURCES, budgetResourceUrl } from "../sources/council-budgets/manifest.js";
 import { ARCGIS_BASE } from "../sources/geohive/index.js";
 import { snapshotHealth as kohesioSnapshotHealth } from "../sources/kohesio/index.js";
+import { snapshotHealth as cibSnapshotHealth } from "../sources/cib/index.js";
+import { snapshotHealth as civicDirectorySnapshotHealth } from "../sources/civic-directory/index.js";
 import { RAIL_BASE } from "../sources/irish-rail/index.js";
 import { EISB } from "../sources/legislation/index.js";
 import { LUAS_BASE } from "../sources/luas/index.js";
@@ -79,6 +81,9 @@ export function defaultProbes(env: Record<string, string | undefined>): Probe[] 
     { source: "cro", url: "https://opendata.cro.ie/api/3/action/status_show" },
     // Tools read the packaged CSV snapshot, so probing the (cloud-IP-blocked) live API would be misleading.
     { source: "kohesio", url: "", local: kohesioSnapshotHealth },
+    // Pinned, checksummed snapshots; the official reports and the directory are never fetched at request time.
+    { source: "cib", url: "", local: cibSnapshotHealth },
+    { source: "civic-directory", url: "", local: civicDirectorySnapshotHealth },
     { source: "smart-dublin", url: "https://data.smartdublin.ie/api/3/action/status_show" },
     { source: "met-eireann", url: WARNINGS_URL },
     ntaKey

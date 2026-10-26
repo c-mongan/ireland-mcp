@@ -95,6 +95,11 @@ export const operationContracts = {
   epa_bathing_measurements: shape({ total: number, season: text, measurements: records }),
   kohesio_search_projects: shape({ total: number, projects: records }),
   kohesio_get_project: shape({ id: text, title: text }),
+  cib_cis_annual_summary: (data) => shape({ record: object })(data) && data.record.callers > 0 && data.record.queries > 0,
+  cib_cis_query_categories: (data) => shape({ record: object })(data) && Array.isArray(data.record.categories) && data.record.categories.length > 0,
+  cib_cips_summary: (data) => shape({ record: object })(data) && data.record.contacts?.total > 0,
+  civic_directory_search: (data) => shape({ total: number, projects: records })(data)
+    && data.projects.every((p) => p.citizendata_listing?.url?.startsWith("https://citizendata.ie/project/") && p.project_link?.note === "as listed, unverified"),
   ted_search_tenders: shape({ total: number, tenders: records }),
   ted_get_notice: shape({ notice: object }),
   oireachtas_search_members: shape({ total: number, members: records }),
