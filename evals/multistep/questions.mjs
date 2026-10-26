@@ -711,6 +711,39 @@ export const items = [
     }
   },
   {
+    id: "t2-cib-social-welfare-vs-ja",
+    tier: "T2",
+    control: true,
+    drift: "stable",
+    question: "Between 2023 and 2025, by what percentage did the number of Social Welfare queries handled by Citizens Information Services change, and what share of all their 2025 queries were about Social Welfare? Over the same period, by what percentage did the national number of Jobseeker's Allowance recipients change (DSP quarterly counts, 2023Q2 to 2025Q2)? Did the two move in the same direction?",
+    required_sources: ["cib", "cso"],
+    tool_path: ["cib_cis_query_categories(2023, Social Welfare)", "cib_cis_query_categories(2025, Social Welfare)", "cso_get_table_metadata(DSP24)", "cso_get_data(DSP24, Ireland, Jobseekers Allowance, 2023Q2/2025Q2)"],
+    answer: {
+      cib_social_welfare_change_pct: { type: "number", tol_abs: 0.2 },
+      social_welfare_share_2025_pct: { type: "number", tol_abs: 0.2 },
+      ja_change_pct: { type: "number", tol_abs: 0.2 },
+      same_direction: { type: "bool" }
+    },
+    gaps: [],
+    async reference(ctx) {
+      const q = async (year) => (await ctx.call("cib", "cib_cis_query_categories", { year, category: "Social Welfare" }, { allowTruncated: true })).record;
+      const a = await q(2023);
+      const b = await q(2025);
+      const sw = (r) => r.categories.find((c) => c.category === "Social Welfare").queries;
+      const meta = await ctx.call("cso", "cso_get_table_metadata", { table_code: "DSP24", max_categories: 60 });
+      const scheme = meta.dimensions.find((d) => /Scheme/i.test(d.label));
+      const county = meta.dimensions.find((d) => d.label === "County");
+      const ja = scheme.categories.find((c) => /^Jobseekers Allowance$/i.test(c.label));
+      const ie = county.categories.find((c) => c.label === "Ireland");
+      const rows = await csoRows(ctx, "DSP24", { "TLIST(Q1)": ["2023Q2", "2025Q2"], [scheme.code]: [ja.code], [county.code]: [ie.code] });
+      const j0 = rows.find((r) => r.Quarter === "2023Q2").value;
+      const j1 = rows.find((r) => r.Quarter === "2025Q2").value;
+      const cibChange = pct(sw(a), sw(b));
+      const jaChange = pct(j0, j1);
+      return { cib_social_welfare_change_pct: cibChange, social_welfare_share_2025_pct: round((sw(b) / b.total_queries) * 100, 1), ja_change_pct: jaChange, same_direction: Math.sign(cibChange) === Math.sign(jaChange) };
+    }
+  },
+  {
     id: "t2-ed-deprivation-population",
     tier: "T2",
     drift: "stable",
@@ -844,7 +877,7 @@ export const items = [
     id: "t3-welfare-unemployment-law",
     tier: "T3",
     drift: "slow",
-    question: "Did Jobseeker's Allowance recipients in County Donegal rise or fall between 2024Q2 and 2026Q2 (DSP county counts), how does Donegal's Census 2022 ILO unemployment rate compare with the State's, how many Citizens Information queries about social welfare came from Donegal, and which Act consolidates the law on Jobseeker's Allowance (title, year, number)?",
+    question: "Did Jobseeker's Allowance recipients in County Donegal rise or fall between 2024Q2 and 2026Q2 (DSP county counts), how does Donegal's Census 2022 ILO unemployment rate compare with the State's, how many Citizens Information queries about social welfare came from Donegal (CIB publishes national totals only), and which Act consolidates the law on Jobseeker's Allowance (title, year, number)?",
     required_sources: ["cso", "legislation"],
     tool_path: ["cso_get_data(DSP24, Co.Donegal, JA, 2024Q2/2026Q2)", "cso_get_data(CPNI37)", "Citizens Information query statistics: no source", "legislation_list_acts(2005, Social Welfare Consolidation)"],
     answer: {
@@ -855,8 +888,8 @@ export const items = [
       act: { type: "text", desc: "Act title" },
       act_number: { type: "number", tol_abs: 0 }
     },
-    blocked_keys: { cib_social_welfare_queries: "knowledge:citizens-info-stats" },
-    gaps: ["knowledge:citizens-info-stats", "knowledge:law-search", "crosswalk:la-vs-county"],
+    blocked_keys: { cib_social_welfare_queries_donegal: "source:cib-county-breakdown" },
+    gaps: ["source:cib-county-breakdown", "knowledge:law-search", "crosswalk:la-vs-county"],
     async reference(ctx) {
       const meta = await ctx.call("cso", "cso_get_table_metadata", { table_code: "DSP24", max_categories: 60 });
       const scheme = meta.dimensions.find((d) => /Scheme/i.test(d.label));
@@ -1080,7 +1113,7 @@ export const items = [
     },
     gaps: ["knowledge:citizens-info", "knowledge:law-search"],
     async reference(ctx) {
-      throw new GapError("knowledge:citizens-info", ctx.hasOperation("cib_search") ? "cib_search present: write this reference" : "no Citizens Information search/get operation in the catalogue");
+      throw new GapError("knowledge:citizens-info", ctx.hasOperation("citizens_info_search") ? "citizens_info_search present: write this reference" : "no Citizens Information guidance search/get operation in the catalogue (cib_* tools are query statistics only)");
     }
   },
   {

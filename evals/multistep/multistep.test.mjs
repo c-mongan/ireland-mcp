@@ -98,6 +98,8 @@ test("failure symptoms map transcripts to pillars without trusting declared tags
 test("pillar probes flip when a capability appears", () => {
   const base = { operations: new Set(["cso_get_data", "ireland_catalogue"]), toolArgs: { ireland_catalogue: ["domain"] } };
   assert.deepEqual(pillarProbes(base), { crosswalk: false, "dataset-card": false, "server-query": false, knowledge: false });
-  const later = { operations: new Set(["ireland_resolve_place", "ireland_query", "cib_search"]), toolArgs: { ireland_catalogue: ["geo_level"] } };
+  const stats = { operations: new Set(["cib_cis_query_categories"]), toolArgs: {} };
+  assert.equal(pillarProbes(stats).knowledge, false, "CIB statistics are not a knowledge index");
+  const later = { operations: new Set(["ireland_resolve_place", "ireland_query", "citizens_info_search"]), toolArgs: { ireland_catalogue: ["geo_level"] } };
   assert.deepEqual(pillarProbes(later), { crosswalk: true, "dataset-card": true, "server-query": true, knowledge: true });
 });

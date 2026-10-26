@@ -11,12 +11,12 @@ The questions, the reference code and the runner are in `evals/multistep/`.
 
 ## Questions
 
-There are 40 questions in three tiers:
+There are 41 questions in three tiers:
 
 | Tier | What it asks | Example |
 | --- | --- | --- |
 | T1 (12) | A lookup in each of two sources | Galway's Census 2022 population and the Galway West TDs |
-| T2 (16) | A join plus arithmetic | Jobseeker's Allowance recipients per 1,000 residents by county, ranked |
+| T2 (17) | A join plus arithmetic | Jobseeker's Allowance recipients per 1,000 residents by county, ranked |
 | T3 (12) | Three or more sources plus reasoning | Ballymun against Tallaght: deprivation, transport stops and flood risk |
 
 Each question in `questions.mjs` has:
@@ -28,7 +28,7 @@ Each question in `questions.mjs` has:
 - a reference function that computes the answer by calling the real tools through `ireland_call`;
 - its capability-gap tags.
 
-Eight questions are **controls**. They have the same multi-step shape but need none of the
+Nine questions are **controls**. They have the same multi-step shape but need none of the
 planned pillars. Comparing them with the rest shows whether a failure comes from a missing
 capability or from general multi-step weakness.
 

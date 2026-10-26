@@ -1,7 +1,7 @@
 {
   "as_of": "2026-10-26",
   "server": "stdio dist/src/cli.js",
-  "git_sha": "8345128",
+  "git_sha": "6624f73",
   "items": {
     "t1-galway-pop-tds": {
       "tier": "T1",
@@ -1795,7 +1795,7 @@
             "max_categories": 60
           },
           "url": "https://data.cso.ie/table/DSP24",
-          "retrieved_at": "2026-10-26T13:54:35.923Z"
+          "retrieved_at": "2026-10-26T14:54:13.355Z"
         },
         {
           "source": "cso",
@@ -1817,7 +1817,7 @@
             "limit": 500
           },
           "url": "https://data.cso.ie/table/DSP24",
-          "retrieved_at": "2026-10-26T13:54:36.085Z"
+          "retrieved_at": "2026-10-26T14:54:13.456Z"
         },
         {
           "source": "cso",
@@ -1827,7 +1827,7 @@
             "max_categories": 100
           },
           "url": "https://data.cso.ie/table/CPNI37",
-          "retrieved_at": "2026-10-26T13:54:36.091Z"
+          "retrieved_at": "2026-10-26T14:54:13.483Z"
         },
         {
           "source": "cso",
@@ -1843,7 +1843,7 @@
             "limit": 500
           },
           "url": "https://data.cso.ie/table/CPNI37",
-          "retrieved_at": "2026-10-26T13:54:36.174Z"
+          "retrieved_at": "2026-10-26T14:54:13.554Z"
         },
         {
           "source": "legislation",
@@ -1853,7 +1853,7 @@
             "query": "Social Welfare Consolidation"
           },
           "url": "https://www.irishstatutebook.ie/eli/2005/act/",
-          "retrieved_at": "2026-10-26T13:54:36.261Z"
+          "retrieved_at": "2026-10-26T14:54:13.630Z"
         }
       ],
       "workarounds": [
@@ -2219,7 +2219,7 @@
       "drift": "slow",
       "retrieved": "2026-10-26",
       "gap": "knowledge:citizens-info",
-      "evidence": "no Citizens Information search/get operation in the catalogue"
+      "evidence": "no Citizens Information guidance search/get operation in the catalogue (cib_* tools are query statistics only)"
     },
     "t3-section-text-and-stats": {
       "tier": "T3",
@@ -2330,6 +2330,72 @@
           },
           "url": "https://experience.arcgis.com/experience/edf34d92e28040fd87d3d14f55d8d95f/",
           "retrieved_at": "2026-10-26T13:55:41.745Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t2-cib-social-welfare-vs-ja": {
+      "tier": "T2",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "cib_social_welfare_change_pct": -15.3,
+        "social_welfare_share_2025_pct": 44.5,
+        "ja_change_pct": -13,
+        "same_direction": true
+      },
+      "calls": [
+        {
+          "source": "cib",
+          "operation": "cib_cis_query_categories",
+          "args": {
+            "year": 2023,
+            "category": "Social Welfare"
+          },
+          "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2023-v3.docx",
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
+        },
+        {
+          "source": "cib",
+          "operation": "cib_cis_query_categories",
+          "args": {
+            "year": 2025,
+            "category": "Social Welfare"
+          },
+          "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2025.docx",
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_table_metadata",
+          "args": {
+            "table_code": "DSP24",
+            "max_categories": 60
+          },
+          "url": "https://data.cso.ie/table/DSP24",
+          "retrieved_at": "2026-10-26T14:54:13.003Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_data",
+          "args": {
+            "table_code": "DSP24",
+            "filters": {
+              "TLIST(Q1)": [
+                "2023Q2",
+                "2025Q2"
+              ],
+              "C03824V04573": [
+                "110"
+              ],
+              "C03788V04538": [
+                "IE0"
+              ]
+            },
+            "limit": 500
+          },
+          "url": "https://data.cso.ie/table/DSP24",
+          "retrieved_at": "2026-10-26T14:54:13.352Z"
         }
       ],
       "workarounds": []

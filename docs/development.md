@@ -28,7 +28,7 @@ npm run dev:http     # local HTTP dev server, MCP at /mcp
 | `npm run live:sanity` | Real source calls through `ireland_call`; includes the stored legal pilot when `LEGAL_ENABLED=true` or the root catalogue advertises it. Prints a Markdown receipt. See [docs/live-sanity.md](live-sanity.md). |
 | `npm run live:all [-- --url https://mcp.irishopendata.ie/mcp]` | Real MCP client proof for every catalogue operation; writes [docs/live-all-ops.md](live-all-ops.md). |
 | `npm run eval` | Promptfoo evaluation; default surface unless `EVAL_TOOLSETS=all`. |
-| `npm run eval:multistep [-- --agent]` | Hard multi-step benchmark: 40 questions that combine at least two sources. With no model key it only recomputes the reference answers and reports capability gaps. See [docs/evals-multistep.md](evals-multistep.md). |
+| `npm run eval:multistep [-- --agent]` | Hard multi-step benchmark: 41 questions that combine at least two sources. With no model key it only recomputes the reference answers and reports capability gaps. See [docs/evals-multistep.md](evals-multistep.md). |
 
 The [quality loop](quality-loop.md) explains local, hosted, semantic and visual proof. The [playground access guide](playground-auth.md) distinguishes the public query playground from ChatGPT sign-in and subscription use.
 

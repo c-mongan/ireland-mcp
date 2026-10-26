@@ -140,7 +140,8 @@ export function pillarProbes(catalogue) {
     crosswalk: ops.some((o) => /resolve_place|crosswalk/.test(o)),
     "dataset-card": (catalogue.toolArgs.ireland_catalogue ?? []).some((a) => /geo_level|topic|dimension/.test(a)),
     "server-query": ops.some((o) => /^ireland_query$|_query_tables?$/.test(o)),
-    knowledge: ops.some((o) => /citizens|^cib_|legal_search|law_search/.test(o))
+    // Statistics about Citizens Information (cib_*) are data, not a searchable guidance or law index.
+    knowledge: ops.some((o) => /citizens_info_search|legal_search|law_search|^legislation_search/.test(o))
   };
 }
 
