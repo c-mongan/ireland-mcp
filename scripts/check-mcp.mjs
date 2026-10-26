@@ -8,6 +8,9 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 
+// First-party checks are tagged so usage metrics count only real clients.
+const SYNTHETIC = { requestInit: { headers: { "x-ireland-mcp-synthetic": "1" } } };
+
 const META = ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about"];
 const sorted = (values) => [...values].sort();
 const bodyOf = (result, error = false) => {
@@ -167,7 +170,7 @@ async function main(argv) {
     if (endpoint) {
       const url = new URL(endpoint);
       if (toolsets) url.searchParams.set("toolsets", toolsets);
-      return new StreamableHTTPClientTransport(url);
+      return new StreamableHTTPClientTransport(url, SYNTHETIC);
     }
     return new StdioClientTransport({ command: process.execPath, args: [fileURLToPath(new URL("../dist/src/cli.js", import.meta.url)), ...(toolsets ? [`--toolsets=${toolsets}`] : [])], env: { ...process.env, IRELAND_MCP_TOOLSETS: "" }, stderr: "ignore" });
   };

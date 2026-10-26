@@ -2,6 +2,28 @@ const HOSTS = new Set(["https://eu.i.posthog.com", "https://us.i.posthog.com"]);
 const CLIENTS = new Set(["vscode", "cursor", "codex", "claude", "chatgpt", "copilot", "gemini", "windsurf", "generic", "endpoint"]);
 const RESULT_ACTIONS = new Set(["inspect_raw", "open_source", "connect"]);
 
+const REFERRERS = [
+  [/(^|\.)google\./, "google"], [/(^|\.)bing\.com$/, "bing"], [/(^|\.)duckduckgo\.com$/, "duckduckgo"],
+  [/(^|\.)github\.com$/, "github"], [/(^|\.)reddit\.com$/, "reddit"], [/(^|\.)(x|twitter)\.com$|^t\.co$/, "x"],
+  [/(^|\.)linkedin\.com$|^lnkd\.in$/, "linkedin"], [/^news\.ycombinator\.com$/, "hn"],
+  [/(^|\.)(chatgpt|openai)\.com$/, "chatgpt"], [/(^|\.)claude\.ai$|(^|\.)anthropic\.com$/, "claude"]
+];
+const UTM_SOURCES = new Set(["google", "bing", "duckduckgo", "github", "reddit", "x", "twitter", "linkedin", "hn", "chatgpt", "claude", "newsletter", "mcp-registry"]);
+
+/** Fixed labels only: a page view never carries a URL, query string, full referrer or device detail. */
+export function pageViewProperties({ path, referrer, utmSource, width, ownHost }) {
+  let referrerHost;
+  try { referrerHost = referrer ? new URL(referrer).hostname.toLowerCase() : undefined; } catch { referrerHost = "_invalid"; }
+  const source = typeof utmSource === "string" ? utmSource.toLowerCase().trim() : "";
+  return {
+    path: path === "/" || path === "/index.html" ? "/" : path === "/404.html" ? "/404" : "_OTHER",
+    referrer: !referrerHost ? "direct" : referrerHost === ownHost ? "internal"
+      : REFERRERS.find(([pattern]) => pattern.test(referrerHost))?.[1] ?? "other",
+    utm_source: !source ? "none" : UTM_SOURCES.has(source) ? (source === "twitter" ? "x" : source) : "other",
+    viewport: !Number.isFinite(width) ? "_OTHER" : width < 640 ? "mobile" : width < 1024 ? "tablet" : "desktop"
+  };
+}
+
 function privacyBlocked() {
   return navigator.globalPrivacyControl === true ||
     [navigator.doNotTrack, window.doNotTrack].some((value) => value === "1" || value === "yes");
@@ -62,21 +84,36 @@ export function createAnalytics({ operations = new Map(), fetch: send = window.f
     const controller = new AbortController();
     pending.add(controller);
     const timeout = setTimeout(() => controller.abort(), 2000);
-    // No browser SDK: no page URLs, referrers, cookies, persistence, replay, or automatic capture.
-    Promise.resolve().then(() => {
-      if (controller.signal.aborted || !enabled || privacyBlocked()) return;
+    post(event, properties, identity, controller, () => enabled).finally(() => {
+      clearTimeout(timeout);
+      pending.delete(controller);
+    });
+  }
+  // No browser SDK: no page URLs, referrers, cookies, persistence, replay, or automatic capture.
+  function post(event, properties, distinctId, controller, allowed) {
+    return Promise.resolve().then(() => {
+      if (controller.signal.aborted || !allowed() || !config || privacyBlocked()) return;
       return send(`${config.host}/i/v0/e/`, {
         method: "POST", credentials: "omit", referrerPolicy: "no-referrer", redirect: "error",
         signal: controller.signal, headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          api_key: config.token, event, distinct_id: identity,
+          api_key: config.token, event, distinct_id: distinctId,
           properties: { ...properties, ...(config.release_commit ? { release_commit: config.release_commit } : {}), surface: "web", schema_version: 1, $process_person_profile: false, $geoip_disable: true, $ip: "0.0.0.0" }
         })
       });
-    }).then((response) => response?.body?.cancel()).catch(() => undefined).finally(() => {
-      clearTimeout(timeout);
-      pending.delete(controller);
+    }).then((response) => response?.body?.cancel()).catch(() => undefined);
+  }
+  /** One anonymous count per page load. Its random id is never reused, stored, or linked to opt-in events. */
+  function pageView() {
+    if (!config || privacyBlocked()) return;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2000);
+    const params = new URLSearchParams(location.search);
+    const properties = pageViewProperties({
+      path: location.pathname, referrer: document.referrer, utmSource: params.get("utm_source"),
+      width: window.innerWidth, ownHost: location.hostname.toLowerCase()
     });
+    post("ireland_page_viewed", properties, crypto.randomUUID(), controller, () => true).finally(() => clearTimeout(timeout));
   }
   async function init(button) {
     if (button) {
@@ -90,6 +127,7 @@ export function createAnalytics({ operations = new Map(), fetch: send = window.f
       });
       if (response.ok) configure(await response.json());
     } catch { /* Missing configuration leaves all capture off. */ }
+    pageView();
     if (!button) return;
     function render() {
       const blocked = privacyBlocked();
@@ -102,5 +140,5 @@ export function createAnalytics({ operations = new Map(), fetch: send = window.f
     document.addEventListener("visibilitychange", render);
     render();
   }
-  return { configure, setEnabled, capture, init };
+  return { configure, setEnabled, capture, init, pageView };
 }

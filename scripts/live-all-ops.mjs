@@ -11,6 +11,9 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 import { assessResult } from "./live-result.mjs";
 import { appModules } from "../dist/src/registry.js";
 
+// First-party checks are tagged so usage metrics count only real clients.
+const SYNTHETIC = { requestInit: { headers: { "x-ireland-mcp-synthetic": "1" } } };
+
 const DEPLOYED_URL = "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp";
 const DEFAULT_TOOLS = ["search", "fetch", "nearby", "ireland_catalogue", "ireland_describe", "ireland_about", "ireland_call"];
 const TODAY = new Date().toISOString().slice(0, 10);
@@ -105,7 +108,7 @@ async function connect(url) {
   const make = () => {
     const client = new Client({ name: "live-all-ops", version: "1.0.0" });
     const transport = url
-      ? new StreamableHTTPClientTransport(new URL(url))
+      ? new StreamableHTTPClientTransport(new URL(url), SYNTHETIC)
       : new StdioClientTransport({ command: process.execPath, args: ["dist/src/cli.js"], stderr: "pipe", cwd: process.cwd(), maxBufferSize: 30 * 1024 * 1024 });
     return { client, transport };
   };

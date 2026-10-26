@@ -43,7 +43,22 @@ export function safeToolProperties(event: ToolCallEvent, operations: Options["op
   if (typeof event.cached === "boolean") properties.cached = event.cached;
   if (typeof event.stale === "boolean") properties.stale = event.stale;
   if (event.errorCode !== undefined) properties.error_code = ERROR_CODES.has(event.errorCode) ? event.errorCode : "_OTHER";
+  properties.synthetic = event.synthetic === true;
+  properties.channel = event.channel === "playground" ? "playground" : "client";
   return properties;
+}
+
+export interface ConnectEvent { client: string; protocol: string; synthetic: boolean; }
+
+const CLIENTS = new Set(["claude-code", "claude", "chatgpt", "codex", "cursor", "windsurf", "copilot-cli", "vscode", "gemini", "inspector", "other", "unknown"]);
+
+/** Labels are already bucketed by privacy.ts; re-check here so nothing else can cross the boundary. */
+export function safeConnectProperties(event: ConnectEvent): Properties {
+  return {
+    client: CLIENTS.has(event.client) ? event.client : "other",
+    protocol: /^\d{4}-\d{2}-\d{2}$/.test(event.protocol) ? event.protocol : "_OTHER",
+    synthetic: event.synthetic === true
+  };
 }
 
 /** Small, loss-tolerant capture client. Capture never starts or waits for network work. */
@@ -61,14 +76,14 @@ export function createPostHogCapture(options: Options) {
     if (env.IRELAND_MCP_TELEMETRY === "off" || env.IRELAND_MCP_POSTHOG_ENABLED !== "true" || !host || !HOSTS.has(host) || !token) return;
     return { host, token };
   }
-  function capture(event: ToolCallEvent): void {
+  function enqueue(name: string, properties: Properties): void {
     if (!config()) return;
     if (queue.length >= MAX_QUEUE) { queueFullDrops = Math.min(1_000_000, queueFullDrops + 1); return; }
     queue.push({
-      event: "ireland_mcp_tool_completed",
+      event: name,
       distinct_id: "ireland-mcp-service-aggregate",
       properties: {
-        ...safeToolProperties(event, options.operations),
+        ...properties,
         ...(release ? { release_commit: release } : {}),
         schema_version: 1,
         surface: "mcp",
@@ -77,6 +92,12 @@ export function createPostHogCapture(options: Options) {
         $ip: "0.0.0.0"
       }
     });
+  }
+  function capture(event: ToolCallEvent): void {
+    enqueue("ireland_mcp_tool_completed", safeToolProperties(event, options.operations));
+  }
+  function captureConnect(event: ConnectEvent): void {
+    enqueue("ireland_mcp_client_connected", safeConnectProperties(event));
   }
   async function drain(): Promise<void> {
     const deadline = Date.now() + FLUSH_BUDGET_MS;
@@ -131,7 +152,7 @@ export function createPostHogCapture(options: Options) {
     if (!active) active = drain().catch(() => undefined).finally(() => { active = undefined; });
     return active;
   }
-  return { capture, flush };
+  return { capture, captureConnect, flush };
 }
 
 let deployedCapture: ReturnType<typeof createPostHogCapture> | undefined;
@@ -140,4 +161,5 @@ export function configurePostHog(operations: Options["operations"]): void {
   deployedCapture ??= createPostHogCapture({ operations });
 }
 export function capturePostHog(event: ToolCallEvent): void { deployedCapture?.capture(event); }
+export function captureConnectPostHog(event: ConnectEvent): void { deployedCapture?.captureConnect(event); }
 export function flushPostHog(): Promise<void> { return deployedCapture?.flush() ?? Promise.resolve(); }

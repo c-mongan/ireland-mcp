@@ -10,6 +10,7 @@ import { ToolError } from "./errors.js";
 import { handleMcpHttp } from "./httpHandler.js";
 import { defineTool, type SourceModule } from "./module.js";
 import { RateLimiter } from "./rateLimit.js";
+import { currentSynthetic } from "./requestScope.js";
 import { buildServer } from "./server.js";
 import { SECURITY_HEADERS } from "./securityHeaders.js";
 import { UnknownToolsetError } from "./toolsets.js";
@@ -317,5 +318,16 @@ describe("OpenTelemetry", () => {
       .getMetrics()
       .flatMap((m) => m.scopeMetrics.flatMap((s) => s.metrics.map((x) => x.descriptor.name)));
     expect(names).toContain("mcp.server.operation.duration");
+  });
+});
+
+describe("synthetic traffic", () => {
+  it("scopes the synthetic header to tool calls in that request only", async () => {
+    const seen: boolean[] = [];
+    const tagged = () => buildServer({ modules: [demo], context: ctx, toolsets: "all", telemetry: () => seen.push(currentSynthetic()) });
+    const body = { jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: "demo_lookup", arguments: { query: "x" } } };
+    await handleMcpHttp(post(body, { "x-ireland-mcp-synthetic": "1" }), { createServer: tagged });
+    await handleMcpHttp(post(body), { createServer: tagged });
+    expect(seen).toEqual([true, false]);
   });
 });

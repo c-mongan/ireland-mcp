@@ -1,11 +1,15 @@
 import { test, expect, type Page } from "@playwright/test";
 
 const ingestion = "https://eu.i.posthog.com/i/v0/e/";
+const pageViewsByPage = new WeakMap<Page, Record<string, unknown>[]>();
+const pageViewsOf = (page: Page) => pageViewsByPage.get(page) ?? [];
 async function fixtures(page: Page, enabled = true) {
   const captures: Record<string, unknown>[] = [];
+  const pageViews: Record<string, unknown>[] = [];
   await page.route("**/analytics-config.json", (route) => route.fulfill({ json: { enabled, token: "test-public-token", host: "https://eu.i.posthog.com", release: "abcdef0123456789" } }));
   await page.route(ingestion, (route) => {
-    captures.push(route.request().postDataJSON());
+    const body = route.request().postDataJSON();
+    (body.event === "ireland_page_viewed" ? pageViews : captures).push(body);
     return route.fulfill({ status: 200, json: { status: 1 } });
   });
   await page.route("https://mcp.irishopendata.ie/mcp", (route) => {
@@ -16,6 +20,7 @@ async function fixtures(page: Page, enabled = true) {
     } });
   });
   await page.route("https://raw.githubusercontent.com/**/status.json", (route) => route.abort());
+  pageViewsByPage.set(page, pageViews);
   return captures;
 }
 
@@ -91,8 +96,26 @@ for (const setting of ["doNotTrack", "globalPrivacyControl"] as const) {
     await expect(page.locator("#analytics-toggle")).toHaveText("Usage metrics blocked by privacy settings");
     await page.locator("#theme-toggle").click();
     expect(captures).toEqual([]);
+    expect(pageViewsOf(page)).toEqual([]);
   });
 }
+
+test("one anonymous page view is counted without opt-in, cookies or storage", async ({ page, context }) => {
+  const captures = await fixtures(page);
+  await page.goto("/?utm_source=private-campaign&q=private-query");
+  await expect.poll(() => pageViewsOf(page).length).toBe(1);
+  const [view] = pageViewsOf(page) as Array<{ distinct_id: string; properties: Record<string, unknown> }>;
+  expect(view!.properties).toMatchObject({ path: "/", referrer: "direct", utm_source: "other", surface: "web", $ip: "0.0.0.0", $process_person_profile: false });
+  expect(Object.keys(view!.properties).sort()).toEqual(["$geoip_disable", "$ip", "$process_person_profile", "path", "referrer", "release_commit", "schema_version", "surface", "utm_source", "viewport"].sort());
+  expect(JSON.stringify(view)).not.toContain("private");
+  expect(captures).toEqual([]);
+  expect(await context.cookies()).toEqual([]);
+  expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0);
+  await optIn(page);
+  await page.locator("#theme-toggle").click();
+  await expect.poll(() => captures.length).toBe(1);
+  expect(captures[0]!.distinct_id).not.toBe(view!.distinct_id);
+});
 
 test("query event cannot include user text, unknown labels, response data or URL", async ({ page }) => {
   const captures = await fixtures(page);

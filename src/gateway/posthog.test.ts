@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createPostHogCapture, safeToolProperties, validatedRelease } from "./posthog.js";
+import { createPostHogCapture, safeConnectProperties, safeToolProperties, validatedRelease } from "./posthog.js";
 
 const operations = new Map([["cso", new Set(["cso_search_tables"])]]);
 const event = { source: "cso", tool: "cso_search_tables", durationMs: 12.6, outcome: "ok" as const };
@@ -10,10 +10,10 @@ afterEach(() => vi.useRealTimers());
 describe("safe PostHog capture", () => {
   it("projects only known registry labels, scalar fields and error codes", () => {
     expect(safeToolProperties({ ...event, cached: true, stale: false, errorCode: "BAD_ARGS", args: "private" } as typeof event, operations)).toEqual({
-      source: "cso", operation: "cso_search_tables", duration_ms: 13, outcome: "ok", cached: true, stale: false, error_code: "BAD_ARGS"
+      source: "cso", operation: "cso_search_tables", duration_ms: 13, outcome: "ok", cached: true, stale: false, error_code: "BAD_ARGS", synthetic: false, channel: "client"
     });
     expect(safeToolProperties({ source: "private@email.test", tool: "https://private.example/secret", outcome: "error", durationMs: Infinity, errorCode: "private message" }, operations)).toEqual({
-      source: "_OTHER", operation: "_OTHER", duration_ms: 0, outcome: "error", error_code: "_OTHER"
+      source: "_OTHER", operation: "_OTHER", duration_ms: 0, outcome: "error", error_code: "_OTHER", synthetic: false, channel: "client"
     });
     expect(safeToolProperties({ ...event, durationMs: 999999, tool: "private" }, operations)).toMatchObject({ operation: "_OTHER", duration_ms: 120000 });
     expect(safeToolProperties({ ...event, durationMs: -5 }, operations).duration_ms).toBe(0);
@@ -41,11 +41,30 @@ describe("safe PostHog capture", () => {
     expect(body.batch).toHaveLength(50);
     expect(body.batch[0]).toEqual({
       event: "ireland_mcp_tool_completed", distinct_id: "ireland-mcp-service-aggregate",
-      properties: { source: "cso", operation: "cso_search_tables", outcome: "ok", duration_ms: 13, schema_version: 1, surface: "mcp", $process_person_profile: false, $geoip_disable: true, $ip: "0.0.0.0" }
+      properties: { source: "cso", operation: "cso_search_tables", outcome: "ok", duration_ms: 13, synthetic: false, channel: "client", schema_version: 1, surface: "mcp", $process_person_profile: false, $geoip_disable: true, $ip: "0.0.0.0" }
     });
     expect(JSON.stringify(body)).not.toContain("private");
     await capture.flush();
     expect(send).toHaveBeenCalledOnce();
+  });
+
+  it("marks only explicitly synthetic tool calls", () => {
+    expect(safeToolProperties({ ...event, synthetic: true }, operations).synthetic).toBe(true);
+    expect(safeToolProperties({ ...event, synthetic: "yes" } as unknown as typeof event, operations).synthetic).toBe(false);
+    expect(safeToolProperties({ ...event, channel: "playground" }, operations).channel).toBe("playground");
+    expect(safeToolProperties({ ...event, channel: "private" } as unknown as typeof event, operations).channel).toBe("client");
+  });
+
+  it("sends client connections with fixed labels only", async () => {
+    expect(safeConnectProperties({ client: "private-client-name", protocol: "private", synthetic: "1" as unknown as boolean })).toEqual({ client: "other", protocol: "_OTHER", synthetic: false });
+    const send = vi.fn<typeof fetch>().mockResolvedValue(new Response(null));
+    const capture = createPostHogCapture({ operations, env: configured(), fetch: send, onDelivery: vi.fn() });
+    capture.captureConnect({ client: "claude", protocol: "2025-06-18", synthetic: true });
+    await capture.flush();
+    expect(JSON.parse(String(send.mock.calls[0]![1]!.body)).batch[0]).toEqual({
+      event: "ireland_mcp_client_connected", distinct_id: "ireland-mcp-service-aggregate",
+      properties: { client: "claude", protocol: "2025-06-18", synthetic: true, schema_version: 1, surface: "mcp", $process_person_profile: false, $geoip_disable: true, $ip: "0.0.0.0" }
+    });
   });
 
   it("does not throw or retry network errors or failed HTTP responses", async () => {

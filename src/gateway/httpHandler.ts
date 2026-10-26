@@ -2,9 +2,11 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { endMcpOperations, startMcpOperations, withOperationContext } from "./mcpTelemetry.js";
 import { DEFAULT_ALLOWED_ORIGINS, isOriginAllowed } from "./origin.js";
-import { hashedClientKey } from "./privacy.js";
+import { captureConnectPostHog } from "./posthog.js";
+import { clientBucket, clientInfoFrom, hashedClientKey, protocolBucket } from "./privacy.js";
 import type { RateLimiter } from "./rateLimit.js";
 import { SECURITY_HEADERS } from "./securityHeaders.js";
+import { channelOf, isSyntheticRequest, withRequestScope } from "./requestScope.js";
 import { reportHandlerError } from "./telemetry.js";
 import { UnknownToolsetError } from "./toolsets.js";
 
@@ -108,16 +110,31 @@ async function handleRequest(request: Request, options: McpHttpOptions, headers:
     throw error;
   }
 
+  const synthetic = isSyntheticRequest(request.headers);
   const operations = startMcpOperations(bodyText, request.headers);
+  recordConnects(bodyText, synthetic);
   let status = 500;
   let body: string | null = null;
   try {
-    const response = await withOperationContext(operations, () => serve(server, request, bodyText, cors));
+    const response = await withRequestScope({ synthetic, channel: channelOf(request.headers) }, () =>
+      withOperationContext(operations, () => serve(server, request, bodyText, cors)));
     status = response.status;
     body = response.body;
     return new Response(body, { status, headers: response.headers });
   } finally {
     endMcpOperations(operations, status, body);
+  }
+}
+
+/** One usage count per `initialize`, with the client reduced to a fixed label. */
+function recordConnects(bodyText: string, synthetic: boolean): void {
+  if (process.env.IRELAND_MCP_TELEMETRY === "off") return;
+  let parsed: unknown;
+  try { parsed = JSON.parse(bodyText); } catch { return; }
+  for (const message of Array.isArray(parsed) ? parsed : [parsed]) {
+    if (!message || typeof message !== "object" || (message as { method?: unknown }).method !== "initialize") continue;
+    const params = (message as { params?: unknown }).params;
+    captureConnectPostHog({ client: clientBucket(clientInfoFrom(params).name), protocol: protocolBucket(params), synthetic });
   }
 }
 
