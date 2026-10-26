@@ -22,7 +22,7 @@ The adapter reads the [annotated combined CSV](https://paygap.ie/downloads/annot
 
 This is a collection of employer reports, not a representative census or proof of unequal pay for equivalent work. The [dataset repository](https://github.com/zenbuffy/irishGenderPayGap) states CC0 1.0; the original employer reports retain their own terms. Credit PayGap.ie and link the original report when using a figure.
 
-If Azure receives HTTP 403 from the primary export, the tool uses the publisher’s pinned GitHub snapshot and identifies that source and date in the response. Annotation flags are unavailable in that snapshot and are returned as null. See [fallback provenance and refresh notes](paygap-source-fallback.md).
+If Azure receives HTTP 403 from the primary export, the tool uses the latest validated publisher GitHub snapshot and identifies that source and date in the response. The first request after the one-hour cache expires checks for a newer CSV commit; responses distinguish the snapshot date from the last successful check. Annotation flags are unavailable in that snapshot and are returned as null. See [fallback provenance and refresh notes](paygap-source-fallback.md).
 
 ## Council budgets
 

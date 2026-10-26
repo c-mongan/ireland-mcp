@@ -1,28 +1,43 @@
 # PayGap public source fallback
 
 The tool first requests the annotated CSV from `https://paygap.ie/downloads/annotated`.
-If that request returns HTTP 403, it uses the publisher's public GitHub export.
-This uses normal HTTPS access. It does not change TLS checks or bypass the publisher's access controls.
-Other HTTP statuses and invalid primary CSV data do not activate the fallback. The source health probe checks the publisher snapshot, so the known website refusal does not falsely mark the available source as down.
+Only an HTTP 403 enables the publisher's public GitHub fallback. Normal HTTPS validation stays enabled. Other HTTP errors and malformed primary CSV data do not silently select another source.
 
-The fallback is pinned to commit `a35d6c57d54528d1bd2e339179eab048543fd993`, published on `2026-10-12T03:00:09Z`:
+## Automatic refresh
 
-- [fullDenormalised.csv](https://raw.githubusercontent.com/zenbuffy/irishGenderPayGap/a35d6c57d54528d1bd2e339179eab048543fd993/fullDenormalised.csv)
-- [Publisher repository and CC0 licence](https://github.com/zenbuffy/irishGenderPayGap)
+The dataset cache lasts one hour. The first request after expiry checks GitHub's latest commit affecting `fullDenormalised.csv` on the publisher's `main` branch. Updates do not need a code change, redeployment, new credentials, or a background job. If nobody calls the tool, it does not fetch data in the background.
 
-The returned envelope URL identifies this CSV. Dataset metadata gives the commit, publication date, fallback flag, source URL and coverage note. The snapshot can have different coverage and an earlier update date than the current website export. Cache validation lasts one day. The shared cache can serve a previously validated dataset as stale after an availability failure.
+The revision lookup is [the publisher's file commit history](https://api.github.com/repos/zenbuffy/irishGenderPayGap/commits?sha=main&path=fullDenormalised.csv&per_page=1). Unrelated repository commits do not change the snapshot date. After validating the full commit SHA and timestamp, the tool reads the CSV at that exact immutable revision. It never reads changing `main` content as report data.
 
-The snapshot contains 4,097 curated report rows for 2022–2025. The tool keeps the publisher's company names, sites, NACE names and codes, report links and 26 metric fields. It preserves blank metrics as null and zero metrics as zero. It excludes missing or invalid years and returns their count. It does not infer a year from a date or company record.
+Concurrent requests share a refresh. Validated CSV content is cached by commit for 30 days, so an unchanged revision does not need another file download. A newly selected revision enters the dataset cache only after its CSV schema and records pass validation. Empty, malformed or unusable replacements are rejected.
 
-This export has no publication annotations. The fallback returns `annotations_available: false` at the dataset and report levels. Every annotation value is null. Null means unavailable; it does not mean the publisher reported no problem. The normal annotated export retains its published flag values.
+The health probe uses the public raw CSV on `main` for basic liveness only. It does not consume GitHub API revision requests or establish data freshness.
 
-The separate `gpg.csv` file has more rows and contains quoting that the strict CSV scanner rejects. It is not used as an inventory or annotation source. The tool does not infer an export dialect or attach annotations by an uncertain match. The separate company export is not fetched, so contact fields are not returned.
+## Dates and missing annotations
 
-To update the snapshot:
+The envelope URL always identifies the immutable CSV actually used. Fallback dataset metadata includes:
 
-1. Check the publisher's repository commit and publication date.
-2. Verify `fullDenormalised.csv` at that exact commit with the strict scanner. Check its header, row count, years, metric mapping and NACE fields.
-3. Change the commit and publication date in `src/sources/paygap/github.ts` and the test snapshot. Update this note with the observed counts.
-4. Run the PayGap tests, TypeScript checks and build. Test the fallback against the pinned public URL with a simulated primary HTTP 403. After deployment, check the same flow from the hosted service.
+| Field | Meaning |
+| --- | --- |
+| `snapshot_commit` | Exact publisher revision used for the records. |
+| `snapshot_published_at` | CSV commit timestamp, retained under this field name for compatibility. |
+| `snapshot_date_basis` | `git_committer_timestamp`; not a reporting period or the time of this request. |
+| `snapshot_checked_at` | Last successful revision check and dataset validation. |
+| `refresh_interval_seconds` | 3600 seconds. |
+| `refresh_mode` | `on_request`. |
+| `refresh_status` | `validated`, `cached`, or `failed_using_last_valid`. |
+| `annotations_available` | Always false for this curated GitHub export. |
 
-Both HTTP reads and CSV parsing enforce the existing 5 MiB bound. CSV parsing also enforces the existing 10,000-row bound. A wrong header, malformed quoting or wrong field count fails validation and is not cached.
+Publication annotations are absent from `fullDenormalised.csv`. Each report marks them unavailable and returns null annotation flags. Null does not mean that the publisher reported no problem. The normal website export keeps its published annotations.
+
+A retryable upstream outage can return the last validated dataset with `stale: true` and `refresh_status: failed_using_last_valid`. Its original commit, snapshot date and check time remain unchanged. If no validated cache exists, or the new data fails schema validation, the call returns an error. A failed refresh never relabels old records with the new commit or today's date. Publisher outages, API limits and schema changes can delay updates; they are not hidden as fresh data.
+
+## Data and maintenance
+
+The [publisher repository](https://github.com/zenbuffy/irishGenderPayGap) licenses the dataset under CC0 1.0. Keep its attribution and the employer report links. The tool retains company names, sites, NACE fields, and 26 metrics. It preserves missing values and zero separately. It excludes invalid report years with an explicit count, and rejects an export with no valid reports.
+
+The separate `gpg.csv` is not used: its quoting is incompatible with the strict scanner. No uncertain annotation joins or export-dialect guesses are made. Company contact data is not fetched.
+
+CSV reads are bounded to 5 MiB and 10,000 rows. Revision metadata is bounded to 100,000 bytes. The metadata API is public and unauthenticated; normal cache hits make no GitHub request. A changed CSV schema requires a reviewed parser update rather than manual snapshot pinning.
+
+Tests simulate new commits, unchanged revisions, cache expiry, simultaneous requests, malformed metadata and data, and outages that preserve the prior snapshot identity. Live checks compare the selected revision and date with the publisher's file history.

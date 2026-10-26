@@ -5,7 +5,7 @@ import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
 import { csvRows } from "../shared/csv.js";
 import { ANNOTATION_FIELDS, METRIC_FIELDS, metricValue, type PayGapReport } from "./model.js";
-import { GITHUB_SOURCE, parseGithubReports } from "./github.js";
+import { resolveGithubSnapshot, parseGithubReports, REFRESH_INTERVAL_SECONDS, type GithubSnapshot } from "./github.js";
 
 const DATA_URL = "https://paygap.ie/downloads/annotated";
 const CSV_MAX_BYTES = 5 * 1024 * 1024;
@@ -56,10 +56,10 @@ function parseReports(text: string): PayGapReport[] {
   });
 }
 
-type LoadedDataset = { reports: PayGapReport[]; url: string; fallback?: typeof GITHUB_SOURCE & { excluded_reports: { invalid_or_missing_year: number }; annotations_available: false } };
+type LoadedDataset = { reports: PayGapReport[]; url: string; fallback?: GithubSnapshot & { excluded_reports: { invalid_or_missing_year: number }; annotations_available: false } };
 
 async function loadReports(ctx: ToolContext) {
-  const result = await ctx.cache.getOrLoad<LoadedDataset>(`paygap:dataset:v2:${DATA_URL}`, DAY, async () => {
+  const result = await ctx.cache.getOrLoad<LoadedDataset>(`paygap:dataset:v3:${DATA_URL}`, REFRESH_INTERVAL_SECONDS * 1000, async () => {
     let text: string;
     try {
       text = await ctx.http.text(DATA_URL, { label: "PayGap.ie annotated dataset", maxBytes: CSV_MAX_BYTES });
@@ -67,9 +67,14 @@ async function loadReports(ctx: ToolContext) {
       // Only the observed access refusal enables the publisher's public snapshot.
       // A successful response with a bad schema must still fail validation below.
       if (!(error instanceof ToolError) || error.httpStatus !== 403) throw error;
-      const reportsText = await ctx.http.text(GITHUB_SOURCE.source_urls[0], { label: "PayGap publisher GitHub CSV", maxBytes: CSV_MAX_BYTES });
-      const parsed = parseGithubReports(reportsText);
-      return { reports: parsed.reports, url: GITHUB_SOURCE.source_urls[0], fallback: { ...GITHUB_SOURCE, excluded_reports: parsed.excluded_reports, annotations_available: parsed.annotations_available } };
+      const snapshot = await resolveGithubSnapshot(ctx);
+      // Immutable content can be reused after a fresh revision check; it cannot change under this SHA.
+      const content = await ctx.cache.getOrLoad(`paygap:github-csv:v1:${snapshot.snapshot_commit}`, 30 * DAY, async () => {
+        const text = await ctx.http.text(snapshot.source_urls[0], { label: "PayGap publisher GitHub CSV", maxBytes: CSV_MAX_BYTES });
+        return parseGithubReports(text);
+      });
+      const parsed = content.value;
+      return { reports: parsed.reports, url: snapshot.source_urls[0], fallback: { ...snapshot, snapshot_checked_at: ctx.now().toISOString(), excluded_reports: parsed.excluded_reports, annotations_available: parsed.annotations_available } };
     }
     return { reports: parseReports(text), url: DATA_URL };
   });
@@ -85,7 +90,7 @@ const matchesIndustry = (report: PayGapReport, query: string) => {
 const searchTool = defineTool({
   name: "paygap_search_reports",
   title: "Search Irish gender pay gap reports",
-  description: "Search the combined PayGap.ie employer report dataset by company name, report year and/or NACE industry. Returns submitted report figures, source report links and source annotations when available. If the primary export refuses access, a dated publisher GitHub snapshot is used with explicit source and annotation limits. Coverage and completeness are as published by PayGap.ie; the data is not a census of all employers and does not prove discrimination or equal pay.",
+  description: "Search the combined PayGap.ie employer report dataset by company name, report year and/or NACE industry. Returns submitted report figures, source report links and source annotations when available. If the primary export refuses access, the latest publisher CSV commit is rechecked after a one-hour cache expires and downloaded by its immutable revision, with explicit snapshot dates and annotation limits. Coverage and completeness are as published by PayGap.ie; the data is not a census of all employers and does not prove discrimination or equal pay.",
   example: { company: "AIB", year: 2025, limit: 10 },
   inputSchema: {
     company: z.string().max(120).optional().describe("Case-insensitive company-name fragment."),
@@ -104,7 +109,7 @@ const searchTool = defineTool({
       (!industryQuery || matchesIndustry(report, industryQuery))
     );
     const reports = matches.slice(offset, offset + limit);
-    return envelope(loaded.fallback ? { ...paygapInfo, name: `${paygapInfo.name} — publisher snapshot`, attribution: `${paygapInfo.attribution} Snapshot: ${GITHUB_SOURCE.snapshot_published_at}; publication annotations unavailable.` } : paygapInfo, {
+    return envelope(loaded.fallback ? { ...paygapInfo, name: `${paygapInfo.name} — publisher snapshot`, attribution: `${paygapInfo.attribution} Snapshot: ${loaded.fallback.snapshot_published_at}; publication annotations unavailable.` } : paygapInfo, {
       data: {
         total_reports: matches.length,
         offset,
@@ -114,7 +119,7 @@ const searchTool = defineTool({
         dataset: {
           total_reports: loaded.reports.length,
           available_years: [...new Set(loaded.reports.map((report) => report.report_year))].sort((a, b) => b - a),
-          ...(loaded.fallback ?? {})
+          ...(loaded.fallback ? { ...loaded.fallback, refresh_status: loaded.stale ? "failed_using_last_valid" : loaded.cached ? "cached" : "validated" } : {})
         },
         next_offset: offset + reports.length < matches.length ? offset + reports.length : null,
         reports
