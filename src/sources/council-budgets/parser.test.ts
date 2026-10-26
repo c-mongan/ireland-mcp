@@ -119,6 +119,13 @@ describe("council budget workbook parser", () => {
     expect(() => parseBudgetWorkbook(withCells({ C42: 1 }), 2026)).toThrow(/reconcile with the published division totals/);
   });
 
+  it("accepts a total exactly five cents off and rejects six", () => {
+    const total = Number(XLSX.read(workbook("budget-2026.xlsx"), { type: "buffer" }).Sheets["Revenue I&E SVCDIV A"]!.K120!.v);
+    expect(() => parseBudgetWorkbook(withCells({ K120: total + 0.05 }), 2026)).not.toThrow();
+    expect(() => parseBudgetWorkbook(withCells({ K120: total - 0.05 }), 2026)).not.toThrow();
+    expect(() => parseBudgetWorkbook(withCells({ K120: total + 0.06 }), 2026)).toThrow(/reconcile/);
+  });
+
   it("keeps a blank numeric cell as null", () => {
     const original = Number(XLSX.read(workbook("budget-2026.xlsx"), { type: "buffer" }).Sheets["Revenue I&E SVCDIV A"]!.C42!.v);
     const budget = parseBudgetWorkbook(withCarlowLine(null, -original), 2026);

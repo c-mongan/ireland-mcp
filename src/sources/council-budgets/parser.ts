@@ -94,7 +94,7 @@ function divisionForSheet(name: string): string | null {
 interface DivisionTotal { Expenditure: number | null; Income: number | null; }
 
 /** Published totals are rounded per cell; allow a few cents of accumulated rounding. */
-const TOTAL_TOLERANCE_EUR = 0.05;
+const TOTAL_TOLERANCE_CENTS = 5;
 
 const PUBLISHED_2017_BLOCK_COUNTS: Record<string, number[]> = {
   A: [31, 31, 31], B: [31, 31, 31], C: [30, 30], D: [30, 30, 31],
@@ -236,9 +236,10 @@ function assertLinesMatchTotals(rows: BudgetRow[], totals: Map<string, DivisionT
   if (totals.size === 0 || totals.size !== authorities.size) throw mismatch();
   for (const [authority, total] of totals) {
     for (const measure of ["Expenditure", "Income"] as const) {
-      const sum = rows.filter((row) => row.authority === authority && row.measure === measure)
-        .reduce((acc, row) => acc + (row.amount ?? 0), 0);
-      if (Math.abs(sum - (total[measure] ?? 0)) > TOTAL_TOLERANCE_EUR) throw mismatch();
+      // Whole cents avoid floating-point noise at the tolerance boundary.
+      const sumCents = rows.filter((row) => row.authority === authority && row.measure === measure)
+        .reduce((acc, row) => acc + Math.round((row.amount ?? 0) * 100), 0);
+      if (Math.abs(sumCents - Math.round((total[measure] ?? 0) * 100)) > TOTAL_TOLERANCE_CENTS) throw mismatch();
     }
   }
 }
