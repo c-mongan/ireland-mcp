@@ -50,4 +50,4 @@ Files:
 
 The Ennis answer from VS Code and Copilot CLI agreed: 27,923 people (13,377 male, 14,546 female), average age 38.9.
 
-At the time of the v1.0 run, Claude Desktop and ChatGPT developer-mode connectors were not tested. The later ChatGPT Work integration demonstration is listed at the top of this page. See the current [installation guide](../../README.md#install) for supported setup routes.
+At the time of the v1.0 run, Claude Desktop and ChatGPT developer-mode connectors were not tested. The later ChatGPT Work integration demonstration is listed at the top of this page. See the current [installation guide](../../README.md#set-it-up-in-30-seconds) for supported setup routes.

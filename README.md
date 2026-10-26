@@ -5,27 +5,45 @@
 [![MCP](https://img.shields.io/badge/MCP-Streamable%20HTTP-6f42c1.svg)](https://modelcontextprotocol.io)
 [![Token budget](https://img.shields.io/badge/default%20surface-7%20tools%20%7C%20~2.1k%20tokens-0a7.svg)](#why-its-lean)
 
-**Ireland MCP is a free, read-only MCP server that lets AI assistants answer questions with live Irish public data and citations.**
+**Ask ChatGPT, Claude or Copilot about Ireland, and get answers that cite official public sources.**
 
-**Who it's for:** people using Claude, ChatGPT or Copilot who want cited answers from Irish public data, and developers building on Irish open data.
+Ireland MCP is a free connector for AI assistants. It lets your assistant look up Irish public data, such as census figures, train times, weather warnings, house prices and Dáil business, and tell you where every number came from. Website: [irishopendata.ie](https://irishopendata.ie).
 
-## Try it in 60 seconds
+- **Free, with no account or API key.** Paste one web address into your assistant.
+- **Read-only.** It only looks things up. It cannot change or submit anything.
+- **Official sources.** Answers come back with the publisher, licence and the time the data was fetched, so you can check them.
+- **Open source** under the MIT licence. An unofficial community project, not a government service.
 
-**1. Add the server.** GitHub Copilot CLI:
+## What can I ask?
 
-```sh
-copilot mcp add --transport http ireland https://mcp.irishopendata.ie/mcp
-```
+- “What is the latest population profile for Galway city or County Cork?”
+- “Are there Met Éireann weather warnings near Dublin today?”
+- “What did houses sell for in Ennis last year?”
+- “When is the next train from Heuston, and are there disruptions?”
+- “Who are the current TDs for my constituency, and what bills are active?”
+- “What protected habitats, monuments, planning applications or census areas are near this point?”
 
-VS Code (`.vscode/mcp.json`):
+The assistant writes the answer; Ireland MCP supplies the data and its source. Check the date and source before you rely on a figure.
 
-```json
-{ "servers": { "ireland": { "type": "http", "url": "https://mcp.irishopendata.ie/mcp" } } }
-```
+## Set it up in 30 seconds
 
-**2. Ask:** *"Using the ireland MCP tools, give me the Census 2022 profile of Ennis, Co Clare, and the Met Éireann forecast for Galway. Cite the sources."*
+The server address is `https://mcp.irishopendata.ie/mcp`. It needs no sign-in.
 
-**3. Check the citations.** The answer should link `https://data.cso.ie/table/F1015` and the Met Éireann location-forecast URL.<sup>†</sup>
+- **ChatGPT:** Plugins → **+** → **Add custom MCP server** → paste the address → **No authentication**. [Full steps](#connect-your-assistant).
+- **Claude:** Settings → Connectors → **Add custom connector** → paste the address.
+- **GitHub Copilot CLI:**
+
+  ```sh
+  copilot mcp add --transport http ireland https://mcp.irishopendata.ie/mcp
+  ```
+
+- **VS Code:** add `.vscode/mcp.json`:
+
+  ```json
+  { "servers": { "ireland": { "type": "http", "url": "https://mcp.irishopendata.ie/mcp" } } }
+  ```
+
+**Check it works.** Ask: *"Using the ireland tools, give me the Census 2022 profile of Ennis, Co Clare, and the Met Éireann forecast for Galway. Cite the sources."* The answer should link `https://data.cso.ie/table/F1015` and the Met Éireann forecast URL.<sup>†</sup>
 
 <sub>† The forecast URL is `http://`: Met Éireann's `https://` host currently redirects to an origin that fails TLS.</sub>
 
@@ -33,9 +51,44 @@ VS Code (`.vscode/mcp.json`):
   <img src="docs/demo/vscode-copilot-chat.png" alt="VS Code Copilot agent mode answering with the Ennis Census 2022 profile and a Met Éireann forecast, each with a source citation" width="800">
 </p>
 
+## Beta features
+
+Beta features are off on the hosted server. You can turn them on when you run your own copy.
+
+### Beta: Irish law & your rights (annual leave and working time)
+
+> **Not legal advice.** For your own situation, contact [Citizens Information](https://www.citizensinformation.ie), the [Workplace Relations Commission](https://www.workplacerelations.ie) or a solicitor.
+
+An optional pilot finds Irish employment-law evidence and quotes it with links. It covers only two topics today: **annual leave and working time**.
+
+- **What it reads:** two Citizens Information guidance pages, the Organisation of Working Time Act 1997 and the Irish Statute Book page listing that Act's later changes.
+- **Act text is as passed in 1997.** It may not include later amendments. Check the changes page and the cited source.
+- **Citizens Information blocks automated access today.** Its firewall refused the pilot's requests on 26 October 2026, so a sync may fetch only the Irish Statute Book pages. We will not disguise the pilot as a browser. Wider coverage needs permission or an official export from the Citizens Information Board; we are asking.
+- **AI summaries can be wrong.** Every answer quotes its sources. Read them.
+
+The always-on server already quotes Irish law as enacted: Acts, statutory instruments and the Constitution, live from the Irish Statute Book. The beta adds Citizens Information guidance and stored, versioned evidence.
+
+Try it on your own machine:
+
+```sh
+npm run legal:sync    # fetch the seed pages into .irish-legal-cache
+npm run legal:serve   # chat page and tools at http://127.0.0.1:4173
+```
+
+`legal:sync` exits with an error while any page fails. Today that is expected for the Citizens Information pages; the Irish Statute Book pages are still saved.
+
+Or add it to the main server with `LEGAL_ENABLED=true` (off by default). Read the [beta assessment](docs/legal-beta-assessment.md) and [pilot guide](packages/irish-legal-mcp/README.md) first.
+
+---
+
+<details>
+<summary><strong>For developers: endpoint details</strong></summary>
+
 Hosted endpoint: `https://mcp.irishopendata.ie/mcp`
 Transport: Streamable HTTP. Auth: none. Writes: none.
 Registry: [`io.github.c-mongan/ireland-mcp`](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.c-mongan%2Fireland-mcp/versions/latest) on the official MCP Registry.
+
+</details>
 
 ## Connect your assistant
 
@@ -64,15 +117,6 @@ Portable Copilot / MCP JSON:
 }
 ```
 
-## Try asking
-
-- “What is the latest population profile for Galway city or County Cork?”
-- “Are there Met Éireann weather warnings near Dublin today?”
-- “What did houses sell for in Ennis last year?”
-- “When is the next train from Heuston, and are there disruptions?”
-- “Who are the current TDs for my constituency, and what bills are active?”
-- “What protected habitats, monuments, planning applications or census areas are near this point?”
-
 ## What's inside
 
 <!-- counts:start (generated by `npm run counts`; CI checks it) -->
@@ -88,7 +132,7 @@ Portable Copilot / MCP JSON:
 
 Last full run of every operation then in the catalogue against the hosted endpoint: <!-- live-ops:start -->[docs/live-all-ops.md](docs/live-all-ops.md) (2026-10-26): 78 of 82 pass, 1 fail; 3 need an operator key (NTA, Logainm).<!-- live-ops:end -->
 
-The default profile covers statistics (CSO, Eurostat, ECB, World Bank), the Oireachtas and Irish Statute Book, Met Éireann, transport (Irish Rail, Luas, NTA, TFI stops, bikes), property, planning, heritage, environment, energy, tourism, lobbying, pay-gap reports, council budgets and more. An optional [Irish legal and Citizens Information pilot](packages/irish-legal-mcp/README.md) is off by default.
+The default profile covers statistics (CSO, Eurostat, ECB, World Bank), the Oireachtas and Irish Statute Book, Met Éireann, transport (Irish Rail, Luas, NTA, TFI stops, bikes), property, planning, heritage, environment, energy, tourism, lobbying, pay-gap reports, council budgets and more. An optional [Irish legal and Citizens Information pilot](packages/irish-legal-mcp/README.md) is off by default; see [Beta features](#beta-features).
 
 <details>
 <summary><strong>All 36 sources, publishers and licences</strong></summary>
@@ -139,16 +183,6 @@ The default profile registers 36 source modules in `src/registry.ts`. The defaul
 The civic-source additions and GeoHive layer selection are described in [civic source notes](docs/civic-sources.md). Counts describe the code in this revision, not a deployment receipt. Check the connected server with `ireland_catalogue`; verify a release with `node scripts/live-civic.mjs --url https://mcp.irishopendata.ie/mcp`.
 
 </details>
-
-## Beta: Irish law and your rights
-
-An optional add-on lets your assistant quote [Citizens Information](https://www.citizensinformation.ie) guidance and the [Irish Statute Book](https://www.irishstatutebook.ie), with a citation for every passage.
-
-- **Covers:** one topic so far: annual leave and working hours (Organisation of Working Time Act 1997).
-- **Not legal advice.** It quotes sources. It cannot confirm that a law is in force today, so check the linked publisher page.
-- **Off by default.** It is not on the public server. Run it yourself with the [pilot guide](packages/irish-legal-mcp/README.md), or set `LEGAL_ENABLED=true` on your own deployment.
-
-Read the [beta assessment](docs/legal-beta-assessment.md) for coverage, licences and known risks.
 
 ## Why it's lean
 
