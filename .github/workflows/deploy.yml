@@ -17,6 +17,8 @@ concurrency:
 
 jobs:
   deploy:
+    # Maintainer-only: skipped on forks.
+    if: github.repository == 'c-mongan/ireland-mcp'
     runs-on: ubuntu-latest
     environment: production
     env:

@@ -1,0 +1,37 @@
+name: Request a data source
+description: Suggest Irish public data that Ireland MCP should cover
+labels: [source-request]
+body:
+  - type: input
+    id: source
+    attributes:
+      label: Publisher and dataset
+      description: Who publishes it, and what is it?
+      placeholder: "e.g. SEAI BER certificates, National Parks visitor numbers"
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Link to the data or API
+      description: An official download page, API docs or open-data portal entry.
+    validations:
+      required: true
+  - type: input
+    id: licence
+    attributes:
+      label: Licence, if you know it
+      placeholder: "e.g. CC BY 4.0, PSI General Licence"
+  - type: textarea
+    id: questions
+    attributes:
+      label: What would you ask an assistant with it?
+      description: Two or three example questions help decide which operations to build.
+    validations:
+      required: true
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contributing
+      options:
+        - label: I'd like to build this myself (see CONTRIBUTING.md)

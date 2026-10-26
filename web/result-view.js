@@ -141,7 +141,12 @@ export function renderResultView(container, model) {
     for (const label of group.columns) { const cell = element("th", label); cell.scope = "col"; heading.append(cell); }
     head.append(heading);
     const body = element("tbody");
-    for (const row of group.rows) { const line = element("tr"); line.append(...row.map((value) => element("td", value))); body.append(line); }
+    for (const row of group.rows) {
+      const line = element("tr");
+      // Short dates and codes read badly when split at a hyphen; the table scrolls instead.
+      line.append(...row.map((value) => { const cell = element("td", value); if (/^[\d-]{4,10}$|^\d{4}-\d{2}-\d{2}[T ][\d:.]+Z?$/.test(String(value ?? ""))) cell.className = "cell-nowrap"; return cell; }));
+      body.append(line);
+    }
     if (!group.rows.length) { const line = element("tr"); const cell = element("td", "No entries in this response."); cell.colSpan = group.columns.length; line.append(cell); body.append(line); }
     table.append(head, body); scroll.append(table); container.append(scroll);
   }

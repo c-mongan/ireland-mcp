@@ -477,6 +477,7 @@ select { text-overflow: ellipsis; }
 .result-table tbody tr:hover { background-color: var(--surface-2); }
 /* Preserve whole words when sizing columns; long content can still wrap. */
 .result-table td { overflow-wrap: break-word; }
+.result-table td.cell-nowrap { white-space: nowrap; }
 .result-provenance {
   display: grid;
   gap: .65rem;
