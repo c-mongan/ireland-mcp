@@ -62,6 +62,10 @@ const CATEGORY_LABELS = new Map([
   ["Money & Tax", "Money and Tax"]
 ]);
 
+const CANONICAL = [...new Set(CATEGORY_LABELS.values())];
+/** The first canonical category named in free text such as a table caption or total-row label. */
+const categoryNamedIn = (text) => CANONICAL.find((c) => new RegExp(c.replace(/ and /g, " (?:and|&) "), "i").test(text));
+
 export function canonicalCategory(label) {
   const clean = label.replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
   const canonical = CATEGORY_LABELS.get(clean);
@@ -98,7 +102,7 @@ function categoryRows(rows, valueColumn, source, label) {
   if (totalIndex < 0) throw new Error(`${label}: category table has no total row.`);
   const categories = body.slice(0, totalIndex).map((row) => {
     const printed = clean(row[valueColumn] ?? "");
-    return { category: canonicalCategory(row[0]), source_label: clean(row[0]), count: figure(printed, source), share_percent: parsePercent(row[shareColumn] ?? ""), share_column: clean(rows[0][shareColumn]) };
+    return { category: canonicalCategory(row[0]), source_label: clean(row[0]), count: figure(printed, source), share_percent: parsePercent(row[shareColumn] ?? "") };
   });
   const totalRow = body[totalIndex];
   return { categories, total: figure(totalRow[valueColumn], source) };
@@ -214,10 +218,10 @@ export function buildCibSnapshots(files, asOf) {
       const last = sub.rows.at(-1).map(clean);
       const totalCell = last.findIndex((c) => /^[\d,]+$/.test(c));
       const labelText = last.slice(0, totalCell).join(" ").trim();
-      const name = [...new Set(CATEGORY_LABELS.values())].find((c) => new RegExp(c.replace(/ and /g, " (?:and|&) "), "i").test(labelText))
-        ?? [...new Set(CATEGORY_LABELS.values())].find((c) => new RegExp(c.replace(/ and /g, " (?:and|&) "), "i").test(sub.caption));
+      // The total-row label wins over the caption: CIPS 2021 Table 7 is captioned Moving Country but totals Money and Tax.
+      const captionName = categoryNamedIn(sub.caption);
+      const name = categoryNamedIn(labelText) ?? captionName;
       if (!name) throw new Error(`${id}: cannot identify the category of sub-category table "${sub.caption}".`);
-      const captionName = [...new Set(CATEGORY_LABELS.values())].find((c) => new RegExp(c.replace(/ and /g, " (?:and|&) "), "i").test(sub.caption));
       if (captionName && captionName !== name) notes.push(`"${clean(sub.caption)}" ends with a total row labelled "${labelText}" (${last[totalCell]}); it is treated as the ${name} breakdown.`);
       const row = out.find((c) => c.category === name);
       if (!row) throw new Error(`${id}: sub-category table for ${name} has no main-table row.`);
@@ -292,25 +296,31 @@ function verifyPinned(annual, categories, cips) {
   for (const [key, value] of Object.entries(PINNED.cips2025)) if (got[key] !== value) fail(`CIPS 2025 ${key} expected ${value}, parsed ${got[key]}.`);
 }
 
-/** Every figure with a printed form must occur verbatim in the text of the file it cites. */
-export function verifyFigures(documents, loaded) {
-  const failures = [];
-  let checked = 0;
+/** Every printed figure in the documents, with its JSON path: { path, printed, value, source }. */
+export function listFigures(documents) {
+  const figures = [];
   const walk = (node, path) => {
     if (Array.isArray(node)) return node.forEach((v, i) => walk(v, `${path}[${i}]`));
     if (!node || typeof node !== "object") return;
-    if (typeof node.printed === "string" && typeof node.source === "string") {
-      checked++;
-      const file = loaded.get(node.source);
-      if (!file) failures.push(`${path}: unknown source ${node.source}`);
-      else if (!textContainsFigure(file.text, node.printed)) failures.push(`${path}: "${node.printed}" not found in ${file.url}`);
-      else if (parseCount(node.printed) !== node.value) failures.push(`${path}: value ${node.value} does not match printed ${node.printed}`);
-    }
+    if (typeof node.printed === "string") figures.push({ path, printed: node.printed, value: node.value, source: node.source });
     for (const [k, v] of Object.entries(node)) if (k !== "sources") walk(v, `${path}.${k}`);
   };
-  for (const [name, doc] of Object.entries(documents)) walk(doc, name);
+  for (const [name, doc] of Object.entries(documents)) walk(doc.years, `${name.replace(/\.json$/, "")}.years`);
+  return figures;
+}
+
+/** Every figure with a printed form must occur verbatim in the text of the file it cites. Returns the count checked. */
+export function verifyFigures(documents, loaded) {
+  const figures = listFigures(documents);
+  const failures = [];
+  for (const { path, printed, value, source } of figures) {
+    const file = loaded.get(source);
+    if (!file) failures.push(`${path}: unknown source ${source}`);
+    else if (!textContainsFigure(file.text, printed)) failures.push(`${path}: "${printed}" not found in ${file.url}`);
+    else if (parseCount(printed) !== value) failures.push(`${path}: value ${value} does not match printed ${printed}`);
+  }
   if (failures.length) throw new Error(`Figure verification failed:\n${failures.join("\n")}`);
-  return checked;
+  return figures.length;
 }
 
 /** Strips fields that legitimately change between runs, so --check compares content only. */

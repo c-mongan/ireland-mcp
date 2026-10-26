@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 // @ts-expect-error -- plain ESM script without type declarations
 import { docxBlocks, docxText, htmlText, parseCount, parsePercent, readZipEntry, textContainsFigure } from "../scripts/lib/docx.mjs";
 // @ts-expect-error -- plain ESM script without type declarations
-import { canonicalCategory, CIB_HOST, CIB_SOURCES, verifyFigures } from "../scripts/lib/cib.mjs";
+import { canonicalCategory, CIB_HOST, CIB_SOURCES, listFigures, verifyFigures } from "../scripts/lib/cib.mjs";
 
 /** Minimal ZIP writer (stored or deflated entries) for synthetic .docx fixtures. */
 function zip(entries: Record<string, string>, deflate = true): Buffer {
@@ -87,6 +87,7 @@ describe("CIB refresh helpers", () => {
   it("fails verification when a pinned figure is not in its cited file", () => {
     const loaded = new Map([["q", { url: "https://x/q.docx", text: "There were 708,862 queries" }]]);
     expect(verifyFigures({ "a.json": { years: [{ queries: { value: 708862, printed: "708,862", source: "q" } }] } }, loaded)).toBe(1);
+    expect(listFigures({ "a.json": { years: [{ queries: { value: 708862, printed: "708,862", source: "q" } }] } })).toEqual([{ path: "a.years[0].queries", printed: "708,862", value: 708862, source: "q" }]);
     expect(() => verifyFigures({ "a.json": { years: [{ queries: { value: 708863, printed: "708,863", source: "q" } }] } }, loaded)).toThrow("not found");
     expect(() => verifyFigures({ "a.json": { years: [{ queries: { value: 1, printed: "708,862", source: "q" } }] } }, loaded)).toThrow("does not match");
     expect(() => verifyFigures({ "a.json": { years: [{ queries: { value: 1, printed: "1", source: "zz" } }] } }, loaded)).toThrow("unknown source");

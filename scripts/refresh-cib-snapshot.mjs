@@ -9,7 +9,7 @@
 //   add --evidence to print every verified figure with its source URL
 // Not used by hosted requests: the MCP server only reads the committed JSON.
 import { readFile, rename, writeFile } from "node:fs/promises";
-import { buildCibSnapshots, CIB_HOST, CIB_SOURCES, comparable } from "./lib/cib.mjs";
+import { buildCibSnapshots, CIB_HOST, CIB_SOURCES, comparable, listFigures } from "./lib/cib.mjs";
 
 const args = new Set(process.argv.slice(2));
 const write = args.has("--write");
@@ -31,21 +31,9 @@ for (const source of CIB_SOURCES) files.set(source.id, { bytes: await download(s
 const asOf = new Date().toISOString().slice(0, 10);
 const documents = buildCibSnapshots(files, asOf);
 
-let figures = 0;
-const evidence = [];
-for (const [name, doc] of Object.entries(documents)) {
-  const visit = (node, path) => {
-    if (Array.isArray(node)) return node.forEach((v, i) => visit(v, `${path}[${i}]`));
-    if (!node || typeof node !== "object") return;
-    if (typeof node.printed === "string") {
-      figures++;
-      evidence.push(`${path}\t${node.printed}\t${doc.sources.find((s) => s.id === node.source)?.url}`);
-    }
-    for (const [k, v] of Object.entries(node)) if (k !== "sources") visit(v, `${path}.${k}`);
-  };
-  visit(doc.years, name.replace(/\.json$/, ""));
-}
-if (args.has("--evidence")) console.log(evidence.join("\n"));
+const figures = listFigures(documents);
+const urlOf = (id) => CIB_SOURCES.find((s) => s.id === id)?.url;
+if (args.has("--evidence")) console.log(figures.map((f) => `${f.path}\t${f.printed}\t${urlOf(f.source)}`).join("\n"));
 
 const drift = [];
 for (const [name, doc] of Object.entries(documents)) {
@@ -72,4 +60,4 @@ if (drift.length) {
   console.error(`CIB snapshot check FAILED:\n${drift.join("\n")}\nReview the publisher changes, then rerun with --write.`);
   process.exit(1);
 }
-console.log(`${write ? "Wrote" : "Checked"} ${Object.keys(documents).length} CIB snapshots: ${CIB_SOURCES.length} files hashed, ${figures} figures found verbatim in their cited files.`);
+console.log(`${write ? "Wrote" : "Checked"} ${Object.keys(documents).length} CIB snapshots: ${CIB_SOURCES.length} files hashed, ${figures.length} figures found verbatim in their cited files.`);
