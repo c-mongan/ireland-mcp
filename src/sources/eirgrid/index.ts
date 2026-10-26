@@ -51,32 +51,37 @@ const statusTool = defineTool({
   handler: async ({ region }, ctx) => {
     const load = (area: string, date: string) =>
       ctx.cachedJson<{ Rows?: Row[] }>(chartUrl(region, area, date), 5 * MINUTE, { label: `EirGrid ${area}` });
-    const loadDay = (date: string) => Promise.all([load("demandactual", date), load("windactual", date), load("co2intensity", date)]);
+    const areas = ["demandactual", "windactual", "co2intensity"] as const;
     // Just after midnight Irish time the new day's charts fill in one series at a time; any series
     // without a reading yet falls back to yesterday's last value.
     const today = dublinDate(ctx.now());
     const yesterday = dublinDate(new Date(ctx.now().getTime() - 24 * 60 * 60 * 1000));
-    const current = await loadDay(today);
-    const complete = current.every((r) => latest(r.value.Rows));
-    const previous = complete ? undefined : await loadDay(yesterday);
+    const current = await Promise.all(areas.map((area) => load(area, today)));
+    const missing = areas.map((_area, index) => !latest(current[index]!.value.Rows));
+    // Wind share pairs demand with wind, so a missing one of the two also needs the other from yesterday.
+    const pairMissing = missing[0] || missing[1];
+    const needed = areas.map((_area, index) => missing[index] || (index < 2 && pairMissing));
+    // Fetch only the series still needed, and let each fallback fail on its own so today's readings survive.
+    const previous = await Promise.all(areas.map((area, index) => (needed[index] ? load(area, yesterday).catch(() => undefined) : undefined)));
     const pick = (index: number) => {
       const fromToday = latest(current[index]!.value.Rows);
-      return fromToday ? { row: fromToday, date: today } : { row: latest(previous?.[index]!.value.Rows), date: yesterday };
+      return fromToday ? { row: fromToday, date: today } : { row: latest(previous[index]?.value.Rows), date: yesterday };
     };
     const [demand, wind, co2] = [pick(0), pick(1), pick(2)];
     const d = demand.row;
     const w = wind.row;
     const c = co2.row;
     // Wind share needs demand and wind from the same interval, so it is computed within one day.
-    const shareFrom = (day: typeof current | undefined) => {
-      if (!day) return undefined;
-      const windAt = new Map((day[1].value.Rows ?? []).filter((r) => typeof r.Value === "number").map((r) => [r.EffectiveTime, r.Value as number]));
-      const row = [...(day[0].value.Rows ?? [])].reverse().find((r) => typeof r.Value === "number" && r.Value > 0 && windAt.has(r.EffectiveTime));
+    type Chart = (typeof current)[number] | undefined;
+    const shareFrom = (demandChart: Chart, windChart: Chart) => {
+      if (!demandChart || !windChart) return undefined;
+      const windAt = new Map((windChart.value.Rows ?? []).filter((r) => typeof r.Value === "number").map((r) => [r.EffectiveTime, r.Value as number]));
+      const row = [...(demandChart.value.Rows ?? [])].reverse().find((r) => typeof r.Value === "number" && r.Value > 0 && windAt.has(r.EffectiveTime));
       return row ? { row, wind: windAt.get(row.EffectiveTime)! } : undefined;
     };
-    const share = shareFrom(current) ?? shareFrom(previous);
+    const share = shareFrom(current[0], current[1]) ?? shareFrom(previous[0], previous[1]);
     const usedYesterday = [demand, wind, co2].some((series) => series.row && series.date === yesterday);
-    const used = [...current, ...(previous ?? [])];
+    const used = [...current, ...previous.filter((chart) => chart !== undefined)];
     if (!d && !w && !c) throw new ToolError("UPSTREAM_DOWN", "EirGrid returned no readings for today or yesterday.", { hint: "Try again in a few minutes." });
     return envelope(eirgridInfo, {
       data: {

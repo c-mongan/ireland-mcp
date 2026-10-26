@@ -81,6 +81,34 @@ describe("EirGrid module", () => {
     expect(body.data.note).toContain("26-Oct-2026");
   });
 
+  it("keeps today's readings when only an unneeded part of yesterday fails", async () => {
+    const now = () => new Date("2026-10-26T01:09:00Z");
+    const routes: Route[] = [
+      ...["demandactual", "windactual"].map((area) => ({ match: new RegExp(`dateFrom=26-Oct-2026.*areas=${area}`), file: f(`${area}.json`) })),
+      { match: /dateFrom=26-Oct-2026.*areas=co2intensity/, body: '{"Rows":[]}' },
+      { match: /dateFrom=25-Oct-2026.*areas=co2intensity/, file: f("co2intensity.json") },
+      { match: /dateFrom=25-Oct-2026/, status: 500, body: "down" }
+    ];
+    const fetch = fakeFetch(routes);
+    const { ok, body } = await callTool(mod, "grid_get_status", { region: "ALL" }, createContext({ fetch, now }));
+    expect(ok).toBe(true);
+    expect(body.data).toMatchObject({ demand_mw: 5753, wind_mw: 826, co2_g_per_kwh: 149 });
+    // Only the missing CO2 series is fetched for yesterday.
+    expect(fetch.calls.filter((call) => call.url.includes("25-Oct-2026"))).toHaveLength(1);
+  });
+
+  it("returns null for a series whose fallback read fails, keeping the rest", async () => {
+    const now = () => new Date("2026-10-26T01:09:00Z");
+    const routes: Route[] = [
+      ...["demandactual", "windactual"].map((area) => ({ match: new RegExp(`dateFrom=26-Oct-2026.*areas=${area}`), file: f(`${area}.json`) })),
+      { match: /dateFrom=26-Oct-2026.*areas=co2intensity/, body: '{"Rows":[]}' },
+      { match: /dateFrom=25-Oct-2026/, status: 500, body: "down" }
+    ];
+    const { ok, body } = await callTool(mod, "grid_get_status", { region: "ALL" }, createContext({ fetch: fakeFetch(routes), now }));
+    expect(ok).toBe(true);
+    expect(body.data).toMatchObject({ demand_mw: 5753, co2_g_per_kwh: null });
+  });
+
   it("reports UPSTREAM_DOWN when the dashboard returns no rows", async () => {
     const empty: Route[] = [{ match: /smartgriddashboard/, body: '{"Rows":[]}' }];
     const { ok, body } = await callTool(mod, "grid_get_status", { region: "ROI" }, fakeFetch(empty));
