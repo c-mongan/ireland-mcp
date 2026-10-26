@@ -65,6 +65,22 @@ describe("EirGrid module", () => {
     expect(fetch.calls).toHaveLength(6);
   });
 
+  it("falls back per series when only some of today's charts have readings", async () => {
+    const now = () => new Date("2026-10-26T01:09:00Z"); // 01:09 on 26 Oct in Dublin (after the clocks change)
+    const todayWind = JSON.stringify({ Rows: [{ EffectiveTime: "26-Oct-2026 01:00:00", FieldName: "WIND_ACTUAL", Region: "ALL", Value: 2189 }] });
+    const routes: Route[] = [
+      { match: /dateFrom=26-Oct-2026.*areas=windactual/, body: todayWind },
+      { match: /dateFrom=26-Oct-2026/, body: '{"Rows":[]}' },
+      ...["demandactual", "windactual", "co2intensity"].map((area) => ({ match: new RegExp(`dateFrom=25-Oct-2026.*areas=${area}`), file: f(`${area}.json`) }))
+    ];
+    const { ok, body } = await callTool(mod, "grid_get_status", { region: "ALL" }, createContext({ fetch: fakeFetch(routes), now }));
+    expect(ok).toBe(true);
+    expect(body.data).toMatchObject({ demand_mw: 5753, wind_mw: 2189, wind_time: "26-Oct-2026 01:00:00", co2_g_per_kwh: 149 });
+    // Wind share must come from one day's matching interval, never today's wind over yesterday's demand.
+    expect(body.data.wind_share_time).toBe("05-Oct-2026 16:45:00");
+    expect(body.data.note).toContain("26-Oct-2026");
+  });
+
   it("reports UPSTREAM_DOWN when the dashboard returns no rows", async () => {
     const empty: Route[] = [{ match: /smartgriddashboard/, body: '{"Rows":[]}' }];
     const { ok, body } = await callTool(mod, "grid_get_status", { region: "ROI" }, fakeFetch(empty));

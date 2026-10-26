@@ -68,7 +68,7 @@ export function liveOpsSummary(report: string): string {
   const [pass, notConfigured, blocked, degraded, fail] = line.slice(1).map((n) => Number(n ?? 0)) as [number, number, number, number, number];
   const total = pass + notConfigured + blocked + degraded + fail;
   const notes = [
-    `${notConfigured} need the NTA key`,
+    `${notConfigured} need an operator key (NTA, Logainm)`,
     ...(blocked ? [`${blocked} blocked from Azure IPs`] : []),
     ...(degraded ? [`${degraded} degraded (stale or partial)`] : [])
   ];
