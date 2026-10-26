@@ -16,7 +16,7 @@ export function pageViewProperties({ path, referrer, utmSource, width, ownHost }
   try { referrerHost = referrer ? new URL(referrer).hostname.toLowerCase() : undefined; } catch { referrerHost = "_invalid"; }
   const source = typeof utmSource === "string" ? utmSource.toLowerCase().trim() : "";
   return {
-    path: path === "/" || path === "/index.html" ? "/" : path === "/404.html" ? "/404" : "_OTHER",
+    path: path === "/" || path === "/index.html" ? "/" : "_OTHER",
     referrer: !referrerHost ? "direct" : referrerHost === ownHost ? "internal"
       : REFERRERS.find(([pattern]) => pattern.test(referrerHost))?.[1] ?? "other",
     utm_source: !source ? "none" : UTM_SOURCES.has(source) ? (source === "twitter" ? "x" : source) : "other",

@@ -55,7 +55,7 @@ describe("anonymous page view projection", () => {
 
   it("keeps only allow-listed paths, campaign sources and viewport classes", () => {
     expect(pageViewProperties({ ...base, path: "/private/path", utmSource: "private-campaign", width: 375 })).toEqual({ path: "_OTHER", referrer: "direct", utm_source: "other", viewport: "mobile" });
-    expect(pageViewProperties({ ...base, path: "/404.html", utmSource: "Twitter", width: 800 })).toEqual({ path: "/404", referrer: "direct", utm_source: "x", viewport: "tablet" });
+    expect(pageViewProperties({ ...base, path: "/index.html", utmSource: "Twitter", width: 800 })).toEqual({ path: "/", referrer: "direct", utm_source: "x", viewport: "tablet" });
     expect(pageViewProperties({ ...base, width: NaN })).toMatchObject({ path: "/", utm_source: "none", viewport: "_OTHER" });
   });
 });

@@ -112,7 +112,6 @@ async function handleRequest(request: Request, options: McpHttpOptions, headers:
 
   const synthetic = isSyntheticRequest(request.headers);
   const operations = startMcpOperations(bodyText, request.headers);
-  recordConnects(bodyText, synthetic);
   let status = 500;
   let body: string | null = null;
   try {
@@ -123,26 +122,33 @@ async function handleRequest(request: Request, options: McpHttpOptions, headers:
     return new Response(body, { status, headers: response.headers });
   } finally {
     endMcpOperations(operations, status, body);
+    if (process.env.IRELAND_MCP_TELEMETRY !== "off") {
+      for (const event of connectEvents(bodyText, body, status, synthetic)) captureConnectPostHog(event);
+    }
   }
 }
 
-/** One usage count per `initialize`, with the client reduced to a fixed label. */
-export function connectEvents(bodyText: string, synthetic: boolean): ConnectEvent[] {
-  let parsed: unknown;
-  try { parsed = JSON.parse(bodyText); } catch { return []; }
-  return (Array.isArray(parsed) ? parsed : [parsed]).flatMap((message) => {
-    if (!message || typeof message !== "object" || (message as { method?: unknown }).method !== "initialize") return [];
-    const params = (message as { params?: unknown }).params;
-    const name = clientInfoFrom(params).name;
+/**
+ * One usage count per successful `initialize`, with the client reduced to a fixed label.
+ * Requests whose initialize failed (HTTP error, JSON-RPC error or no matching reply) are not counted.
+ */
+export function connectEvents(bodyText: string, responseText: string | null, status: number, synthetic: boolean): ConnectEvent[] {
+  if (status >= 400 || !responseText) return [];
+  const list = (text: string): unknown[] => {
+    try { const parsed: unknown = JSON.parse(text); return Array.isArray(parsed) ? parsed : [parsed]; } catch { return []; }
+  };
+  const succeeded = new Set(list(responseText).flatMap((reply) => {
+    const r = reply as { id?: unknown; result?: unknown; error?: unknown } | null;
+    return r && typeof r === "object" && r.result !== undefined && r.error === undefined && r.id !== undefined && r.id !== null ? [String(r.id)] : [];
+  }));
+  return list(bodyText).flatMap((message) => {
+    const m = message as { method?: unknown; id?: unknown; params?: unknown } | null;
+    if (!m || typeof m !== "object" || m.method !== "initialize" || m.id === undefined || m.id === null || !succeeded.has(String(m.id))) return [];
+    const name = clientInfoFrom(m.params).name;
     // Our Azure availability test predates the header; its fixed client name also marks it.
     const probe = name === "azure-availability";
-    return [{ client: clientBucket(name), protocol: protocolBucket(params), synthetic: synthetic || probe }];
+    return [{ client: clientBucket(name), protocol: protocolBucket(m.params), synthetic: synthetic || probe }];
   });
-}
-
-function recordConnects(bodyText: string, synthetic: boolean): void {
-  if (process.env.IRELAND_MCP_TELEMETRY === "off") return;
-  for (const event of connectEvents(bodyText, synthetic)) captureConnectPostHog(event);
 }
 
 async function serve(

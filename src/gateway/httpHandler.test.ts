@@ -333,12 +333,30 @@ describe("synthetic traffic", () => {
 });
 
 describe("client connection counts", () => {
-  const init = (name: string) => ({ jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", clientInfo: { name, version: "9.9 private" } } });
+  const init = (name: string, id = 1) => ({ jsonrpc: "2.0", id, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name, version: "9.9 private" } } });
+  const ok = (id = 1) => JSON.stringify({ jsonrpc: "2.0", id, result: { protocolVersion: "2025-06-18" } });
 
-  it("labels clients and treats our availability probe as synthetic", () => {
-    expect(connectEvents(JSON.stringify(init("claude-ai")), false)).toEqual([{ client: "claude", protocol: "2025-06-18", synthetic: false }]);
-    expect(connectEvents(JSON.stringify(init("azure-availability")), false)).toEqual([{ client: "other", protocol: "2025-06-18", synthetic: true }]);
-    expect(connectEvents(JSON.stringify([init("cursor-vscode"), { jsonrpc: "2.0", id: 2, method: "tools/list" }]), true)).toEqual([{ client: "cursor", protocol: "2025-06-18", synthetic: true }]);
-    expect(connectEvents("not json", false)).toEqual([]);
+  it("labels successful handshakes and treats our availability probe as synthetic", () => {
+    expect(connectEvents(JSON.stringify(init("claude-ai")), ok(), 200, false)).toEqual([{ client: "claude", protocol: "2025-06-18", synthetic: false }]);
+    expect(connectEvents(JSON.stringify(init("azure-availability")), ok(), 200, false)).toEqual([{ client: "other", protocol: "2025-06-18", synthetic: true }]);
+    expect(connectEvents(JSON.stringify([init("cursor-vscode", 7), { jsonrpc: "2.0", id: 8, method: "tools/list" }]), JSON.stringify([JSON.parse(ok(7)), JSON.parse(ok(8))]), 200, true))
+      .toEqual([{ client: "cursor", protocol: "2025-06-18", synthetic: true }]);
+  });
+
+  it("does not count rejected or unanswered handshakes", () => {
+    const body = JSON.stringify(init("claude-ai"));
+    expect(connectEvents(body, JSON.stringify({ jsonrpc: "2.0", id: 1, error: { code: -32602, message: "bad" } }), 200, false)).toEqual([]);
+    expect(connectEvents(body, ok(2), 200, false)).toEqual([]);
+    expect(connectEvents(body, ok(), 429, false)).toEqual([]);
+    expect(connectEvents(body, null, 200, false)).toEqual([]);
+    expect(connectEvents("not json", ok(), 200, false)).toEqual([]);
+  });
+
+  it("counts a real initialize handled by the server, but not one the server rejects", async () => {
+    const response = await handleMcpHttp(post(init("claude-ai")), { createServer });
+    expect(connectEvents(JSON.stringify(init("claude-ai")), await response.text(), response.status, false)).toEqual([{ client: "claude", protocol: "2025-06-18", synthetic: false }]);
+    const malformed = { ...init("claude-ai"), params: { protocolVersion: "2025-06-18", clientInfo: { name: "claude-ai", version: "1" } } };
+    const rejected = await handleMcpHttp(post(malformed), { createServer });
+    expect(connectEvents(JSON.stringify(malformed), await rejected.text(), rejected.status, false)).toEqual([]);
   });
 });

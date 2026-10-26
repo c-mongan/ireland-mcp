@@ -8,8 +8,11 @@ describe("request scope", () => {
     expect(isSyntheticRequest(new Headers())).toBe(false);
   });
 
-  it("treats only browser requests as the playground channel", () => {
+  it("treats only the project website as the playground channel", () => {
     expect(channelOf(new Headers({ origin: "https://irishopendata.ie" }))).toBe("playground");
+    for (const origin of ["https://claude.ai", "https://chatgpt.com", "vscode-webview://abc", "http://localhost:7071"]) {
+      expect(channelOf(new Headers({ origin }))).toBe("client");
+    }
     expect(channelOf(new Headers())).toBe("client");
   });
 

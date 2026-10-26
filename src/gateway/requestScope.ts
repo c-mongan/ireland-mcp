@@ -27,7 +27,13 @@ export function currentChannel(): Channel {
   return storage.getStore()?.channel ?? "client";
 }
 
-/** Only browsers send Origin, and disallowed origins are rejected before this point. */
+/** The project's own website. Other allowed browser origins (claude.ai, chatgpt.com, editors) are MCP clients. */
+const PLAYGROUND_ORIGINS = new Set([
+  "https://irishopendata.ie", "https://www.irishopendata.ie",
+  "https://irishopendata.com", "https://www.irishopendata.com",
+  "https://lemon-meadow-03b2b8903.3.azurestaticapps.net"
+]);
+
 export function channelOf(headers: Headers): Channel {
-  return headers.get("origin") ? "playground" : "client";
+  return PLAYGROUND_ORIGINS.has(headers.get("origin") ?? "") ? "playground" : "client";
 }

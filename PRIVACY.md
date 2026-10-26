@@ -17,14 +17,16 @@ no personal data. This page lists exactly what the hosted endpoint records.
 ## Usage counts (PostHog)
 
 The hosted service also sends aggregate usage counts to a dedicated PostHog project in the EU,
-so the maintainer can see whether the service is used. Every event uses one fixed service
-identity, no person profile, no GeoIP and `$ip: 0.0.0.0`, and the project discards IP data.
+so the maintainer can see whether the service is used. Server events use one fixed service
+identity; each website page view uses a fresh random id, and opted-in website events use a separate
+id that lasts only for the open page. No event has a person profile or GeoIP, every event sets
+`$ip: 0.0.0.0`, and the project discards IP data.
 
 | Event | Fields |
 | --- | --- |
-| `ireland_mcp_tool_completed` | Known source and operation labels, outcome, duration, cache flags, typed error code, `synthetic`, `channel` (`client` or website `playground`) |
+| `ireland_mcp_tool_completed` | Known source and operation labels, outcome, duration, cache flags, typed error code, `synthetic`, `channel` (`playground` for this project's website, otherwise `client`) |
 | `ireland_mcp_client_connected` | Client app reduced to a fixed label (`claude`, `chatgpt`, `vscode`, `cursor`, … or `other`), protocol version, `synthetic` |
-| `ireland_page_viewed` (website) | Page (`/`, `/404` or `_OTHER`), referring site reduced to a fixed label (`google`, `github`, … `other`, `direct`), `utm_source` label, viewport class |
+| `ireland_page_viewed` (website) | Page (`/` or `_OTHER`), referring site reduced to a fixed label (`google`, `github`, … `other`, `direct`), `utm_source` label, viewport class |
 
 `synthetic` is `true` only when a request carries `x-ireland-mcp-synthetic: 1`. The project's
 own checks send it so they are not counted as real use. Raw client names, versions, URLs, full

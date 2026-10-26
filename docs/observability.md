@@ -29,7 +29,7 @@ For the website, `/analytics-config.json` contains `{ "enabled": false }` by def
 
 Each page load sends one anonymous `ireland_page_viewed` event with a fresh random id that is never stored or reused; Do Not Track and Global Privacy Control suppress it. Visitors must select **Enable usage metrics** before any other website event is sent. This choice lasts for the open page only. A reload resets the choice and creates a new random identity after the next opt-in. The module uses no analytics cookies, local storage, or session storage. DNT and Global Privacy Control override the choice. **Disable usage metrics** stops capture and cancels pending requests. Existing events cannot be recalled.
 
-The browser sends requests directly to PostHog after opt-in. PostHog receives the network connection and its IP address; the project setting controls IP removal from stored events. The site's referrer policy prevents page URL disclosure. Apart from the page view's fixed labels, the browser sends no URL, referrer, browser metadata, user-entered label, query arguments, result, error message, header, or account identifier in the event payload. No SDK, automatic event capture, session replay, or remote script is loaded.
+The browser sends the page-view request to PostHog on load (unless DNT or GPC is on) and other events only after opt-in. Both go directly to PostHog. PostHog receives the network connection and its IP address; the project setting controls IP removal from stored events. The site's referrer policy prevents page URL disclosure. Apart from the page view's fixed labels, the browser sends no URL, referrer, browser metadata, user-entered label, query arguments, result, error message, header, or account identifier in the event payload. No SDK, automatic event capture, session replay, or remote script is loaded.
 
 ## Event contract
 
@@ -39,7 +39,7 @@ All events have `schema_version: 1`, `surface: mcp|web`, and the three privacy p
 | --- | --- |
 | `ireland_mcp_tool_completed` | `source`, `operation`, `outcome: ok|error`, `duration_ms`, optional Boolean `cached` and `stale`, optional `error_code`, Boolean `synthetic`, `channel: client|playground` |
 | `ireland_mcp_client_connected` | `client: claude|claude-code|chatgpt|codex|cursor|windsurf|copilot-cli|vscode|gemini|inspector|other|unknown`, `protocol` (date-shaped or `_OTHER`), Boolean `synthetic` |
-| `ireland_page_viewed` | `path: /|/404|_OTHER`, `referrer: direct|internal|google|bing|duckduckgo|github|reddit|x|linkedin|hn|chatgpt|claude|other`, `utm_source` label, `viewport: mobile|tablet|desktop` |
+| `ireland_page_viewed` | `path: /|_OTHER`, `referrer: direct|internal|google|bing|duckduckgo|github|reddit|x|linkedin|hn|chatgpt|claude|other`, `utm_source` label, `viewport: mobile|tablet|desktop` |
 | `ireland_query_started` | `source`, `operation` |
 | `ireland_query_completed` | `source`, `operation`, `outcome: ok|error`, `duration_ms` |
 | `ireland_result_action` | `source`, `operation`, `action: inspect_raw|open_source|connect` |
@@ -86,5 +86,6 @@ References: [PostHog capture and batch API](https://posthog.com/docs/api/capture
 
 First-party scripts (`check:mcp`, `live:all`, `live-civic`, the nightly live smoke and the
 maintainer's quality loop) send `x-ireland-mcp-synthetic: 1`. Filter dashboards on
-`synthetic = false` to see real use. Website playground calls arrive with a browser `Origin`
-and are labelled `channel: playground`; MCP clients are `channel: client`.
+`synthetic = false` to see real use. Website playground calls arrive from this project's own site origins and are labelled
+`channel: playground`. Everything else, including browser-based clients such as claude.ai, is
+`channel: client`.
