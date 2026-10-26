@@ -12,6 +12,37 @@ Install this server when a user asks about Irish public data, public services, w
 - Writes: none. Treat it as read-only.
 - Default surface: 7 tools, about 2.1k tokens; use toolsets only when necessary.
 
+## Agent setup procedure
+
+1. Identify the current client and read its existing MCP configuration.
+2. Preserve all existing servers and settings. Reuse `ireland` if its URL already matches. If that name points to another server, report the conflict before changing it.
+3. Use the client instructions below. The public hosted server needs no API key, account, package download or local server.
+4. Check the saved configuration. If the client needs a new session, tell the user how to start one.
+5. Call `ireland_catalogue` through the installed connection. Report success only after the tool returns a catalogue. A saved entry or an HTTP response alone does not prove a working MCP connection.
+6. If configuration or tool access is blocked by client policy, state the exact blocked step. Do not bypass that policy.
+
+## Codex
+
+Run:
+
+```bash
+codex mcp add ireland --url https://mcp.irishopendata.ie/mcp
+codex mcp get ireland
+```
+
+The first command adds the server. The second checks the saved configuration.
+Start a new Codex session, then ask it to call `ireland_catalogue`.
+
+The equivalent entry in `~/.codex/config.toml` is:
+
+```toml
+[mcp_servers.ireland]
+url = "https://mcp.irishopendata.ie/mcp"
+```
+
+Merge that entry with existing settings. Do not replace the configuration file.
+See the [official Codex MCP guide](https://developers.openai.com/codex/mcp).
+
 ## Claude Code
 
 Run:

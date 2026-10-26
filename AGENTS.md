@@ -18,8 +18,9 @@ npm run dev:http         # local server on http://localhost:7071
 npm run legal:check      # legal corpus package checks
 ```
 
-`npm run live:sanity` and `npm run live:all` call real upstream services; run
-them by hand, never in CI.
+`npm run live:sanity` and `npm run live:all` call real upstream services. Run
+them by hand; they are not part of PR CI (the nightly live-smoke workflow runs
+`live:sanity`).
 
 ## Layout
 
@@ -46,3 +47,13 @@ them by hand, never in CI.
 
 CI enables `LEGAL_SOCKET_TESTS=1` and runs lint, typecheck, tests, the build and
 the Inspector conformance check.
+
+## Reviewing a new source
+
+- Use fixed official URLs, bounded reads and explicit response validation. An
+  empty or malformed response must not become valid zero data or enter the cache.
+- Preserve publisher attribution, reporting dates, retrieval dates, missing
+  values, stale state and transfer-limit flags. A local or fixture check is not
+  hosted verification.
+- Add a bounded case to `scripts/live-sanity.mjs` (environment-gated if it
+  needs an operator key).

@@ -154,6 +154,8 @@ p { max-width: 70ch; text-wrap: pretty; }
   color: var(--accent-ink);
   border-color: var(--mint);
   box-shadow: 0 4px 14px rgba(164, 232, 191, 0.25);
+  /* Keep the primary colours fixed while hovering so contrast never dips mid-transition. */
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
 .btn.primary:hover {
   background: #c4f5d6;
@@ -374,11 +376,19 @@ pre { min-width: 0; max-width: 100%; overflow: auto; padding: 1.1rem; background
 .how-flow p { color: var(--muted); font-size: .95rem; margin: .75rem 0 1rem; }
 .flow-detail { display: block; color: var(--mint); font-size: .85rem; line-height: 1.7; font-weight: 600; }
 .how-note { color: var(--muted); font-size: .85rem; margin: 2rem 0 0; max-width: 90ch; }
-.docs-callout { display: flex; justify-content: space-between; align-items: center; gap: 3rem; padding-block: 2.5rem; }
+.docs-callout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: start; gap: 3rem; padding-block: 2.5rem; }
 .docs-callout h2 { font-size: 1.5rem; line-height: 1.3; }
 .docs-callout p { font-size: .9rem; margin-bottom: 0; max-width: 60ch; }
 .doc-links { display: grid; grid-template-columns: auto auto; gap: .3rem 1.5rem; flex-shrink: 0; }
 .doc-links a { display: inline-flex; align-items: center; min-height: 44px; font-size: .85rem; overflow-wrap: anywhere; }
+.agent-shortcut { color: var(--muted); margin: 0 0 1.25rem; }
+.agent-steps { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; padding-left: 1.2rem; margin-block: 1.5rem; color: var(--mint); font-size: .85rem; }
+.docs-callout .agent-limit { color: var(--muted); margin-bottom: 1rem; }
+.agent-request { min-width: 0; }
+.agent-request pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; line-height: 1.6; margin-block: 1rem; }
+.agent-request code { font: inherit; }
+.agent-request [hidden] { display: none; }
+@media (max-width: 760px) { .docs-callout { grid-template-columns: minmax(0, 1fr); gap: 1.75rem; } }
 .playground-layout { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.45fr); gap: clamp(2rem, 5vw, 3.5rem); align-items: start; }
 .question-examples { padding-top: .5rem; }
 .question-examples > p { font-size: .9rem; }

@@ -7,11 +7,12 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createContext } from "../dist/src/gateway/context.js";
 import { createAppServer } from "../dist/src/registry.js";
-import { assessSmokeResult, exitCode, ntaSummarySample, optionalLegalCases } from "./live-sanity-policy.mjs";
+import { assessSmokeResult, exitCode, ntaSummarySample, optionalLegalCases, publicSourceCases } from "./live-sanity-policy.mjs";
 import { assessResult } from "./live-result.mjs";
 
 const year = new Date().getUTCFullYear();
 const CASES = [
+  ...publicSourceCases,
   ["ncse", "ncse_search_datasets", { query: "school allocations", limit: 2 }, (d) => d.datasets?.length > 0],
   ["cso", "cso_area_profile", { area: "Galway" }, (d) => d.census?.length > 0],
   ["world-bank", "worldbank_get_indicator", { indicator: "SP.POP.TOTL", last: 2 }, (d) => d.observations?.[0]?.value > 5_000_000],
@@ -33,6 +34,9 @@ const CASES = [
   ["smart-dublin", "smartdublin_search_datasets", { query: "bike", limit: 3 }, (d) => d.total > 0],
   ["met-eireann", "met_get_forecast", { lat: 53.3498, lon: -6.2603, hours: 3 }, (d) => d.forecast?.length === 3],
   ["met-eireann", "met_get_warnings", {}, (d) => Array.isArray(d.warnings)],
+  ["lobbying", "lobbying_search_returns", { limit: 1 }, (d) => d.returns?.length === 1 && /^\d+$/.test(d.returns[0].id)],
+  ["paygap", "paygap_search_reports", { year: 2025, limit: 1 }, (d) => d.total_reports > 0 && d.reports?.[0]?.report_year === 2025],
+  ["council-budgets", "council_budgets_get", { year: 2026, authority: "Carlow County Council", division: "A", limit: 1 }, (d) => d.amount_unit === "EUR" && d.rows?.length === 1],
   ["nta", "nta_get_realtime_summary", { limit: 3 }, ntaSummarySample, { needsEnv: "NTA_API_KEY" }],
   ["legislation", "legislation_list_acts", { year: year - 1, limit: 3 }, (d) => JSON.stringify(d).includes("title")],
   ["ppr", "ppr_price_stats", { county: "Galway" }, (d) => d.count > 0],

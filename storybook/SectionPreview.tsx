@@ -3,11 +3,11 @@ import { sectionDocument } from "./sectionFixture.js";
 
 export interface SectionPreviewProps {
   /** Production section or dialog ID. The preview reads its markup from web/index.html. */
-  section: "top" | "install" | "directory" | "playground" | "status" | "demo-dialog";
+  section: "top" | "install" | "agent-docs" | "directory" | "playground" | "status" | "demo-dialog";
   /** Fixed website colour theme. Both themes have reviewed visual baselines. */
   theme: "dark" | "light";
   /** Fixed sample response or health state. No provider request runs here. */
-  state?: "idle" | "loading" | "success" | "empty" | "truncated" | "error" | "weather" | "transport" | "rent" | "cached-stale" | "healthy" | "degraded" | "stale" | "unreachable";
+  state?: "idle" | "loading" | "success" | "empty" | "truncated" | "error" | "weather" | "transport" | "rent" | "cached-stale" | "tourism" | "static-stops" | "groundwater" | "healthy" | "degraded" | "stale" | "unreachable";
 }
 
 /**

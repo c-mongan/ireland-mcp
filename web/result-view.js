@@ -92,6 +92,20 @@ export function buildResultView(payload, { source, operation, isError = false } 
       ["Carbon intensity", number(data.co2_g_per_kwh, " gCO₂/kWh"), text(data.co2_time)]
     ] });
     if ([data.demand_mw, data.wind_mw, data.wind_share_pct, data.co2_g_per_kwh].some((value) => typeof value !== "number" || !Number.isFinite(value))) model.notices.push("Some grid readings are not reported. Missing readings are not zero.");
+  } else if (key === "failte-ireland/failte_search" && record(data) && table("Tourism listings", ["Name", "County", "Category", "Address"], data.records, (item) => [text(item.name), text(item.county), text(item.category), text(item.address)], ["name", "county", "category", "address"])) {
+    model.title = data.records.length ? "Fáilte Ireland listings" : "No tourism listings in this response";
+    model.description = "Published tourism listings, not a complete business inventory. Opening hours and availability are not supplied.";
+    model.notices.push(`Source update date: ${text(data.source_updated_at)}. Retrieval time is separate.`);
+  } else if (key === "tfi-static/tfi_static_search_stops" && record(data) && table("Static transport stops", ["Stop", "NaPTAN AtcoCode", "Plate code", "Record status"], data.stops, (item) => [text(item.name), text(item.atco_code), text(item.plate_code), text(item.status)], ["name", "atco_code", "plate_code", "status"])) {
+    model.title = data.stops.length ? "Static Irish transport stop records" : "No stop records in this response";
+    model.description = "Static stop records, not live services, schedules or confirmed accessibility. AtcoCode has not been verified as a GTFS-Realtime stop_id.";
+    model.notices.push(`Publisher snapshot: ${text(data.snapshot_modified_at)}; its time zone is not supplied.`);
+    model.notices.push(`Upstream download: ${text(data.fetched_at)}. Retrieval time is separate.`);
+  } else if (key === "gsi/groundwater_vulnerability_at" && record(data) && table("Groundwater vulnerability areas", ["Area ID", "Category", "Description"], data.areas, (item) => [text(item.id), text(item.category), text(item.description)], ["id", "category", "description"])) {
+    model.title = data.areas.length ? "Groundwater vulnerability at this point" : "No mapped area in this response";
+    model.description = `Map scale: ${text(data.map_scale)}. Use for screening. This map does not replace a site investigation or provide engineering approval.`;
+    model.notices.push(`Dataset revision: ${text(data.dataset_revision)}. Retrieval time is separate.`);
+    if (!data.areas.length) model.notices.push("No mapped area does not establish low vulnerability. Inspect the source coverage and raw response.");
   } else if (key === "ppr/ppr_price_stats" && record(data) && typeof data.count === "number" && Number.isInteger(data.count) && data.count >= 0) {
     model.title = "Property sale statistics";
     model.description = `${number(data.count)} sales reported for the supplied filters. This is a sale-price summary, not a valuation.`;

@@ -101,5 +101,7 @@ describe("DeepHealth", () => {
     expect(defaultProbes({}).find((p) => p.source === "world-bank")?.url).toContain("data360api.worldbank.org");
     expect(defaultProbes({}).find((p) => p.source === "nta")?.skip).toBeTruthy();
     expect(defaultProbes({ NTA_API_KEY: "k" }).find((p) => p.source === "nta")?.skip).toBeUndefined();
+    expect(defaultProbes({}).find((p) => p.source === "logainm")?.skip).toBeTruthy();
+    expect(defaultProbes({ LOGAINM_API_KEY: "k" }).find((p) => p.source === "logainm")?.headers).toEqual({ "X-Api-Key": "k" });
   });
 });

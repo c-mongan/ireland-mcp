@@ -75,3 +75,16 @@ export function exitCode(results, maxTolerated = MAX_TOLERATED_FLAKY) {
   return results.filter((r) => r.status === "WARN").length > maxTolerated ? 1 : 0;
 }
 
+
+/** One bounded real operation per new adapter; no subscription key means an explicit skip. */
+export const publicSourceCases = [
+  ["failte-ireland", "failte_search", { dataset: "accommodation", county: "Galway", limit: 2 },
+    d => d.records?.length > 0 && d.records.every(r => typeof r.name === "string" && r.name.length > 0)],
+  ["tfi-static", "tfi_static_search_stops", { name: "Dublin", limit: 2 },
+    d => d.stops?.length > 0 && d.stops.every(s => typeof s.atco_code === "string" && s.atco_code.length > 0 && s.name)],
+  ["gsi", "groundwater_vulnerability_at", { lat: 53.3498, lon: -6.2603, limit: 10 },
+    d => d.status === "matched" && d.areas?.length > 0 && d.areas.every(a => typeof a.category === "string" && a.category.length > 0)],
+  ["logainm", "logainm_search_places", { query: "Dublin", limit: 2 },
+    d => d.places?.length > 0 && d.places.every(p => Number.isInteger(p.id) && p.id > 0 && p.names?.some(n => n.wording)),
+    { needsEnv: "LOGAINM_API_KEY" }]
+];
