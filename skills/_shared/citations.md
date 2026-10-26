@@ -28,6 +28,7 @@ retrieved_at, and sometimes `stale`). Use it. These rules apply to every skill i
 | `ppr` | Property Services Regulatory Authority | PSI General Licence / CC BY 4.0 | Residential Property Price Register, PSRA |
 | `met-eireann` | Met Éireann | CC BY 4.0 | Copyright Met Éireann, www.met.ie, CC BY 4.0 |
 | `oireachtas` | Houses of the Oireachtas | Oireachtas (Open Data) PSI Licence | Contains Oireachtas information under the Oireachtas (Open Data) PSI Licence |
+| `eu-law` | Publications Office of the European Union (Cellar) | Commission Decision 2011/833/EU reuse notice | © European Union; metadata from the Publications Office Cellar. Only the Official Journal is authentic |
 | `legislation` | Office of the Attorney General (eISB) | Oireachtas (Open Data) PSI Licence (incorporates CC BY 4.0) | Contains Oireachtas information licensed under the Oireachtas (Open Data) PSI Licence; Irish Statute Book |
 | `nta` | National Transport Authority | CC BY 4.0 | Contains NTA (Transport for Ireland) data, CC BY 4.0 |
 | `irish-rail` | Iarnród Éireann | Irish Rail realtime API terms | Source: Irish Rail realtime API |

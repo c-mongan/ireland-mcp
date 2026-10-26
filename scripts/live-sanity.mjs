@@ -25,6 +25,8 @@ const CASES = [
   ["ecb", "ecb_exchange_rate", { currency: "USD", lastNObservations: 3 }, (d) => d.observations?.length > 0],
   ["pobal", "pobal_deprivation_search", { query: "Galvone", limit: 3 }, (d) => d.areas?.some((a) => a.ed_id === "128020")],
   ["oireachtas", "oireachtas_search_bills", { query: "housing", limit: 3 }, (d) => JSON.stringify(d).length > 50],
+  ["oireachtas", "oireachtas_get_bill", { act_year: 2018, act_no: 7, limit: 3 }, (d) => d.bill === "2018/10" && d.act?.number === 7],
+  ["eu-law", "eu_law_lookup", { celex: "32016R0679" }, (d) => d.documents?.[0]?.type === "REG"],
   ["geohive", "geohive_boundaries_at_point", { lat: 53.3498, lon: -6.2603 }, (d) => d.county?.name],
   ["geohive", "geohive_locate", { name: "An Daingean" }, (d) => d.places?.some((p) => p.county === "Kerry")],
   ["wikidata", "wikidata_entity", { qid: "Q27" }, (d) => d.qid === "Q27" && d.label],

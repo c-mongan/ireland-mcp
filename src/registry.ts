@@ -11,6 +11,7 @@ import { csoModule } from "./sources/cso/index.js";
 import { dataGovIeModule } from "./sources/data-gov-ie/index.js";
 import { geohiveModule } from "./sources/geohive/index.js";
 import { legislationModule } from "./sources/legislation/index.js";
+import { euLawModule } from "./sources/eu-law/index.js";
 import { metModule } from "./sources/met-eireann/index.js";
 import { ntaModule } from "./sources/nta/index.js";
 import { pprModule } from "./sources/ppr/index.js";
@@ -63,6 +64,7 @@ export const sourceModules: SourceModule[] = [
   metModule,
   ntaModule,
   legislationModule,
+  euLawModule,
   pprModule,
   irishRailModule,
   luasModule,

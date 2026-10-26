@@ -7,6 +7,7 @@ import { snapshotHealth as cibSnapshotHealth } from "../sources/cib/index.js";
 import { snapshotHealth as civicDirectorySnapshotHealth } from "../sources/civic-directory/index.js";
 import { RAIL_BASE } from "../sources/irish-rail/index.js";
 import { EISB } from "../sources/legislation/index.js";
+import { CELLAR_SPARQL } from "../sources/eu-law/index.js";
 import { LUAS_BASE } from "../sources/luas/index.js";
 import { WARNINGS_URL } from "../sources/met-eireann/index.js";
 import { TRIP_UPDATES_URL } from "../sources/nta/index.js";
@@ -90,6 +91,7 @@ export function defaultProbes(env: Record<string, string | undefined>): Probe[] 
       ? { source: "nta", url: TRIP_UPDATES_URL, headers: { "x-api-key": ntaKey } }
       : { source: "nta", url: TRIP_UPDATES_URL, skip: "NTA_API_KEY not set" },
     { source: "legislation", url: `${EISB}/` },
+    { source: "eu-law", url: `${CELLAR_SPARQL}?query=${encodeURIComponent("ASK { ?s ?p ?o }")}&format=application%2Fsparql-results%2Bjson` },
     { source: "ppr", url: PPR_DOWNLOADS },
     { source: "irish-rail", url: `${RAIL_BASE}/getAllStationsXML` },
     { source: "luas", url: `${LUAS_BASE}?action=forecast&stop=HEU&encrypt=false` },

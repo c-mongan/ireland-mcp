@@ -8,6 +8,9 @@ const f = (name: string) => fixturePath(import.meta.url, name);
 const routes: Route[] = [
   { match: /\/members\?chamber=dail&house_no=34/, file: f("members-dail34.json") },
   { match: /\/legislation\?bill_year=2099/, body: '{"head":{"counts":{"billCount":0,"resultCount":0}},"results":[]}' },
+  { match: /\/legislation\?act_year=2018&act_no=7&/, file: f("bill-act-2018-7.json") },
+  { match: /\/legislation\?bill_year=2018&bill_no=10&/, file: f("bill-act-2018-7.json") },
+  { match: /\/legislation\?act_year=1950&act_no=1&/, body: '{"head":{"counts":{"billCount":0,"resultCount":0}},"results":[]}' },
   { match: /\/legislation/, file: f("legislation.json") },
   { match: /\/debates/, file: f("debates.json") },
   { match: /\/questions/, file: f("questions.json") },
@@ -94,5 +97,41 @@ describe("Oireachtas module", () => {
     const bill = await mod.fetchById!(hits[0]!.id.replace("oireachtas:", ""), ctx);
     expect(bill.text).toContain("Status:");
     await expect(mod.fetchById!("nonsense", ctx)).rejects.toThrow("Unknown Oireachtas id");
+  });
+
+  it("joins an Act to its bill, stages and Irish Statute Book ELI", async () => {
+    const fetch = fakeFetch(routes);
+    const { body } = await callTool(mod, "oireachtas_get_bill", { act_year: 2018, act_no: 7 }, fetch);
+    expect(body.attribution).toBe("Contains Oireachtas information licensed under the Oireachtas (Open Data) PSI Licence.");
+    expect(body.data).toMatchObject({ bill: "2018/10", title: "Data Protection Bill 2018", status: "Enacted" });
+    expect(body.data.act).toEqual({
+      title: "Data Protection Act 2018",
+      year: 2018,
+      number: 7,
+      date_signed: "2018-05-24",
+      eli: "https://www.irishstatutebook.ie/eli/2018/act/7/enacted/en/html",
+      effects: "https://www.irishstatutebook.ie/eli/isbc/2018_7.html"
+    });
+    expect(body.data.stages[0]).toEqual({ stage: "First Stage", chamber: "Seanad Éireann", house: "25th Seanad", date: "2018-01-30", completed: true });
+    expect(body.data.stages.at(-1)).toMatchObject({ stage: "Enacted", date: "2018-05-24" });
+    expect(body.data.versions.map((v: { pdf: string | null }) => v.pdf)).toEqual([
+      "https://data.oireachtas.ie/ie/oireachtas/act/2018/7/gle/enacted/a0718i.pdf",
+      "https://data.oireachtas.ie/ie/oireachtas/act/2018/7/eng/enacted/a0718.pdf",
+      expect.stringMatching(/^https:\/\/data\.oireachtas\.ie\//),
+      null
+    ]);
+    expect(body.data.warnings.join(" ")).toMatch(/Not legal advice.*legislation_get_act_effects/);
+    const byBill = await callTool(mod, "oireachtas_get_bill", { bill_year: 2018, bill_no: 10, limit: 2 }, fetch);
+    expect(byBill.body.data.act.number).toBe(7);
+    expect(byBill.body.data.stages).toHaveLength(2);
+    expect(byBill.body.truncated).toBe(true);
+  });
+
+  it("requires exactly one bill or Act reference and reports a missing Act", async () => {
+    const fetch = fakeFetch(routes);
+    expect((await callTool(mod, "oireachtas_get_bill", { act_year: 2018 }, fetch)).body.error.code).toBe("BAD_ARGS");
+    expect((await callTool(mod, "oireachtas_get_bill", { act_year: 2018, act_no: 7, bill_year: 2018, bill_no: 10 }, fetch)).body.error.code).toBe("BAD_ARGS");
+    const missing = await callTool(mod, "oireachtas_get_bill", { act_year: 1950, act_no: 1 }, fetch);
+    expect(missing.body.error).toMatchObject({ code: "NOT_FOUND", message: "No bill in the Oireachtas API became Act 1 of 1950." });
   });
 });

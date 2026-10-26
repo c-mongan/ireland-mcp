@@ -219,6 +219,7 @@ const HOST_SOURCES: Record<string, string> = {
   "gsi.geodata.gov.ie": "gsi",
   "www.logainm.ie": "logainm",
   "www.irishstatutebook.ie": "legislation",
+  "publications.europa.eu": "eu-law",
   "www.propertypriceregister.ie": "ppr",
   "api.irishrail.ie": "irish-rail",
   "luasforecasts.rpa.ie": "luas",
