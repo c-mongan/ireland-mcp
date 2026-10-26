@@ -116,7 +116,7 @@ describe("skills pack", () => {
 
   it.each(folders.map((name) => [name]))("%s only names ireland_* tools that exist", (name) => {
     const text = markdownFiles(join(skillsDir, name)).map((file) => readFileSync(file, "utf8")).join("\n");
-    for (const m of text.matchAll(/`(ireland_[a-z_]+)`/g)) {
+    for (const m of text.matchAll(/`(ireland_[a-z0-9_]+)\b/g)) {
       expect([...META_TOOLS, ...allOps], `${name}: unknown tool ${m[1]}`).toContain(m[1]);
     }
   });
