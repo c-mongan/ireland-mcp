@@ -54,7 +54,7 @@ function present(p: DirectoryProject) {
 function snapshotMeta() {
   const { data, sha256 } = load();
   return {
-    repository: data.repository, commit: data.commit, commit_date: data.commit_date, as_of: data.as_of,
+    schema: data.schema, repository: data.repository, commit: data.commit, commit_date: data.commit_date, as_of: data.as_of, generated_at: data.generated_at,
     public_file: DIRECTORY_PUBLIC_FILE, file_sha256: sha256, licence: data.licence, licence_url: data.licence_url,
     listing_site: data.listing_site, listing_note: data.listing_note, verification: data.verification
   };
@@ -81,7 +81,7 @@ const searchTool = defineTool({
     category: z.string().max(80).optional().describe("Exact category, e.g. Housing, Transport, Democracy. Case-insensitive."),
     owner: z.string().max(120).optional().describe("Case-insensitive part of an owner name."),
     status: z.enum(["active", "inactive", "any"]).default("any").describe("Status as listed by the directory; not verified."),
-    limit: z.number().int().min(1).max(50).default(10),
+    limit: z.number().int().min(1).max(50).default(8),
     offset: z.number().int().min(0).max(10_000).default(0)
   },
   handler: async ({ query, category, owner, status, limit, offset }) => {
@@ -89,12 +89,12 @@ const searchTool = defineTool({
     const page = all.slice(offset, offset + limit);
     const { data } = load();
     return envelope(civicDirectoryInfo, {
-      url: `${DIRECTORY_REPO}/tree/${data.commit}`, cached: true, retrievedAt: new Date(`${data.as_of}T00:00:00Z`),
+      url: `${DIRECTORY_REPO}/tree/${data.commit}`, cached: true, retrievedAt: new Date(data.generated_at),
       truncated: offset + page.length < all.length,
       data: {
         total: all.length, offset, next_offset: offset + page.length < all.length ? offset + page.length : null,
         projects: page.map(present),
-        categories: [...new Set(data.projects.map((p) => p.category))].sort(),
+        ...(all.length ? {} : { categories: [...new Set(data.projects.map((p) => p.category))].sort() }),
         snapshot: snapshotMeta()
       }
     });
@@ -115,7 +115,7 @@ export const civicDirectoryModule: SourceModule = {
   tools: [searchTool],
   async search(query: string, limit: number, _ctx: ToolContext): Promise<SearchHit[]> {
     return matches({ query }).slice(0, Math.min(50, Math.max(1, limit))).map((p) => ({
-      id: `civic-directory:${p.slug}`, title: `${p.title} [civic-tech directory, as listed]`, url: p.citizendata_listing_url
+      id: `civic-directory:${p.slug}`, title: `${p.title} (${p.owners.join(", ")}) [civic-tech directory; ${VERIFICATION}]`, url: p.citizendata_listing_url
     }));
   },
   async fetchById(key: string, _ctx: ToolContext): Promise<FetchedDocument> {

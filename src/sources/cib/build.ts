@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { docxBlocks, paragraphs, tables, type DocxBlock } from "./docx.js";
 import type { CheckResult, CipsRecord, CisAnnualRecord, CisCategoryRecord, CibDataset, SourceFile } from "./schema.js";
-import { CIB_ATTRIBUTION, CIB_LICENCE, CIB_LICENCE_URL, CIB_PSI_NOTICE, categoryKey } from "./schema.js";
+import { CIB_ATTRIBUTION, CIB_LICENCE, CIB_LICENCE_URL, CIB_PSI_NOTICE, CIB_SCHEMA, categoryKey } from "./schema.js";
 
 /** Maintenance only. Pinned official CIB files: the refresh downloads these and nothing else. */
 export const CIB_ORIGIN = "https://www.citizensinformationboard.ie";
@@ -204,18 +204,18 @@ const COMMON_NOTES = [
   "Category labels vary between years, for example 'Birth, Family & Relationships' and 'Covid 19'. Use category_key to compare years."
 ];
 
-function dataset<T>(kind: string, title: string, description: string, landing: string, notes: string[], records: T[], asOf: string): CibDataset<T> {
+function dataset<T>(kind: string, title: string, description: string, landing: string, notes: string[], records: T[], generatedAt: string): CibDataset<T> {
   return {
-    schema: `https://irishopendata.ie/data/cib/${kind}.json#v1`, title, description,
+    schema: CIB_SCHEMA(kind), title, description,
     publisher: "Citizens Information Board", landing_page: landing,
     licence: CIB_LICENCE, licence_url: CIB_LICENCE_URL, reuse_notice: CIB_PSI_NOTICE, attribution: CIB_ATTRIBUTION,
-    as_of: asOf, generated_by: "scripts/refresh-cib.mjs (https://github.com/c-mongan/ireland-mcp)",
+    as_of: generatedAt.slice(0, 10), generated_at: generatedAt, generated_by: "scripts/refresh-cib.mjs (https://github.com/c-mongan/ireland-mcp)",
     notes, records
   };
 }
 
 /** Builds the three published datasets from already-downloaded official files. */
-export function buildCibDatasets(downloads: Downloads, asOf: string) {
+export function buildCibDatasets(downloads: Downloads, generatedAt: string) {
   const { annual, categories } = buildCisRecords(downloads);
   const cips = buildCipsRecords(downloads);
   const failed = [...annual, ...categories, ...cips].flatMap((r) => r.checks.filter((c) => !c.ok).map((c) => ({ key: `${r.year} ${c.name}`, detail: c.detail })));
@@ -227,14 +227,14 @@ export function buildCibDatasets(downloads: Downloads, asOf: string) {
         "2021–2024 callers are the annual figures printed on each year's CIS statistical summary page.",
         "CIB publishes no annual callers figure for 2025. The 2025 value is the sum of the four 2025 quarterly reports (callers_basis = derived_sum_of_quarterly_reports). The 2024 quarterly reports (106,122 + 99,181 + 101,610 + 88,104) sum to the published 2024 annual figure.",
         "The 2024 report profiles 767,168 non-casework queries. It reports 1,517 new long-term advocacy cases separately, and calls the ratio 'queries per interaction'."
-      ], annual, asOf),
+      ], annual, generatedAt),
     cisCategories: dataset("cis-query-categories", "Citizens Information Services: queries by top-level category",
       "Table 1 of each year's CIS Query Categories report: queries per top-level category.", CIS_HUB, [
         ...COMMON_NOTES,
         "'Local' is a generic signposting and referral category with no published breakdown.",
         "Only top-level categories are included. Sub-category tables are not transcribed.",
         "The 2025 Table 1 column headed '% Sub-Category' is the share of all queries; it is stored as share_pct_published."
-      ], categories, asOf),
+      ], categories, generatedAt),
     cips: dataset("cips-annual", "Citizens Information Phone Service: contacts and call categories by year",
       "Annual contacts by mode and categorised calls by top-level category for the Citizens Information Phone Service.", CIPS_HUB, [
         ...COMMON_NOTES,
@@ -242,6 +242,6 @@ export function buildCibDatasets(downloads: Downloads, asOf: string) {
         "Categorised calls are a subset of all contacts; not every call is categorised. Category sets also vary by year, for example Budget, Ukraine and Covid-19.",
         "The 2023 contact-mode table is headed 'Number of Callers (Q1 2023)', but its rows sum to the annual 135,477 contacts given in the text.",
         "In the 2025 report, three sub-category table totals differ slightly from the main category table: Housing 6,382 vs 6,381, Money and Tax 6,014 vs 6,012, Moving Country 4,108 vs 4,105. The main-table figures are stored; see each record's checks."
-      ], cips, asOf)
+      ], cips, generatedAt)
   };
 }

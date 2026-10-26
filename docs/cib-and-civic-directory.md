@@ -38,6 +38,9 @@ CSV, API or county breakdown. These tools never read a report at request time.
 
 ### What is included
 
+Each tool takes a `year` (2021–2025), so every answer carries its own source files and
+checksums. For a multi-year series, fetch the public JSON file.
+
 - **CIS annual** (`cis-annual.json`): callers, queries, the published queries-per-caller
   ratio and a recomputed ratio for 2021–2025.
 - **CIS categories** (`cis-query-categories.json`): Table 1 of each year's Query
@@ -96,7 +99,9 @@ node scripts/refresh-cib.mjs
 The refresh downloads only the pinned `citizensinformationboard.ie` URLs in
 `src/sources/cib/build.ts`. It checksums every DOCX, PDF and HTML input and parses the
 DOCX editions. It stops on any unexpected failed check, and it replaces the three files
-only after all three have been built. Review the diff, then run the tests. For a new
+only after all three have been built. The three files share one `generated_at`; the
+health check reports a mixed set. Review the diff, update the pinned digests in
+`src/sources/cib/cib.test.ts`, then run the tests. For a new
 year, add its pinned URLs and caller pattern to `CIS_PINS` and `CIPS_PINS`.
 
 ## Éire Civic Tech Directory (`civic-directory`)
@@ -128,16 +133,21 @@ npm run build
 node scripts/refresh-civic-directory.mjs <40-character commit SHA>
 ```
 
+After a refresh, review the diff and update the pinned digest in
+`src/sources/civic-directory/civic-directory.test.ts`.
+
 ## File schemas
 
-Every file is UTF-8 JSON with a `schema` identifier ending `#v1`. Fields will not be
-removed or renamed within v1.
+Every file is UTF-8 JSON with an exact `schema` identifier ending `#v1`; the tools refuse
+any other value. Fields will not be removed or renamed within v1. Tests pin each file's
+SHA-256, so a refresh or hand edit must update those digests deliberately after review.
 
 ### CIB files (`cis-annual`, `cis-query-categories`, `cips-annual`)
 
 Top level: `schema`, `title`, `description`, `publisher`, `landing_page`, `licence`,
 `licence_url`, `reuse_notice`, `attribution`, `as_of` (refresh date, `YYYY-MM-DD`),
-`generated_by`, `notes[]`, `records[]`.
+`generated_at` (refresh timestamp, identical in all three files), `generated_by`,
+`notes[]`, `records[]`.
 
 Every record has `year`, `sources[]` and `checks[]`:
 
@@ -158,8 +168,8 @@ the figures changing.
 
 Top level: `schema`, `title`, `description`, `publisher`, `maintainer`, `repository`,
 `commit`, `commit_date`, `licence`, `licence_url`, `licence_text`, `licence_sha256`,
-`attribution`, `listing_site`, `listing_note`, `verification`, `as_of`, `generated_by`,
-`projects[]`.
+`attribution`, `listing_site`, `listing_note`, `verification`, `as_of`, `generated_at`,
+`generated_by`, `projects[]`.
 
 `projects[]` entries contain `slug`, `title`, `category`, `owners[]`, `description`,
 `status_as_listed` (`active` or `inactive`), `founding_year` (or `null`), `link`,

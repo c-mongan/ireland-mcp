@@ -9,6 +9,7 @@
   "reuse_notice": "https://www.citizensinformationboard.ie/en/notices/psi.html",
   "attribution": "Contains Irish Public Sector Data licensed under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence. Source: Citizens Information Board, Data Hub statistical reports.",
   "as_of": "2026-10-26",
+  "generated_at": "2026-10-26T14:12:02.636Z",
   "generated_by": "scripts/refresh-cib.mjs (https://github.com/c-mongan/ireland-mcp)",
   "notes": [
     "National aggregates only. The Citizens Information Board publishes no county, local-office or CIS-company breakdown in these reports.",
@@ -139,7 +140,7 @@
           "format": "docx",
           "sha256": "3d24ba339a1d9380391374514d593f1e64c4fbd6f1227d4e9ef0bbe3b7a42ce7",
           "bytes": 57682,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/CIPS-statistical-summary-2021-1.pdf",
@@ -147,7 +148,7 @@
           "format": "pdf",
           "sha256": "414bd78c552e554491ffea4cb9f458d618afe54abf3c2a51ed568ccb787979e0",
           "bytes": 353480,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         }
       ],
       "checks": [
@@ -323,7 +324,7 @@
           "format": "docx",
           "sha256": "514021877fe7d298044e3d4fde093fac6b28628e873428ab2427e01166f026eb",
           "bytes": 57188,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/CIPS-statistical-summary-2022-1.pdf",
@@ -331,7 +332,7 @@
           "format": "pdf",
           "sha256": "0901f6425aac4a3edde01226723a83cb45f34bd18b2a7b5b5f02522d867ddea0",
           "bytes": 353643,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         }
       ],
       "checks": [
@@ -507,7 +508,7 @@
           "format": "docx",
           "sha256": "b04cd02bd6a11fd6b88a9d82b9fbc5b8735b7764a7c31679fbf61c026d3ee13c",
           "bytes": 46885,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/CIPS-statistical-summary-2023.pdf",
@@ -515,7 +516,7 @@
           "format": "pdf",
           "sha256": "e74312214eecafe8439827359631394d5b4e6385254486942b17adcbc7374f3a",
           "bytes": 363753,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         }
       ],
       "checks": [
@@ -691,7 +692,7 @@
           "format": "docx",
           "sha256": "a4c6e49b1a8490e831576d63eaeab2c7d6762722a956535ffac9823a877b9a76",
           "bytes": 56290,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/CIPS-statistical-summary-2024.pdf",
@@ -699,7 +700,7 @@
           "format": "pdf",
           "sha256": "6f9571b427dabe9b9c1c028fae306e50bb5f7aefc78d96b58a1574f7dc39fc87",
           "bytes": 312464,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         }
       ],
       "checks": [
@@ -869,7 +870,7 @@
           "format": "docx",
           "sha256": "70ff0ba09c8dca1d57aa95bb513da849a5bd497eb1e8a6b02670aae09e65f10b",
           "bytes": 1098824,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/CIPS-statistical-summary-2025.pdf",
@@ -877,7 +878,7 @@
           "format": "pdf",
           "sha256": "8dce1c2f41929674bae04c97651bac6b8dc7438c858c86673ea6e764500eb781",
           "bytes": 493146,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         }
       ],
       "checks": [

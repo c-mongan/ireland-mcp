@@ -41,8 +41,9 @@ function load<K extends Kind>(kind: K): { data: z.infer<(typeof SCHEMAS)[K]>; sh
 /** Health of the packaged snapshots, used by the deep health check. */
 export function snapshotHealth(): { ok: true; note: string } | { ok: false; error: string } {
   try {
-    const asOf = (Object.keys(FILES) as Kind[]).map((k) => load(k).data.as_of);
-    return { ok: true, note: `packaged CIB snapshots as of ${asOf.sort()[0]}` };
+    const generations = new Set((Object.keys(FILES) as Kind[]).map((k) => load(k).data.generated_at));
+    if (generations.size !== 1) return { ok: false, error: "CIB snapshot files come from different refreshes" };
+    return { ok: true, note: `packaged CIB snapshots generated ${[...generations][0]}` };
   } catch {
     return { ok: false, error: "CIB snapshot unreadable or invalid" };
   }
@@ -51,7 +52,7 @@ export function snapshotHealth(): { ok: true; note: string } | { ok: false; erro
 function snapshotMeta(kind: Kind) {
   const { data, sha256 } = load(kind);
   return {
-    title: data.title, publisher: data.publisher, as_of: data.as_of, landing_page: data.landing_page,
+    schema: data.schema, title: data.title, publisher: data.publisher, as_of: data.as_of, generated_at: data.generated_at, landing_page: data.landing_page,
     public_file: `${CIB_PUBLIC_DATA}${FILES[kind]}`, file_sha256: sha256,
     licence: data.licence, licence_url: data.licence_url, reuse_notice: data.reuse_notice, notes: data.notes
   };
@@ -70,16 +71,11 @@ const yearArg = z.number().int().min(2000).max(2100);
 
 const annualTool = defineTool({
   name: "cib_cis_annual_summary", title: "Citizens Information Services callers and queries",
-  description: "National callers and queries handled by Citizens Information Services for one year, or a compact series when year is omitted. From pinned, checksummed Citizens Information Board reports; not live data.",
+  description: "National callers and queries handled by Citizens Information Services in one year (2021–2025), with source files, checksums and checks. From pinned Citizens Information Board reports; not live data.",
   example: { year: 2025 },
-  inputSchema: { year: yearArg.optional().describe("Report year, e.g. 2025. Omit for the full series without per-record sources.") },
+  inputSchema: { year: yearArg.describe("Report year, e.g. 2025.") },
   handler: async ({ year }) => {
     const { records } = load("annual").data;
-    if (year === undefined) {
-      const series = records.map(({ sources: _s, checks: _c, callers_derivation: _d, ...r }) => r);
-      return envelope(cibInfo, { url: load("annual").data.landing_page, cached: true, retrievedAt: retrieved(records.flatMap((r) => r.sources)),
-        data: { series, snapshot: snapshotMeta("annual"), hint: "Pass year for the source files, checksums and checks behind one record." } });
-    }
     const record = byYear(records, year, "CIS annual");
     return envelope(cibInfo, { url: record.sources[0]!.url, cached: true, retrievedAt: retrieved(record.sources), data: { record, snapshot: snapshotMeta("annual") } });
   }
@@ -110,17 +106,11 @@ const categoriesTool = defineTool({
 
 const cipsTool = defineTool({
   name: "cib_cips_summary", title: "Citizens Information Phone Service contacts and call categories",
-  description: "Citizens Information Phone Service contacts by mode and categorised calls by top-level category for one year, or a compact series when year is omitted. The published 'calls answered' definition changed in 2024; compare years with contacts.total.",
+  description: "Citizens Information Phone Service contacts by mode and categorised calls by top-level category in one year (2021–2025). The published 'calls answered' definition changed in 2024; compare years with contacts.total.",
   example: { year: 2025 },
-  inputSchema: { year: yearArg.optional().describe("Report year, e.g. 2025. Omit for the contacts series.") },
+  inputSchema: { year: yearArg.describe("Report year, e.g. 2025.") },
   handler: async ({ year }) => {
     const { records } = load("cips").data;
-    if (year === undefined) {
-      const series = records.map((r) => ({ year: r.year, contacts: r.contacts, calls_answered_published: r.calls_answered_published,
-        calls_answered_basis: r.calls_answered_basis, categorised_calls_total: r.categorised_calls_total }));
-      return envelope(cibInfo, { url: load("cips").data.landing_page, cached: true, retrievedAt: retrieved(records.flatMap((r) => r.sources)),
-        data: { series, snapshot: snapshotMeta("cips"), hint: "Pass year for call categories, source files, checksums and checks." } });
-    }
     const record = byYear(records, year, "CIPS");
     return envelope(cibInfo, { url: record.sources[0]!.url, cached: true, retrievedAt: retrieved(record.sources), data: { record, snapshot: snapshotMeta("cips") } });
   }

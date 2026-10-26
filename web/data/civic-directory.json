@@ -16,6 +16,7 @@
   "listing_note": "citizendata_listing_url (\"see listing on CitizenData.ie\") is derived from each entry's file name. Ireland MCP does not fetch or scrape citizendata.ie.",
   "verification": "Status, owners and links are as listed, unverified. Ireland MCP has not checked whether projects are live or accurately described.",
   "as_of": "2026-10-26",
+  "generated_at": "2026-10-26T14:12:08.800Z",
   "generated_by": "scripts/refresh-civic-directory.mjs (https://github.com/c-mongan/ireland-mcp)",
   "projects": [
     {

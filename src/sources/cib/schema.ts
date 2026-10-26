@@ -47,21 +47,23 @@ const cips = z.object({
   sources: z.array(sourceFile).min(1), checks: z.array(checkResult)
 });
 
-const datasetOf = <T extends z.ZodTypeAny>(record: T) => z.object({
-  schema: z.string(), title: z.string(), description: z.string(), publisher: z.literal("Citizens Information Board"),
+export const CIB_SCHEMA = (kind: string) => `https://irishopendata.ie/data/cib/${kind}.json#v1`;
+const datasetOf = <T extends z.ZodTypeAny>(kind: string, record: T) => z.object({
+  schema: z.literal(CIB_SCHEMA(kind)), title: z.string(), description: z.string(), publisher: z.literal("Citizens Information Board"),
   landing_page: z.string().url(), licence: z.literal(CIB_LICENCE), licence_url: z.string().url(), reuse_notice: z.string().url(),
-  attribution: z.string().min(1), as_of: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), generated_by: z.string(),
+  attribution: z.string().min(1), as_of: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), generated_at: z.string().datetime(), generated_by: z.string(),
   notes: z.array(z.string()), records: z.array(record).min(1)
 });
-export const cisAnnualDataset = datasetOf(cisAnnual);
-export const cisCategoryDataset = datasetOf(cisCategory);
-export const cipsDataset = datasetOf(cips);
+export const cisAnnualDataset = datasetOf("cis-annual", cisAnnual);
+export const cisCategoryDataset = datasetOf("cis-query-categories", cisCategory);
+export const cipsDataset = datasetOf("cips-annual", cips);
 
 export type SourceFile = z.infer<typeof sourceFile>;
 export type CheckResult = z.infer<typeof checkResult>;
 export type CisAnnualRecord = z.infer<typeof cisAnnual>;
 export type CisCategoryRecord = z.infer<typeof cisCategory>;
 export type CipsRecord = z.infer<typeof cips>;
-export interface CibDataset<T> extends Omit<z.infer<ReturnType<typeof datasetOf>>, "records" | "publisher" | "licence"> {
+export interface CibDataset<T> extends Omit<z.infer<typeof cisAnnualDataset>, "records" | "publisher" | "licence" | "schema"> {
+  schema: string;
   publisher: "Citizens Information Board"; licence: typeof CIB_LICENCE; records: T[];
 }

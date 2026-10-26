@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { createContext } from "../../gateway/context.js";
@@ -39,6 +40,10 @@ describe("civic directory snapshot and search", () => {
   const raw = JSON.parse(readFileSync(new URL("../../../web/data/civic-directory.json", import.meta.url), "utf8"));
 
   it("is a valid MIT snapshot of the pinned commit with per-entry checksums", () => {
+    const bytes = readFileSync(new URL("../../../web/data/civic-directory.json", import.meta.url));
+    // Reviewed snapshot digest; update deliberately after reviewing a refresh diff.
+    expect(createHash("sha256").update(bytes).digest("hex")).toBe("05bdec39dafec6caf8ddbcc27ac3ece10405d0d2b1cc5987e043b9f215c1b497");
+    expect(directorySnapshot.safeParse({ ...raw, schema: "https://irishopendata.ie/data/civic-directory.json#v2" }).success).toBe(false);
     const data = directorySnapshot.parse(raw);
     expect(data.commit).toBe("7f0aeaf1a8655b25e55f76dae94a497943970629");
     expect(data.projects).toHaveLength(119);
@@ -63,8 +68,24 @@ describe("civic directory snapshot and search", () => {
     expect(second.body.data.projects[0].slug).not.toBe(first.body.data.projects[1].slug);
     const owner = await callTool(civicDirectoryModule, "civic_directory_search", { owner: "biodiversity" }, offline);
     expect(owner.body.data.projects.some((p: { slug: string }) => p.slug === "actions-for-pollinators")).toBe(true);
+    const big = await callTool(civicDirectoryModule, "civic_directory_search", { limit: 50 }, offline);
+    const shown = big.body.data.projects.length;
+    expect(shown).toBeLessThan(50);
+    expect(big.body.data.next_offset).toBe(shown);
+    expect(big.body.data.projects.every((p: { citizendata_listing?: unknown; project_link?: unknown }) => p.citizendata_listing && p.project_link)).toBe(true);
+    expect(big.body.attribution).toContain("William Kennedy");
+    const rest = await callTool(civicDirectoryModule, "civic_directory_search", { limit: 8, offset: shown }, offline);
+    const ordered = (await callTool(civicDirectoryModule, "civic_directory_search", { limit: 8, offset: shown - 1 }, offline)).body.data.projects;
+    expect(rest.body.data.projects[0].slug).toBe(ordered[1].slug);
     const tooMany = await callTool(civicDirectoryModule, "civic_directory_search", { limit: 51 }, offline);
     expect(tooMany.ok).toBe(false);
+    const defaultPage = await callTool(civicDirectoryModule, "civic_directory_search", {}, offline);
+    expect(defaultPage.body.data.projects).toHaveLength(8);
+    expect(defaultPage.body.truncated_at).toBeUndefined();
+    expect(defaultPage.body.data.categories).toBeUndefined();
+    const nothing = await callTool(civicDirectoryModule, "civic_directory_search", { category: "Astrology" }, offline);
+    expect(nothing.body.data.total).toBe(0);
+    expect(nothing.body.data.categories).toContain("Housing");
   });
 
   it("labels links as listed and unverified and points to CitizenData.ie", async () => {

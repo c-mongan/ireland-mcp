@@ -9,6 +9,7 @@
   "reuse_notice": "https://www.citizensinformationboard.ie/en/notices/psi.html",
   "attribution": "Contains Irish Public Sector Data licensed under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence. Source: Citizens Information Board, Data Hub statistical reports.",
   "as_of": "2026-10-26",
+  "generated_at": "2026-10-26T14:12:02.636Z",
   "generated_by": "scripts/refresh-cib.mjs (https://github.com/c-mongan/ireland-mcp)",
   "notes": [
     "National aggregates only. The Citizens Information Board publishes no county, local-office or CIS-company breakdown in these reports.",
@@ -128,7 +129,7 @@
           "format": "docx",
           "sha256": "dc1964cdada2e964a31683856593e22a6f1f67c973ee17d4372b6a22b92b31d9",
           "bytes": 92771,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories2021.pdf",
@@ -136,7 +137,7 @@
           "format": "pdf",
           "sha256": "c43597b5f23eabc9e4a7db1faaea5854d3bfe796f4ecd449ac2ff38b6f828f46",
           "bytes": 519001,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         }
       ],
       "checks": [
@@ -260,7 +261,7 @@
           "format": "docx",
           "sha256": "590bd9c04839428e4adff191d24891aa56e17ee6fb3b16c3e3dbbfda6143f28a",
           "bytes": 111600,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2022.pdf",
@@ -268,7 +269,7 @@
           "format": "pdf",
           "sha256": "c09513bd5553f7e571ef41348753cec94cd94e4cc583df1307bba4e08dc49ff8",
           "bytes": 582676,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         }
       ],
       "checks": [
@@ -392,7 +393,7 @@
           "format": "docx",
           "sha256": "9737b74b3a2a195f78d96be21372f0e2e57c8e879f34aa4e176fe1457d49dbfc",
           "bytes": 131568,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2023-v3.pdf",
@@ -400,7 +401,7 @@
           "format": "pdf",
           "sha256": "5a387fb426842971c022d2fa4a0648e61e1bdf4060a20ee0dcfe8f8e6c8da26f",
           "bytes": 649382,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         }
       ],
       "checks": [
@@ -524,7 +525,7 @@
           "format": "docx",
           "sha256": "ba80297c638af7d16f242a9269dd7f3ee8681d21a1d4bce4bcc684c5263ba168",
           "bytes": 137453,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2024.pdf",
@@ -532,7 +533,7 @@
           "format": "pdf",
           "sha256": "3f08636ed9eec06fa982aaf5f6d2670224fedb046c6dc58941364ec95625a6a5",
           "bytes": 525200,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         }
       ],
       "checks": [
@@ -650,7 +651,7 @@
           "format": "docx",
           "sha256": "54c8213efe06112ed38376a60b3dc7d78f97a27508efa4b7b61c2f722d13a97e",
           "bytes": 111749,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2025.pdf",
@@ -658,7 +659,7 @@
           "format": "pdf",
           "sha256": "367550e65eabbf69e124282863a6bf85c158f8f33f76977e9b4b4a1349cdfaf8",
           "bytes": 654271,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         }
       ],
       "checks": [

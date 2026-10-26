@@ -16,7 +16,7 @@ export async function refreshCib(http = new HttpClient(), now = new Date()) {
     const bytes = await http.bytes(url, { label: "Citizens Information Board report", timeoutMs: 30_000, maxBytes: 5_000_000, retries: 1 });
     downloads.set(url, { bytes, retrievedAt: now.toISOString() });
   }
-  const built = buildCibDatasets(downloads, now.toISOString().slice(0, 10));
+  const built = buildCibDatasets(downloads, now.toISOString());
   const unexpected = built.failed.filter((f) => !KNOWN_FAILED_CHECKS.has(f.key));
   if (unexpected.length) throw new Error(`CIB refresh stopped; unexpected failed checks:\n${unexpected.map((f) => `${f.key}: ${f.detail}`).join("\n")}`);
   return built;

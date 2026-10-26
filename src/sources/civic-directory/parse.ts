@@ -27,13 +27,14 @@ export const directoryProject = z.object({
 });
 export type DirectoryProject = z.infer<typeof directoryProject>;
 
+export const DIRECTORY_SCHEMA = "https://irishopendata.ie/data/civic-directory.json#v1";
 export const directorySnapshot = z.object({
-  schema: z.string(), title: z.string(), description: z.string(),
+  schema: z.literal(DIRECTORY_SCHEMA), title: z.string(), description: z.string(),
   publisher: z.string(), maintainer: z.string(), repository: z.literal(DIRECTORY_REPO),
   commit: z.string().regex(/^[0-9a-f]{40}$/), commit_date: z.string().datetime({ offset: true }),
   licence: z.literal("MIT"), licence_url: z.string().url(), licence_text: z.string().min(100), licence_sha256: z.string().regex(/^[0-9a-f]{64}$/),
   attribution: z.string().min(1), listing_site: z.literal(`${CITIZENDATA}/`), listing_note: z.string(), verification: z.string(),
-  as_of: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), generated_by: z.string(),
+  as_of: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), generated_at: z.string().datetime(), generated_by: z.string(),
   projects: z.array(directoryProject).min(1).max(2000)
 });
 export type DirectorySnapshot = z.infer<typeof directorySnapshot>;

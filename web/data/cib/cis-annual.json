@@ -9,6 +9,7 @@
   "reuse_notice": "https://www.citizensinformationboard.ie/en/notices/psi.html",
   "attribution": "Contains Irish Public Sector Data licensed under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence. Source: Citizens Information Board, Data Hub statistical reports.",
   "as_of": "2026-10-26",
+  "generated_at": "2026-10-26T14:12:02.636Z",
   "generated_by": "scripts/refresh-cib.mjs (https://github.com/c-mongan/ireland-mcp)",
   "notes": [
     "National aggregates only. The Citizens Information Board publishes no county, local-office or CIS-company breakdown in these reports.",
@@ -34,7 +35,7 @@
           "format": "html",
           "sha256": "d41c45b7a415c64123e987541407f7bed1f59d706d597d6f4283c25f27b29706",
           "bytes": 27590,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories2021.docx",
@@ -42,7 +43,7 @@
           "format": "docx",
           "sha256": "dc1964cdada2e964a31683856593e22a6f1f67c973ee17d4372b6a22b92b31d9",
           "bytes": 92771,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories2021.pdf",
@@ -50,7 +51,7 @@
           "format": "pdf",
           "sha256": "c43597b5f23eabc9e4a7db1faaea5854d3bfe796f4ecd449ac2ff38b6f828f46",
           "bytes": 519001,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         }
       ],
       "checks": [
@@ -85,7 +86,7 @@
           "format": "html",
           "sha256": "882f64af0eb8bbbfa7f22324f72f635fb7af71aaeb3eed6f8903fb1ea0c00c92",
           "bytes": 50223,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2022.docx",
@@ -93,7 +94,7 @@
           "format": "docx",
           "sha256": "590bd9c04839428e4adff191d24891aa56e17ee6fb3b16c3e3dbbfda6143f28a",
           "bytes": 111600,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2022.pdf",
@@ -101,7 +102,7 @@
           "format": "pdf",
           "sha256": "c09513bd5553f7e571ef41348753cec94cd94e4cc583df1307bba4e08dc49ff8",
           "bytes": 582676,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         }
       ],
       "checks": [
@@ -136,7 +137,7 @@
           "format": "html",
           "sha256": "226806a632843beeb290425490e1196d68a487aa24839b99eff09d8b269c1f83",
           "bytes": 55433,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2023-v3.docx",
@@ -144,7 +145,7 @@
           "format": "docx",
           "sha256": "9737b74b3a2a195f78d96be21372f0e2e57c8e879f34aa4e176fe1457d49dbfc",
           "bytes": 131568,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2023-v3.pdf",
@@ -152,7 +153,7 @@
           "format": "pdf",
           "sha256": "5a387fb426842971c022d2fa4a0648e61e1bdf4060a20ee0dcfe8f8e6c8da26f",
           "bytes": 649382,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         }
       ],
       "checks": [
@@ -187,7 +188,7 @@
           "format": "html",
           "sha256": "93488219f3b9ab064b2a6b51865173ec449d195a0cf59a176feef05d5edaf4b6",
           "bytes": 87960,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2024.docx",
@@ -195,7 +196,7 @@
           "format": "docx",
           "sha256": "ba80297c638af7d16f242a9269dd7f3ee8681d21a1d4bce4bcc684c5263ba168",
           "bytes": 137453,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2024.pdf",
@@ -203,7 +204,7 @@
           "format": "pdf",
           "sha256": "3f08636ed9eec06fa982aaf5f6d2670224fedb046c6dc58941364ec95625a6a5",
           "bytes": 525200,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         }
       ],
       "checks": [
@@ -264,7 +265,7 @@
           "format": "docx",
           "sha256": "405218442e078eebe567097ef2dfe29a753ef1d5da3ad29a300128915be3d705",
           "bytes": 1700018,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/q1-2025.pdf",
@@ -272,7 +273,7 @@
           "format": "pdf",
           "sha256": "90ce507ea62a93ba24277e318240d431e0207c281cacaf28b4314677da320058",
           "bytes": 855791,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/Q2-2025-CIS-statistical-report.docx",
@@ -280,7 +281,7 @@
           "format": "docx",
           "sha256": "38c1aa7c64bba26bcfbc93dea59f142c0e99201e745df6cceac98ce7efb4df02",
           "bytes": 1737521,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/Q2-2025-CIS-statistical-report.pdf",
@@ -288,7 +289,7 @@
           "format": "pdf",
           "sha256": "5543243f23569d3368a8b967f5a6ff739b599b2c8ee38f5757456c0b5124787d",
           "bytes": 917419,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/Q3-2025-CIS-statistical-report.docx",
@@ -296,7 +297,7 @@
           "format": "docx",
           "sha256": "522a4db56ecff709a0a1c3733c378b7ce99cb72bc913304d7315635895d69e53",
           "bytes": 2207236,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/Q3-2025-CIS-statistical-report.pdf",
@@ -304,7 +305,7 @@
           "format": "pdf",
           "sha256": "25261d8f49274ba3461944884e88afe29efb62741457d3adb44e6f6251d95abc",
           "bytes": 1261239,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/Q4-2025-CIS-statistical-report.docx",
@@ -312,7 +313,7 @@
           "format": "docx",
           "sha256": "8306e5f76a989f04eaa943cf51d095f91c1b09fb9307ceec100471047076a862",
           "bytes": 1459055,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/Q4-2025-CIS-statistical-report.pdf",
@@ -320,7 +321,7 @@
           "format": "pdf",
           "sha256": "59ed20df064ca4463ded29398d384a8ece6f79407188c90d878f37396247b2d6",
           "bytes": 1183906,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2025.docx",
@@ -328,7 +329,7 @@
           "format": "docx",
           "sha256": "54c8213efe06112ed38376a60b3dc7d78f97a27508efa4b7b61c2f722d13a97e",
           "bytes": 111749,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         },
         {
           "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2025.pdf",
@@ -336,7 +337,7 @@
           "format": "pdf",
           "sha256": "367550e65eabbf69e124282863a6bf85c158f8f33f76977e9b4b4a1349cdfaf8",
           "bytes": 654271,
-          "retrieved_at": "2026-10-26T13:50:44.600Z"
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
         }
       ],
       "checks": [

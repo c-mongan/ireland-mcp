@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { HttpClient } from "../../gateway/http.js";
 import {
-  CITIZENDATA, DIRECTORY_RAW, DIRECTORY_REPO, LISTING_LABEL, PROJECTS_PATH, VERIFICATION,
+  CITIZENDATA, DIRECTORY_RAW, DIRECTORY_SCHEMA, DIRECTORY_REPO, LISTING_LABEL, PROJECTS_PATH, VERIFICATION,
   directorySnapshot, parseEntry, type DirectorySnapshot
 } from "./parse.js";
 
@@ -39,7 +39,7 @@ export async function refreshDirectory(commit: string, http = new HttpClient(), 
   const licence = utf8(licenceBytes);
   if (!/^MIT License/.test(licence.trim())) throw new Error("The pinned commit's LICENSE is not the MIT licence.");
   return directorySnapshot.parse({
-    schema: "https://irishopendata.ie/data/civic-directory.json#v1",
+    schema: DIRECTORY_SCHEMA,
     title: "Éire Civic Tech Directory snapshot",
     description: "Irish civic-tech projects as listed in the Éire Civic Tech Directory, which powers CitizenData.ie.",
     publisher: "Éire Civic Tech Directory (CitizenData.ie)", maintainer: "William Kennedy",
@@ -49,7 +49,7 @@ export async function refreshDirectory(commit: string, http = new HttpClient(), 
     listing_site: `${CITIZENDATA}/`,
     listing_note: `citizendata_listing_url ("${LISTING_LABEL}") is derived from each entry's file name. Ireland MCP does not fetch or scrape citizendata.ie.`,
     verification: `Status, owners and links are ${VERIFICATION}. Ireland MCP has not checked whether projects are live or accurately described.`,
-    as_of: now.toISOString().slice(0, 10), generated_by: "scripts/refresh-civic-directory.mjs (https://github.com/c-mongan/ireland-mcp)",
+    as_of: now.toISOString().slice(0, 10), generated_at: now.toISOString(), generated_by: "scripts/refresh-civic-directory.mjs (https://github.com/c-mongan/ireland-mcp)",
     projects
   });
 }
