@@ -25,7 +25,11 @@ The default `legislation` source reads the Irish Statute Book live, with a cache
 | `legislation_get_act_effects` | `/eli/isbc/{year}_{n}.html` (Legislation Directory) | 1 day | Directory entries, not amended text; the section filter is a best-effort text match |
 | `legislation_list_sis`, `legislation_get_si` | `/eli/{year}/si/`, `/eli/{year}/si/{n}/made/en/html` | 1 day (list), 7 days (SI) | Text as made; SI XML is not published (HTTP 404) |
 | `legislation_get_constitution_article` | `/eli/cons/en/html`, `/eli/cons/ga/html` | 7 days | eISB edition (printed January 2020); references follow the printed numbering because some eISB anchors do not |
+| `oireachtas_get_bill` (source `oireachtas`) | Oireachtas API `/v1/legislation?act_year&act_no` or `?bill_year&bill_no` | 1 hour | Bill stages and versions; the enacted Act's eISB ELI link is built from `act.actYear`/`act.actNo` |
+| `eu_law_lookup` (source `eu-law`) | Publications Office Cellar SPARQL, one bounded `SELECT … LIMIT 50` per CELEX or ELI | 7 days | Metadata only; EUR-Lex is linked, never fetched |
 
-Every response carries the Oireachtas (Open Data) PSI Licence attribution, the retrieval time and a "Not legal advice" warning. Text and directory responses also warn that enacted or made text is not amended text. Pages that lack the expected markers are rejected and never cached.
+EU law licence: the data.europa.eu record for the Cellar SPARQL endpoint (dataset `sparql-cellar-of-the-publications-office`, checked 26 October 2026, publisher Publications Office of the European Union) lists every distribution, including the SPARQL endpoint, under `http://data.europa.eu/eli/dec/2011/833/oj`, the European Commission reuse notice. The Publications Office copyright notice refers Cellar reuse questions to op-copyright@publications.europa.eu. Responses therefore cite Decision 2011/833/EU and do not claim CC BY 4.0. EUR-Lex HTML blocked automated requests during testing and is not fetched.
+
+Every eISB response carries the Oireachtas (Open Data) PSI Licence attribution, the retrieval time and a "Not legal advice" warning. Text and directory responses also warn that enacted or made text is not amended text. Pages that lack the expected markers are rejected and never cached.
 
 Not built: court judgments (courts.ie judgments were offline and BAILII restricts automated harvesting) and Revised Acts content (no reuse licence; it stays behind the pilot permission gate, off by default).

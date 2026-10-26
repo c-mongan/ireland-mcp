@@ -104,6 +104,8 @@ export const operationContracts = {
   ted_get_notice: shape({ notice: object }),
   oireachtas_search_members: shape({ total: number, members: records }),
   oireachtas_search_bills: shape({ total: number, bills: records }),
+  oireachtas_get_bill: shape({ bill: text, title: text, status: text, stages: records, versions: records }),
+  eu_law_lookup: (data) => shape({ documents: records, total: number })(data) && data.documents.every((d) => text(d.cellar_uri) && Array.isArray(d.celex)),
   oireachtas_get_debates: shape({ total: number, days: records }),
   oireachtas_search_questions: shape({ total: number, questions: records }),
   oireachtas_get_votes: shape({ total: number, votes: records }),

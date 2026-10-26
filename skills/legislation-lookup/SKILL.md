@@ -1,6 +1,6 @@
 ---
 name: legislation-lookup
-description: Looks up Irish Acts, sections, Statutory Instruments, Constitution Articles and Act amendments in the Irish Statute Book (eISB) through the Ireland MCP server and quotes the official text with a citation, optionally finding the related Bill in the Oireachtas. Use when someone asks what an Irish Act, SI or Constitution Article says, whether a section has been amended or commenced, or which Act covers a topic. Gives the text, not legal advice.
+description: Looks up Irish Acts, sections, Statutory Instruments, Constitution Articles and Act amendments in the Irish Statute Book (eISB) through the Ireland MCP server and quotes the official text with a citation, links the Act to its Oireachtas bill and stages, and identifies EU acts that an SI transposes. Use when someone asks what an Irish Act, SI or Constitution Article says, whether a section has been amended or commenced, or which Act covers a topic. Gives the text, not legal advice.
 license: MIT
 ---
 
@@ -44,8 +44,12 @@ be called directly with the same `args`.
 6. **Constitution.** Call `legislation/legislation_get_constitution_article` with `{ "article": "40", "subsection": "3" }`
    (`lang: "ga"` for Irish). Cite each paragraph by its `ref`, e.g. Article 40.3.3°, and link its `url`.
    In a conflict the Irish text prevails (Article 25.5.4°).
-7. **Bill history** (optional): call `oireachtas/oireachtas_search_bills` with the Act's short title
-   and `year` to show how it passed through the Oireachtas.
+7. **Bill history.** Call `oireachtas/oireachtas_get_bill` with the Act, e.g. `{ "act_year": 2018, "act_no": 7 }`,
+   to list its bill's stages, sponsors and versions; or with `{ "bill_year": 2018, "bill_no": 10 }` for a bill, which
+   returns the enacted Act's `eli` when it passed. Use `oireachtas/oireachtas_search_bills` to find a bill by title.
+8. **EU law.** For an SI's `transposes` ELI or a CELEX number, call `eu-law/eu_law_lookup` with
+   `{ "eli": "http://data.europa.eu/eli/reg/2014/536/oj" }` or `{ "celex": "32016R0679" }` for the title, type,
+   dates and in-force flag. Only the Official Journal is authentic; cite the EUR-Lex link for reading.
 
 ## Output format
 

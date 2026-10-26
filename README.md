@@ -135,9 +135,9 @@ Last full run of every operation then in the catalogue against the hosted endpoi
 The default profile covers statistics (CSO, Eurostat, ECB, World Bank), the Oireachtas and Irish Statute Book, Met Éireann, transport (Irish Rail, Luas, NTA, TFI stops, bikes), property, planning, heritage, environment, energy, tourism, lobbying, pay-gap reports, council budgets and more. An optional [Irish legal and Citizens Information pilot](packages/irish-legal-mcp/README.md) is off by default; see [Beta features](#beta-features).
 
 <details>
-<summary><strong>All 38 sources, publishers and licences</strong></summary>
+<summary><strong>All 39 sources, publishers and licences</strong></summary>
 
-The default profile registers 38 source modules in `src/registry.ts`. The default `nearby`, `search` and `fetch` shortcuts sit above these sources. The optional pilot rows require `LEGAL_ENABLED=true` and an ingested corpus; check `ireland_catalogue` for the modules available on an endpoint. See [new provider access and limits](docs/public-source-additions.md).
+The default profile registers 39 source modules in `src/registry.ts`. The default `nearby`, `search` and `fetch` shortcuts sit above these sources. The optional pilot rows require `LEGAL_ENABLED=true` and an ingested corpus; check `ireland_catalogue` for the modules available on an endpoint. See [new provider access and limits](docs/public-source-additions.md).
 
 | Domain | Source id | Publisher / source | Operations | Licence |
 | --- | --- | --- | ---: | --- |
@@ -159,8 +159,9 @@ The default profile registers 38 source modules in `src/registry.ts`. The defaul
 | law/politics | `lobbying` | [SIPO Register of Lobbying](https://www.lobbying.ie/) — published returns ([notes](docs/lobbying-source.md)) | 1 | SIPO PSI reuse policy |
 | economy | `paygap` | [PayGap.ie](https://paygap.ie/downloads) — employer reports with annotations ([notes](docs/civic-sources.md)) | 1 | CC0 1.0 |
 | economy | `council-budgets` | [Official council budget workbooks](https://data.gov.ie/dataset/local-authority-and-regional-assembly-annual-budgets) ([notes](docs/council-budgets-source.md)) | 2 | CC BY-SA 4.0 |
-| law/politics | `oireachtas` | [Houses of the Oireachtas Open Data API](https://api.oireachtas.ie) | 5 | Oireachtas Open Data PSI Licence |
+| law/politics | `oireachtas` | [Houses of the Oireachtas Open Data API](https://api.oireachtas.ie) — includes bill stages linked to the enacted Act | 6 | Oireachtas Open Data PSI Licence |
 | law/politics | `legislation` | [Irish Statute Book](https://www.irishstatutebook.ie) — Acts and SIs as enacted/made, the Constitution, amendment and commencement directory | 7 | [Oireachtas (Open Data) PSI Licence](https://www.irishstatutebook.ie/eli/open-data.html) (incorporates CC BY 4.0) |
+| law/politics | `eu-law` | [Publications Office of the EU — Cellar SPARQL](https://op.europa.eu/en/web/cellar) — EU act metadata by CELEX or ELI | 1 | [Commission Decision 2011/833/EU reuse notice](https://data.europa.eu/data/datasets/sparql-cellar-of-the-publications-office) |
 | law/politics | `irish-legal` (optional pilot) | [Irish legal evidence corpus](packages/irish-legal-mcp/README.md) — indexed source versions and Act sections; annual-leave/working-time seeds; current law unverified | 6 | Per-document publisher licence; Revised Acts storage and redistribution permission gated |
 | stats | `cib` | [Citizens Information Board Data Hub](https://www.citizensinformationboard.ie/en/data-hub/) — pinned, checksummed annual CIS and CIPS statistics 2021–2025; not live data ([notes](docs/cib-and-civic-directory.md)) | 3 | CC BY 4.0 |
 | law/politics | `civic-directory` | [Éire Civic Tech Directory](https://github.com/williamkennedy/eire_civic_tech_directory) behind [CitizenData.ie](https://citizendata.ie/) — pinned catalogue; status and links as listed, unverified ([notes](docs/cib-and-civic-directory.md)) | 1 | MIT (catalogue) |

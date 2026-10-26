@@ -3,6 +3,7 @@ import { HOUR } from "../../gateway/context.js";
 import { bound, envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { actUri } from "../legislation/index.js";
 
 export const oireachtasInfo: SourceInfo = {
   id: "oireachtas",
@@ -301,6 +302,107 @@ const votesTool = defineTool({
   }
 });
 
+/** Keeps only https links on the Oireachtas data host; upstream URLs are returned, never fetched. */
+function oireachtasDataLink(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  try {
+    const url = new URL(raw);
+    return url.protocol === "https:" && url.hostname === "data.oireachtas.ie" && !url.username && !url.password && !url.port && !url.search ? url.href : null;
+  } catch {
+    return null;
+  }
+}
+
+const refNumber = z.number().int().min(1).max(9999);
+
+const billTool = defineTool({
+  name: "oireachtas_get_bill",
+  title: "Bill stages and Act link",
+  description:
+    "One bill's passage through the Oireachtas, found by bill (bill_year + bill_no) or by the Act it became (act_year + act_no): status, sponsors, every stage with chamber and date, published versions, and for enacted bills the Act number, date signed and Irish Statute Book ELI link.",
+  inputSchema: {
+    act_year: refNumber.min(1922).max(2100).optional().describe("Year of the Act, e.g. 2018. Use with act_no."),
+    act_no: refNumber.optional().describe("Act number within the year, e.g. 7 (Data Protection Act 2018)."),
+    bill_year: refNumber.min(1922).max(2100).optional().describe("Bill year. Use with bill_no instead of act_year/act_no."),
+    bill_no: refNumber.optional().describe("Bill number within the year."),
+    limit: z.number().int().min(1).max(100).default(40).describe("Maximum stages and versions to list.")
+  },
+  example: { act_year: 2018, act_no: 7 },
+  handler: async ({ act_year, act_no, bill_year, bill_no, limit: max }, ctx) => {
+    const byAct = act_year !== undefined && act_no !== undefined;
+    const byBill = bill_year !== undefined && bill_no !== undefined;
+    if (byAct === byBill) {
+      throw new ToolError("BAD_ARGS", "Give either act_year and act_no, or bill_year and bill_no.", {
+        hint: "For example { act_year: 2018, act_no: 7 } or { bill_year: 2018, bill_no: 10 }."
+      });
+    }
+    const list = await getList(ctx, "legislation", byAct ? { act_year, act_no, lang: "en" } : { bill_year, bill_no, lang: "en" });
+    const wanted = list.results.filter((r) =>
+      byAct ? Number(r.bill?.act?.actYear) === act_year && Number(r.bill?.act?.actNo) === act_no : Number(r.bill?.billYear) === bill_year && Number(r.bill?.billNo) === bill_no
+    );
+    const raw = wanted[0];
+    if (!raw) {
+      throw new ToolError("NOT_FOUND", byAct ? `No bill in the Oireachtas API became Act ${act_no} of ${act_year}.` : `No bill ${bill_year}/${bill_no} in the Oireachtas API.`, {
+        hint: "Check the number with legislation_list_acts or oireachtas_search_bills. Older Acts may predate the API's bill records."
+      });
+    }
+    const b = raw.bill;
+    const summary = summariseBill(raw);
+    const stages = (b.stages ?? []).map((s: Json) => s.event).filter(Boolean).map((e: Json) => ({
+      stage: e.showAs ?? null,
+      chamber: e.chamber?.showAs ?? null,
+      house: e.house?.showAs ?? null,
+      date: e.dates?.at(-1)?.date ?? null,
+      completed: e.stageCompleted ?? null
+    }));
+    const versions = (b.versions ?? []).map((v: Json) => v.version).filter(Boolean).map((v: Json) => ({
+      title: v.showAs ?? null,
+      type: v.docType ?? null,
+      language: v.lang ?? null,
+      date: v.date ?? null,
+      pdf: oireachtasDataLink(v.formats?.pdf?.uri)
+    }));
+    const actYear = Number(b.act?.actYear);
+    const actNo = Number(b.act?.actNo);
+    const act = b.act && Number.isInteger(actYear) && Number.isInteger(actNo) && actYear > 0 && actNo > 0
+      ? {
+          title: b.act.shortTitleEn ?? null,
+          year: actYear,
+          number: actNo,
+          date_signed: b.act.dateSigned ?? null,
+          eli: actUri(actYear, actNo),
+          effects: `https://www.irishstatutebook.ie/eli/isbc/${actYear}_${actNo}.html`
+        }
+      : null;
+    const [s, v] = [bound(stages, max), bound(versions, max)];
+    return envelope(oireachtasInfo, {
+      data: {
+        bill: summary.bill,
+        title: summary.title,
+        status: summary.status,
+        source: summary.source,
+        origin_house: summary.origin_house,
+        sponsors: summary.sponsors,
+        long_title: summary.long_title,
+        latest_stage: summary.latest_stage,
+        last_updated: summary.last_updated,
+        url: summary.url,
+        act,
+        stages: s.items,
+        versions: v.items,
+        warnings: [
+          "Not legal advice.",
+          ...(act ? ["The ELI link is the Act as enacted in the Irish Statute Book (Oireachtas (Open Data) PSI Licence); use legislation_get_act_effects for later amendments."] : [])
+        ]
+      },
+      url: list.url,
+      cached: list.cached,
+      stale: list.stale,
+      truncated: s.truncated || v.truncated
+    });
+  }
+});
+
 async function search(query: string, max: number, ctx: ToolContext) {
   const [members, bills] = await Promise.all([
     membersOf(ctx, "dail", CURRENT_HOUSE.dail),
@@ -368,10 +470,10 @@ async function fetchById(key: string, ctx: ToolContext) {
 
 export const oireachtasModule: SourceModule = {
   info: oireachtasInfo,
-  summary: "Parliament: TDs and Senators, bills and their stages, debates, parliamentary questions and votes.",
+  summary: "Parliament: TDs and Senators, bills and their stages (linked to the enacted Act), debates, parliamentary questions and votes.",
   domain: "law/politics",
   coverage: "Houses of the Oireachtas: members, bills, debates, parliamentary questions and divisions from the Oireachtas Open Data API.",
-  tools: [membersTool, billsTool, debatesTool, questionsTool, votesTool],
+  tools: [membersTool, billsTool, billTool, debatesTool, questionsTool, votesTool],
   search,
   fetchById
 };

@@ -1,0 +1,535 @@
+{
+ "head": {
+  "counts": {
+   "billCount": 1,
+   "resultCount": 1
+  }
+ },
+ "results": [
+  {
+   "bill": {
+    "act": {
+     "actNo": "7",
+     "actYear": "2018",
+     "dateSigned": "2018-05-24",
+     "longTitleEn": "Act to establish a body to be known as An Coimisiún um Chosaint Sonraí or, in the English language, the Data Protection Commission; to give further effect to Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016 on the protection of natural persons with regard to the processing of personal data and on the free movement of such data, and repealing Directive 95/46/EC (General Data Protection Regulation); to give effect to Directive (EU) 2016/680 of the European Parliament and of the Council of 27 April 2016 on the protection of natural persons with regard to the processing of personal data by competent authorities for the purposes of the prevention, investigation, detection or prosecution of criminal offences or the execution of criminal penalties, and on the free movement of such data, and repealing Council Framework Decision 2008/977/JHA; to give further effect to the Convention for the Protection of Individuals with regard to Automatic Processing of Personal Data done at Strasbourg on the 28th day of January 1981\nand for those and other purposes to amend the Data Protection Act 1988; to provide for the consequential amendment of certain other enactments; and to provide for related matters",
+     "longTitleGa": "Acht do bhunú comhlacht ar a dtabharfar an Coimisiún um Chosaint Sonraí nó, sa Bhéarla, the Data Protection Commission; do thabhairt tuilleadh éifeachta do Rialachán (AE) 2016/679 ó Pharlaimint na hEorpa agus ón gComhairle an 27 Aibreán 2016 maidir le daoine nádúrtha a chosaint i ndáil le sonraí pearsanta a phróiseáil agus maidir le saorghluaiseacht sonraí den sórt sin, agus lena n-aisghairtear Treoir 95/46/CE (An Rialachán Ginearálta maidir le Cosaint Sonraí); do thabhairt éifeacht do Threoir (AE) 2016/680 ó Pharlaimint na hEorpa agus ón gComhairle an 27 Aibreán 2016  maidir le daoine nádúrtha a chosaint i ndáil le sonraí pearsanta a phróiseáil ag údaráis inniúla chun cionta coiriúla a chosc, a imscrúdú, a bhrath nó a ionchúiseamh nó chun pionóis choiriúla a fhorghníomhú, agus maidir le saorghluaiseacht sonraí den sórt sin, agus lena n aisghairtear Creat-Chinneadh 2008/977/JHA ón gComhairle; do thabhairt tuilleadh éifeachta don Choinbhinsiún chun Daoine Aonair a Chosaint maidir le Sonraí Pearsanta a Phróiseáil go hUathoibríoch arna dhéanamh in Strasbourg an 28ú lá d'Eanáir 1981 agus chun na críche sin agus chun críoch eile do leasú an Achta um Chosaint Sonraí, 1988; do dhéanamh socrú maidir le leasú iarmhartach a dhéanamh ar achtacháin áirithe eile; agus do dhéanamh socrú i dtaobh nithe gaolmhara",
+     "shortTitleEn": "Data Protection Act 2018",
+     "shortTitleGa": "An tAcht um Chosaint Sonraí, 2018",
+     "statutebookURI": "http://www.irishstatutebook.ie/eli/2018/act/7",
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/act/2018/7"
+    },
+    "amendmentLists": [
+     {
+      "amendmentList": {
+       "amendmentTypeUri": {
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/def/amendment-type/creamList"
+       },
+       "chamber": {
+        "showAs": "Dail",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/def/dail"
+       },
+       "date": "2018-05-21",
+       "formats": {
+        "pdf": {
+         "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/dail/6/amendment/creamList/eng/cl-b10b18s.pdf"
+        },
+        "xml": null
+       },
+       "showAs": "Cream List [Dáil amendments to Seanad Bill]",
+       "stage": {
+        "showAs": "Cream List",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/dail/6"
+       },
+       "stageNo": "6"
+      }
+     }
+    ],
+    "billNo": "10",
+    "billType": "Public",
+    "billTypeURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-type/public",
+    "billYear": "2018",
+    "debates": [
+     {
+      "chamber": {
+       "showAs": "Seanad Éireann",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/seanad"
+      },
+      "date": "2018-05-22",
+      "debateSectionId": "dbsect_11",
+      "showAs": "Data Protection Bill 2018: [Seanad Bill amended by the Dáil] Report and Final Stages",
+      "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/seanad/2018-05-22/debate/main"
+     }
+    ],
+    "events": [
+     {
+      "event": {
+       "chamber": null,
+       "dates": [
+        {
+         "date": "2018-01-30"
+        }
+       ],
+       "eventURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-event/published",
+       "showAs": "Published",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/published"
+      }
+     }
+    ],
+    "lastUpdated": "2019-04-01T09:27:20.550000+00:00",
+    "longTitleEn": "Bill entitled an Act to establish a body to be known as An Coimisiún um Chosaint Sonraí or, in the English language, the Data Protection Commission; to give further effect to Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016 on the protection of natural persons with regard to the processing of personal data and on the free movement of such data, and repealing Directive 95/46/EC (General Data Protection Regulation); to give effect to Directive (EU) 2016/680 of the European Parliament and of the Council of 27 April 2016 on the protection of natural persons with regard to the processing of personal data by competent authorities for the purposes of the prevention, investigation, detection or prosecution of criminal offences or the execution of criminal penalties, and on the free movement of such data, and repealing Council Framework Decision 2008/977/JHA; to give further effect to the Convention for the Protection of Individuals with regard to Automatic Processing of Personal Data done at Strasbourg on the 28th day of January 1981\nand for those and other purposes to amend the Data Protection Act 1988; to provide for the consequential amendment of certain other enactments; and to provide for related matters",
+    "longTitleGa": "Bille dá ngairtear Acht do bhunú comhlacht ar a dtabharfar an Coimisiún um Chosaint Sonraí nó, sa Bhéarla, the Data Protection Commission; do thabhairt tuilleadh éifeachta do Rialachán (AE) 2016/679 ó Pharlaimint na hEorpa agus ón gComhairle an 27 Aibreán 2016 maidir le daoine nádúrtha a chosaint i ndáil le sonraí pearsanta a phróiseáil agus maidir le saorghluaiseacht sonraí den sórt sin, agus lena n-aisghairtear Treoir 95/46/CE (An Rialachán Ginearálta maidir le Cosaint Sonraí); do thabhairt éifeacht do Threoir (AE) 2016/680 ó Pharlaimint na hEorpa agus ón gComhairle an 27 Aibreán 2016  maidir le daoine nádúrtha a chosaint i ndáil le sonraí pearsanta a phróiseáil ag údaráis inniúla chun cionta coiriúla a chosc, a imscrúdú, a bhrath nó a ionchúiseamh nó chun pionóis choiriúla a fhorghníomhú, agus maidir le saorghluaiseacht sonraí den sórt sin, agus lena n aisghairtear Creat-Chinneadh 2008/977/JHA ón gComhairle; do thabhairt tuilleadh éifeachta don Choinbhinsiún chun Daoine Aonair a Chosaint maidir le Sonraí Pearsanta a Phróiseáil go hUathoibríoch arna dhéanamh in Strasbourg an 28ú lá d'Eanáir 1981 agus chun na críche sin agus chun críoch eile do leasú an Achta um Chosaint Sonraí, 1988; do dhéanamh socrú maidir le leasú iarmhartach a dhéanamh ar achtacháin áirithe eile; agus do dhéanamh socrú i dtaobh nithe gaolmhara",
+    "method": "Presented",
+    "methodURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-method/presented",
+    "mostRecentStage": {
+     "event": {
+      "chamber": null,
+      "dates": [
+       {
+        "date": "2018-05-24"
+       }
+      ],
+      "house": null,
+      "progressStage": 11,
+      "showAs": "Enacted",
+      "stageCompleted": true,
+      "stageOutcome": "Enacted",
+      "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/enacted",
+      "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/stage/oireachtas/enacted"
+     }
+    },
+    "originHouse": {
+     "showAs": "Seanad Éireann",
+     "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/seanad"
+    },
+    "originHouseURI": "https://data.oireachtas.ie/ie/oireachtas/def/house/seanad",
+    "relatedDocs": [
+     {
+      "relatedDoc": {
+       "date": "2020-05-08",
+       "docType": "errata",
+       "formats": {
+        "pdf": {
+         "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/eng/errata/erratum-slip-data-protection-bill-2018.pdf"
+        },
+        "xml": null
+       },
+       "lang": "eng",
+       "showAs": "Erratum slip",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/eng/errata"
+      }
+     }
+    ],
+    "shortTitleEn": "Data Protection Bill 2018",
+    "shortTitleGa": "An Bille um Chosaint Sonraí, 2018",
+    "source": "Government",
+    "sourceURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-source/government",
+    "sponsors": [
+     {
+      "sponsor": {
+       "as": {
+        "showAs": "Minister for Justice and Equality",
+        "uri": null
+       },
+       "by": {
+        "showAs": null,
+        "uri": null
+       },
+       "isPrimary": true
+      }
+     }
+    ],
+    "stages": [
+     {
+      "event": {
+       "chamber": {
+        "chamberCode": "seanad",
+        "showAs": "Seanad Éireann",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/seanad"
+       },
+       "dates": [
+        {
+         "date": "2018-01-30"
+        }
+       ],
+       "house": {
+        "chamberCode": "seanad",
+        "chamberType": "house",
+        "houseCode": "seanad",
+        "houseNo": "25",
+        "showAs": "25th Seanad",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/house/seanad/25"
+       },
+       "progressStage": 1,
+       "showAs": "First Stage",
+       "stageCompleted": true,
+       "stageOutcome": null,
+       "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/1",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/stage/seanad/1"
+      }
+     },
+     {
+      "event": {
+       "chamber": {
+        "chamberCode": "seanad",
+        "showAs": "Seanad Éireann",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/seanad"
+       },
+       "dates": [
+        {
+         "date": "2018-02-08"
+        }
+       ],
+       "house": {
+        "chamberCode": "seanad",
+        "chamberType": "house",
+        "houseCode": "seanad",
+        "houseNo": "25",
+        "showAs": "25th Seanad",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/house/seanad/25"
+       },
+       "progressStage": 2,
+       "showAs": "Second Stage",
+       "stageCompleted": true,
+       "stageOutcome": null,
+       "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/2",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/stage/seanad/2"
+      }
+     },
+     {
+      "event": {
+       "chamber": {
+        "chamberCode": "seanad",
+        "showAs": "Seanad Éireann",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/seanad"
+       },
+       "dates": [
+        {
+         "date": "2018-02-15"
+        }
+       ],
+       "house": {
+        "chamberCode": "seanad",
+        "chamberType": "house",
+        "houseCode": "seanad",
+        "houseNo": "25",
+        "showAs": "25th Seanad",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/house/seanad/25"
+       },
+       "progressStage": 3,
+       "showAs": "Committee Stage",
+       "stageCompleted": true,
+       "stageOutcome": null,
+       "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/3",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/stage/seanad/3"
+      }
+     },
+     {
+      "event": {
+       "chamber": {
+        "chamberCode": "seanad",
+        "showAs": "Seanad Éireann",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/seanad"
+       },
+       "dates": [
+        {
+         "date": "2018-03-13"
+        },
+        {
+         "date": "2018-03-13"
+        }
+       ],
+       "house": {
+        "chamberCode": "seanad",
+        "chamberType": "house",
+        "houseCode": "seanad",
+        "houseNo": "25",
+        "showAs": "25th Seanad",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/house/seanad/25"
+       },
+       "progressStage": 4,
+       "showAs": "Report Stage",
+       "stageCompleted": true,
+       "stageOutcome": null,
+       "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/4",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/stage/seanad/4"
+      }
+     },
+     {
+      "event": {
+       "chamber": {
+        "chamberCode": "seanad",
+        "showAs": "Seanad Éireann",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/seanad"
+       },
+       "dates": [
+        {
+         "date": "2018-03-28"
+        }
+       ],
+       "house": {
+        "chamberCode": "seanad",
+        "chamberType": "house",
+        "houseCode": "seanad",
+        "houseNo": "25",
+        "showAs": "25th Seanad",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/house/seanad/25"
+       },
+       "progressStage": 5,
+       "showAs": "Fifth Stage",
+       "stageCompleted": true,
+       "stageOutcome": null,
+       "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/5",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/stage/seanad/5"
+      }
+     },
+     {
+      "event": {
+       "chamber": {
+        "chamberCode": "dail",
+        "showAs": "Dáil Éireann",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail"
+       },
+       "dates": [
+        {
+         "date": "2018-04-17"
+        },
+        {
+         "date": "2018-04-17"
+        }
+       ],
+       "house": {
+        "chamberCode": "dail",
+        "chamberType": "house",
+        "houseCode": "dail",
+        "houseNo": "32",
+        "showAs": "32nd Dáil",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/32"
+       },
+       "progressStage": 6,
+       "showAs": "Second Stage",
+       "stageCompleted": true,
+       "stageOutcome": null,
+       "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/2",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/stage/dail/2"
+      }
+     },
+     {
+      "event": {
+       "chamber": {
+        "chamberCode": "dail",
+        "showAs": "Dáil Éireann",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail"
+       },
+       "dates": [
+        {
+         "date": "2018-04-18"
+        },
+        {
+         "date": "2018-04-18"
+        }
+       ],
+       "house": {
+        "chamberCode": "dail",
+        "chamberType": "house",
+        "houseCode": "dail",
+        "houseNo": "32",
+        "showAs": "32nd Dáil",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/32"
+       },
+       "progressStage": 7,
+       "showAs": "Committee Stage",
+       "stageCompleted": true,
+       "stageOutcome": null,
+       "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/3",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/stage/dail/3"
+      }
+     },
+     {
+      "event": {
+       "chamber": {
+        "chamberCode": "dail",
+        "showAs": "Dáil Éireann",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail"
+       },
+       "dates": [
+        {
+         "date": "2018-05-15"
+        },
+        {
+         "date": "2018-05-15"
+        }
+       ],
+       "house": {
+        "chamberCode": "dail",
+        "chamberType": "house",
+        "houseCode": "dail",
+        "houseNo": "32",
+        "showAs": "32nd Dáil",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/32"
+       },
+       "progressStage": 8,
+       "showAs": "Report Stage",
+       "stageCompleted": true,
+       "stageOutcome": null,
+       "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/4",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/stage/dail/4"
+      }
+     },
+     {
+      "event": {
+       "chamber": {
+        "chamberCode": "dail",
+        "showAs": "Dáil Éireann",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/dail"
+       },
+       "dates": [
+        {
+         "date": "2018-05-16"
+        },
+        {
+         "date": "2018-05-16"
+        }
+       ],
+       "house": {
+        "chamberCode": "dail",
+        "chamberType": "house",
+        "houseCode": "dail",
+        "houseNo": "32",
+        "showAs": "32nd Dáil",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/house/dail/32"
+       },
+       "progressStage": 9,
+       "showAs": "Fifth Stage",
+       "stageCompleted": true,
+       "stageOutcome": "Enacted",
+       "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/5",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/stage/dail/5"
+      }
+     },
+     {
+      "event": {
+       "chamber": {
+        "chamberCode": "seanad",
+        "showAs": "Seanad Éireann",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/def/house/seanad"
+       },
+       "dates": [
+        {
+         "date": "2018-05-22"
+        }
+       ],
+       "house": {
+        "chamberCode": "seanad",
+        "chamberType": "house",
+        "houseCode": "seanad",
+        "houseNo": "25",
+        "showAs": "25th Seanad",
+        "uri": "https://data.oireachtas.ie/ie/oireachtas/house/seanad/25"
+       },
+       "progressStage": 10,
+       "showAs": "Cream List",
+       "stageCompleted": true,
+       "stageOutcome": "Enacted",
+       "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/6",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/stage/seanad/6"
+      }
+     },
+     {
+      "event": {
+       "chamber": null,
+       "dates": [
+        {
+         "date": "2018-05-24"
+        }
+       ],
+       "house": null,
+       "progressStage": 11,
+       "showAs": "Enacted",
+       "stageCompleted": true,
+       "stageOutcome": "Enacted",
+       "stageURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-stage/enacted",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/stage/oireachtas/enacted"
+      }
+     }
+    ],
+    "status": "Enacted",
+    "statusURI": "https://data.oireachtas.ie/ie/oireachtas/def/bill-status/enacted",
+    "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10",
+    "versions": [
+     {
+      "version": {
+       "date": "2018-05-24",
+       "docType": "act",
+       "formats": {
+        "pdf": {
+         "uri": "https://data.oireachtas.ie/ie/oireachtas/act/2018/7/gle/enacted/a0718i.pdf"
+        },
+        "xml": null
+       },
+       "lang": "gle",
+       "showAs": "An tAcht um Chosaint Sonraí, 2018",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/act/2018/7/gle/enacted"
+      }
+     },
+     {
+      "version": {
+       "date": "2018-05-24",
+       "docType": "act",
+       "formats": {
+        "pdf": {
+         "uri": "https://data.oireachtas.ie/ie/oireachtas/act/2018/7/eng/enacted/a0718.pdf"
+        },
+        "xml": null
+       },
+       "lang": "eng",
+       "showAs": "Data Protection Act 2018",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/act/2018/7/eng/enacted"
+      }
+     },
+     {
+      "version": {
+       "date": "2018-05-18",
+       "docType": "bill",
+       "formats": {
+        "pdf": {
+         "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/eng/ver_d/b10d18s.pdf"
+        },
+        "xml": null
+       },
+       "lang": "eng",
+       "showAs": "As passed by Dáil Éireann",
+       "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/10/eng/ver_d"
+      }
+     },
+     {
+      "version": {
+       "date": "2018-01-30",
+       "docType": "bill",
+       "formats": {
+        "pdf": {
+         "uri": "https://evil.example/x.pdf"
+        },
+        "xml": null
+       },
+       "lang": "eng",
+       "showAs": "As initiated",
+       "uri": "x"
+      }
+     }
+    ]
+   },
+   "billSort": {
+    "actNoSort": 7,
+    "actShortTitleEnSort": "data-protection-act-2018",
+    "actShortTitleGaSort": "an-tacht-um-chosaint-sonrai-2018",
+    "actYearSort": 2018,
+    "billNoSort": 10,
+    "billShortTitleEnSort": "data-protection-bill-2018",
+    "billShortTitleGaSort": "an-bille-um-chosaint-sonrai-2018",
+    "billYearSort": 2018
+   },
+   "contextDate": "2018-05-24"
+  }
+ ]
+}

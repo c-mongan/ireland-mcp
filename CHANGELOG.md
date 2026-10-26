@@ -13,6 +13,8 @@ All notable changes to this project are documented here. The format follows
 - `cachedText` accepts `validate`, so HTML soft-error pages are rejected before caching.
 - The legal beta assessment records the 26 October 2026 finding that Citizens Information returns HTTP 403 to automated clients, including the pilot's own user-agent, and what wider coverage needs.
 - Hard multi-step benchmark (`npm run eval:multistep`): 41 questions across three tiers that each combine at least two sources. Reference answers are pinned and recomputed through the real tools. Each failing question is tagged with the capability that would unlock it: dataset cards, place crosswalk, server-side query or knowledge index. A nightly references-only workflow needs no model key. See `docs/evals-multistep.md`.
+- `oireachtas_get_bill`: one bill's stages, sponsors and versions, found by bill number or by the Act it became, with the enacted Act's Irish Statute Book ELI and Legislation Directory links.
+- New `eu-law` source: `eu_law_lookup` returns EU act metadata (title, type, dates, in-force flag, ELI, CELEX) from the Publications Office Cellar SPARQL endpoint by CELEX or ELI, attributed under Commission Decision 2011/833/EU.
 
 ### Changed
 - Website rewritten in plain English: "Ask AI about Ireland. See the source.", sample questions, three-step setup, a "Built to be checked" trust section, an FAQ and a clearly labelled **Beta: Irish law and your rights** section (off on the hosted server, not legal advice).
