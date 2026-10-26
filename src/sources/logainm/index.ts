@@ -19,7 +19,7 @@ const category = z.object({ ID: z.string(), NameEN: nullableText, NameGA: nullab
 const placeSchema = z.object({
   ID: id, Permalink: z.string().url(), DateCreated: timestamp, DateModified: timestamp.nullable().optional(),
   ReplacementID: id.nullable().optional(),
-  Placenames: z.array(z.object({ ID: id, Language: nullableText, Wording: z.string(), Main: z.boolean() })).min(1),
+  Placenames: z.array(z.object({ ID: id, Language: nullableText, Wording: z.string().trim().min(1), Main: z.boolean() })).min(1),
   IncludedIn: z.array(z.object({ ID: id, NameEN: nullableText, NameGA: nullableText, Category: category.nullable().optional() })).optional(),
   Geography: z.object({ Accurate: z.boolean(), Coordinates: z.array(z.object({
     Latitude: z.number().min(-90).max(90), Longitude: z.number().min(-180).max(180)

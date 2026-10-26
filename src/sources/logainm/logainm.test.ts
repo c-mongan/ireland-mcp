@@ -64,6 +64,7 @@ describe("Logainm search", () => {
   });
   it.each([null, {}, { error: "denied" }, { ...page, TotalCount: -1 }, { ...page, TotalPages: 0 }, { ...page, Results: [{ ...place, DateCreated: "not-a-date" }] },
     { ...page, Results: [{ ...place, Placenames: [] }] },
+    { ...page, Results: [{ ...place, Placenames: [{ ...place.Placenames[0], Wording: "  " }] }] },
     { ...page, Results: [{ ...place, Geography: { Accurate: true, Coordinates: [{ Latitude: 95, Longitude: 0 }] } }] },
     { ...page, CurrentPage: 2 }
   ])("rejects malformed provider data before caching: %j", async payload => {
