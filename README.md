@@ -128,7 +128,7 @@ Portable Copilot / MCP JSON:
 | Default tools | 7 | What `tools/list` returns: 4 meta tools plus `search`, `fetch` and `nearby`. |
 | Tools with `?toolsets=all` | 98 | Every operation as a typed tool, plus the 4 meta tools, `search` and `fetch`. |
 | Prompts | 3 | `area_profile`, `commute_check`, `compare_counties`. |
-| Dataset cards | 38 of 38 | Sources with a card (topics, geography levels, time coverage, join keys) that `ireland_catalogue` filters on. See [dataset cards](docs/dataset-cards.md). |
+| Dataset cards | 39 of 39 | Sources with a card (topics, geography levels, time coverage, join keys) that `ireland_catalogue` filters on. See [dataset cards](docs/dataset-cards.md). |
 <!-- counts:end -->
 
 Last full run of every operation then in the catalogue against the hosted endpoint: <!-- live-ops:start -->[docs/live-all-ops.md](docs/live-all-ops.md) (2026-10-26): 78 of 82 pass, 1 fail; 3 need an operator key (NTA, Logainm).<!-- live-ops:end -->
