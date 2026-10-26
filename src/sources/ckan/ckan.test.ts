@@ -64,6 +64,29 @@ describe("CKAN modules", () => {
     expect(doc.text).toContain("Resources:");
   });
 
+  it("does not cache CKAN success:false bodies but still caches good ones", async () => {
+    const rejection = '{"success":false,"error":{"__type":"Validation Error","message":"bad query"}}';
+    const fetch = fakeFetch([
+      { match: /package_search\?q=bad/, body: rejection },
+      { match: /package_show\?id=bad-id/, body: rejection },
+      { match: /datastore_search/, body: rejection },
+      { match: /package_search\?q=good/, file: f("search-data.gov.ie.json") }
+    ]);
+    const ctx = createContext({ fetch });
+    const datastore = { resource_id: "330d9b75-0e85-4c95-b948-58b86acaa577" };
+    for (const [tool, args] of [["datagov_search_datasets", { query: "bad" }], ["datagov_get_dataset", { id: "bad-id" }], ["datagov_query_datastore", datastore]] as const) {
+      const before = fetch.calls.length;
+      for (let i = 0; i < 2; i++) {
+        const { body } = await callTool(dataGovIeModule, tool, args, ctx);
+        expect(body.error.code).toBe("BAD_ARGS");
+      }
+      expect(fetch.calls.length - before).toBe(2);
+    }
+    const before = fetch.calls.length;
+    for (let i = 0; i < 2; i++) expect((await callTool(dataGovIeModule, "datagov_search_datasets", { query: "good" }, ctx)).ok).toBe(true);
+    expect(fetch.calls.length - before).toBe(1);
+  });
+
   it("handles CKAN rejections and sparse packages", async () => {
     const sparse = { success: true, result: { count: 1, results: [{ id: "x", name: "sparse", title: "Sparse", organization: null, notes: null }] } };
     const extra: Route[] = [

@@ -81,6 +81,11 @@ export function createCkanModule(config: CkanConfig): SourceModule {
   const datasetUrl = (name: string) => `${site}/dataset/${name}`;
   const ex = config.examples ?? DEFAULT_EXAMPLES;
 
+  // CKAN can answer 200 with success:false; reject it inside the loader so it is never cached.
+  const rejectUnsuccessful = (body: CkanEnvelope<unknown>) => {
+    unwrap(body, portal);
+  };
+
   const summarise = (p: CkanPackage) => ({
     id: p.name,
     title: p.title,
@@ -94,14 +99,14 @@ export function createCkanModule(config: CkanConfig): SourceModule {
 
   async function packageSearch(ctx: ToolContext, params: Record<string, string>) {
     const url = `${api}/package_search?${new URLSearchParams(params).toString()}`;
-    const result = await ctx.cachedJson<CkanEnvelope<{ count: number; results: CkanPackage[] }>>(url, ttl, { label: portal });
+    const result = await ctx.cachedJson<CkanEnvelope<{ count: number; results: CkanPackage[] }>>(url, ttl, { label: portal, validate: rejectUnsuccessful });
     return { url, value: unwrap(result.value, portal), cached: result.cached, stale: result.stale };
   }
 
   async function packageShow(ctx: ToolContext, id: string) {
     if (!DATASET_ID.test(id)) throw new ToolError("BAD_ARGS", `Dataset id must be the dataset's URL name, e.g. '${ex.dataset}'.`);
     const url = `${api}/package_show?id=${encodeURIComponent(id)}`;
-    const result = await ctx.cachedJson<CkanEnvelope<CkanPackage>>(url, ttl, { label: portal });
+    const result = await ctx.cachedJson<CkanEnvelope<CkanPackage>>(url, ttl, { label: portal, validate: rejectUnsuccessful });
     return { url, value: unwrap(result.value, portal), cached: result.cached, stale: result.stale };
   }
 
@@ -176,7 +181,7 @@ export function createCkanModule(config: CkanConfig): SourceModule {
       if (q) params.set("q", q);
       if (filters && Object.keys(filters).length) params.set("filters", JSON.stringify(filters));
       const url = `${api}/datastore_search?${params.toString()}`;
-      const result = await ctx.cachedJson<CkanEnvelope<DatastoreResult>>(url, ttl, { label: portal });
+      const result = await ctx.cachedJson<CkanEnvelope<DatastoreResult>>(url, ttl, { label: portal, validate: rejectUnsuccessful });
       const value = unwrap(result.value, portal);
       const records = value.records ?? [];
       return envelope(info, {
