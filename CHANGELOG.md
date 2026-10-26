@@ -5,6 +5,9 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+- Website rewritten in plain English: "Ask AI about Ireland. See the source.", sample questions, three-step setup, a "Built to be checked" trust section, an FAQ and a clearly labelled **Beta: Irish law and your rights** section (off on the hosted server, not legal advice).
+
 ### Added
 - A "Website or docs feedback" issue template, so feedback about irishopendata.ie and the docs has a clear route.
 - The legal pilot now appears as a beta on the website and in the README, with a plain-English [assessment](docs/legal-beta-assessment.md) of coverage, licences and risks. `LEGAL_ENABLED` stays off by default.

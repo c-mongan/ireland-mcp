@@ -4,7 +4,10 @@
 
 Make the product understandable in ten seconds: connect an AI assistant to Irish
 public data, ask a question, and inspect the source. The voice is civic, practical
-and curious. This is a community-built read-only connector, not an official
+and curious. Write for someone who has never heard of MCP: short sentences, plain
+words, no internal terms such as "operation", "toolset" or "endpoint" in headings.
+Explain MCP once, in the FAQ. The hero line is "Ask AI about Ireland. See the
+source." Keep it to two short lines so the live playground stays near the fold. This is a community-built read-only connector, not an official
 government service or an AI answer engine.
 
 The visual reference is a public-data observatory: a green, cinematic opening
@@ -54,6 +57,20 @@ dependencies are needed.
   catalogue and links to the existing domain heading IDs. Do not add fixed links
   that assume every subject is present in the live catalogue.
 - Status exposes upstream failures and freshness rather than promising uptime.
+- Section order: hero, live playground ("What can I ask?" sample questions),
+  setup in three numbered steps, how it works, trust ("Built to be checked":
+  official sources, read-only, privacy, open source), agent setup, source
+  directory, legal beta, FAQ, status. The header links Try it, Set up, Sources
+  and FAQ; the footer links status, privacy and feedback.
+- Trust copy must stay true to PRIVACY.md: no question values or results are
+  logged, and anonymous usage counts are kept. Do not claim "no tracking".
+- The legal beta section (`#legal-beta`) states that it is off on the hosted
+  server, is not legal advice, covers only annual leave and working time, uses
+  Act text as passed in 1997, and that Citizens Information blocks automated
+  access. Do not describe it as available until the hosted pilot passes its
+  deployment check. See `docs/legal-beta-assessment.md`.
+- The FAQ uses native `<details>` with 44px summaries and needs no JavaScript.
+  Each new section stays a static block; do not add fixed counts to prose.
 
 ## Design tokens
 
