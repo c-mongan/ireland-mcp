@@ -62,8 +62,9 @@ dependencies are needed.
   official sources, read-only, privacy, open source), agent setup, source
   directory, legal beta, FAQ, status. The header links Try it, Set up, Sources
   and FAQ; the footer links status, privacy and feedback.
-- Trust copy must stay true to PRIVACY.md: no question values or results are
-  logged, and anonymous usage counts are kept. Do not claim "no tracking".
+- Trust copy must stay true to PRIVACY.md: argument values and results are never
+  logged, but tool, source, client and timing telemetry is. Do not claim "no
+  tracking" or "only counts".
 - The legal beta section (`#legal-beta`) states that it is off on the hosted
   server, is not legal advice, covers only annual leave and working time, uses
   Act text as passed in 1997, and that Citizens Information blocks automated
