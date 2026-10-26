@@ -3,7 +3,7 @@
 [![CI](https://github.com/c-mongan/ireland-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/c-mongan/ireland-mcp/actions/workflows/ci.yml)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-34c08a.svg)](LICENSE)
 [![MCP](https://img.shields.io/badge/MCP-Streamable%20HTTP-6f42c1.svg)](https://modelcontextprotocol.io)
-[![Token budget](https://img.shields.io/badge/default%20surface-8%20tools%20%7C%20~2.7k%20tokens-0a7.svg)](#why-its-lean)
+[![Token budget](https://img.shields.io/badge/default%20surface-8%20tools%20%7C%20~3.0k%20tokens-0a7.svg)](#why-its-lean)
 
 **Ask ChatGPT, Claude or Copilot about Ireland, and get answers that cite official public sources.**
 
@@ -192,7 +192,7 @@ The civic-source additions and GeoHive layer selection are described in [civic s
 
 ## Why it's lean
 
-Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **8 tools, 10,752 characters, about 2,688 tokens** (`toolsets=all` is 99 tools, about 29k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
+Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **8 tools, 11,924 characters, about 2,981 tokens** (`toolsets=all` is 99 tools, about 29k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
 
 <p align="center">
   <a href="docs/architecture/ireland-mcp-lean-surface.drawio">
