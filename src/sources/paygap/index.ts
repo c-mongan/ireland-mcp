@@ -4,6 +4,8 @@ import { envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js"
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
 import { csvRows } from "../shared/csv.js";
+import { ANNOTATION_FIELDS, METRIC_FIELDS, metricValue, type PayGapReport } from "./model.js";
+import { GITHUB_SOURCE, parseGithubReports } from "./github.js";
 
 const DATA_URL = "https://paygap.ie/downloads/annotated";
 const CSV_MAX_BYTES = 5 * 1024 * 1024;
@@ -25,38 +27,6 @@ const HEADERS = [
   "Percentage Employees Male", "Board Exec Female", "Board Exec Male", "Board Non-Exec Female", "Board Non-Exec Male",
   "Late Filing", "Report Removed", "Govt Employer Removed", "Data Missing", "Incomplete", "Quartile Error", "No Narrative", "Notes"
 ] as const;
-
-const METRIC_FIELDS = [
-  "mean_hourly_gap", "median_hourly_gap", "mean_bonus_gap", "median_bonus_gap", "mean_hourly_gap_part_time",
-  "median_hourly_gap_part_time", "mean_hourly_gap_part_temp", "median_hourly_gap_part_temp", "percentage_bonus_paid_female",
-  "percentage_bonus_paid_male", "percentage_bik_paid_female", "percentage_bik_paid_male", "q1_female", "q1_male",
-  "q2_female", "q2_male", "q3_female", "q3_male", "q4_female", "q4_male", "percentage_employees_female",
-  "percentage_employees_male", "board_exec_female", "board_exec_male", "board_non_exec_female", "board_non_exec_male"
-] as const;
-
-const ANNOTATION_FIELDS = ["late_filing", "report_removed", "govt_employer_removed", "data_missing", "incomplete", "quartile_error", "no_narrative", "notes"] as const;
-type Metric = number | string | null;
-type PayGapReport = {
-  source_row: number;
-  company_name: string;
-  nace_section: string;
-  nace_letter: string;
-  nace_division: string;
-  company_site: string | null;
-  report_link: string | null;
-  report_year: number;
-  metrics: Record<(typeof METRIC_FIELDS)[number], Metric>;
-  /** Annotation values stay as published strings so flags and notes are not silently reinterpreted. */
-  annotations: Record<(typeof ANNOTATION_FIELDS)[number], string>;
-};
-
-const metricValue = (raw: string): Metric => {
-  if (raw.trim() === "") return null;
-  const value = raw.trim();
-  if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(value)) return raw;
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : raw;
-};
 
 function parseReports(text: string): PayGapReport[] {
   const rows = csvRows(text, "PayGap annotated dataset");
@@ -86,12 +56,24 @@ function parseReports(text: string): PayGapReport[] {
   });
 }
 
+type LoadedDataset = { reports: PayGapReport[]; url: string; fallback?: typeof GITHUB_SOURCE & { excluded_reports: { invalid_or_missing_year: number }; annotations_available: false } };
+
 async function loadReports(ctx: ToolContext) {
-  const result = await ctx.cache.getOrLoad<PayGapReport[]>(`GET ${DATA_URL}`, DAY, async () => {
-    const text = await ctx.http.text(DATA_URL, { label: "PayGap.ie annotated dataset", maxBytes: CSV_MAX_BYTES });
-    return parseReports(text);
+  const result = await ctx.cache.getOrLoad<LoadedDataset>(`paygap:dataset:v2:${DATA_URL}`, DAY, async () => {
+    let text: string;
+    try {
+      text = await ctx.http.text(DATA_URL, { label: "PayGap.ie annotated dataset", maxBytes: CSV_MAX_BYTES });
+    } catch (error) {
+      // Only the observed access refusal enables the publisher's public snapshot.
+      // A successful response with a bad schema must still fail validation below.
+      if (!(error instanceof ToolError) || error.httpStatus !== 403) throw error;
+      const reportsText = await ctx.http.text(GITHUB_SOURCE.source_urls[0], { label: "PayGap publisher GitHub CSV", maxBytes: CSV_MAX_BYTES });
+      const parsed = parseGithubReports(reportsText);
+      return { reports: parsed.reports, url: GITHUB_SOURCE.source_urls[0], fallback: { ...GITHUB_SOURCE, excluded_reports: parsed.excluded_reports, annotations_available: parsed.annotations_available } };
+    }
+    return { reports: parseReports(text), url: DATA_URL };
   });
-  return { reports: result.value, cached: result.cached, stale: result.stale };
+  return { ...result.value, cached: result.cached, stale: result.stale };
 }
 
 const fold = (text: string) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLocaleLowerCase("en");
@@ -103,7 +85,7 @@ const matchesIndustry = (report: PayGapReport, query: string) => {
 const searchTool = defineTool({
   name: "paygap_search_reports",
   title: "Search Irish gender pay gap reports",
-  description: "Search the combined PayGap.ie employer report dataset by company name, report year and/or NACE industry. Returns submitted report figures, source report links and source annotations. Coverage and completeness are as published by PayGap.ie; the data is not a census of all employers and does not prove discrimination or equal pay.",
+  description: "Search the combined PayGap.ie employer report dataset by company name, report year and/or NACE industry. Returns submitted report figures, source report links and source annotations when available. If the primary export refuses access, a dated publisher GitHub snapshot is used with explicit source and annotation limits. Coverage and completeness are as published by PayGap.ie; the data is not a census of all employers and does not prove discrimination or equal pay.",
   example: { company: "AIB", year: 2025, limit: 10 },
   inputSchema: {
     company: z.string().max(120).optional().describe("Case-insensitive company-name fragment."),
@@ -122,7 +104,7 @@ const searchTool = defineTool({
       (!industryQuery || matchesIndustry(report, industryQuery))
     );
     const reports = matches.slice(offset, offset + limit);
-    return envelope(paygapInfo, {
+    return envelope(loaded.fallback ? { ...paygapInfo, name: `${paygapInfo.name} — publisher snapshot`, attribution: `${paygapInfo.attribution} Snapshot: ${GITHUB_SOURCE.snapshot_published_at}; publication annotations unavailable.` } : paygapInfo, {
       data: {
         total_reports: matches.length,
         offset,
@@ -131,12 +113,13 @@ const searchTool = defineTool({
         population_coverage: "not_established",
         dataset: {
           total_reports: loaded.reports.length,
-          available_years: [...new Set(loaded.reports.map((report) => report.report_year))].sort((a, b) => b - a)
+          available_years: [...new Set(loaded.reports.map((report) => report.report_year))].sort((a, b) => b - a),
+          ...(loaded.fallback ?? {})
         },
         next_offset: offset + reports.length < matches.length ? offset + reports.length : null,
         reports
       },
-      url: DATA_URL,
+      url: loaded.url,
       cached: loaded.cached,
       stale: loaded.stale,
       truncated: offset + reports.length < matches.length
@@ -146,7 +129,7 @@ const searchTool = defineTool({
 
 export const paygapModule: SourceModule = {
   info: paygapInfo,
-  summary: "Annotated Irish gender pay gap reports from the PayGap.ie dataset.",
+  summary: "Irish employer pay-gap reports: annotated export or an explicitly dated publisher snapshot when access is refused.",
   domain: "economy",
   coverage: "Combined employer report records and publication annotations supplied by PayGap.ie. Coverage and completeness are as published; records do not establish population coverage or causation.",
   tools: [searchTool]

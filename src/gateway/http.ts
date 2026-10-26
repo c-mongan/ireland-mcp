@@ -165,7 +165,7 @@ export class HttpClient {
       const message = `${label} returned HTTP ${response.status}.`;
       const transient = TRANSIENT_STATUSES.has(response.status) || options.retryStatuses?.includes(response.status);
       if (transient) throw new TransientUpstreamError(message, { kind: "http", status: response.status });
-      throw new ToolError("UPSTREAM_DOWN", message, { hint: hintForStatus(response.status), retryable: false });
+      throw new ToolError("UPSTREAM_DOWN", message, { hint: hintForStatus(response.status), retryable: false, httpStatus: response.status });
     }
 
     const maxBytes = options.maxBytes ?? DEFAULT_MAX_BYTES;

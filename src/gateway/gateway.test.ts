@@ -227,6 +227,8 @@ describe("HttpClient", () => {
       const { fetch, calls, waits, timing } = sequence(status, 200);
       await expect(new HttpClient(fetch, undefined, timing).text("https://x.ie/", { retries: 3 })).rejects.toMatchObject({
         code: "UPSTREAM_DOWN",
+        httpStatus: status,
+        retryable: false,
         message: expect.stringContaining(`HTTP ${status}`)
       });
       expect(calls).toHaveLength(1);
