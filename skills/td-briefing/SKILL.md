@@ -8,6 +8,11 @@ license: MIT
 
 Build a neutral, sourced briefing on one member of the Dáil or Seanad.
 
+**Related projects:** [Oireachtas Explorer](https://oireachtas-explorer.ie) (David Ward),
+[Dáil Tracker](https://dailtracker.streamlit.app/member-overview) (peweet),
+[Contact Your Local TD](https://www.contactyourtd.ie/) (Unknown). Not affiliated; see
+[../_shared/inspirations.md](../_shared/inspirations.md).
+
 ## Calling the tools
 
 Steps name each operation as source/operation (e.g. `ppr/ppr_price_stats`), using the typed tool name as the operation. On the

@@ -8,6 +8,9 @@ license: MIT
 
 Snapshot of the all-island electricity system right now.
 
+**Related projects:** [Smart Grid Dashboard](https://www.smartgriddashboard.com/all/) (EirGrid Group plc).
+Not affiliated; see [../_shared/inspirations.md](../_shared/inspirations.md).
+
 ## Calling the tools
 
 Steps name each operation as source/operation (e.g. `ppr/ppr_price_stats`), using the typed tool name as the operation. On the

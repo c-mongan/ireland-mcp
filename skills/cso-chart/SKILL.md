@@ -8,6 +8,8 @@ license: MIT
 
 Turn a question into a correctly filtered CSO table and a simple chart.
 
+**Related projects:** None in the catalogue.
+
 ## Calling the tools
 
 Steps name each operation as source/operation (e.g. `ppr/ppr_price_stats`), using the typed tool name as the operation. On the

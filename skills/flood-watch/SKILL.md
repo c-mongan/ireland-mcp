@@ -8,6 +8,8 @@ license: MIT
 
 Describe what the gauges and forecasts show now. Do not issue warnings.
 
+**Related projects:** None in the catalogue.
+
 ## Calling the tools
 
 Steps name each operation as source/operation (e.g. `ppr/ppr_price_stats`), using the typed tool name as the operation. On the

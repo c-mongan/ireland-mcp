@@ -8,6 +8,9 @@ license: MIT
 
 Find and quote Irish legislation accurately.
 
+**Related projects:** [Rule.ie](https://rule.ie/) (Unknown). Not affiliated; see
+[../_shared/inspirations.md](../_shared/inspirations.md).
+
 ## Calling the tools
 
 Steps name each operation as source/operation (e.g. `ppr/ppr_price_stats`), using the typed tool name as the operation. On the

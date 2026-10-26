@@ -8,6 +8,7 @@ All notable changes to this project are documented here. The format follows
 ### Added
 - A "Website or docs feedback" issue template, so feedback about irishopendata.ie and the docs has a clear route.
 - The legal pilot now appears as a beta on the website and in the README, with a plain-English [assessment](docs/legal-beta-assessment.md) of coverage, licences and risks. `LEGAL_ENABLED` stays off by default.
+- Skills pack 0.2.0: 16 cross-dataset skills (area comparison, where-to-live shortlist, local election brief, Oireachtas tracker, lobbying watch, council budgets, public money, EU funding, pay gap, planning and heritage, transport reliability, safety stats, energy, housing supply, dereliction and vacancy, rights check), with related Irish civic-tech projects credited in `skills/_shared/inspirations.md`.
 
 ### Fixed
 - CKAN portals (data.gov.ie, Smart Dublin, CRO, NCSE) no longer cache a `success:false` response for the cache TTL; the next call retries upstream.
