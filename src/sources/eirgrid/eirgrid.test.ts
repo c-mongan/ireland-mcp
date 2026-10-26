@@ -65,6 +65,68 @@ describe("EirGrid module", () => {
     expect(fetch.calls).toHaveLength(6);
   });
 
+  it("falls back per series when only some of today's charts have readings", async () => {
+    const now = () => new Date("2026-10-26T01:09:00Z"); // 01:09 on 26 Oct in Dublin (after the clocks change)
+    const todayWind = JSON.stringify({ Rows: [{ EffectiveTime: "26-Oct-2026 01:00:00", FieldName: "WIND_ACTUAL", Region: "ALL", Value: 2189 }] });
+    const routes: Route[] = [
+      { match: /dateFrom=26-Oct-2026.*areas=windactual/, body: todayWind },
+      { match: /dateFrom=26-Oct-2026/, body: '{"Rows":[]}' },
+      ...["demandactual", "windactual", "co2intensity"].map((area) => ({ match: new RegExp(`dateFrom=25-Oct-2026.*areas=${area}`), file: f(`${area}.json`) }))
+    ];
+    const { ok, body } = await callTool(mod, "grid_get_status", { region: "ALL" }, createContext({ fetch: fakeFetch(routes), now }));
+    expect(ok).toBe(true);
+    expect(body.data).toMatchObject({ demand_mw: 5753, wind_mw: 2189, wind_time: "26-Oct-2026 01:00:00", co2_g_per_kwh: 149 });
+    // Wind share must come from one day's matching interval, never today's wind over yesterday's demand.
+    expect(body.data.wind_share_time).toBe("05-Oct-2026 16:45:00");
+    expect(body.data.note).toContain("26-Oct-2026");
+  });
+
+  it("keeps today's readings when only an unneeded part of yesterday fails", async () => {
+    const now = () => new Date("2026-10-26T01:09:00Z");
+    const routes: Route[] = [
+      ...["demandactual", "windactual"].map((area) => ({ match: new RegExp(`dateFrom=26-Oct-2026.*areas=${area}`), file: f(`${area}.json`) })),
+      { match: /dateFrom=26-Oct-2026.*areas=co2intensity/, body: '{"Rows":[]}' },
+      { match: /dateFrom=25-Oct-2026.*areas=co2intensity/, file: f("co2intensity.json") },
+      { match: /dateFrom=25-Oct-2026/, status: 500, body: "down" }
+    ];
+    const fetch = fakeFetch(routes);
+    const { ok, body } = await callTool(mod, "grid_get_status", { region: "ALL" }, createContext({ fetch, now }));
+    expect(ok).toBe(true);
+    expect(body.data).toMatchObject({ demand_mw: 5753, wind_mw: 826, co2_g_per_kwh: 149 });
+    // Only the missing CO2 series is fetched for yesterday.
+    expect(fetch.calls.filter((call) => call.url.includes("25-Oct-2026"))).toHaveLength(1);
+  });
+
+  it("returns null for a series whose fallback read fails, keeping the rest", async () => {
+    const now = () => new Date("2026-10-26T01:09:00Z");
+    const routes: Route[] = [
+      ...["demandactual", "windactual"].map((area) => ({ match: new RegExp(`dateFrom=26-Oct-2026.*areas=${area}`), file: f(`${area}.json`) })),
+      { match: /dateFrom=26-Oct-2026.*areas=co2intensity/, body: '{"Rows":[]}' },
+      { match: /dateFrom=25-Oct-2026/, status: 500, body: "down" }
+    ];
+    const { ok, body } = await callTool(mod, "grid_get_status", { region: "ALL" }, createContext({ fetch: fakeFetch(routes), now }));
+    expect(ok).toBe(true);
+    expect(body.data).toMatchObject({ demand_mw: 5753, co2_g_per_kwh: null });
+  });
+
+  it("never reports yesterday's wind share without saying so", async () => {
+    const now = () => new Date("2026-10-26T01:09:00Z");
+    // Today's demand and wind share no interval, and CO2 is empty on both days.
+    const demand = JSON.stringify({ Rows: [{ EffectiveTime: "26-Oct-2026 00:45:00", FieldName: "SYSTEM_DEMAND", Region: "ALL", Value: 4100 }] });
+    const wind = JSON.stringify({ Rows: [{ EffectiveTime: "26-Oct-2026 01:00:00", FieldName: "WIND_ACTUAL", Region: "ALL", Value: 2189 }] });
+    const routes: Route[] = [
+      { match: /dateFrom=26-Oct-2026.*areas=demandactual/, body: demand },
+      { match: /dateFrom=26-Oct-2026.*areas=windactual/, body: wind },
+      { match: /areas=co2intensity/, body: '{"Rows":[]}' },
+      ...["demandactual", "windactual"].map((area) => ({ match: new RegExp(`dateFrom=25-Oct-2026.*areas=${area}`), file: f(`${area}.json`) }))
+    ];
+    const fetch = fakeFetch(routes);
+    const { body } = await callTool(mod, "grid_get_status", { region: "ALL" }, createContext({ fetch, now }));
+    expect(body.data).toMatchObject({ demand_mw: 4100, wind_mw: 2189, wind_share_pct: null, co2_g_per_kwh: null });
+    expect(body.data.note).toBeUndefined();
+    expect(fetch.calls.filter((call) => /25-Oct-2026.*areas=(demand|wind)/.test(call.url))).toHaveLength(0);
+  });
+
   it("reports UPSTREAM_DOWN when the dashboard returns no rows", async () => {
     const empty: Route[] = [{ match: /smartgriddashboard/, body: '{"Rows":[]}' }];
     const { ok, body } = await callTool(mod, "grid_get_status", { region: "ROI" }, fakeFetch(empty));
