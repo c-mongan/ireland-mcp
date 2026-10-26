@@ -40,8 +40,12 @@ NTA checks the real summary fields: `feed_timestamp`, `trips`, `cancelled`,
 `NTA_API_KEY` is SKIP. An invalid HTTP-200 feed is a typed `UPSTREAM_DOWN` error
 and is not cached as an empty feed.
 
-Only the exact marked tool error `UPSTREAM_DOWN: Kohesio returned HTTP 403.`
-can become WARN for the known cloud-runner restriction. Wrong data, stale data,
+Only two exact marked tool errors can become WARN:
+`UPSTREAM_DOWN: Kohesio returned HTTP 403.` for the known cloud-runner
+restriction, and `RATE_LIMITED: Fáilte Ireland CSV is out of its publisher API
+quota (HTTP 403).` when Fáilte Ireland's shared Azure API Management bandwidth
+quota is used up (it answers 403 "Out of bandwidth quota" to every caller until
+it resets; see #110). Wrong data, stale data,
 other HTTP errors, and unclassified upstream errors remain FAIL. Structured
 transport failures (timeout, network failure, or transient HTTP exhaustion)
 are DEGRADED. DEGRADED is a failing result, not an outage exemption. One WARN

@@ -15,6 +15,11 @@ export interface HttpOptions {
   maxBytes?: number;
   /** Label used in error messages instead of the raw URL (keeps keys out of errors). */
   label?: string;
+  /**
+   * Read the body of an HTTP 403 to recognise an Azure API Management quota that the publisher's
+   * open-data API has used up (for example "Out of bandwidth quota"). It is reported as RATE_LIMITED.
+   */
+  detectQuota?: boolean;
 }
 
 export const DEFAULT_TIMEOUT_MS = 10_000;
@@ -110,9 +115,11 @@ export class HttpClient {
     let timer: ReturnType<typeof setTimeout>;
     const deadline = new Promise<never>((_resolve, reject) => {
       timer = setTimeout(() => {
-        // A known argument rejection stays strict even if its explanatory body stalls.
-        reject(receivedStatus !== undefined && CALLER_ERROR_STATUSES.has(receivedStatus)
-          ? rejectedArgs(label, receivedStatus) : timedOut());
+        // A known argument rejection, or a 403 whose quota body is being read, stays strict
+        // (and is not retried) even if its explanatory body stalls.
+        if (receivedStatus !== undefined && CALLER_ERROR_STATUSES.has(receivedStatus)) reject(rejectedArgs(label, receivedStatus));
+        else if (receivedStatus === 403 && options.detectQuota) reject(httpStatusError(label, 403));
+        else reject(timedOut());
         controller.abort();
       }, timeoutMs);
     });
@@ -153,6 +160,10 @@ export class HttpClient {
       const reason = await upstreamReason(response, controller, timedOut);
       throw rejectedArgs(label, response.status, reason);
     }
+    if (response.status === 403 && options.detectQuota) {
+      const quota = quotaExhausted(label, await upstreamReason(response, controller, timedOut));
+      if (quota) throw quota;
+    }
     if (!response.ok) void response.body?.cancel().catch(() => undefined);
     if (response.status === 404) throw new ToolError("NOT_FOUND", `${label} has no matching resource.`);
     if (response.status === 429) {
@@ -162,10 +173,9 @@ export class HttpClient {
       });
     }
     if (!response.ok) {
-      const message = `${label} returned HTTP ${response.status}.`;
       const transient = TRANSIENT_STATUSES.has(response.status) || options.retryStatuses?.includes(response.status);
-      if (transient) throw new TransientUpstreamError(message, { kind: "http", status: response.status });
-      throw new ToolError("UPSTREAM_DOWN", message, { hint: hintForStatus(response.status), retryable: false, httpStatus: response.status });
+      if (transient) throw new TransientUpstreamError(`${label} returned HTTP ${response.status}.`, { kind: "http", status: response.status });
+      throw httpStatusError(label, response.status);
     }
 
     const maxBytes = options.maxBytes ?? DEFAULT_MAX_BYTES;
@@ -189,6 +199,23 @@ const CALLER_ERROR_STATUSES = new Set([400, 409, 413, 414, 422]);
 function rejectedArgs(label: string, status: number, reason = ""): ToolError {
   return new ToolError("BAD_ARGS", `${label} rejected the request parameters (HTTP ${status})${reason ? `: ${reason}` : "."}`, {
     hint: "Fix the arguments (check field or column names, values and formats against the tool schema or the dataset's fields) and retry."
+  });
+}
+
+function httpStatusError(label: string, status: number): ToolError {
+  return new ToolError("UPSTREAM_DOWN", `${label} returned HTTP ${status}.`, { hint: hintForStatus(status), retryable: false, httpStatus: status });
+}
+
+/** Azure API Management's quota policy answers 403 "Out of bandwidth quota. Quota will be replenished in 10:35:01." */
+export function quotaExhausted(label: string, reason: string): ToolError | undefined {
+  if (!/\bout of (?:bandwidth|call volume) quota\b/i.test(reason)) return undefined;
+  const wait = /replenished in (?:(\d+)\.)?(\d{1,2}):(\d{2}):(\d{2})/i.exec(reason);
+  const seconds = wait ? ((Number(wait[1] ?? 0) * 24 + Number(wait[2])) * 60 + Number(wait[3])) * 60 + Number(wait[4]) : undefined;
+  const resets = seconds === undefined ? "when the publisher's quota period resets" : `in about ${Math.max(1, Math.round(seconds / 3600))} hour(s)`;
+  return new ToolError("RATE_LIMITED", `${label} is out of its publisher API quota (HTTP 403).`, {
+    hint: `The publisher's open-data API has used up its shared quota for this period, for every caller. It resets ${resets}. Retrying sooner will not help.`,
+    ...(seconds === undefined ? {} : { retryAfterSeconds: seconds }),
+    httpStatus: 403
   });
 }
 

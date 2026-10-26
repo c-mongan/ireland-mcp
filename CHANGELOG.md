@@ -12,6 +12,7 @@ All notable changes to this project are documented here. The format follows
 ### Fixed
 - `fetch` now resolves the `eurostat:` and `wikidata:` ids that `search` returns; before, it answered NOT_FOUND. The NOT_FOUND hint lists only sources that can fetch, and an empty key (`cso:`) returns BAD_ARGS.
 - EirGrid `grid_get_status`: an all-empty chart is now a transient failure. It is retried once, never cached (an earlier copy is served flagged stale when there is one), and the output `note` says when a value came from yesterday or is missing (#106).
+- Fáilte Ireland `failte_search`: when the publisher's open-data API runs out of its shared bandwidth quota (HTTP 403 "Out of bandwidth quota"), the tool now returns `RATE_LIMITED` with the reset time, or an earlier export flagged stale, instead of a generic access error. The export is cached for a day instead of an hour to use less of that quota. The nightly live smoke reports this exact error as WARN (#110).
 
 ## [1.1.4] - 2026-10-08
 

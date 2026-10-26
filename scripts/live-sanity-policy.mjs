@@ -38,7 +38,13 @@ export function assessSmokeResult(result, { source, tool, check, raw = false, ty
       return { ...failure, status: "DEGRADED", note: `${failure.note} [${transport.kind}; attempts=${transport.attempts}${transport.status ? `; HTTP=${transport.status}` : ""}${transport.timeout_ms ? `; timeout_ms=${transport.timeout_ms}` : ""}]` };
     }
     // Known outages must be actual tool errors. Successful malformed data must never become WARN.
-    return result?.isError && assessed.status === "HOSTED_BLOCKED" ? classify(failure) : failure;
+    if (result?.isError && assessed.status === "HOSTED_BLOCKED") return classify(failure);
+    // A rate limit keeps its error code in the note so only the exact known quota error can match.
+    // Routing or metadata failures keep their own note and are never tolerated.
+    if (result?.isError && routed && body?.error?.code === "RATE_LIMITED" && assessed.reason === body.error.message) {
+      return classify({ ...failure, note: errorNote });
+    }
+    return failure;
   }
   try {
     return check(raw ? body : body.data)
@@ -49,23 +55,30 @@ export function assessSmokeResult(result, { source, tool, check, raw = false, ty
   }
 }
 
-/** Sources with a specific known cloud-runner failure eligible for WARN. */
+/** Sources with a specific known upstream failure eligible for WARN. */
 export const KNOWN_FLAKY = {
-  kohesio: "Kohesio returns HTTP 403 to some cloud-hosted IPs (GitHub runners); it works from residential IPs."
+  kohesio: "Kohesio returns HTTP 403 to some cloud-hosted IPs (GitHub runners); it works from residential IPs.",
+  "failte-ireland": "Fáilte Ireland's open-data API has a shared daily bandwidth quota that other callers can use up (HTTP 403 for everyone until it resets); the server serves a cached export when it has one."
+};
+
+/** The exact normalized note each known-flaky source must produce; anything else still fails. */
+const KNOWN_FLAKY_NOTES = {
+  kohesio: "UPSTREAM_DOWN: Kohesio returned HTTP 403.",
+  "failte-ireland": "RATE_LIMITED: Fáilte Ireland CSV is out of its publisher API quota (HTTP 403)."
 };
 
 /** At most this many known-flaky warnings are tolerated before the run fails anyway. */
 export const MAX_TOLERATED_FLAKY = 1;
 
 /**
- * Downgrades only the normalized Kohesio cloud-runner HTTP 403 to WARN.
- * Other outages, timeouts and unexpected handler/schema failures still fail.
+ * Downgrades only the normalized Kohesio cloud-runner HTTP 403 and the Fáilte Ireland publisher
+ * quota error to WARN. Other outages, timeouts and unexpected handler/schema failures still fail.
  */
 export function classify(result, knownFlaky = KNOWN_FLAKY) {
   if (result.status !== "FAIL") return result;
   const reason = knownFlaky[result.source];
-  if (!reason || result.source !== "kohesio"
-    || result.note !== "UPSTREAM_DOWN: Kohesio returned HTTP 403.") return result;
+  if (!reason || !Object.hasOwn(KNOWN_FLAKY_NOTES, result.source)
+    || result.note !== KNOWN_FLAKY_NOTES[result.source]) return result;
   return { ...result, status: "WARN", note: `${result.note} Known flaky: ${reason}` };
 }
 

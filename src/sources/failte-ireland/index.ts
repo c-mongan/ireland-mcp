@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { z } from "zod";
-import { HOUR } from "../../gateway/context.js";
+import { DAY } from "../../gateway/context.js";
 import { envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule } from "../../gateway/module.js";
@@ -41,7 +41,7 @@ function records(csv: string, dataset: "accommodation" | "attractions") {
 export const failteIreland: SourceModule = {
   info: failteIrelandInfo, domain: "places/property",
   summary: "Search Fáilte Ireland accommodation and tourism activity/attraction CSV listings by name, county and category; no API key.",
-  coverage: "Published Fáilte Ireland CSV listings. Accommodation register and listed tourism businesses, not all businesses. Retrieval time is not a source update date; availability and opening hours are not supplied.",
+  coverage: "Published Fáilte Ireland CSV listings. Accommodation register and listed tourism businesses, not all businesses. Retrieval time is not a source update date; availability and opening hours are not supplied. The publisher's API has a shared bandwidth quota: when it is used up, the tool serves an earlier export flagged stale or returns RATE_LIMITED.",
   tools: [defineTool({
     name: "failte_search", title: "Search Fáilte Ireland listings",
     description: "Search public accommodation or attractions/activity CSV listings. query matches names; county is exact ignoring case/accents; category matches sector or tags. Does not provide availability, opening hours, or a complete business inventory.",
@@ -49,8 +49,10 @@ export const failteIreland: SourceModule = {
     example: {dataset:"accommodation",county:"Galway",limit:10},
     async handler(args, ctx) {
       const url = `${BASE}/${args.dataset}/csv`;
-      const r = await ctx.cache.getOrLoad(`failte-ireland:csv:v1:${args.dataset}`, HOUR, async () => {
-        const bytes = await ctx.http.bytes(url, {maxBytes: MAX_EXPORT_BYTES, label:"Fáilte Ireland CSV",headers:{accept:"text/csv"}});
+      // The publisher's API has a shared daily bandwidth quota, so the full export is cached for a day.
+      // When the quota is used up, an earlier copy is served flagged stale.
+      const r = await ctx.cache.getOrLoad(`failte-ireland:csv:v1:${args.dataset}`, DAY, async () => {
+        const bytes = await ctx.http.bytes(url, {maxBytes: MAX_EXPORT_BYTES, label:"Fáilte Ireland CSV",headers:{accept:"text/csv"},detectQuota:true});
         let csv: string;
         try { csv = new TextDecoder("utf-8", {fatal:true}).decode(bytes); } catch { return invalid(); }
         return {records: records(csv,args.dataset), sha256: createHash("sha256").update(bytes).digest("hex"), retrieved_at:ctx.now().toISOString()};
