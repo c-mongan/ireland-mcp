@@ -20,7 +20,7 @@ test("items are well formed", () => {
     assert.ok(i.required_sources.length >= 2, `${i.id} needs at least two sources`);
     if (i.tier === "T3") assert.ok(i.required_sources.length >= 3 || Object.keys(i.answer).length >= 4, `${i.id}: T3 needs 3+ sources or a multi-part analysis`);
     assert.ok(Object.keys(i.answer).length >= 2, `${i.id} answer keys`);
-    for (const s of Object.values(i.answer)) assert.ok(["number", "text", "list", "ordered_list", "bool"].includes(s.type), i.id);
+    for (const s of Object.values(i.answer)) assert.ok(["number", "text", "date", "list", "ordered_list", "bool"].includes(s.type), i.id);
     for (const g of [...i.gaps, ...Object.values(i.blocked_keys ?? {})]) assert.ok(pillarOf(g) in GAP_PILLARS, `${i.id}: unknown pillar in ${g}`);
     assert.equal(typeof i.reference, "function");
     assert.ok(i.tool_path.length >= 2, i.id);
@@ -59,6 +59,10 @@ test("checkKey applies tolerances, lists, ordering and live alternatives", () =>
   assert.ok(!checkKey({ type: "number", tol_abs: 0.05 }, 4.3, 4.4));
   assert.ok(checkKey({ type: "number" }, 1000, 1009), "default 1% tolerance");
   assert.ok(checkKey({ type: "text" }, "Dublin South-West", "Dublin South West"));
+  assert.ok(!checkKey({ type: "text" }, "Dublin South-West", "Dublin"), "a partial name is not a match");
+  assert.ok(checkKey({ type: "text" }, "Waterford City & County", "Waterford City and County Council"));
+  assert.ok(checkKey({ type: "date" }, "2024-10-17", "17 October 2024"));
+  assert.ok(!checkKey({ type: "date" }, "2024-10-17", "2024-10-18"));
   assert.ok(checkKey({ type: "list" }, ["Farrell", "Naughton"], ["Mairéad Farrell", "Hildegarde Naughton", "Noel Grealish"]));
   assert.ok(!checkKey({ type: "list", exact: true }, ["Farrell"], ["Mairéad Farrell", "Noel Grealish"]));
   assert.ok(checkKey({ type: "ordered_list", exact: true }, ["Galway", "Mayo"], ["Galway", "Mayo"]));

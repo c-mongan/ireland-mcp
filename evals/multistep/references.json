@@ -1,7 +1,7 @@
 {
   "as_of": "2026-10-26",
   "server": "stdio dist/src/cli.js",
-  "git_sha": "4ddd5b5",
+  "git_sha": "8345128",
   "items": {
     "t1-galway-pop-tds": {
       "tier": "T1",
@@ -535,7 +535,7 @@
             "limit": 20
           },
           "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/arcgis/rest/services/Counties___OSi_National_Statutory_Boundaries/FeatureServer/0/query?returnGeometry=false&f=json&where=PROVINCE%3D%27Munster%27&outFields=ENGLISH%2CPROVINCE&resultRecordCount=20",
-          "retrieved_at": "2026-10-26T13:54:12.375Z"
+          "retrieved_at": "2026-10-26T14:09:28.265Z"
         },
         {
           "source": "cso",
@@ -545,7 +545,7 @@
             "max_categories": 100
           },
           "url": "https://data.cso.ie/table/CPNI37",
-          "retrieved_at": "2026-10-26T13:54:12.417Z"
+          "retrieved_at": "2026-10-26T14:09:28.395Z"
         },
         {
           "source": "cso",
@@ -566,7 +566,7 @@
             "limit": 500
           },
           "url": "https://data.cso.ie/table/CPNI37",
-          "retrieved_at": "2026-10-26T13:54:12.493Z"
+          "retrieved_at": "2026-10-26T14:09:28.508Z"
         },
         {
           "source": "cso",
@@ -576,7 +576,7 @@
             "max_categories": 100
           },
           "url": "https://data.cso.ie/table/CPNI05",
-          "retrieved_at": "2026-10-26T13:54:12.523Z"
+          "retrieved_at": "2026-10-26T14:09:28.545Z"
         },
         {
           "source": "cso",
@@ -597,7 +597,7 @@
             "limit": 500
           },
           "url": "https://data.cso.ie/table/CPNI05",
-          "retrieved_at": "2026-10-26T13:54:12.601Z"
+          "retrieved_at": "2026-10-26T14:09:28.748Z"
         }
       ],
       "workarounds": [
@@ -1106,7 +1106,7 @@
       "retrieved": "2026-10-26",
       "expected": {
         "aib_mean_gap_pct": 17.5,
-        "sector_median_pct": 20.6,
+        "sector_median_pct": 19.06,
         "eurostat_ie_pct": 8.3,
         "eurostat_year": "2024"
       },
@@ -1120,7 +1120,7 @@
             "limit": 5
           },
           "url": "https://paygap.ie/downloads/annotated",
-          "retrieved_at": "2026-10-26T13:54:24.846Z"
+          "retrieved_at": "2026-10-26T14:09:29.951Z"
         },
         {
           "source": "paygap",
@@ -1128,11 +1128,11 @@
           "args": {
             "industry": "Financial and Insurance",
             "year": 2025,
-            "limit": 500,
+            "limit": 20,
             "offset": 0
           },
           "url": "https://paygap.ie/downloads/annotated",
-          "retrieved_at": "2026-10-26T13:54:24.854Z"
+          "retrieved_at": "2026-10-26T14:09:29.995Z"
         },
         {
           "source": "paygap",
@@ -1140,11 +1140,95 @@
           "args": {
             "industry": "Financial and Insurance",
             "year": 2025,
-            "limit": 500,
-            "offset": 500
+            "limit": 20,
+            "offset": 20
           },
           "url": "https://paygap.ie/downloads/annotated",
-          "retrieved_at": "2026-10-26T13:54:24.869Z"
+          "retrieved_at": "2026-10-26T14:09:30.003Z"
+        },
+        {
+          "source": "paygap",
+          "operation": "paygap_search_reports",
+          "args": {
+            "industry": "Financial and Insurance",
+            "year": 2025,
+            "limit": 20,
+            "offset": 40
+          },
+          "url": "https://paygap.ie/downloads/annotated",
+          "retrieved_at": "2026-10-26T14:09:30.050Z"
+        },
+        {
+          "source": "paygap",
+          "operation": "paygap_search_reports",
+          "args": {
+            "industry": "Financial and Insurance",
+            "year": 2025,
+            "limit": 20,
+            "offset": 60
+          },
+          "url": "https://paygap.ie/downloads/annotated",
+          "retrieved_at": "2026-10-26T14:09:30.061Z"
+        },
+        {
+          "source": "paygap",
+          "operation": "paygap_search_reports",
+          "args": {
+            "industry": "Financial and Insurance",
+            "year": 2025,
+            "limit": 20,
+            "offset": 80
+          },
+          "url": "https://paygap.ie/downloads/annotated",
+          "retrieved_at": "2026-10-26T14:09:30.076Z"
+        },
+        {
+          "source": "paygap",
+          "operation": "paygap_search_reports",
+          "args": {
+            "industry": "Financial and Insurance",
+            "year": 2025,
+            "limit": 20,
+            "offset": 100
+          },
+          "url": "https://paygap.ie/downloads/annotated",
+          "retrieved_at": "2026-10-26T14:09:30.094Z"
+        },
+        {
+          "source": "paygap",
+          "operation": "paygap_search_reports",
+          "args": {
+            "industry": "Financial and Insurance",
+            "year": 2025,
+            "limit": 20,
+            "offset": 120
+          },
+          "url": "https://paygap.ie/downloads/annotated",
+          "retrieved_at": "2026-10-26T14:09:30.108Z"
+        },
+        {
+          "source": "paygap",
+          "operation": "paygap_search_reports",
+          "args": {
+            "industry": "Financial and Insurance",
+            "year": 2025,
+            "limit": 20,
+            "offset": 140
+          },
+          "url": "https://paygap.ie/downloads/annotated",
+          "retrieved_at": "2026-10-26T14:09:30.118Z"
+        },
+        {
+          "source": "paygap",
+          "operation": "paygap_search_reports",
+          "args": {
+            "industry": "Financial and Insurance",
+            "year": 2025,
+            "limit": 20,
+            "offset": 160
+          },
+          "url": "https://paygap.ie/downloads/annotated",
+          "retrieved_at": "2026-10-26T14:09:30.125Z"
         },
         {
           "source": "eurostat",
@@ -1162,10 +1246,12 @@
             "since": "2018"
           },
           "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_gr_gpgr2?format=JSON&lang=EN&geo=IE&nace_r2=B-S_X_O&unit=PC&sinceTimePeriod=2018",
-          "retrieved_at": "2026-10-26T13:54:25.046Z"
+          "retrieved_at": "2026-10-26T14:09:30.442Z"
         }
       ],
-      "workarounds": []
+      "workarounds": [
+        "server-query:pagination"
+      ]
     },
     "t2-dublin-top-lea-completions": {
       "tier": "T2",

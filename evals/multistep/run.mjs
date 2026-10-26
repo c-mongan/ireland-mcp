@@ -217,7 +217,7 @@ function md(report) {
   for (const s of Object.keys(meaning)) if (by(s).length) L.push(`| ${s} | ${by(s).length} | ${meaning[s]} |`);
   L.push("");
   if (report.agent) {
-    const a = report.agent.items;
+    const a = report.agent.items.filter((x) => !x.skipped && !x.unanswerable);
     const pass = (t) => a.filter((x) => (!t || x.tier === t) && x.strict_pass).length;
     const n = (t) => a.filter((x) => !t || x.tier === t).length;
     L.push(`## Agent scores`, "");
@@ -230,6 +230,10 @@ function md(report) {
     }
     const controls = a.filter((x) => x.control);
     if (controls.length) L.push("", `Control items (no pillar needed): ${controls.filter((x) => x.strict_pass).length}/${controls.length} strict pass.`);
+    const blocked = report.agent.items.filter((x) => x.unanswerable);
+    if (blocked.length) L.push("", `Blocked items (no reference possible): the agent said the data was unavailable in ${blocked.filter((x) => x.admitted_gap).length}/${blocked.length}; any other answer is unsupported.`);
+    const skipped = report.agent.items.filter((x) => x.skipped);
+    if (skipped.length) L.push("", `Skipped (reference unavailable this run): ${skipped.map((x) => x.id).join(", ")}.`);
     L.push("");
   } else if (report.agent_skipped) {
     L.push(`## Agent scores`, "", `Skipped: ${report.agent_skipped}`, "");
@@ -241,7 +245,7 @@ function md(report) {
     const blocked = refs.filter((r) => r.gap && pillarOf(r.gap) === p).map((r) => r.id);
     const work = refs.filter((r) => r.workarounds.some((w) => pillarOf(w) === p)).map((r) => r.id);
     const declared = report.items.filter((i) => [...i.gaps, ...Object.values(i.blocked_keys ?? {})].some((g) => pillarOf(g) === p)).map((i) => i.id);
-    const agent = report.agent ? report.agent.items.filter((x) => x.attributed_gaps.some((g) => pillarOf(g) === p)).map((x) => x.id) : null;
+    const agent = report.agent ? report.agent.items.filter((x) => (x.attributed_gaps ?? []).some((g) => pillarOf(g) === p)).map((x) => x.id) : null;
     const present = report.probes[p] === undefined ? "n/a" : report.probes[p] ? "yes" : "no";
     L.push(`| ${label} | ${blocked.length} | ${work.length} | ${declared.length}${agent ? ` | ${agent.length}` : ""} | ${present} |`);
   }
@@ -262,7 +266,13 @@ function md(report) {
   L.push(`| Item | Tier | Drift | Reference | Calls | Workarounds / gap${report.agent ? " | Agent" : ""} |`, `| --- | --- | --- | --- | ---: | --- |${report.agent ? " --- |" : ""}`);
   for (const r of refs) {
     const a = report.agent?.items.find((x) => x.id === r.id);
-    const agentCell = a ? ` | ${a.strict_pass ? "pass" : a.lenient_pass ? "lenient" : "fail"} (${a.tool_calls} calls${a.attributed_gaps.length ? `; ${a.attributed_gaps.join(", ")}` : ""})` : report.agent ? " | n/a" : "";
+    let verdict = "fail";
+    if (a?.skipped) verdict = "skipped";
+    else if (a?.unanswerable) verdict = a.admitted_gap ? "blocked (admitted)" : "blocked (answered anyway)";
+    else if (a?.strict_pass) verdict = "pass";
+    else if (a?.lenient_pass) verdict = "lenient";
+    const detail = a && !a.skipped ? ` (${a.tool_calls} calls${a.attributed_gaps?.length ? `; ${a.attributed_gaps.join(", ")}` : ""})` : "";
+    const agentCell = a ? ` | ${verdict}${detail}` : report.agent ? " | n/a" : "";
     const gapCell = [r.gap ? `**${r.gap}**` : null, ...r.workarounds, r.error ? `error: ${r.error.slice(0, 120).replace(/\|/g, "/")}` : null].filter(Boolean).join("; ");
     L.push(`| ${r.id} | ${r.tier} | ${r.drift} | ${r.status} | ${r.calls.length} | ${gapCell}${agentCell} |`);
   }
@@ -310,10 +320,17 @@ async function main() {
     for (const item of selected) {
       const ref = report.references.find((r) => r.id === item.id);
       const base = { id: item.id, tier: item.tier, control: Boolean(item.control), reference_status: ref.status };
-      if (!["ok", "changed"].includes(ref.status) && opts.mode === "oracle") continue;
+      const answerable = ["ok", "changed"].includes(ref.status);
+      // A stable or slow item whose recompute hit an upstream outage is still scored against its pin.
+      const fallback = !answerable && item.drift !== "live" && ref.status !== "gap" ? pinned.items[item.id]?.expected : null;
+      if (opts.mode === "oracle" && !answerable) continue;
+      if (!answerable && !fallback && ref.status !== "gap") {
+        report.agent.items.push({ ...base, skipped: `reference ${ref.status}` });
+        continue;
+      }
       for (let rep = 0; rep < opts.repeats; rep++) {
         let run;
-        let expected = ref.expected ?? {};
+        let expected = ref.expected ?? fallback ?? {};
         if (opts.mode === "oracle") {
           run = { answer: `Oracle.\n\`\`\`ANSWER_JSON\n${JSON.stringify(ref.expected)}\n\`\`\``, calls: ref.calls.map((c) => ({ name: "ireland_call", source: c.source, operation: c.operation, isError: false, truncated: c.truncated })), hitRoundCap: false };
         } else {
@@ -328,7 +345,7 @@ async function main() {
             if (after.expected) expected = Object.fromEntries(Object.keys(item.answer).map((k) => [k, { any: [ref.expected?.[k], after.expected[k]].filter((v) => v !== undefined) }]));
           }
         }
-        if (!["ok", "changed"].includes(ref.status) && !Object.keys(expected).length) {
+        if (ref.status === "gap") {
           const symptoms = failureSymptoms({ calls: run.calls, answer: run.answer, hitRoundCap: run.hitRoundCap });
           report.agent.items.push({ ...base, rep, strict_pass: false, lenient_pass: false, key_fraction: 0, tool_calls: run.calls.length, sources_cited_in_trace: false, unanswerable: true, admitted_gap: symptoms.includes("declared-unavailable"), symptoms, attributed_gaps: ref.gap ? [ref.gap] : ["unattributed"] });
           continue;

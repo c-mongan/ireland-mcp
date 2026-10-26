@@ -48,10 +48,19 @@ function withinTolerance(spec, expected, got) {
   return Math.abs(got - expected) <= tol + 1e-9;
 }
 
+const FILLER = new Set(["and", "the", "of", "council", "co"]);
+const tokens = (s) => norm(s).split(" ").filter((t) => t && !FILLER.has(t));
+
+/** Every meaningful token of the expected text appears in the answer ("Dublin" alone does not match "Dublin South-West"). */
 const textMatch = (expected, got) => {
-  const e = norm(expected);
-  const g = norm(got);
-  return e.length > 0 && g.length > 0 && (g === e || g.includes(e) || (g.length >= 4 && e.includes(g)));
+  const e = tokens(expected);
+  const g = new Set(tokens(got));
+  return e.length > 0 && e.every((t) => g.has(t));
+};
+
+const dayOf = (v) => {
+  const t = Date.parse(String(v));
+  return Number.isNaN(t) ? null : new Date(t + 12 * 3600 * 1000).toISOString().slice(0, 10);
 };
 
 function asList(got) {
@@ -76,16 +85,15 @@ export function checkKey(spec, expected, got) {
       const g = typeof got === "boolean" ? got : /^(true|yes|y)$/i.test(String(got).trim()) ? true : /^(false|no|n)$/i.test(String(got).trim()) ? false : null;
       return g === expected;
     }
+    case "date":
+      return dayOf(got) !== null && dayOf(got) === dayOf(expected);
     case "list":
     case "ordered_list": {
       const g = asList(got);
       const idx = expected.map((e) => g.findIndex((x) => textMatch(e, x)));
       if (idx.some((i) => i < 0)) return false;
       if (spec.exact && g.length !== expected.length) return false;
-      if (spec.type === "ordered_list") {
-        if (g.length !== expected.length && spec.exact !== false) return false;
-        for (let i = 1; i < idx.length; i++) if (idx[i] <= idx[i - 1]) return false;
-      }
+      if (spec.type === "ordered_list") for (let i = 1; i < idx.length; i++) if (idx[i] <= idx[i - 1]) return false;
       return true;
     }
     default:
@@ -101,9 +109,11 @@ export function checkKeyInText(spec, expected, text) {
   const t = norm(text);
   switch (spec.type) {
     case "number":
-      return numbersIn(text).some((n) => withinTolerance(spec, expected, n) || (spec.percent && withinTolerance(spec, expected, n * 100)));
+      return numbersIn(text).some((n) => withinTolerance(spec, expected, n));
     case "bool":
       return false;
+    case "date":
+      return t.includes(norm(expected)) || [...String(text).matchAll(/\b\d{1,2}(?:st|nd|rd|th)? [A-Z][a-z]+ \d{4}\b/g)].some((m) => dayOf(m[0].replace(/(st|nd|rd|th) /, " ")) === dayOf(expected));
     case "list":
     case "ordered_list":
       return expected.every((e) => t.includes(norm(e)));

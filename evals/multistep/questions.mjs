@@ -126,7 +126,7 @@ export const items = [
     tool_path: ["legislation_list_acts(2024, planning)", "legislation_get_act", "oireachtas_search_bills(Planning and Development, 2023)"],
     answer: {
       act_number: { type: "number", tol_abs: 0, desc: "Act number in 2024" },
-      enacted: { type: "text", desc: "YYYY-MM-DD" },
+      enacted: { type: "date", desc: "YYYY-MM-DD" },
       bill: { type: "text", desc: "bill number as YYYY/N" }
     },
     gaps: [],
@@ -552,13 +552,18 @@ export const items = [
       const aib = await ctx.call("paygap", "paygap_search_reports", { company: "AIB", year: 2025, limit: 5 });
       const a = aib.reports.find((r) => r.company_name === "AIB");
       const gaps = [];
-      for (let offset = 0; offset < 5000; offset += 500) {
-        const page = await ctx.call("paygap", "paygap_search_reports", { industry: "Financial and Insurance", year: 2025, limit: 500, offset }, { allowTruncated: true });
+      // Follow next_offset: the server trims each page to its token budget.
+      let seen = 0;
+      let total = null;
+      for (let offset = 0, guard = 0; offset != null && guard < 100; guard++) {
+        const page = await ctx.call("paygap", "paygap_search_reports", { industry: "Financial and Insurance", year: 2025, limit: 20, offset }, { allowTruncated: true });
+        total = page.total_reports;
+        seen += page.reports.length;
         for (const r of page.reports) if (typeof r.metrics?.mean_hourly_gap === "number") gaps.push(r.metrics.mean_hourly_gap);
-        if (page.truncated || page.reports.length === 500) ctx.workaround("server-query:pagination");
-        if (!page.next_offset) break;
+        offset = page.next_offset;
       }
-      if (gaps.length < 20) throw new Error(`only ${gaps.length} sector reports`);
+      ctx.workaround("server-query:pagination");
+      if (seen !== total) throw new Error(`paged ${seen} of ${total} sector reports`);
       gaps.sort((x, y) => x - y);
       const mid = gaps.length / 2;
       const median = gaps.length % 2 ? gaps[Math.floor(mid)] : (gaps[mid - 1] + gaps[mid]) / 2;
@@ -710,8 +715,8 @@ export const items = [
     tier: "T2",
     drift: "stable",
     question: "For the point at the Spire on O'Connell Street, Dublin (53.3498, -6.2603): which CSO electoral division is it in, what is that ED's 2022 Pobal HP relative deprivation score and category, and what is the Census 2022 population of the small area containing the point?",
-    required_sources: ["geohive", "pobal", "census-areas"],
-    tool_path: ["geohive_boundaries_at_point", "pobal_deprivation_search(ED name)", "census_small_area_at"],
+    required_sources: ["census-areas", "pobal"],
+    tool_path: ["census_small_area_at (or geohive_boundaries_at_point)", "pobal_deprivation_search(ED code)"],
     answer: {
       electoral_division: { type: "text" },
       relative_score: { type: "number", tol_abs: 0.01 },
@@ -1087,7 +1092,7 @@ export const items = [
     tool_path: ["legislation_list_acts(2019, Data Sharing)", "legislation_get_act", "legislation_get_section(2)", "legislation_list_acts(2019) total", "datagov_search_datasets(data sharing)"],
     answer: {
       act_number: { type: "number", tol_abs: 0 },
-      enacted: { type: "text" },
+      enacted: { type: "date", desc: "YYYY-MM-DD" },
       defines_public_body: { type: "bool" },
       acts_2019_total: { type: "number", tol_abs: 0 },
       datagov_matches: { type: "number", tol_rel: 0.1, tol_abs: 2 }
