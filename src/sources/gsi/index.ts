@@ -4,6 +4,7 @@ import { defineTool, type SourceModule } from "../../gateway/module.js";
 import { DAY } from "../../gateway/context.js";
 import { assertInIreland } from "../geohive/index.js";
 import { ToolError } from "../../gateway/errors.js";
+import { gsiCard } from "./card.js";
 
 const LAYER = "https://gsi.geodata.gov.ie/server/rest/services/Groundwater/IE_GSI_Groundwater_Vulnerability_40K_IE26_ITM/MapServer/0";
 const responseSchema = z.object({
@@ -26,7 +27,7 @@ export const gsiInfo: SourceInfo = {
 export const gsiModule: SourceModule = {
   info: gsiInfo,
   summary: "Groundwater vulnerability map categories at a WGS84 point.",
-  domain: "environment",
+  domain: "environment", card: gsiCard,
   coverage: "Republic of Ireland groundwater vulnerability polygons at map scale 1:40000. Dataset revision is unknown.",
   tools: [defineTool({
     name: "groundwater_vulnerability_at",

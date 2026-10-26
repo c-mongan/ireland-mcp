@@ -1,4 +1,5 @@
 import { createCkanModule } from "../ckan/factory.js";
+import { croCard } from "./card.js";
 
 export const croModule = createCkanModule({
   info: {
@@ -12,7 +13,7 @@ export const croModule = createCkanModule({
   portal: "CRO open data",
   site: "https://opendata.cro.ie",
   summary: "Irish companies register open data: company records and financial-statement datasets.",
-  domain: "economy",
+  domain: "economy", card: croCard,
   examples: { query: "'company register' or 'financial statements'", organization: "companies", dataset: "companies" },
   coverage: "CRO CKAN catalogue and queryable datastore resources for company and financial-statement records."
 });

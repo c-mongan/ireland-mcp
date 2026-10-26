@@ -3,6 +3,7 @@ import { MINUTE } from "../../gateway/context.js";
 import { bound, envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { bikesCard } from "./card.js";
 
 export const bikesInfo: SourceInfo = {
   id: "bikes",
@@ -148,7 +149,7 @@ const stationsTool = defineTool({
 export const bikesModule: SourceModule = {
   info: bikesInfo,
   summary: "Transport: Irish bike-share networks and nearby station availability from CityBikes/GBFS.",
-  domain: "transport",
+  domain: "transport", card: bikesCard,
   coverage: "Irish CityBikes networks: Dublin Bikes and TFI Bikes in Cork, Galway, Limerick and Waterford where feeds are available.",
   tools: [networksTool, stationsTool]
 };

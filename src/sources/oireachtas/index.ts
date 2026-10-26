@@ -4,6 +4,7 @@ import { bound, envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envel
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
 import { actUri } from "../legislation/index.js";
+import { oireachtasCard } from "./card.js";
 
 export const oireachtasInfo: SourceInfo = {
   id: "oireachtas",
@@ -471,7 +472,7 @@ async function fetchById(key: string, ctx: ToolContext) {
 export const oireachtasModule: SourceModule = {
   info: oireachtasInfo,
   summary: "Parliament: TDs and Senators, bills and their stages (linked to the enacted Act), debates, parliamentary questions and votes.",
-  domain: "law/politics",
+  domain: "law/politics", card: oireachtasCard,
   coverage: "Houses of the Oireachtas: members, bills, debates, parliamentary questions and divisions from the Oireachtas Open Data API.",
   tools: [membersTool, billsTool, billTool, debatesTool, questionsTool, votesTool],
   search,

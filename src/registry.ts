@@ -1,5 +1,6 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { SourceModule, ToolContext } from "./gateway/module.js";
+import { crossCard } from "./cross/card.js";
 import { crossInfo, crossSourceTools } from "./cross/index.js";
 import { buildServer } from "./gateway/server.js";
 import type { TelemetrySink } from "./gateway/telemetry.js";
@@ -98,6 +99,7 @@ export function appModules(modules: SourceModule[] = sourceModules): { modules: 
     info: crossInfo,
     summary: "Combined lookups: what is at a point (nearby), a one-call place snapshot, and the source list.",
     domain: "places/property",
+    card: crossCard,
     coverage: "Combines GeoHive boundaries, Met Éireann forecasts and warnings and CSO census population for any point or major place in Ireland.",
     tools: cross.filter((t) => !t.raw)
   };

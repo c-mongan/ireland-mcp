@@ -3,6 +3,7 @@ import { envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js"
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
 import { assertInIreland } from "../geohive/index.js";
 import { ARCGIS_LAYERS, queryLayer } from "../arcgis/client.js";
+import { environmentSitesCard } from "./card.js";
 
 export const environmentSitesInfo: SourceInfo = {
   id: "environment-sites",
@@ -101,7 +102,7 @@ const nearTool = defineTool({
 export const environmentSitesModule: SourceModule = {
   info: environmentSitesInfo,
   summary: "NPWS SPA, SAC, NHA and proposed NHA sites at or near a point.",
-  domain: "environment",
+  domain: "environment", card: environmentSitesCard,
   coverage: "Republic of Ireland designated protected sites from NPWS ArcGIS FeatureServer.",
   tools: [atTool, nearTool]
 };

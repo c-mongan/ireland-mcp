@@ -5,6 +5,7 @@ import { envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type FetchedDocument, type SearchHit, type SourceModule, type ToolContext } from "../../gateway/module.js";
 import { DIRECTORY_REPO, LISTING_LABEL, VERIFICATION, directorySnapshot, type DirectoryProject, type DirectorySnapshot } from "./parse.js";
+import { civicDirectoryCard } from "./card.js";
 
 export const civicDirectoryInfo: SourceInfo = {
   id: "civic-directory", name: "Éire Civic Tech Directory (CitizenData.ie)",
@@ -110,7 +111,7 @@ function getProject(slug: string): DirectoryProject {
 export const civicDirectoryModule: SourceModule = {
   info: civicDirectoryInfo,
   summary: "Discovery index of Irish civic-tech projects from the MIT-licensed Éire Civic Tech Directory behind CitizenData.ie; links to each project and its CitizenData.ie listing.",
-  domain: "law/politics",
+  domain: "law/politics", card: civicDirectoryCard,
   coverage: "All directory entries at one pinned commit, with per-entry SHA-256. Status, owners and links are as listed, unverified. citizendata.ie is never fetched. Also published as JSON at https://irishopendata.ie/data/civic-directory.json.",
   tools: [searchTool],
   async search(query: string, limit: number, _ctx: ToolContext): Promise<SearchHit[]> {

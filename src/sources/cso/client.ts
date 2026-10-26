@@ -16,10 +16,10 @@ export function metadataUrl(code: string): string {
   return `${CSO_REST}/PxStat.Data.Cube_API.ReadMetadata/${encodeURIComponent(code)}/en`;
 }
 
-/** CSO table codes are short upper-case alphanumerics with at least one letter and one digit. */
+/** CSO table codes are upper-case alphanumerics with at least one letter and one digit, e.g. F1001 or SAP2022T1T1CTY. */
 export function normaliseTableCode(input: string): string {
   const code = input.trim().toUpperCase().match(/^([A-Z0-9]+)/)?.[1] ?? "";
-  if (!code || code.length > 12 || !/[A-Z]/.test(code) || !/\d/.test(code)) {
+  if (!code || code.length > 20 || !/[A-Z]/.test(code) || !/\d/.test(code)) {
     throw new ToolError("BAD_ARGS", `"${input}" is not a CSO table code.`, {
       hint: "Table codes look like F1001 or HPM09. Use cso_search_tables to find one."
     });

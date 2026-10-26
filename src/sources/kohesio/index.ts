@@ -4,6 +4,7 @@ import { envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js"
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type FetchedDocument, type SearchHit, type SourceModule, type ToolContext } from "../../gateway/module.js";
 import { DATA_PAGE, type Snapshot } from "./export.js";
+import { kohesioCard } from "./card.js";
 
 export const kohesioInfo: SourceInfo = {
   id: "kohesio", name: "Kohesio EU-funded projects",
@@ -84,7 +85,7 @@ const getTool = defineTool({
 export const kohesioModule: SourceModule = {
   info: kohesioInfo,
   summary: "EU cohesion-funded Irish projects from dated official European Commission Kohesio CSV exports; not live data.",
-  domain: "economy",
+  domain: "economy", card: kohesioCard,
   coverage: "Packaged Irish country exports for 2014–2020 and 2021–2027. Snapshot dates and download attribution returned with results; excludes separate Interreg exports.",
   tools: [searchTool, getTool],
   async search(query: string, limit: number, _ctx: ToolContext): Promise<SearchHit[]> {

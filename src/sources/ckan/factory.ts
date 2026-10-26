@@ -2,6 +2,7 @@ import { z } from "zod";
 import { HOUR } from "../../gateway/context.js";
 import { bound, envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
+import type { SourceCard } from "../../gateway/cards.js";
 import { defineTool, type Domain, type SourceModule, type ToolContext } from "../../gateway/module.js";
 
 /** Minimal CKAN 2.x action API client shared by data.gov.ie and Smart Dublin. */
@@ -16,6 +17,7 @@ export interface CkanConfig {
   summary: string;
   domain: Domain;
   coverage: string;
+  card?: SourceCard;
   ttlMs?: number;
   /** Portal-specific examples for tool descriptions; defaults suit data.gov.ie. */
   examples?: { query: string; organization: string; dataset: string };
@@ -203,6 +205,7 @@ export function createCkanModule(config: CkanConfig): SourceModule {
     summary: config.summary,
     domain: config.domain,
     coverage: config.coverage,
+    ...(config.card ? { card: config.card } : {}),
     tools: [searchTool, getTool, datastoreTool],
     async search(query, max, ctx) {
       const result = await packageSearch(ctx, { q: query, rows: String(max) });

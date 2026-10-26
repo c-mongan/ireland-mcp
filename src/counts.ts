@@ -20,6 +20,7 @@ export interface Counts {
   default_tools: number;
   all_tools: number;
   prompts: number;
+  dataset_cards: number;
 }
 
 export function computeCounts(): Counts {
@@ -35,7 +36,8 @@ export function computeCounts(): Counts {
     cross_operations: ops.length - sourceOps,
     default_tools: META_TOOLS + extraTools.length + ops.filter((t) => t.pinned).length,
     all_tools: META_TOOLS + extraTools.length + ops.length,
-    prompts: PROMPTS.length
+    prompts: PROMPTS.length,
+    dataset_cards: sourceModules.filter((m) => m.card).length
   };
 }
 
@@ -55,6 +57,7 @@ export function renderCounts(c: Counts): string {
     `| Default tools | ${c.default_tools} | What \`tools/list\` returns: ${META_TOOLS} meta tools plus \`search\`, \`fetch\` and \`nearby\`. |`,
     `| Tools with \`?toolsets=all\` | ${c.all_tools} | Every operation as a typed tool, plus the ${META_TOOLS} meta tools, \`search\` and \`fetch\`. |`,
     `| Prompts | ${c.prompts} | ${PROMPTS.map((p) => `\`${p}\``).join(", ")}. |`,
+    `| Dataset cards | ${c.dataset_cards} of ${c.sources} | Sources with a card (topics, geography levels, time coverage, join keys) that \`ireland_catalogue\` filters on. See [dataset cards](docs/dataset-cards.md). |`,
     COUNTS_END
   ].join("\n");
 }

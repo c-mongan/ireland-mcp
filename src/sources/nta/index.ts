@@ -3,6 +3,7 @@ import { MINUTE } from "../../gateway/context.js";
 import { bound, DEFAULT_LIMIT, envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { ntaCard } from "./card.js";
 
 export const ntaInfo: SourceInfo = {
   id: "nta",
@@ -209,7 +210,7 @@ const tripsTool = defineTool({
 export const ntaModule: SourceModule = {
   info: ntaInfo,
   summary: "Live public transport: GTFS-Realtime cancellations and delays (needs a server-side NTA key).",
-  domain: "transport",
+  domain: "transport", card: ntaCard,
   coverage: "GTFS-Realtime trip updates for Dublin Bus, Bus Éireann, Go-Ahead and other NTA-licensed services; needs a server-side key.",
   tools: [summaryTool, tripsTool]
 };

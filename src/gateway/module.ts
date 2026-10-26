@@ -1,5 +1,6 @@
 import type { z } from "zod";
 import type { TieredCache, CacheResult } from "./cache.js";
+import type { SourceCard } from "./cards.js";
 import type { Envelope, SourceInfo } from "./envelope.js";
 import type { HttpClient, HttpOptions } from "./http.js";
 
@@ -79,6 +80,11 @@ export interface SourceModule {
   domain?: Domain;
   /** What the source covers (time span, geography, freshness). Shown in the ireland://sources/{id} resource. */
   coverage?: string;
+  /**
+   * Dataset card: topics, geography levels, time coverage, cadence, dimensions, join keys, freshness, auth and
+   * example questions, with optional per-operation overrides. Every registered module must have one (cards.test.ts).
+   */
+  card?: SourceCard;
   /** Each tool is also an ireland_call operation of this source, keyed by its tool name. */
   tools: AnyTool[];
   /** Participates in the cross-source `search` tool. */

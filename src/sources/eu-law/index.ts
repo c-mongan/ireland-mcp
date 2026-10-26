@@ -3,6 +3,7 @@ import { DAY } from "../../gateway/context.js";
 import { envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { euLawCard } from "./card.js";
 
 // Licence: the data.europa.eu record for the Cellar SPARQL endpoint (dataset
 // "sparql-cellar-of-the-publications-office", checked 26 Oct 2026) lists every distribution under
@@ -173,6 +174,7 @@ export const euLawModule: SourceModule = {
   info: euLawInfo,
   summary: "EU law metadata from the Publications Office (Cellar): title, type, dates, in-force flag, ELI and CELEX.",
   domain: "law/politics",
+  card: euLawCard,
   coverage: "EU legal acts indexed in the Publications Office Cellar, looked up one at a time by CELEX number or ELI.",
   tools: [lookupTool]
 };

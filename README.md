@@ -128,6 +128,7 @@ Portable Copilot / MCP JSON:
 | Default tools | 7 | What `tools/list` returns: 4 meta tools plus `search`, `fetch` and `nearby`. |
 | Tools with `?toolsets=all` | 98 | Every operation as a typed tool, plus the 4 meta tools, `search` and `fetch`. |
 | Prompts | 3 | `area_profile`, `commute_check`, `compare_counties`. |
+| Dataset cards | 39 of 39 | Sources with a card (topics, geography levels, time coverage, join keys) that `ireland_catalogue` filters on. See [dataset cards](docs/dataset-cards.md). |
 <!-- counts:end -->
 
 Last full run of every operation then in the catalogue against the hosted endpoint: <!-- live-ops:start -->[docs/live-all-ops.md](docs/live-all-ops.md) (2026-10-26): 78 of 82 pass, 1 fail; 3 need an operator key (NTA, Logainm).<!-- live-ops:end -->
@@ -138,6 +139,8 @@ The default profile covers statistics (CSO, Eurostat, ECB, World Bank), the Oire
 <summary><strong>All 39 sources, publishers and licences</strong></summary>
 
 The default profile registers 39 source modules in `src/registry.ts`. The default `nearby`, `search` and `fetch` shortcuts sit above these sources. The optional pilot rows require `LEGAL_ENABLED=true` and an ingested corpus; check `ireland_catalogue` for the modules available on an endpoint. See [new provider access and limits](docs/public-source-additions.md).
+
+Every source has a [dataset card](docs/dataset-cards.md): topics, geography levels, time coverage, update cadence, join keys and licence. Ask `ireland_catalogue` for, say, `{"geo_level": "lea", "topic": "housing"}` to list only the operations with that data, and `ireland_describe` with a source for its full card.
 
 | Domain | Source id | Publisher / source | Operations | Licence |
 | --- | --- | --- | ---: | --- |

@@ -3,6 +3,7 @@ import { HOUR } from "../../gateway/context.js";
 import { envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type FetchedDocument, type SearchHit, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { tedCard } from "./card.js";
 
 export const tedInfo: SourceInfo = {
   id: "ted",
@@ -171,7 +172,7 @@ const getTool = defineTool({
 export const tedModule: SourceModule = {
   info: tedInfo,
   summary: "Procurement: Irish-buyer EU TED tender notices, values, deadlines and notice links.",
-  domain: "economy",
+  domain: "economy", card: tedCard,
   coverage: "Published EU TED notices where buyer-country is Ireland (IRL); search endpoint is keyless.",
   tools: [searchTool, getTool],
   search: async (query, limit, ctx): Promise<SearchHit[]> => {

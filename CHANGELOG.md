@@ -6,6 +6,9 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- Dataset cards for every source (`src/sources/<id>/card.ts`): topics, geography levels, time coverage, update cadence, key dimensions, join keys, freshness, operator-key needs and example questions, with per-operation overrides and unverified fields marked `unknown` with a reason. `ireland_catalogue` takes optional `topic`, `geo_level`, `join_key`, `has_time_series` and `text` filters and then returns only matching operations with compact cards; with no filter its output is unchanged. `ireland_describe` with only `source` returns the full card, and with an operation it adds the operation's card. See [docs/dataset-cards.md](docs/dataset-cards.md).
+- `cso_search_tables` ranks tables by geography level when the query names one ("completions LEA", "population council") or `geo_level` is passed, and lists each table's `geo_levels`. Cross-source `search` uses the same ranking. Without a level the CSO's order is kept.
+- `node evals/multistep/discovery.mjs` (`npm run eval:discovery`) measures how well search and the filtered catalogue surface the tables and operations the dataset-card benchmark items need.
 - A "Website or docs feedback" issue template, so feedback about irishopendata.ie and the docs has a clear route.
 - The legal pilot now appears as a beta on the website and in the README, with a plain-English [assessment](docs/legal-beta-assessment.md) of coverage, licences and risks. `LEGAL_ENABLED` stays off by default.
 - Skills pack 0.2.0: 16 cross-dataset skills (area comparison, where-to-live shortlist, local election brief, Oireachtas tracker, lobbying watch, council budgets, public money, EU funding, pay gap, planning and heritage, transport reliability, safety stats, energy, housing supply, dereliction and vacancy, rights check), with related Irish civic-tech projects credited in `skills/_shared/inspirations.md`.
@@ -21,6 +24,7 @@ All notable changes to this project are documented here. The format follows
 - README opens in plain English: what you can ask, a 30-second setup, how to check an answer and a **Beta features** section near the top. Developer detail sits lower.
 
 ### Fixed
+- `cso_get_table_metadata` and `cso_get_data` accept CSO table codes longer than 12 characters, such as the Census small-area tables `SAP2022T1T1CTY`, which `cso_search_tables` returns.
 - CKAN portals (data.gov.ie, Smart Dublin, CRO, NCSE) no longer cache a `success:false` response for the cache TTL; the next call retries upstream.
 - `fetch` now resolves the `eurostat:` and `wikidata:` ids that `search` returns; before, it answered NOT_FOUND. The NOT_FOUND hint lists only sources that can fetch, and an empty key (`cso:`) returns BAD_ARGS.
 - EirGrid `grid_get_status`: an all-empty chart is now a transient failure. It is retried once, never cached (an earlier copy is served flagged stale when there is one), and the output `note` says when a value came from yesterday or is missing (#106).

@@ -3,6 +3,7 @@ import { HOUR } from "../../gateway/context.js";
 import { envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { lobbyingCard } from "./card.js";
 
 const SEARCH_URL = "https://api.lobbying.ie/api/Search";
 const LOBBYING_URL = "https://www.lobbying.ie";
@@ -221,7 +222,7 @@ export function createLobbyingModule(): SourceModule {
   return {
     info: lobbyingInfo,
     summary: "Public lobbying returns filed with the Standards in Public Office Commission, searchable by matter, date, official and lobbyist.",
-    domain: "law/politics",
+    domain: "law/politics", card: lobbyingCard,
     coverage: "Published returns in the Register of Lobbying on Lobbying.ie. Search results are paged; a full register export is not implied.",
     tools: [searchTool]
   };

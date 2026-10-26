@@ -1,4 +1,5 @@
 import { createCkanModule } from "../ckan/factory.js";
+import { ncseCard } from "./card.js";
 
 /** Discover each year's resources from CKAN; UUIDs and column names can change. */
 export const ncseModule = createCkanModule({
@@ -13,7 +14,7 @@ export const ncseModule = createCkanModule({
   portal: "NCSE open data",
   site: "https://opendata.ncse.ie",
   summary: "School allocations by academic year: special-education teaching (SET), special classes and special needs assistants (SNA). Allocations do not establish vacancies, capacity or school quality.",
-  domain: "stats",
+  domain: "stats", card: ncseCard,
   examples: { query: "'school allocations' or 'special classes'", organization: "resource-allocation", dataset: "2026-2027-school-allocations" },
   coverage: "NCSE published school allocation datasets. Discover the academic year and its active datastore resources before querying; resource IDs and year-specific field names may change."
 });

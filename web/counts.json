@@ -10,5 +10,6 @@
   "cross_operations": 3,
   "default_tools": 7,
   "all_tools": 98,
-  "prompts": 3
+  "prompts": 3,
+  "dataset_cards": 39
 }

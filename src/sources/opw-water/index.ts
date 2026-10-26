@@ -3,6 +3,7 @@ import { MINUTE } from "../../gateway/context.js";
 import { bound, envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { opwWaterCard } from "./card.js";
 
 export const opwWaterInfo: SourceInfo = {
   id: "opw-water",
@@ -139,7 +140,7 @@ const levelTool = defineTool({
 export const opwWaterModule: SourceModule = {
   info: opwWaterInfo,
   summary: "Rivers: live water levels and temperatures from ~460 OPW gauging stations (waterlevel.ie).",
-  domain: "environment",
+  domain: "environment", card: opwWaterCard,
   coverage: "About 460 OPW hydrometric stations on waterlevel.ie: latest level and temperature plus the last day of readings.",
   tools: [findTool, levelTool]
 };
