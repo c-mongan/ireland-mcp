@@ -1,5 +1,19 @@
 import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import {
+  cardMatches,
+  compactCard,
+  GEO_LEVELS,
+  hasFilter,
+  JOIN_KEYS,
+  normaliseGeoLevel,
+  normaliseJoinKey,
+  normaliseTopic,
+  operationCard,
+  textWords,
+  TOPICS,
+  type CardFilter
+} from "./cards.js";
 import { exampleArgs, listOperations, operationSchema, shortDescription, type Operation } from "./catalogue.js";
 import { applyBudget, DEFAULT_MAX_TOKENS, MAX_MAX_TOKENS } from "./envelope.js";
 import { ToolError, toToolError } from "./errors.js";
@@ -15,7 +29,7 @@ export const REPO_URL = "https://github.com/c-mongan/ireland-mcp";
 export const INSTRUCTIONS = [
   "Read-only Irish public data (CSO, Oireachtas, Met Éireann, transport, property, energy and more).",
   "Workflow: ireland_call's description indexes every source and operation; when one fits, call ireland_call with {source, operation, args} directly (bad args return the schema and an example).",
-  "Otherwise use ireland_catalogue to browse, and ireland_describe for an operation's argument schema.",
+  "Otherwise use ireland_catalogue to find datasets (filter by topic, geo_level, join_key, has_time_series or text; each result has a compact dataset card), and ireland_describe for the full card and an operation's argument schema.",
   "search/fetch is keyword discovery (CSO tables, bills, acts, datasets, tenders). nearby covers boundaries, small area code, forecast, monuments and protected sites at a lat/lon only.",
   "Use ireland_call for live readings (weather observations, river levels, buoys, bikes), populations (cso_area_profile, census_small_area_at) and place names (geohive_locate).",
   "Cite `source`, `url`, `licence` and `attribution` from each result.",
@@ -162,27 +176,89 @@ function registerTyped(server: McpServer, tool: AnyTool, source: string, context
   );
 }
 
-function catalogueOf(modules: SourceModule[], domain?: string) {
+export interface CatalogueArgs {
+  domain?: string;
+  topic?: string;
+  geo_level?: string;
+  has_time_series?: boolean;
+  join_key?: string;
+  text?: string;
+}
+
+function parseFilter(args: CatalogueArgs): CardFilter {
+  const pick = <T>(value: string | undefined, normalise: (v: string) => T | undefined, field: string, valid: readonly string[]): T | undefined => {
+    if (value === undefined || value.trim() === "") return undefined;
+    const found = normalise(value);
+    if (!found) throw new ToolError("BAD_ARGS", `Unknown ${field} "${value}".`, { hint: `Valid ${field} values: ${valid.join(", ")}.` });
+    return found;
+  };
+  const topic = pick(args.topic, normaliseTopic, "topic", TOPICS);
+  const geoLevel = pick(args.geo_level, normaliseGeoLevel, "geo_level", GEO_LEVELS);
+  const joinKey = pick(args.join_key, normaliseJoinKey, "join_key", JOIN_KEYS);
+  const words = args.text ? textWords(args.text) : [];
   return {
-    domains: DOMAINS.filter((d) => !domain || d === domain)
-      .map((d) => ({
-        domain: d,
-        sources: modules
-          .filter((m) => m.domain === d)
-          .map((m) => ({ id: m.info.id, name: m.info.name, summary: m.summary, operations: m.tools.map((t) => t.name) }))
-      }))
-      .filter((d) => d.sources.length > 0),
-    next: "ireland_describe(source, operation) for arguments, then ireland_call."
+    ...(topic ? { topic } : {}),
+    ...(geoLevel ? { geo_level: geoLevel } : {}),
+    ...(joinKey ? { join_key: joinKey } : {}),
+    ...(args.has_time_series !== undefined ? { has_time_series: args.has_time_series } : {}),
+    ...(words.length ? { words } : {})
+  };
+}
+
+/** Free text an operation is searched by, besides its card. */
+function operationText(module: SourceModule, tool: AnyTool): string {
+  return [module.info.id, module.info.name, module.summary, module.coverage ?? "", tool.name, tool.title, shortDescription(tool.description, 400)].join(" ");
+}
+
+export function catalogueOf(modules: SourceModule[], args: CatalogueArgs = {}) {
+  const filter = parseFilter(args);
+  const filtering = hasFilter(filter);
+  const sourceEntry = (m: SourceModule) => {
+    const tools = filtering
+      ? m.tools.filter((t) => m.card && cardMatches(operationCard(m.card, t.name), filter, operationText(m, t)))
+      : m.tools;
+    if (tools.length === 0) return undefined;
+    return {
+      id: m.info.id,
+      name: m.info.name,
+      summary: m.summary,
+      operations: tools.map((t) => t.name),
+      ...(filtering && m.card ? { card: compactCard(m.card) } : {})
+    };
+  };
+  const domains = DOMAINS.filter((d) => !args.domain || d === args.domain)
+    .map((d) => ({
+      domain: d,
+      sources: modules
+        .filter((m) => m.domain === d)
+        .map(sourceEntry)
+        .filter((s) => s !== undefined)
+    }))
+    .filter((d) => d.sources.length > 0);
+  if (!filtering) {
+    return { domains, next: "ireland_describe(source, operation) for arguments, then ireland_call. Filter with topic, geo_level, join_key, has_time_series or text to get dataset cards." };
+  }
+  const count = domains.reduce((n, d) => n + d.sources.length, 0);
+  return {
+    filters: {
+      ...(args.domain ? { domain: args.domain } : {}),
+      ...(filter.topic ? { topic: filter.topic } : {}),
+      ...(filter.geo_level ? { geo_level: filter.geo_level } : {}),
+      ...(filter.join_key ? { join_key: filter.join_key } : {}),
+      ...(filter.has_time_series !== undefined ? { has_time_series: filter.has_time_series } : {}),
+      ...(filter.words ? { text: filter.words.join(" ") } : {})
+    },
+    count,
+    domains,
+    next:
+      count > 0
+        ? "ireland_describe(source) for the full card, ireland_describe(source, operation) for arguments, then ireland_call. A source-level card can be broader than an operation's; only matching operations are listed."
+        : "Nothing matched. Drop a filter, try a related topic, or use search for keywords."
   };
 }
 
 function findOperation(modules: SourceModule[], source: string, operation: string): Operation {
-  const module = modules.find((m) => m.info.id === source);
-  if (!module) {
-    throw new ToolError("NOT_FOUND", `Unknown source "${source}".`, {
-      hint: `Valid sources: ${modules.map((m) => m.info.id).join(", ")}. Call ireland_catalogue to browse.`
-    });
-  }
+  const module = findSource(modules, source);
   const tool = module.tools.find((t) => t.name === operation);
   if (!tool) {
     throw new ToolError("NOT_FOUND", `Source "${source}" has no operation "${operation}".`, {
@@ -192,7 +268,7 @@ function findOperation(modules: SourceModule[], source: string, operation: strin
   return { tool, source };
 }
 
-function describeOperation({ tool, source }: Operation) {
+function describeOperation(module: SourceModule, { tool, source }: Operation) {
   return {
     source,
     operation: tool.name,
@@ -200,7 +276,41 @@ function describeOperation({ tool, source }: Operation) {
     description: tool.description,
     input_schema: operationSchema(tool),
     example: exampleArgs(tool),
-    call: { tool: "ireland_call", arguments: { source, operation: tool.name, args: exampleArgs(tool) } }
+    call: { tool: "ireland_call", arguments: { source, operation: tool.name, args: exampleArgs(tool) } },
+    ...(module.card ? { card: { ...operationCard(module.card, tool.name), licence: module.info.licence } } : {})
+  };
+}
+
+function findSource(modules: SourceModule[], source: string): SourceModule {
+  const module = modules.find((m) => m.info.id === source);
+  if (!module) {
+    throw new ToolError("NOT_FOUND", `Unknown source "${source}".`, {
+      hint: `Valid sources: ${modules.map((m) => m.info.id).join(", ")}. Call ireland_catalogue to browse.`
+    });
+  }
+  return module;
+}
+
+/** The full dataset card of a source, with its licence and each operation's differences. */
+function describeSource(module: SourceModule) {
+  const { operations: overrides, ...card } = module.card ?? ({} as NonNullable<SourceModule["card"]>);
+  return {
+    source: module.info.id,
+    name: module.info.name,
+    domain: module.domain ?? null,
+    summary: module.summary,
+    coverage: module.coverage ?? module.summary,
+    licence: module.info.licence,
+    attribution: module.info.attribution,
+    homepage: module.info.homepage,
+    ...(module.card ? { card } : {}),
+    operations: module.tools.map((t) => ({
+      name: t.name,
+      title: t.title,
+      description: shortDescription(t.description),
+      ...(overrides?.[t.name] ? { card_differences: overrides[t.name] } : {})
+    })),
+    next: "ireland_describe(source, operation) for an operation's arguments, then ireland_call."
   };
 }
 
@@ -223,24 +333,35 @@ function registerMetaTools(
     "ireland_catalogue",
     {
       title: "Catalogue of Irish data sources",
-      description: `List sources and their operations, grouped by domain: ${DOMAINS.join(", ")}. Start here.`,
-      inputSchema: { domain: z.enum(DOMAINS).optional().describe("Only this domain.") },
+      description: `List sources and their operations, grouped by domain: ${DOMAINS.join(", ")}. Start here. Filter by topic, geo_level (${GEO_LEVELS.join(", ")}), join_key, has_time_series or text to get matching operations with compact dataset cards (geography, time coverage, cadence, join keys).`,
+      inputSchema: {
+        domain: z.enum(DOMAINS).optional().describe("Only this domain."),
+        topic: z.string().max(40).optional().describe("Topic, e.g. housing, population, labour, transport, law. Related topics also match."),
+        geo_level: z.string().max(40).optional().describe("Geography level the data is broken down by, e.g. county, local_authority, lea, ed, small_area, constituency, point."),
+        join_key: z.string().max(40).optional().describe("Key the results expose for joining, e.g. county_name, lea_name, ed_code, member_code, eli, lat_lon."),
+        has_time_series: z.boolean().optional().describe("true: data over several periods; false: current or single-period data."),
+        text: z.string().max(100).optional().describe("Words that must all appear in the source, operation or card.")
+      },
       outputSchema: OUTPUT_SCHEMA,
       annotations: { title: "Catalogue of Irish data sources", ...ANNOTATIONS }
     },
-    async ({ domain }) => guarded(() => catalogueOf(modules, domain))
+    async (args) => guarded(() => catalogueOf(modules, args))
   );
 
   server.registerTool(
     "ireland_describe",
     {
-      title: "Describe an operation",
-      description: "Argument JSON schema, description and an example for one source operation.",
-      inputSchema: { source: z.string().describe("Source id, e.g. 'cso'."), operation: z.string().describe("Operation, e.g. 'cso_get_data'.") },
+      title: "Describe a source or operation",
+      description: "With source only: the full dataset card (topics, geography levels, time coverage, cadence, dimensions, join keys, freshness, licence, auth, example questions). With operation too: its argument JSON schema, an example and its card.",
+      inputSchema: {
+        source: z.string().describe("Source id, e.g. 'cso'."),
+        operation: z.string().optional().describe("Operation, e.g. 'cso_get_data'. Omit for the source's card.")
+      },
       outputSchema: OUTPUT_SCHEMA,
-      annotations: { title: "Describe an operation", ...ANNOTATIONS }
+      annotations: { title: "Describe a source or operation", ...ANNOTATIONS }
     },
-    async ({ source, operation }) => guarded(() => describeOperation(findOperation(modules, source, operation)))
+    async ({ source, operation }) =>
+      guarded(() => (operation === undefined ? describeSource(findSource(modules, source)) : describeOperation(findSource(modules, source), findOperation(modules, source, operation))))
   );
 
   server.registerTool(

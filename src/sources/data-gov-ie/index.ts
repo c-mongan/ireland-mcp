@@ -1,4 +1,5 @@
 import { createCkanModule } from "../ckan/factory.js";
+import { dataGovIeCard } from "./card.js";
 
 export const dataGovIeModule = createCkanModule({
   info: {
@@ -12,6 +13,6 @@ export const dataGovIeModule = createCkanModule({
   portal: "data.gov.ie",
   site: "https://data.gov.ie",
   summary: "National open-data catalogue: find datasets from any public body and read their resources.",
-  domain: "stats",
+  domain: "stats", card: dataGovIeCard,
   coverage: "Metadata for every dataset in the national open-data portal, plus DataStore rows where the publisher loaded them."
 });

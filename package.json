@@ -60,6 +60,7 @@
     "eval": "node scripts/eval.mjs",
     "eval:multistep": "npm run build && node evals/multistep/run.mjs",
     "eval:multistep:test": "node --test evals/multistep/multistep.test.mjs",
+    "eval:discovery": "npm run build && node evals/multistep/discovery.mjs",
     "prepublishOnly": "npm run build",
     "skills:package": "node scripts/package-skills.mjs",
     "test:e2e": "playwright test",

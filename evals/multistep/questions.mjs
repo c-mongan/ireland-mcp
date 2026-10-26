@@ -12,7 +12,7 @@
 //   control    items of the same shape that need no pillar, so gap failures can be told apart
 //              from general multi-step weakness.
 //   tool_path  analysis-only sketch of one valid route; never shown to the agent.
-import { GapError, norm, round } from "./lib.mjs";
+import { GapError, UpstreamError, norm, round } from "./lib.mjs";
 
 const AS_OF = "2026-10-26";
 
@@ -22,6 +22,34 @@ async function csoRows(ctx, table_code, filters, limit = 500) {
   const data = await ctx.call("cso", "cso_get_data", { table_code, filters, limit });
   return data.rows;
 }
+
+/**
+ * Finds a CSO table the way an agent would: a keyword search ranked by geography level (dataset cards),
+ * then the first of the top five hits at that level whose metadata passes `accept`. Falls back to a
+ * known table code, recorded as the dataset-card workaround, when search does not surface one (or the
+ * server predates geo_level).
+ */
+async function discoverCsoTable(ctx, { query, geoLevel, accept, fallback }) {
+  try {
+    const hits = await ctx.call("cso", "cso_search_tables", { query, geo_level: geoLevel, limit: 10 }, { allowTruncated: true });
+    for (const t of hits.filter((h) => (h.geo_levels ?? []).includes(geoLevel)).slice(0, 5)) {
+      try {
+        const meta = await ctx.call("cso", "cso_get_table_metadata", { table_code: t.code, max_categories: 500 }, { allowTruncated: true });
+        if (accept(meta, t)) return { code: t.code, meta };
+      } catch (error) {
+        if (error instanceof UpstreamError) throw error;
+      }
+    }
+  } catch (error) {
+    if (error instanceof UpstreamError) throw error;
+  }
+  ctx.workaround("dataset-card:hardcoded-table-code");
+  return { code: fallback, meta: await ctx.call("cso", "cso_get_table_metadata", { table_code: fallback, max_categories: 500 }) };
+}
+
+/** True when every dimension other than statistic, time and `keep` starts with an all-categories total. */
+const headlineTotals = (meta, keep) =>
+  meta.dimensions.every((d) => d.code === "STATISTIC" || d.role === "time" || d === keep || /^(both sexes|all|total|state)/i.test(d.categories[0]?.label ?? ""));
 
 async function countyPop2022(ctx, county) {
   const p = await ctx.call("cso", "cso_area_profile", { area: county });
@@ -435,14 +463,24 @@ export const items = [
     async reference(ctx) {
       const city = await divisionTotal(ctx, "Cork City Council", 2025, "A");
       const county = await divisionTotal(ctx, "Cork County Council", 2025, "A");
-      // CPNI05 merges Cork City and County; the split lives in FY003A, which search does not surface.
-      ctx.workaround("dataset-card:hardcoded-table-code");
-      const meta = await ctx.call("cso", "cso_get_table_metadata", { table_code: "FY003A", max_categories: 100 });
-      const geo = meta.dimensions.find((d) => d.label === "Administrative Counties");
-      const sex = meta.dimensions.find((d) => d.label === "Sex");
-      const codes = geo.categories.filter((c) => /^Cork (City|County) Council$/.test(c.label)).map((c) => c.code);
-      const pop = await csoRows(ctx, "FY003A", { [geo.code]: codes, [sex.code]: [sex.categories[0].code] });
-      const p = (name) => pop.find((r) => r["Administrative Counties"] === name)?.value;
+      // CPNI05 merges Cork City and County; the split needs a local-authority population table such as FY003A.
+      const corkGeo = (meta) => meta.dimensions.find((d) => ["Cork City Council", "Cork County Council"].every((n) => d.categories.some((c) => c.label === n)));
+      const { code, meta } = await discoverCsoTable(ctx, {
+        query: "population",
+        geoLevel: "local_authority",
+        fallback: "FY003A",
+        accept: (m) =>
+          Boolean(corkGeo(m)) &&
+          /^population$/i.test(m.dimensions.find((d) => d.code === "STATISTIC")?.categories[0]?.label ?? "") &&
+          m.dimensions.some((d) => d.role === "time" && d.categories.some((c) => c.code === "2022")) &&
+          headlineTotals(m, corkGeo(m))
+      });
+      const geo = corkGeo(meta);
+      const time = meta.dimensions.find((d) => d.role === "time");
+      const filters = { [geo.code]: geo.categories.filter((c) => /^Cork (City|County) Council$/.test(c.label)).map((c) => c.code), [time.code]: ["2022"] };
+      for (const d of meta.dimensions) if (d !== geo && d !== time) filters[d.code] = [d.categories[0].code];
+      const pop = await csoRows(ctx, code, filters);
+      const p = (name) => pop.find((r) => r[geo.label] === name)?.value;
       const pc = p("Cork City Council");
       const pk = p("Cork County Council");
       if (!pc || !pk) throw new Error("LA population missing");
@@ -689,9 +727,12 @@ export const items = [
     gaps: ["dataset-card:geo-level-discovery"],
     async reference(ctx) {
       const out = {};
-      for (const [key, code] of [["completions", "NDA05"], ["ukraine", "UA05"]]) {
-        ctx.workaround("dataset-card:hardcoded-table-code");
-        const meta = await ctx.call("cso", "cso_get_table_metadata", { table_code: code, max_categories: 500 });
+      const probes = [
+        ["completions", "NDA05", "new dwelling completions", (m, t) => /completion/i.test(t.title) && m.dimensions.some((d) => d.code === "TLIST(A1)")],
+        ["ukraine", "UA05", "arrivals from Ukraine", (_m, t) => /ukraine/i.test(t.title)]
+      ];
+      for (const [key, fallback, query, accept] of probes) {
+        const { code, meta } = await discoverCsoTable(ctx, { query, geoLevel: "lea", accept, fallback });
         const time = meta.dimensions.find((d) => d.role === "time");
         const geo = meta.dimensions.find((d) => d.role === "geo" || /Electoral/i.test(d.label));
         const stat = meta.dimensions.find((d) => d.code === "STATISTIC");

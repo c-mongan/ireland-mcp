@@ -4,6 +4,7 @@ import { bound, envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envel
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type FetchedDocument, type SourceModule, type ToolContext } from "../../gateway/module.js";
 import { assertJsonStat, cellCount, dimensions, rows, type JsonStat } from "../cso/jsonStat.js";
+import { eurostatCard } from "./card.js";
 
 const API = "https://ec.europa.eu/eurostat/api/dissemination";
 const TOC_URL = `${API}/catalogue/toc/txt?lang=en`;
@@ -203,7 +204,7 @@ async function fetchById(key: string, ctx: ToolContext): Promise<FetchedDocument
 export const eurostatModule: SourceModule = {
   info: eurostatInfo,
   summary: "EU statistical datasets for Ireland and comparable EU aggregates via Eurostat JSON-stat.",
-  domain: "stats",
+  domain: "stats", card: eurostatCard,
   coverage: "Eurostat datasets where Ireland (geo=IE) is published, with optional EU aggregate comparison and time filters.",
   tools: [searchTool, dataTool, compareTool],
   search,

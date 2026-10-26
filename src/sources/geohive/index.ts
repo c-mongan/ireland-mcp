@@ -3,6 +3,7 @@ import { DAY } from "../../gateway/context.js";
 import { bound, envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { geohiveCard } from "./card.js";
 
 export const geohiveInfo: SourceInfo = {
   id: "geohive",
@@ -330,7 +331,7 @@ const locateTool = defineTool({
 export const geohiveModule: SourceModule = {
   info: geohiveInfo,
   summary: "Boundaries and geography: which county, constituency, electoral division or small area a point is in; GeoHive layers.",
-  domain: "places/property",
+  domain: "places/property", card: geohiveCard,
   coverage: "Republic of Ireland statutory boundaries: counties, local authorities, constituencies, electoral divisions, small areas and settlements.",
   tools: [boundariesTool, locateTool, listLayersTool, queryLayerTool]
 };

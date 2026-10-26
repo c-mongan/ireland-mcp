@@ -5,6 +5,7 @@ import { envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule } from "../../gateway/module.js";
 import { csvRows, MAX_EXPORT_BYTES } from "../kohesio/export.js";
+import { failteIrelandCard } from "./card.js";
 
 export const failteIrelandInfo: SourceInfo = {
   id: "failte-ireland", name: "Fáilte Ireland", licence: "CC BY 4.0",
@@ -39,7 +40,7 @@ function records(csv: string, dataset: "accommodation" | "attractions") {
   });
 }
 export const failteIreland: SourceModule = {
-  info: failteIrelandInfo, domain: "places/property",
+  info: failteIrelandInfo, domain: "places/property", card: failteIrelandCard,
   summary: "Search Fáilte Ireland accommodation and tourism activity/attraction CSV listings by name, county and category; no API key.",
   coverage: "Published Fáilte Ireland CSV listings. Accommodation register and listed tourism businesses, not all businesses. Retrieval time is not a source update date; availability and opening hours are not supplied. The publisher's API has a shared bandwidth quota: when it is used up, the tool serves an earlier export flagged stale or returns RATE_LIMITED.",
   tools: [defineTool({

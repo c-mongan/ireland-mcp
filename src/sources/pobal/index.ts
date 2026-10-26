@@ -3,6 +3,7 @@ import { ToolError } from "../../gateway/errors.js";
 import { DAY } from "../../gateway/context.js";
 import { bound, envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js";
 import { defineTool, type FetchedDocument, type SearchHit, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { pobalCard } from "./card.js";
 
 const RESOURCE_ID = "0806f07b-b514-4769-bd3d-649da87ad205";
 const API = "https://data.gov.ie/api/3/action/datastore_search";
@@ -67,7 +68,7 @@ const searchTool = defineTool({
 export const pobalModule: SourceModule = {
   info: pobalInfo,
   summary: "2022 Pobal HP Deprivation Index scores by electoral division.",
-  domain: "stats",
+  domain: "stats", card: pobalCard,
   coverage: "Republic of Ireland electoral divisions, 2022 deprivation index scores from Pobal via data.gov.ie datastore.",
   tools: [searchTool],
   async search(queryText: string, limit: number, ctx: ToolContext): Promise<SearchHit[]> {

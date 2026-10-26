@@ -5,6 +5,7 @@ import { envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule } from "../../gateway/module.js";
 import { CIB_ATTRIBUTION, CIB_LICENCE, categoryKey, cipsDataset, cisAnnualDataset, cisCategoryDataset } from "./schema.js";
+import { cibCard } from "./card.js";
 
 export const cibInfo: SourceInfo = {
   id: "cib", name: "Citizens Information Board Data Hub",
@@ -119,7 +120,7 @@ const cipsTool = defineTool({
 export const cibModule: SourceModule = {
   info: cibInfo,
   summary: "National Citizens Information Services and Phone Service caller, query and category statistics from pinned Citizens Information Board reports (2021–2025); not live data.",
-  domain: "stats",
+  domain: "stats", card: cibCard,
   coverage: "Annual national aggregates transcribed from official CIB Data Hub DOCX reports, with per-file SHA-256 checksums, consistency checks and methodology notes. No county breakdown. Also published as JSON at https://irishopendata.ie/data/cib/.",
   tools: [annualTool, categoriesTool, cipsTool]
 };

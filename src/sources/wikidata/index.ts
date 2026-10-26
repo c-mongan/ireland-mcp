@@ -4,6 +4,7 @@ import { DAY } from "../../gateway/context.js";
 import { bound, envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type FetchedDocument, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { wikidataCard } from "./card.js";
 
 const ENDPOINT = "https://query.wikidata.org/sparql";
 const USER_AGENT = "ireland-mcp/1.0 (templated Irish public-data lookup; https://github.com/c-mongan/ireland-mcp)";
@@ -156,7 +157,7 @@ async function fetchById(key: string, ctx: ToolContext): Promise<FetchedDocument
 export const wikidataModule: SourceModule = {
   info: wikidataInfo,
   summary: "Safe Wikidata templates for Irish places and entity summaries (no arbitrary SPARQL exposed).",
-  domain: "places/property",
+  domain: "places/property", card: wikidataCard,
   coverage: "Wikidata entities, with place lookup constrained to items whose country is Ireland (wd:Q27).",
   tools: [placeTool, entityTool],
   search,

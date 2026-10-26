@@ -3,6 +3,7 @@ import { MINUTE } from "../../gateway/context.js";
 import { envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule } from "../../gateway/module.js";
+import { eirgridCard } from "./card.js";
 
 export const eirgridInfo: SourceInfo = {
   id: "eirgrid",
@@ -169,7 +170,7 @@ const statusTool = defineTool({
 export const eirgridModule: SourceModule = {
   info: eirgridInfo,
   summary: "Energy: live electricity demand, wind generation and carbon intensity for the Irish grid (EirGrid).",
-  domain: "energy",
+  domain: "energy", card: eirgridCard,
   coverage: "All-island (Ireland and Northern Ireland) electricity system, 15-minute resolution, today and recent days.",
   tools: [statusTool]
 };

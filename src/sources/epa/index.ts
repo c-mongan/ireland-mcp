@@ -4,6 +4,7 @@ import { bound, envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envel
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type FetchedDocument, type SearchHit, type SourceModule, type ToolContext } from "../../gateway/module.js";
 import { bathingTools } from "./bathing.js";
+import { epaCard } from "./card.js";
 
 const WFD_BASE = "https://wfdapi.edenireland.ie/api";
 const TTL = DAY;
@@ -113,7 +114,7 @@ const waterbodyTool = defineTool({
 export const epaModule: SourceModule = {
   info: epaInfo,
   summary: "EPA WFD waterbody status/risk plus bathing-water locations, dated samples and published restrictions.",
-  domain: "environment",
+  domain: "environment", card: epaCard,
   coverage: "Republic of Ireland WFD catchments and waterbodies, plus published bathing-water locations, restrictions and dated measurements from EPA open APIs.",
   tools: [searchTool, waterbodyTool, ...bathingTools],
   async search(query: string, limit: number, ctx: ToolContext): Promise<SearchHit[]> {

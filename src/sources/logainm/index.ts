@@ -3,6 +3,7 @@ import { DAY } from "../../gateway/context.js";
 import { z } from "zod";
 import { defineTool, type SourceModule } from "../../gateway/module.js";
 import { DEFAULT_LIMIT, MAX_LIMIT, envelope, type SourceInfo } from "../../gateway/envelope.js";
+import { logainmCard } from "./card.js";
 // Official contracts: https://docs.gaois.ie/en/data/logainm/v1.0/api
 // Schema: https://docs.gaois.ie/en/data/logainm/v1.0/data
 // Header auth: https://docs.gaois.ie/en/data/getting-started
@@ -50,7 +51,7 @@ const normalisePlace = (p: z.infer<typeof placeSchema>) => ({
 });
 
 export const logainmModule: SourceModule = {
-  info: logainmInfo, domain: "places/property",
+  info: logainmInfo, domain: "places/property", card: logainmCard,
   summary: "Irish and English placenames (requires a server-side Gaois API key).",
   coverage: "Placenames Database of Ireland: bilingual names, containing administrative units and coordinate accuracy. Exact, accent-sensitive search; server-side LOGAINM_API_KEY required.",
   tools: [defineTool({

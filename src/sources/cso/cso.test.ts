@@ -11,7 +11,12 @@ const rpcRoute = (method: string, file: string, extra?: (body: string) => boolea
     url.includes("api.jsonrpc") && String(init?.body).includes(method) && (extra ? extra(String(init?.body)) : true),
   file: f(file)
 });
+const searchFor = (query: string, file: string): Route => rpcRoute("Navigation_API.Search", file, (b) => b.includes(`"Search":${JSON.stringify(query)}`));
 const routes: Route[] = [
+  searchFor("ukraine", "search-ukraine.json"),
+  searchFor("ukraine Local Electoral Area", "search-ukraine-local-electoral-area.json"),
+  searchFor("population", "search-population.json"),
+  searchFor("population Administrative Counties", "search-population-administrative-counties.json"),
   rpcRoute("Navigation_API.Search", "search-population-county.json", (b) => b.includes("population")),
   { match: (url, init) => url.includes("api.jsonrpc") && String(init?.body).includes("zzqq"), body: '{"jsonrpc":"2.0","result":[],"id":1}' },
   { match: /ReadMetadata\/F1001\//, file: f("metadata-F1001.json") },
@@ -26,16 +31,64 @@ describe("CSO module", () => {
   it("normalises and validates table codes", () => {
     expect(normaliseTableCode(" f1001 ")).toBe("F1001");
     expect(normaliseTableCode("HPM09 - house prices")).toBe("HPM09");
+    expect(normaliseTableCode("SAP2022T1T1CTY")).toBe("SAP2022T1T1CTY");
     expect(() => normaliseTableCode("population")).toThrow("not a CSO table code");
   });
 
   it("cso_search_tables returns bounded tables with codes", async () => {
-    const { ok, body } = await callTool(csoModule, "cso_search_tables", { query: "population county", limit: 3 }, fakeFetch(routes));
+    const { ok, body } = await callTool(csoModule, "cso_search_tables", { query: "population totals", limit: 3 }, fakeFetch(routes));
     expect(ok).toBe(true);
     expect(body.data).toHaveLength(3);
-    expect(body.data[0]).toMatchObject({ code: "HRD35", url: "https://data.cso.ie/table/HRD35" });
+    expect(body.data[0]).toMatchObject({ code: "HRD35", url: "https://data.cso.ie/table/HRD35", geo_levels: ["county"] });
     expect(body.truncated).toBe(true);
     expect(body.licence).toBe("CC BY 4.0");
+    expect(body.ranked_by_geo_level).toBeUndefined();
+  });
+
+  it("keeps the upstream order when the query names no geography level", async () => {
+    const fetch = fakeFetch(routes);
+    const { body } = await callTool(csoModule, "cso_search_tables", { query: "population", limit: 3 }, fetch);
+    expect(body.data.map((t: { code: string }) => t.code)).toEqual(["MIP20", "EIIEEA28", "PEA26"]);
+    expect(fetch.calls).toHaveLength(1);
+  });
+
+  it("ranks tables at the geography level named in the query first", async () => {
+    // Live PxStat evidence (2026-10-26): plain "Ukraine" ranks UA05 (arrivals by LEA) 26th of 100 and
+    // "Ukraine LEA" finds nothing useful; the LEA-aware search puts it first.
+    const fetch = fakeFetch(routes);
+    const { body } = await callTool(csoModule, "cso_search_tables", { query: "Ukraine LEA", limit: 5 }, fetch);
+    expect(body.ranked_by_geo_level).toBe("lea");
+    expect(body.data[0]).toMatchObject({ code: "UA05", geo_levels: ["lea"] });
+    const sent = fetch.calls.map((c) => JSON.parse(String(c.init?.body)).params.Search).sort();
+    expect(sent).toEqual(["ukraine", "ukraine Local Electoral Area"]);
+  });
+
+  it("surfaces local-authority population tables for 'population council'", async () => {
+    // Plain upstream search ranks F1004A 49th and FY003A 53rd for "population council" (live, 2026-10-26).
+    const { body } = await callTool(csoModule, "cso_search_tables", { query: "population council", limit: 5 }, fakeFetch(routes));
+    expect(body.ranked_by_geo_level).toBe("local_authority");
+    const codes = body.data.map((t: { code: string }) => t.code);
+    expect(codes.some((c: string) => ["FY003A", "F1004A"].includes(c))).toBe(true);
+    for (const t of body.data) expect(t.geo_levels).toContain("local_authority");
+  });
+
+  it("accepts an explicit geo_level and rejects unknown ones", async () => {
+    const fetch = fakeFetch(routes);
+    const { body } = await callTool(csoModule, "cso_search_tables", { query: "Ukraine", geo_level: "Local Electoral Areas", limit: 3 }, fetch);
+    expect(body.data[0].code).toBe("UA05");
+    const bad = await callTool(csoModule, "cso_search_tables", { query: "Ukraine", geo_level: "parish" }, fetch);
+    expect(bad.body.error.code).toBe("BAD_ARGS");
+    expect(bad.body.error.hint).toContain("small_area");
+  });
+
+  it("falls back to one search when the other fails", async () => {
+    const fetch = fakeFetch([
+      { match: (_u, init) => String(init?.body).includes('"Search":"ukraine Local Electoral Area"'), status: 500, body: "down" },
+      ...routes
+    ]);
+    const { ok, body } = await callTool(csoModule, "cso_search_tables", { query: "Ukraine LEA", limit: 3 }, createContext({ fetch, env: {} }));
+    expect(ok).toBe(true);
+    expect(body.data[0].code).toBe("UA05");
   });
 
   it("cso_search_tables returns an empty list for no matches", async () => {
@@ -126,7 +179,7 @@ describe("CSO module", () => {
 
   it("supports cross-source search and fetch", async () => {
     const ctx = createContext({ fetch: fakeFetch(routes) });
-    const hits = await csoModule.search!("population county", 2, ctx);
+    const hits = await csoModule.search!("population totals", 2, ctx);
     expect(hits[0]).toEqual({ id: "cso:HRD35", title: expect.stringContaining("HRD35"), url: "https://data.cso.ie/table/HRD35" });
     const doc = await csoModule.fetchById!("F1001", ctx);
     expect(doc.text).toContain("County [C02779V03348]");

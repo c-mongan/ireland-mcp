@@ -3,6 +3,7 @@ import { envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
 import { assertInIreland } from "../geohive/index.js";
 import { ARCGIS_LAYERS, fieldEq, queryLayer } from "../arcgis/client.js";
+import { censusAreasCard } from "./card.js";
 
 export const censusAreasInfo: SourceInfo = {
   id: "census-areas",
@@ -75,7 +76,7 @@ const tool = defineTool({
 export const censusAreasModule: SourceModule = {
   info: censusAreasInfo,
   summary: "Census 2022 Small Area, ED, county and population at a point.",
-  domain: "stats",
+  domain: "stats", card: censusAreasCard,
   coverage: "Republic of Ireland Census 2022 small areas and population table 1.1.",
   tools: [tool]
 };

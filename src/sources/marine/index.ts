@@ -3,6 +3,7 @@ import { MINUTE } from "../../gateway/context.js";
 import { envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule } from "../../gateway/module.js";
+import { marineCard } from "./card.js";
 
 export const marineInfo: SourceInfo = {
   id: "marine",
@@ -106,7 +107,7 @@ const buoysTool = defineTool({
 export const marineModule: SourceModule = {
   info: marineInfo,
   summary: "Sea: live wind, wave and temperature readings from the Marine Institute's offshore weather buoys.",
-  domain: "environment",
+  domain: "environment", card: marineCard,
   coverage: "Irish Weather Buoy Network (M2-M6 and coastal buoys), latest hourly readings.",
   tools: [buoysTool]
 };

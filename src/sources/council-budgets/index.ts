@@ -4,6 +4,7 @@ import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
 import { BUDGET_RESOURCES, budgetResourceForYear, budgetResourceUrl, DATASET_URL, isAllowedBudgetUrl, MANIFEST_OBSERVED_AT } from "./manifest.js";
 import { canonicalAuthorityName, parseBudgetWorkbook, type ParsedBudget } from "./parser.js";
+import { councilBudgetsCard } from "./card.js";
 
 export const councilBudgetsInfo: SourceInfo = {
   id: "council-budgets",
@@ -132,7 +133,7 @@ const getTool = defineTool({
 export const councilBudgetsModule: SourceModule = {
   info: councilBudgetsInfo,
   summary: "Official council budget estimates from the Department of Housing, Local Government and Heritage, with council-level service division rows from the published Excel workbooks.",
-  domain: "economy",
+  domain: "economy", card: councilBudgetsCard,
   coverage: "Adopted current expenditure and income budgets for 2015–2026. The listed 2013–2014 workbooks use a legacy authority structure and are not parsed. The resource list reflects portal metadata observed on 2026-10-25.",
   tools: [listYearsTool, getTool]
 };

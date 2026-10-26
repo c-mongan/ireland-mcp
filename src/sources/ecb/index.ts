@@ -3,6 +3,7 @@ import { DAY } from "../../gateway/context.js";
 import { bound, envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { ecbCard } from "./card.js";
 
 const API = "https://data-api.ecb.europa.eu/service/data";
 const FLOW_PREFIXES = new Set(["EXR", "FM", "MIR", "BSI", "ICP"]);
@@ -154,7 +155,7 @@ const exchangeTool = defineTool({
 export const ecbModule: SourceModule = {
   info: ecbInfo,
   summary: "ECB Data Portal financial series: euro interest rates, FX rates, and Irish banking series exposed through ECB flows.",
-  domain: "stats",
+  domain: "stats", card: ecbCard,
   coverage: "ECB SDMX REST data including euro area policy rates, exchange rates and selected Ireland MIR/BSI/financial series where exposed by ECB.",
   tools: [seriesTool, interestTool, exchangeTool]
 };

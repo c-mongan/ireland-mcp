@@ -4,6 +4,7 @@ import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule } from "../../gateway/module.js";
 import { assertInIreland } from "../geohive/index.js";
 import { ARCGIS_LAYERS, andWhere, dateClause, fieldEq, fieldLike, orWhere, queryLayer } from "../arcgis/client.js";
+import { planningCard } from "./card.js";
 
 export const planningInfo: SourceInfo = {
   id: "planning",
@@ -117,7 +118,7 @@ const getTool = defineTool({
 export const planningModule: SourceModule = {
   info: planningInfo,
   summary: "Planning applications by location, council, text, date or reference.",
-  domain: "places/property",
+  domain: "places/property", card: planningCard,
   coverage: "Republic of Ireland planning application point layer from the Department of Housing ArcGIS Hub.",
   tools: [searchTool, getTool]
 };

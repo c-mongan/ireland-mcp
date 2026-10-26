@@ -2,6 +2,7 @@ import { z } from "zod";
 import { DAY } from "../../gateway/context.js";
 import { envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js";
 import { defineTool, type FetchedDocument, type SearchHit, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { worldBankCard } from "./card.js";
 
 const BASE = "https://data360api.worldbank.org/data360/data";
 const TTL = DAY;
@@ -89,7 +90,7 @@ const profileTool = defineTool({
 export const worldBankModule: SourceModule = {
   info: worldBankInfo,
   summary: "Ireland macroeconomic, population and development indicators from World Bank Open Data.",
-  domain: "economy",
+  domain: "economy", card: worldBankCard,
   coverage: "World Bank country indicator time series for Ireland (IRL), with optional ISO3 country override for comparisons.",
   tools: [indicatorTool, profileTool],
   async search(query: string, limit: number): Promise<SearchHit[]> {

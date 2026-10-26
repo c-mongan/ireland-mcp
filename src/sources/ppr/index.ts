@@ -5,6 +5,7 @@ import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
 import { pprIndexStoreFromEnv, type PprIndex, type PprIndexStore } from "./indexStore.js";
 import { COUNTIES, csvUrl, parsePprCsv, toSale, type County, type SaleRow } from "./parse.js";
+import { pprCard } from "./card.js";
 
 export const pprInfo: SourceInfo = {
   id: "ppr",
@@ -183,7 +184,7 @@ export function createPprModule(options: PprModuleOptions = {}): SourceModule {
   return {
     info: pprInfo,
     summary: "Residential property sale prices (Property Price Register): search sales and median prices by area.",
-    domain: "places/property",
+    domain: "places/property", card: pprCard,
     coverage: "Every residential sale declared to Revenue since 2010, by county and address, from the Property Services Regulatory Authority.",
     tools: [searchSales, stats]
   };

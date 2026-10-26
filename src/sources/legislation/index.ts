@@ -7,6 +7,7 @@ import { parseConstitution, selectArticle, type ConstitutionSegment } from "./co
 import { parseActEffects } from "./effects.js";
 import { parseSiListing, parseSiPage, siUri } from "./instruments.js";
 import { toText } from "./text.js";
+import { legislationCard } from "./card.js";
 
 // Approach adapted from ie-eli-mcp (Apache-2.0): address Acts by their ELI URI and read the eISB XML rendering.
 // Licence verified 26 Oct 2026 at https://www.irishstatutebook.ie/eli/open-data.html.
@@ -436,7 +437,7 @@ const actEffectsTool = defineTool({
 export const legislationModule: SourceModule = {
   info: legislationInfo,
   summary: "Irish Statute Book: Acts and SIs as enacted/made, the Constitution, and Act amendments and commencement.",
-  domain: "law/politics",
+  domain: "law/politics", card: legislationCard,
   coverage:
     "Acts of the Oireachtas as enacted and Statutory Instruments as made, from 1922 to the current year; the Constitution (eISB edition); Legislation Directory amendment and commencement entries (Irish Statute Book).",
   tools: [listActsTool, getActTool, getSectionTool, actEffectsTool, listSisTool, getSiTool, constitutionTool],

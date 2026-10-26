@@ -3,6 +3,7 @@ import { envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js"
 import { defineTool, type SourceModule } from "../../gateway/module.js";
 import { assertInIreland } from "../geohive/index.js";
 import { ARCGIS_LAYERS, queryLayer } from "../arcgis/client.js";
+import { heritageCard } from "./card.js";
 
 export const heritageInfo: SourceInfo = {
   id: "heritage",
@@ -57,7 +58,7 @@ const tool = defineTool({
 export const heritageModule: SourceModule = {
   info: heritageInfo,
   summary: "Sites and Monuments Record (SMR) points near a location.",
-  domain: "places/property",
+  domain: "places/property", card: heritageCard,
   coverage: "Republic of Ireland archaeological monument point records from the National Monuments Service.",
   tools: [tool]
 };

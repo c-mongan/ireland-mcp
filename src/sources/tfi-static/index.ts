@@ -3,6 +3,7 @@ import { DAY } from "../../gateway/context.js";
 import { envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { tfiStaticCard } from "./card.js";
 
 export const tfiStaticInfo: SourceInfo = {
   id: "tfi-static", name: "Transport for Ireland NaPTAN stop records", licence: "CC BY 4.0",
@@ -71,4 +72,4 @@ const search = defineTool({
     return envelope(tfiStaticInfo, { data: { snapshot_modified_at: r.value.snapshot_modified_at, snapshot_file: r.value.snapshot_file, fetched_at: r.value.fetched_at, stops: stops.slice(offset, offset + limit), total: stops.length, offset, next_offset: offset + limit < stops.length ? offset + limit : null, note }, url: URL, cached: r.cached, stale: r.stale, truncated: offset + limit < stops.length, retrievedAt: new Date(r.value.fetched_at) });
   }
 });
-export const tfiStaticModule: SourceModule = { info: tfiStaticInfo, summary: "Keyless static transport stop discovery from TFI NaPTAN.", domain: "transport", coverage: "Publisher NaPTAN stop snapshot, including Irish and cross-border records. Daily cache; not live services or schedules.", tools: [search] };
+export const tfiStaticModule: SourceModule = { info: tfiStaticInfo, summary: "Keyless static transport stop discovery from TFI NaPTAN.", domain: "transport", card: tfiStaticCard, coverage: "Publisher NaPTAN stop snapshot, including Irish and cross-border records. Daily cache; not live services or schedules.", tools: [search] };

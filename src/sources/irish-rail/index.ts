@@ -4,6 +4,7 @@ import { bound, envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { decodeXml } from "../../gateway/xml.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { irishRailCard } from "./card.js";
 
 export const irishRailInfo: SourceInfo = {
   id: "irish-rail",
@@ -128,7 +129,7 @@ const departuresTool = defineTool({
 export const irishRailModule: SourceModule = {
   info: irishRailInfo,
   summary: "Trains: Irish Rail station lookup and live DART/Commuter/Intercity departures.",
-  domain: "transport",
+  domain: "transport", card: irishRailCard,
   coverage: "All Irish Rail stations; live departures for the next 90 minutes (DART, Commuter, Intercity).",
   tools: [findStationTool, departuresTool]
 };

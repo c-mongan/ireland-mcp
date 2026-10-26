@@ -6,6 +6,7 @@ import { defineTool, type SourceModule, type ToolContext } from "../../gateway/m
 import { csvRows } from "../shared/csv.js";
 import { ANNOTATION_FIELDS, METRIC_FIELDS, metricValue, type PayGapReport } from "./model.js";
 import { resolveGithubSnapshot, parseGithubReports, REFRESH_INTERVAL_SECONDS, type GithubSnapshot } from "./github.js";
+import { paygapCard } from "./card.js";
 
 const DATA_URL = "https://paygap.ie/downloads/annotated";
 const CSV_MAX_BYTES = 5 * 1024 * 1024;
@@ -135,7 +136,7 @@ const searchTool = defineTool({
 export const paygapModule: SourceModule = {
   info: paygapInfo,
   summary: "Irish employer pay-gap reports: annotated export or an explicitly dated publisher snapshot when access is refused.",
-  domain: "economy",
+  domain: "economy", card: paygapCard,
   coverage: "Combined employer report records and publication annotations supplied by PayGap.ie. Coverage and completeness are as published; records do not establish population coverage or causation.",
   tools: [searchTool]
 };

@@ -93,7 +93,14 @@ npm run eval:multistep -- --pin                # refresh references.json after r
 npm run eval:multistep -- --url https://mcp.irishopendata.ie/mcp   # use the hosted endpoint
 npm run eval:multistep -- --only t2-rent-law-rpz --tier T3 --delay-ms 250 --strict
 npm run eval:multistep:test                    # offline scorer and item checks (also run in CI)
+npm run eval:discovery                         # dataset-card discovery probes: search ranks and filtered catalogue
 ```
+
+The two dataset-card items that need a specific CSO table (`t2-cork-housing-spend-per-capita` and
+`t2-dataset-discovery-lea`) now find it the way an agent would: `cso_search_tables` with a `geo_level`,
+then the first of the top five hits whose metadata fits. They fall back to the known table code, and
+record the `dataset-card:hardcoded-table-code` workaround, only when search does not surface one. See
+[dataset cards](dataset-cards.md).
 
 The agent uses the same model settings as `npm run eval`:
 

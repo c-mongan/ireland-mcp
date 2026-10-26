@@ -5,6 +5,7 @@ import { defineTool, type SourceModule, type FetchedDocument } from "../../gatew
 import { createService, TOOLS } from "../../../packages/irish-legal-mcp/src/service.mjs";
 import type { CoreService, CoreDocument, SchemaRule } from "../../../packages/irish-legal-mcp/src/types.mjs";
 import { legalRepositoryFromEnv } from "./backend.js";
+import { citizensInfoCard, irishLegalCard } from "./card.js";
 
 const legalInfo: SourceInfo = { id: "irish-legal", name: "Irish legal evidence corpus", homepage: "https://www.irishstatutebook.ie",
   licence: "Per-document source licence; see citation metadata", attribution: "Irish Statute Book, Citizens Information Board and permitted source publishers; attribution accompanies each document." };
@@ -48,7 +49,7 @@ export function createLegalModules(getService: () => CoreService = defaultServic
       }
     }));
     return {
-      info, tools, domain: "law/politics",
+      info, tools, domain: "law/politics", card: citizen ? citizensInfoCard : irishLegalCard,
       summary: citizen ? "Indexed Citizens Information guidance, with source dates and attribution." : "Versioned legal provisions, source snapshots, amendment evidence and cited research.",
       coverage: "Coverage is limited to ingested pages. Run legal source sync; enacted text and consolidation cutoffs do not certify current law.",
       async search(query, limit) {

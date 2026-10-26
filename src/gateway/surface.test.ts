@@ -9,7 +9,8 @@ import { createContext } from "./context.js";
 import { applyBudget, envelope } from "./envelope.js";
 import { handleMcpHttp } from "./httpHandler.js";
 import { defineTool, type SourceModule } from "./module.js";
-import { buildServer } from "./server.js";
+import { GEO_LEVELS, JOIN_KEYS, TOPICS } from "./cards.js";
+import { buildServer, catalogueOf, type CatalogueArgs } from "./server.js";
 import { resolveToolsets, toolsetsFromArgs, toolsetsFromUrl, UnknownToolsetError } from "./toolsets.js";
 
 const META = ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about", "search", "fetch", "nearby"];
@@ -151,6 +152,70 @@ describe("meta tools", () => {
     const rail = transport.domains[0].sources.find((s: { id: string }) => s.id === "irish-rail");
     expect(rail.operations).toEqual(["rail_find_station", "rail_get_departures"]);
     expect(typeof rail.summary).toBe("string");
+    await client.close();
+  });
+
+  it("catalogue filters by dataset card and returns compact cards", async () => {
+    const client = await connectClient(createAppServer(ctx));
+    const call = async (args: Record<string, unknown>) => text(await client.callTool({ name: "ireland_catalogue", arguments: args }));
+    const unfiltered = await call({});
+    expect(unfiltered.filters).toBeUndefined();
+    expect(unfiltered.domains[0].sources[0].card).toBeUndefined();
+
+    const lea = await call({ geo_level: "LEA", topic: "Housing" });
+    expect(lea.filters).toEqual({ topic: "housing", geo_level: "lea" });
+    const sources = lea.domains.flatMap((d: { sources: Array<{ id: string; operations: string[]; card: { geo_levels: string[] } }> }) => d.sources);
+    expect(lea.count).toBe(sources.length);
+    const cso = sources.find((s: { id: string }) => s.id === "cso");
+    expect(cso.operations).toContain("cso_search_tables");
+    expect(cso.operations).not.toContain("cso_area_profile");
+    for (const s of sources) expect(s.card.geo_levels).toContain("lea");
+
+    const ed = await call({ join_key: "ED code", text: "deprivation" });
+    expect(ed.domains.flatMap((d: { sources: Array<{ id: string }> }) => d.sources.map((s) => s.id))).toContain("pobal");
+    expect(ed.filters).toEqual({ join_key: "ed_code", text: "deprivation" });
+
+    const keyed = await call({ topic: "transport", has_time_series: false });
+    const nta = keyed.domains.flatMap((d: { sources: Array<{ id: string; card: { needs_key?: string } }> }) => d.sources).find((s: { id: string }) => s.id === "nta");
+    expect(nta.card.needs_key).toBe("NTA_API_KEY");
+
+    const none = await call({ geo_level: "small_area", topic: "lobbying" });
+    expect(none.count).toBe(0);
+    expect(none.next).toMatch(/Nothing matched/);
+
+    const bad = await client.callTool({ name: "ireland_catalogue", arguments: { geo_level: "parish" } });
+    expect(bad.isError).toBe(true);
+    expect(text(bad).error.hint).toContain("local_authority");
+    await client.close();
+  });
+
+  it("keeps every catalogue response within the agent result cap", () => {
+    const { modules } = appModules();
+    const cap = 12_000;
+    const size = (args: CatalogueArgs) => JSON.stringify(catalogueOf(modules, args)).length;
+    expect(size({})).toBeLessThan(cap);
+    for (const geo_level of GEO_LEVELS) expect(size({ geo_level }), geo_level).toBeLessThan(cap);
+    for (const topic of TOPICS) expect(size({ topic }), topic).toBeLessThan(cap);
+    for (const join_key of JOIN_KEYS) expect(size({ join_key }), join_key).toBeLessThan(cap);
+    for (const has_time_series of [true, false]) expect(size({ has_time_series })).toBeLessThan(cap);
+  });
+
+  it("describe returns a source's full card, and an operation's card with its schema", async () => {
+    const client = await connectClient(createAppServer(ctx));
+    const source = text(await client.callTool({ name: "ireland_describe", arguments: { source: "ppr" } }));
+    expect(source).toMatchObject({ source: "ppr", licence: expect.any(String), card: { geo_levels: ["county", "point"], time: { start: "2010" } } });
+    expect(source.card.examples.length).toBeGreaterThanOrEqual(2);
+    expect(source.operations.map((o: { name: string }) => o.name)).toEqual(["ppr_search_sales", "ppr_price_stats"]);
+
+    const op = text(await client.callTool({ name: "ireland_describe", arguments: { source: "cso", operation: "cso_area_profile" } }));
+    expect(op.input_schema.properties.area).toBeDefined();
+    expect(op.card).toMatchObject({ geo_levels: ["national", "county", "town"], licence: "CC BY 4.0" });
+
+    const logainm = text(await client.callTool({ name: "ireland_describe", arguments: { source: "logainm" } }));
+    expect(logainm.card.auth).toMatchObject({ required: true, env: "LOGAINM_API_KEY", error: "NOT_CONFIGURED" });
+
+    const unknown = await client.callTool({ name: "ireland_describe", arguments: { source: "nope" } });
+    expect(unknown.isError).toBe(true);
     await client.close();
   });
 

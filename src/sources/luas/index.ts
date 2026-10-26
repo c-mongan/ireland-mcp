@@ -4,6 +4,7 @@ import { envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { decodeXml as decode } from "../../gateway/xml.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { luasCard } from "./card.js";
 
 export const luasInfo: SourceInfo = {
   id: "luas",
@@ -120,7 +121,7 @@ const listStopsTool = defineTool({
 export const luasModule: SourceModule = {
   info: luasInfo,
   summary: "Trams: live Luas arrival times and the stop list for the Red and Green lines.",
-  domain: "transport",
+  domain: "transport", card: luasCard,
   coverage: "Dublin Luas Red and Green line stops with live arrival forecasts.",
   tools: [forecastTool, listStopsTool]
 };

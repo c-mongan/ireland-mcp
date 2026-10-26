@@ -11,7 +11,10 @@ import {
   searchTables,
   tableUrl
 } from "./client.js";
+import { geoIntent, LEVEL_VOCABULARY, mergeResults, rankByLevel, tableLevels } from "./geoRank.js";
 import { cellCount, dimensions, rows } from "./jsonStat.js";
+import { GEO_LEVELS, normaliseGeoLevel, type GeoLevel } from "../../gateway/cards.js";
+import { csoCard } from "./card.js";
 
 export const csoInfo: SourceInfo = {
   id: "cso",
@@ -24,32 +27,72 @@ export const csoInfo: SourceInfo = {
 const limit = z.number().int().min(1).max(MAX_LIMIT).default(50).describe("Maximum rows to return (1-500).");
 const tableCode = z.string().min(2).max(40).describe("CSO table code, e.g. F1001 (population at each census).");
 
+/**
+ * Keyword search, re-ranked by geography level when the query names one ("completions LEA", "population
+ * council") or `level` is given. Without a level the upstream order is kept. Runs at most two upstream searches.
+ */
+export async function searchByLevel(ctx: ToolContext, query: string, explicit?: GeoLevel) {
+  const intent = geoIntent(query, explicit);
+  if (!intent.level) return { ...(await searchTables(ctx, query)), level: undefined };
+  const vocabulary = LEVEL_VOCABULARY[intent.level];
+  const queries = [...new Set([intent.core, ...(vocabulary ? [`${intent.core} ${vocabulary}`] : [])])];
+  const settled = await Promise.allSettled(queries.map((q) => searchTables(ctx, q)));
+  const done = settled.flatMap((s) => (s.status === "fulfilled" ? [s.value] : []));
+  if (done.length === 0) throw (settled[0] as PromiseRejectedResult).reason;
+  const merged = mergeResults(done.map((d) => d.value ?? []));
+  return {
+    value: rankByLevel(merged, intent.level, intent.core),
+    cached: done.every((d) => d.cached),
+    stale: done.some((d) => d.stale),
+    level: intent.level
+  };
+}
+
+function parseLevel(value: string | undefined): GeoLevel | undefined {
+  if (!value) return undefined;
+  const level = normaliseGeoLevel(value);
+  if (!level) throw new ToolError("BAD_ARGS", `Unknown geo_level "${value}".`, { hint: `Valid geo_level values: ${GEO_LEVELS.join(", ")}.` });
+  return level;
+}
+
 const searchTool = defineTool({
   name: "cso_search_tables",
   example: { query: "population by county" },
   title: "Search CSO tables",
   description:
-    "Search the CSO PxStat catalogue of statistical tables by keyword (e.g. 'house prices', 'unemployment', 'population county'). Returns table codes to use with cso_get_table_metadata and cso_get_data.",
-  inputSchema: { query: z.string().min(2).max(200).describe("Keywords to search for."), limit },
-  handler: async ({ query, limit: max }, ctx) => {
-    const result = await searchTables(ctx, query);
-    const tables = result.value.map((table) => ({
+    "Search the CSO PxStat catalogue of statistical tables by keyword (e.g. 'house prices', 'unemployment', 'population county'). Name a geography level in the query ('completions LEA', 'population council') or pass geo_level to put tables broken down by that level first. Returns table codes, with each table's geo_levels, to use with cso_get_table_metadata and cso_get_data.",
+  inputSchema: {
+    query: z.string().min(2).max(200).describe("Keywords to search for."),
+    geo_level: z
+      .string()
+      .max(40)
+      .optional()
+      .describe("Rank tables by this geography level first, e.g. county, local_authority, lea, ed, small_area, constituency, nuts3, town."),
+    limit
+  },
+  handler: async ({ query, geo_level, limit: max }, ctx) => {
+    const result = await searchByLevel(ctx, query, parseLevel(geo_level));
+    const tables = (result.value ?? []).map((table) => ({
       code: table.MtrCode,
       title: table.MtrTitle,
       subject: table.SbjValue ?? table.ThmValue ?? null,
       publisher: table.CprValue ?? null,
       released: table.RlsLiveDatetimeFrom ?? null,
       dimensions: (table.classification ?? []).map((c) => c.ClsValue),
+      geo_levels: tableLevels(table),
       url: tableUrl(table.MtrCode)
     }));
     const { items, truncated } = bound(tables, max);
-    return envelope(csoInfo, {
-      data: items,
-      url: `https://data.cso.ie/search?q=${encodeURIComponent(query)}`,
-      cached: result.cached,
-      stale: result.stale,
-      truncated
-    });
+    return {
+      ...envelope(csoInfo, {
+        data: items,
+        url: `https://data.cso.ie/search?q=${encodeURIComponent(query)}`,
+        cached: result.cached,
+        stale: result.stale,
+        truncated
+      }),
+      ...(result.level ? { ranked_by_geo_level: result.level } : {})
+    };
   }
 });
 
@@ -266,8 +309,8 @@ const areaProfileTool = defineTool({
 });
 
 async function search(query: string, max: number, ctx: ToolContext) {
-  const result = await searchTables(ctx, query);
-  return result.value.slice(0, max).map((t) => ({ id: `cso:${t.MtrCode}`, title: `${t.MtrTitle} (CSO ${t.MtrCode})`, url: tableUrl(t.MtrCode) }));
+  const result = await searchByLevel(ctx, query);
+  return (result.value ?? []).slice(0, max).map((t) => ({ id: `cso:${t.MtrCode}`, title: `${t.MtrTitle} (CSO ${t.MtrCode})`, url: tableUrl(t.MtrCode) }));
 }
 
 async function fetchById(key: string, ctx: ToolContext) {
@@ -301,7 +344,7 @@ async function fetchById(key: string, ctx: ToolContext) {
 export const csoModule: SourceModule = {
   info: csoInfo,
   summary: "Official statistics: census, population, prices, labour market, housing and thousands more PxStat tables.",
-  domain: "stats",
+  domain: "stats", card: csoCard,
   coverage: "National statistics from the CSO PxStat database: censuses (incl. 2016 and 2022), population, prices, labour market and housing, at State, county and smaller geographies.",
   tools: [searchTool, metadataTool, dataTool, areaProfileTool],
   search,

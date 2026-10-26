@@ -1,4 +1,5 @@
 import { createCkanModule } from "../ckan/factory.js";
+import { smartDublinCard } from "./card.js";
 
 export const smartDublinModule = createCkanModule({
   info: {
@@ -12,7 +13,7 @@ export const smartDublinModule = createCkanModule({
   portal: "Smart Dublin",
   site: "https://data.smartdublin.ie",
   summary: "Dublin city/county datasets: cycle counters, parking, footfall, planning, environment; queryable tables.",
-  domain: "stats",
+  domain: "stats", card: smartDublinCard,
   examples: { query: "'cycle counts' or 'footfall'", organization: "dublin-city-council", dataset: "dublin-city-centre-cycle-counts" },
   coverage: "Dublin's four local authorities' open-data catalogue (transport, environment, footfall, bikes), plus DataStore rows."
 });
