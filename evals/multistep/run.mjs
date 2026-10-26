@@ -66,6 +66,8 @@ async function runReference(client, catalogue, probes, item, pinned, opts) {
   try {
     const expected = await withTimeout(item.reference(ctx), ITEM_TIMEOUT_MS, item.id);
     const missing = Object.keys(item.answer).filter((k) => expected[k] === undefined || expected[k] === null || Number.isNaN(expected[k]));
+    // A live feed that has no value right now (e.g. EirGrid between intervals) is an upstream gap, not a broken reference.
+    if (missing.length && item.drift === "live") throw new UpstreamError(`live value missing upstream: ${missing.join(", ")}`, "MISSING_LIVE_VALUE");
     if (missing.length) throw new Error(`reference left keys empty: ${missing.join(", ")}`);
     const pin = pinned.items[item.id];
     let status = "ok";

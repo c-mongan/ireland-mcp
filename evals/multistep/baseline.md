@@ -1,6 +1,6 @@
 # Multi-step benchmark report
 
-- Run: 2026-10-26T14:12:01.442Z · server stdio dist/src/cli.js · git 8345128 · question set as of 2026-10-26
+- Run: 2026-10-26T14:36:54.818Z · server stdio dist/src/cli.js · git 1850ca5 · question set as of 2026-10-26
 - Mode: references
 - Items: 40 (T1 12, T2 16, T3 12)
 
