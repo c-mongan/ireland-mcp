@@ -14,6 +14,11 @@ const withCells = (values: Record<string, unknown>) => {
   }
   return XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
 };
+/** Changes Carlow's first Division A line and moves its published division total by the same amount. */
+const withCarlowLine = (value: string | null, delta: number) => {
+  const original = XLSX.read(workbook("budget-2026.xlsx"), { type: "buffer" }).Sheets["Revenue I&E SVCDIV A"]!;
+  return withCells({ C42: value, K120: Number(original.K120!.v) + delta });
+};
 const with2017Cells = (values: Record<string, unknown>) => {
   const wb = XLSX.read(workbook("budget-2017.xls"), { type: "buffer" });
   const sheet = wb.Sheets["Revenue I&E SVCDIV B"]!;
@@ -91,8 +96,9 @@ describe("council budget workbook parser", () => {
   });
 
   it("accepts valid formatted zero and accounting-negative amounts", () => {
-    const zero = parseBudgetWorkbook(withCells({ C42: "€0.00" }), 2026);
-    const negative = parseBudgetWorkbook(withCells({ C42: "(1,234.56)" }), 2026);
+    const original = Number(XLSX.read(workbook("budget-2026.xlsx"), { type: "buffer" }).Sheets["Revenue I&E SVCDIV A"]!.C42!.v);
+    const zero = parseBudgetWorkbook(withCarlowLine("€0.00", -original), 2026);
+    const negative = parseBudgetWorkbook(withCarlowLine("(1,234.56)", -original - 1_234.56), 2026);
     expect(zero.rows.find((row) => row.authority === "Carlow County Council" && row.division === "A"
       && row.item === "Maintenance/Improvement of LA Housing Units" && row.measure === "Expenditure")?.amount).toBe(0);
     expect(negative.rows.find((row) => row.authority === "Carlow County Council" && row.division === "A"
@@ -107,8 +113,22 @@ describe("council budget workbook parser", () => {
     expect(() => parseBudgetWorkbook(withCells({ K42: 123 }), 2026)).toThrow(/unlabelled budget column/);
   });
 
+  it("rejects a dropped table or a changed line value instead of returning an incomplete budget", () => {
+    // Renaming the first table's council heading drops that whole table from the parse.
+    expect(() => parseBudgetWorkbook(withCells({ B38: "Local Authorities" }), 2026)).toThrow(/reconcile|council counts|consistent council list/);
+    expect(() => parseBudgetWorkbook(withCells({ C42: 1 }), 2026)).toThrow(/reconcile with the published division totals/);
+  });
+
+  it("accepts a total exactly five cents off and rejects six", () => {
+    const total = Number(XLSX.read(workbook("budget-2026.xlsx"), { type: "buffer" }).Sheets["Revenue I&E SVCDIV A"]!.K120!.v);
+    expect(() => parseBudgetWorkbook(withCells({ K120: total + 0.05 }), 2026)).not.toThrow();
+    expect(() => parseBudgetWorkbook(withCells({ K120: total - 0.05 }), 2026)).not.toThrow();
+    expect(() => parseBudgetWorkbook(withCells({ K120: total + 0.06 }), 2026)).toThrow(/reconcile/);
+  });
+
   it("keeps a blank numeric cell as null", () => {
-    const budget = parseBudgetWorkbook(withCells({ C42: null }), 2026);
+    const original = Number(XLSX.read(workbook("budget-2026.xlsx"), { type: "buffer" }).Sheets["Revenue I&E SVCDIV A"]!.C42!.v);
+    const budget = parseBudgetWorkbook(withCarlowLine(null, -original), 2026);
     expect(budget.rows.find((row) => row.authority === "Carlow County Council" && row.division === "A"
       && row.item === "Maintenance/Improvement of LA Housing Units" && row.measure === "Expenditure")?.amount).toBeNull();
   });

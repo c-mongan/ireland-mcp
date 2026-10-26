@@ -91,6 +91,11 @@ function divisionForSheet(name: string): string | null {
   return match?.[1] ?? null;
 }
 
+interface DivisionTotal { Expenditure: number | null; Income: number | null; }
+
+/** Published totals are rounded per cell; allow a few cents of accumulated rounding. */
+const TOTAL_TOLERANCE_CENTS = 5;
+
 const PUBLISHED_2017_BLOCK_COUNTS: Record<string, number[]> = {
   A: [31, 31, 31], B: [31, 31, 31], C: [30, 30], D: [30, 30, 31],
   E: [30, 31, 31, 31], F: [31, 31], G: [31, 31], H: [31, 31, 31]
@@ -105,6 +110,7 @@ function parseDivisionSheet(sheet: XLSX.WorkSheet, division: string, year: numbe
   rows: BudgetRow[];
   councilSets: string[][];
   unlabelledSourceValueCount: number;
+  divisionTotals: Map<string, DivisionTotal>;
 } {
   // Keep blank rows so the offset from the two headers and EUR row stays stable.
   const data = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: null, raw: true });
@@ -117,6 +123,7 @@ function parseDivisionSheet(sheet: XLSX.WorkSheet, division: string, year: numbe
   );
   const rows: BudgetRow[] = [];
   const councilSets: string[][] = [];
+  const divisionTotals = new Map<string, DivisionTotal>();
   let unlabelledSourceValueCount = 0;
 
   for (let blockIndex = 0; blockIndex < headerIndexes.length; blockIndex += 1) {
@@ -167,6 +174,10 @@ function parseDivisionSheet(sheet: XLSX.WorkSheet, division: string, year: numbe
       if (totalColumn) {
         parsedColumns.add(column);
         parsedColumns.add(column + 1);
+        for (const { authority, row } of authorityRows) {
+          if (divisionTotals.has(authority)) throw new ToolError("UPSTREAM_DOWN", `The ${year} Division ${division} workbook repeats a division total.`, { retryable: false });
+          divisionTotals.set(authority, { Expenditure: parseAmount(row[column]), Income: parseAmount(row[column + 1]) });
+        }
         continue;
       }
       if (!item) {
@@ -211,7 +222,26 @@ function parseDivisionSheet(sheet: XLSX.WorkSheet, division: string, year: numbe
   if (councilSets.length !== expectedCounts.length || councilCounts.some((count, index) => count !== expectedCounts[index])) {
     throw new ToolError("UPSTREAM_DOWN", `The ${year} Division ${division} workbook tables list unexpected council counts (${councilCounts.join(", ")}).`, { retryable: false });
   }
-  return { rows, councilSets, unlabelledSourceValueCount };
+  return { rows, councilSets, unlabelledSourceValueCount, divisionTotals };
+}
+
+/**
+ * Independent completeness check: each council's budget lines must add up to the sheet's
+ * "Total For Service Division". A dropped or renamed table changes the sum, so it fails here
+ * instead of returning a silently incomplete budget.
+ */
+function assertLinesMatchTotals(rows: BudgetRow[], totals: Map<string, DivisionTotal>, year: number, division: string): void {
+  const mismatch = () => new ToolError("UPSTREAM_DOWN", `The ${year} Division ${division} budget lines do not reconcile with the published division totals.`, { retryable: false });
+  const authorities = new Set(rows.map((row) => row.authority));
+  if (totals.size === 0 || totals.size !== authorities.size) throw mismatch();
+  for (const [authority, total] of totals) {
+    for (const measure of ["Expenditure", "Income"] as const) {
+      // Whole cents avoid floating-point noise at the tolerance boundary.
+      const sumCents = rows.filter((row) => row.authority === authority && row.measure === measure)
+        .reduce((acc, row) => acc + Math.round((row.amount ?? 0) * 100), 0);
+      if (Math.abs(sumCents - Math.round((total[measure] ?? 0) * 100)) > TOTAL_TOLERANCE_CENTS) throw mismatch();
+    }
+  }
 }
 
 export function parseBudgetWorkbook(bytes: Uint8Array, expectedYear: number): ParsedBudget {
@@ -280,6 +310,12 @@ export function parseBudgetWorkbook(bytes: Uint8Array, expectedYear: number): Pa
   }
   if (rows.length === 0 || councilsByDivision.size !== 8) {
     throw new ToolError("UPSTREAM_DOWN", `The ${expectedYear} budget workbook does not match the supported council division layout.`, { retryable: false });
+  }
+  // 2017 is published with known omissions (see manifest), so its lines cannot reconcile.
+  if (expectedYear !== 2017) {
+    for (const { division, rows: divisionRows, divisionTotals } of parsedDivisions) {
+      assertLinesMatchTotals(divisionRows, divisionTotals, expectedYear, division);
+    }
   }
   return {
     year: expectedYear,
