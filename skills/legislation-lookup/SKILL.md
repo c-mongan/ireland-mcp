@@ -1,6 +1,6 @@
 ---
 name: legislation-lookup
-description: Looks up Irish Acts and sections in the Irish Statute Book (eISB) through the Ireland MCP server and quotes the official text with a citation, optionally finding the related Bill in the Oireachtas. Use when someone asks what an Irish Act says, wants the text of a section, or needs to find which Act covers a topic. Gives the text, not legal advice.
+description: Looks up Irish Acts, sections, Statutory Instruments, Constitution Articles and Act amendments in the Irish Statute Book (eISB) through the Ireland MCP server and quotes the official text with a citation, optionally finding the related Bill in the Oireachtas. Use when someone asks what an Irish Act, SI or Constitution Article says, whether a section has been amended or commenced, or which Act covers a topic. Gives the text, not legal advice.
 license: MIT
 ---
 
@@ -28,13 +28,23 @@ be called directly with the same `args`.
 
 ## Steps
 
-1. **Find the Act.** Call `legislation/legislation_list_acts` with `{ "query": "residential tenancies", "limit": 10 }`.
+1. **Find the Act.** Call `legislation/legislation_list_acts` with `{ "year": 2004, "query": "residential tenancies", "limit": 10 }`.
    Pick by title and year; if several fit, list them and ask.
 2. **Get the Act.** Call `legislation/legislation_get_act` with the Act `year` and `number` from
    step 1, e.g. `{ "year": 2018, "number": 7 }` (Data Protection Act 2018). Show the section list.
 3. **Get a section.** Call `legislation/legislation_get_section` with `year`, `number` and
    `section` (a string such as "2" or "19A") and quote it verbatim.
-4. **Bill history** (optional): call `oireachtas/oireachtas_search_bills` with the Act's short title
+4. **Check amendments and commencement.** Call `legislation/legislation_get_act_effects` with
+   `{ "year": 2018, "number": 7, "section": "2" }`. Report when the section commenced and every listed
+   amendment, repeal or restriction, with `updated_to`. The quoted text is as enacted; if effects exist,
+   say the current wording may differ and name the affecting provisions.
+5. **Statutory Instruments.** Call `legislation/legislation_list_sis` with `{ "year": 2024, "query": "sick leave" }`,
+   then `legislation/legislation_get_si` with `{ "year": 2024, "number": 10 }`. Use `based_on` to name the parent
+   Act's power and `transposes` for EU law it implements. The explanatory note is not part of the SI.
+6. **Constitution.** Call `legislation/legislation_get_constitution_article` with `{ "article": "40", "subsection": "3" }`
+   (`lang: "ga"` for Irish). Cite each paragraph by its `ref`, e.g. Article 40.3.3°, and link its `url`.
+   In a conflict the Irish text prevails (Article 25.5.4°).
+7. **Bill history** (optional): call `oireachtas/oireachtas_search_bills` with the Act's short title
    and `year` to show how it passed through the Oireachtas.
 
 ## Output format
@@ -42,9 +52,10 @@ be called directly with the same `args`.
 ```
 ### <Short title> (No. <n> of <year>), section <s>
 > <verbatim text>
-Status note: the eISB text may not include later amendments; check the Revised Acts on lawreform.ie.
+Status: as enacted. Directory (updated to <updated_to>): <commencement and amendments, or "no effects listed">.
 Sources
-- Irish Statute Book © Office of the Attorney General (PSI General Licence / CC BY 4.0): <url>
+- Contains Oireachtas information licensed under the Oireachtas (Open Data) PSI Licence; Irish Statute Book: <url>
+Not legal advice.
 ```
 
 ## Rules
@@ -53,4 +64,5 @@ Sources
 - Quote, do not paraphrase, when the wording matters. Mark any summary as a summary.
 - **No legal advice.** Do not tell the user what they should do or how a court would decide.
   Suggest a solicitor, Citizens Information or the relevant regulator.
-- Flag that the as-enacted text may have been amended since.
+- Flag that as-enacted or as-made text may have been amended since; quote `legislation_get_act_effects` evidence.
+- Do not present Law Reform Commission Revised Acts text as served by this tool; it is not.

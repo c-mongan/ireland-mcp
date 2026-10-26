@@ -80,9 +80,9 @@ Portable Copilot / MCP JSON:
 | --- | ---: | --- |
 | Data sources | 36 | Upstream public-data sources, one module each. The `cross` combiner is not a source. |
 | Available without an operator key | 34 of 36 | NTA realtime needs an operator key. Logainm needs a Gaois operator account and API key. |
-| Catalogue operations | 82 | 79 source operations plus 3 cross-source ones (`list_sources`, `nearby`, `ireland_snapshot`), all callable through `ireland_call`. |
+| Catalogue operations | 86 | 83 source operations plus 3 cross-source ones (`list_sources`, `nearby`, `ireland_snapshot`), all callable through `ireland_call`. |
 | Default tools | 7 | What `tools/list` returns: 4 meta tools plus `search`, `fetch` and `nearby`. |
-| Tools with `?toolsets=all` | 88 | Every operation as a typed tool, plus the 4 meta tools, `search` and `fetch`. |
+| Tools with `?toolsets=all` | 92 | Every operation as a typed tool, plus the 4 meta tools, `search` and `fetch`. |
 | Prompts | 3 | `area_profile`, `commute_check`, `compare_counties`. |
 <!-- counts:end -->
 
@@ -116,7 +116,7 @@ The default profile registers 36 source modules in `src/registry.ts`. The defaul
 | economy | `paygap` | [PayGap.ie](https://paygap.ie/downloads) — employer reports with annotations ([notes](docs/civic-sources.md)) | 1 | CC0 1.0 |
 | economy | `council-budgets` | [Official council budget workbooks](https://data.gov.ie/dataset/local-authority-and-regional-assembly-annual-budgets) ([notes](docs/council-budgets-source.md)) | 2 | CC BY-SA 4.0 |
 | law/politics | `oireachtas` | [Houses of the Oireachtas Open Data API](https://api.oireachtas.ie) | 5 | Oireachtas Open Data PSI Licence |
-| law/politics | `legislation` | [Irish Statute Book](https://www.irishstatutebook.ie) | 3 | PSI General Licence / CC BY 4.0 |
+| law/politics | `legislation` | [Irish Statute Book](https://www.irishstatutebook.ie) — Acts and SIs as enacted/made, the Constitution, amendment and commencement directory | 7 | [Oireachtas (Open Data) PSI Licence](https://www.irishstatutebook.ie/eli/open-data.html) (incorporates CC BY 4.0) |
 | law/politics | `irish-legal` (optional pilot) | [Irish legal evidence corpus](packages/irish-legal-mcp/README.md) — indexed source versions and Act sections; annual-leave/working-time seeds; current law unverified | 6 | Per-document publisher licence; Revised Acts storage and redistribution permission gated |
 | law/politics | `citizens-info` (optional pilot) | [Citizens Information Board](https://www.citizensinformation.ie) — indexed explanatory guidance from the limited pilot corpus | 2 | CC BY 4.0; third-party material excluded |
 | places/property | `geohive` | [Tailte Éireann GeoHive boundaries](https://www.geohive.ie) | 4 | CC BY 4.0 |
@@ -152,7 +152,7 @@ Read the [beta assessment](docs/legal-beta-assessment.md) for coverage, licences
 
 ## Why it's lean
 
-Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **7 tools, 8,674 characters, about 2,169 tokens** (`toolsets=all` is 88 tools, about 25k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
+Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **7 tools, 8,783 characters, about 2,196 tokens** (`toolsets=all` is 92 tools, about 27k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
 
 <p align="center">
   <a href="docs/architecture/ireland-mcp-lean-surface.drawio">

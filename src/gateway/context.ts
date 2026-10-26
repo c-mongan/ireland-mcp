@@ -1,6 +1,6 @@
 import { TieredCache, type PersistentStore } from "./cache.js";
 import { HttpClient, type FetchLike, type HttpOptions } from "./http.js";
-import type { CachedJsonOptions, ToolContext } from "./module.js";
+import type { CachedJsonOptions, CachedTextOptions, ToolContext } from "./module.js";
 import { SpanKind, withSpan } from "./otel.js";
 import { sourceForUrl, type UpstreamBudgets } from "./upstreamBudget.js";
 
@@ -50,8 +50,16 @@ export function createContext(options: ContextOptions = {}): ToolContext {
         })
       );
     },
-    cachedText: (url: string, ttlMs: number, opts?: HttpOptions & { cacheKey?: string }) =>
-      traced(url, () => cache.getOrLoad<string>(keyFor(url, opts), ttlMs, () => http.text(url, opts)))
+    cachedText: (url: string, ttlMs: number, opts?: CachedTextOptions) => {
+      const { validate, ...httpOpts } = opts ?? {};
+      return traced(url, () =>
+        cache.getOrLoad<string>(keyFor(url, opts), ttlMs, async () => {
+          const value = await http.text(url, httpOpts);
+          validate?.(value);
+          return value;
+        })
+      );
+    }
   };
 }
 

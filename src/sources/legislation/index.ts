@@ -3,66 +3,37 @@ import { DAY } from "../../gateway/context.js";
 import { bound, envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type FetchedDocument, type SearchHit, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { parseConstitution, selectArticle, type ConstitutionSegment } from "./constitution.js";
+import { parseActEffects } from "./effects.js";
+import { parseSiListing, parseSiPage } from "./instruments.js";
+import { toText } from "./text.js";
 
 // Approach adapted from ie-eli-mcp (Apache-2.0): address Acts by their ELI URI and read the eISB XML rendering.
+// Licence verified 26 Oct 2026 at https://www.irishstatutebook.ie/eli/open-data.html.
 export const legislationInfo: SourceInfo = {
   id: "legislation",
   name: "Irish Statute Book (eISB) via ELI",
-  licence: "Re-use under the PSI General Licence / CC BY 4.0",
-  attribution: "Contains Irish Statute Book data © Office of the Attorney General, made available by the eISB.",
+  licence: "Oireachtas (Open Data) PSI Licence (incorporates CC BY 4.0)",
+  attribution:
+    "Contains Oireachtas information licensed under the Oireachtas (Open Data) PSI Licence. Source: electronic Irish Statute Book (eISB), Office of the Attorney General.",
   homepage: "https://www.irishstatutebook.ie"
 };
 
+export const LICENCE_TERMS = "https://www.irishstatutebook.ie/eli/open-data.html";
+export const NOT_LEGAL_ADVICE = "Not legal advice. Check the official source, and get professional advice before relying on it.";
+export const ENACTED_NOT_AMENDED =
+  "Enacted or made text is not amended text: later Acts and SIs may have changed or repealed it. Use legislation_get_act_effects to check amendments and commencement.";
+
 export const EISB = "https://www.irishstatutebook.ie";
 const TTL = DAY;
+const WEEK = 7 * DAY;
 const FIRST_YEAR = 1922;
 
 export const actUri = (year: number, number: number) => `${EISB}/eli/${year}/act/${number}/enacted/en/html`;
 export const sectionUri = (year: number, number: number, section: string) =>
   `${EISB}/eli/${year}/act/${number}/section/${section}/enacted/en/html`;
 
-const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
-
-/** Converts eISB act XML or listing HTML fragments into readable plain text. */
-export function toText(fragment: string): string {
-  return decodeEntities(stripTags(fragment))
-    .replace(/[ \t]+/g, " ")
-    .replace(/ *\n */g, "\n")
-    .replace(/\n{2,}/g, "\n")
-    .trim();
-}
-
-/** Strips until stable so crafted input like "<<b>script>" cannot leave a tag behind, then drops stray brackets. */
-function stripTags(fragment: string): string {
-  let text = fragment;
-  let before: string;
-  do {
-    before = text;
-    text = text.replace(/<fn>[\s\S]*?<\/fn>/g, "");
-  } while (text !== before);
-  text = text
-    .replace(/<odq\/>/g, "“")
-    .replace(/<cdq\/>/g, "”")
-    .replace(/<osq\/>/g, "‘")
-    .replace(/<csq\/>/g, "’")
-    .replace(/<(emdash|endash)\/>/g, (_m, t: string) => (t === "emdash" ? "—" : "–"))
-    .replace(/<\/p>/g, "\n");
-  let previous: string;
-  do {
-    previous = text;
-    text = text.replace(/<[^>]*>/g, "");
-  } while (text !== previous);
-  return text.replace(/[<>]/g, "");
-}
-
-/** Decodes entities after tag stripping; out-of-range numeric entities are left as written. */
-function decodeEntities(text: string): string {
-  return text.replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (m, e: string) => {
-    if (e[0] !== "#") return ENTITIES[e.toLowerCase()] ?? m;
-    const code = e[1] === "x" || e[1] === "X" ? parseInt(e.slice(2), 16) : Number(e.slice(1));
-    return Number.isInteger(code) && code >= 0 && code <= 0x10ffff ? String.fromCodePoint(code) : m;
-  });
-}
+export { toText };
 
 export interface Act {
   year: number;
@@ -73,10 +44,26 @@ export interface Act {
   xml: string;
 }
 
-function checkYear(year: number, now: Date) {
+function checkYear(year: number, now: Date, kind = "Acts") {
   if (year < FIRST_YEAR || year > now.getUTCFullYear()) {
-    throw new ToolError("BAD_ARGS", `The eISB covers Acts from ${FIRST_YEAR} to ${now.getUTCFullYear()}.`);
+    throw new ToolError("BAD_ARGS", `The eISB covers ${kind} from ${FIRST_YEAR} to ${now.getUTCFullYear()}.`);
   }
+}
+
+/** Rejects HTML pages that lack an expected marker, so soft-error pages are never cached. */
+const expectMarker = (marker: RegExp, what: string) => (html: string) => {
+  if (!marker.test(html)) throw new ToolError("UPSTREAM_DOWN", `The Irish Statute Book returned an unexpected ${what} page.`);
+};
+
+/** Replaces the generic upstream 404 message with one naming the requested document. */
+const notFound = (message: string, hint: string) => (error: unknown): never => {
+  if (error instanceof ToolError && error.code === "NOT_FOUND") throw new ToolError("NOT_FOUND", message, { hint });
+  throw error;
+};
+
+/** Cuts text to max characters, reporting the full length. */
+function clip(text: string, max: number) {
+  return { text: text.length > max ? `${text.slice(0, max)}…` : text, text_length: text.length, truncated: text.length > max };
 }
 
 export async function loadAct(ctx: ToolContext, year: number, number: number) {
@@ -188,7 +175,7 @@ const getActTool = defineTool({
     const { act, cached, stale } = await loadAct(ctx, year, number);
     const sections = bound(listSections(act.xml), limit);
     return envelope(legislationInfo, {
-      data: { title: act.title, year, number, enacted: act.enacted, eli: act.url, sections: sections.items, note: "Text is the Act as enacted; check the Revised Acts for amendments." },
+      data: { title: act.title, year, number, enacted: act.enacted, eli: act.url, sections: sections.items, note: "Text is the Act as enacted. Use legislation_get_act_effects for amendments and commencement." },
       url: act.url,
       cached,
       stale,
@@ -212,12 +199,226 @@ const getSectionTool = defineTool({
   }
 });
 
+const siNumber = z.number().int().min(1).max(5000).describe("Statutory Instrument number within the year, e.g. 1 for S.I. No. 1 of 2024.");
+const maxChars = z.number().int().min(500).max(30000).default(6000).describe("Maximum characters of text to return (500-30000).");
+
+const constitutionTool = defineTool({
+  name: "legislation_get_constitution_article",
+  title: "Constitution article",
+  description:
+    "Text of an Article of Bunreacht na hÉireann (the Constitution of Ireland) from the Irish Statute Book, in English or Irish, optionally narrowed to a section or subsection such as '2' or '2.1'. Each paragraph carries its reference (e.g. 12.2.1) and an eISB anchor link.",
+  inputSchema: {
+    article: z.string().regex(/^\d{1,2}[A-Za-z]?$/).describe("Article number, e.g. '40' or '42A'."),
+    subsection: z
+      .string()
+      .regex(/^\d{1,2}(\.\d{1,2})?$/)
+      .optional()
+      .describe("Section, or section.subsection, by the printed numbering, e.g. '3' or '3.3' for Article 40.3.3°."),
+    lang: z.enum(["en", "ga"]).default("en").describe("en (English) or ga (Irish). The Irish text prevails in a conflict (Article 25.5.4°)."),
+    max_chars: maxChars
+  },
+  example: { article: "12", subsection: "2" },
+  handler: async ({ article, subsection, lang, max_chars }, ctx) => {
+    const page = `${EISB}/eli/cons/${lang}/html`;
+    const result = await ctx.cachedText(page, WEEK, {
+      label: "Irish Statute Book",
+      validate: expectMarker(/<?a\s+name="article1"/, "Constitution")
+    });
+    const parsed = parseConstitution(result.value);
+    const found = selectArticle(parsed, article, subsection);
+    if (!found) throw new ToolError("NOT_FOUND", `The Constitution has no Article ${article}.`, { hint: "Articles run from 1 to 50, plus 28A and 42A." });
+    if (!found.segments.length) {
+      throw new ToolError("NOT_FOUND", `Article ${found.article} has no section ${subsection}.`, { hint: "Omit subsection to see the whole Article and its references." });
+    }
+    let budget = max_chars;
+    const paragraphs: Array<ConstitutionSegment & { url: string }> = [];
+    let truncated = false;
+    for (const segment of found.segments) {
+      if (budget <= 0) {
+        truncated = true;
+        break;
+      }
+      const piece = clip(segment.text, budget);
+      truncated ||= piece.truncated;
+      budget -= piece.text.length;
+      paragraphs.push({ ...segment, text: piece.text, url: `${page}#${segment.anchor}` });
+    }
+    const url = `${page}#${found.segments[0]!.anchor}`;
+    return envelope(legislationInfo, {
+      data: {
+        article: found.article,
+        heading: found.heading,
+        part: found.part,
+        language: lang,
+        subsection: subsection ?? null,
+        edition: parsed.edition,
+        paragraphs,
+        total_paragraphs: found.segments.length,
+        text_truncated: truncated,
+        licence_terms: LICENCE_TERMS,
+        warnings: [
+          NOT_LEGAL_ADVICE,
+          `This is the eISB edition of the Constitution${parsed.edition ? ` (printed ${parsed.edition})` : ""}; an amendment made after that edition would not appear here.`,
+          "In a conflict between the Irish and English texts, the Irish text prevails (Article 25.5.4°).",
+          "References follow the printed numbering; eISB anchors are link targets and do not always match it."
+        ]
+      },
+      url,
+      cached: result.cached,
+      stale: result.stale,
+      truncated
+    });
+  }
+});
+
+async function loadSiListing(ctx: ToolContext, year: number) {
+  checkYear(year, ctx.now(), "Statutory Instruments");
+  const url = `${EISB}/eli/${year}/si/`;
+  const result = await ctx.cachedText(url, TTL, { label: "Irish Statute Book", validate: expectMarker(/<tbody/, "SI listing") });
+  return { url, items: parseSiListing(result.value), cached: result.cached, stale: result.stale };
+}
+
+export const siUri = (year: number, number: number) => `${EISB}/eli/${year}/si/${number}/made/en/html`;
+
+const listSisTool = defineTool({
+  name: "legislation_list_sis",
+  title: "List Statutory Instruments for a year",
+  description:
+    "Lists Statutory Instruments (regulations, orders, rules) made in a given year from the Irish Statute Book, optionally filtered by title words, e.g. 'commencement' or 'data protection'.",
+  inputSchema: {
+    year: z.number().int().min(FIRST_YEAR).max(2100).describe("Year the SI was made, e.g. 2024."),
+    query: z.string().max(100).optional().describe("Words that must all appear in the title."),
+    limit: z.number().int().min(1).max(500).default(50)
+  },
+  example: { year: 2024, query: "commencement", limit: 10 },
+  handler: async ({ year, query, limit }, ctx) => {
+    const r = await loadSiListing(ctx, year);
+    const words = (query ?? "").toLowerCase().split(/\s+/).filter(Boolean);
+    const matching = r.items.filter((i) => words.every((w) => i.title.toLowerCase().includes(w)));
+    const page = bound(matching.map((i) => ({ ...i, url: siUri(year, i.number) })), limit);
+    return envelope(legislationInfo, {
+      data: { year, total: matching.length, sis: page.items, licence_terms: LICENCE_TERMS, warnings: [NOT_LEGAL_ADVICE] },
+      url: r.url,
+      cached: r.cached,
+      stale: r.stale,
+      truncated: page.truncated
+    });
+  }
+});
+
+const getSiTool = defineTool({
+  name: "legislation_get_si",
+  title: "Statutory Instrument text",
+  description:
+    "Title, date made, explanatory note, parent-Act powers (based_on), instruments it changes, EU acts it transposes (ELI links) and the text of one Statutory Instrument as made.",
+  inputSchema: {
+    year: z.number().int().min(FIRST_YEAR).max(2100).describe("Year the SI was made, e.g. 2024."),
+    number: siNumber,
+    max_chars: maxChars
+  },
+  example: { year: 2024, number: 1, max_chars: 2000 },
+  handler: async ({ year, number, max_chars }, ctx) => {
+    checkYear(year, ctx.now(), "Statutory Instruments");
+    const url = siUri(year, number);
+    const result = await ctx
+      .cachedText(url, WEEK, { label: "Irish Statute Book", validate: expectMarker(/class="act-content"/, "Statutory Instrument") })
+      .catch(notFound(`No S.I. No. ${number} of ${year} in the Irish Statute Book.`, "Use legislation_list_sis to find SI numbers for a year."));
+    const doc = parseSiPage(result.value);
+    if (!doc) throw new ToolError("NOT_FOUND", `No S.I. No. ${number} of ${year} in the Irish Statute Book.`);
+    const body = clip(doc.text, max_chars);
+    return envelope(legislationInfo, {
+      data: {
+        title: doc.title,
+        citation: `S.I. No. ${number} of ${year}`,
+        year,
+        number,
+        made: doc.made,
+        explanatory_note: doc.explanatory_note,
+        based_on: doc.based_on,
+        changes: doc.changes,
+        transposes: doc.transposes,
+        text: body.text,
+        text_length: body.text_length,
+        text_truncated: body.truncated,
+        eli: url,
+        licence_terms: LICENCE_TERMS,
+        warnings: [NOT_LEGAL_ADVICE, ENACTED_NOT_AMENDED, "The explanatory note is not part of the instrument and is not a legal interpretation."]
+      },
+      url,
+      cached: result.cached,
+      stale: result.stale,
+      truncated: body.truncated
+    });
+  }
+});
+
+/** Best-effort match of a section number in eISB provision text such as "S. 60(3A) inserted" or "Ss. 2-6". */
+export function mentionsSection(text: string, section: string): boolean {
+  if (/^whole act$/i.test(text.trim())) return true;
+  const esc = section.replace(/[^0-9A-Za-z]/g, "");
+  if (new RegExp(`\\bss?\\.\\s*${esc}(?![0-9A-Za-z])`, "i").test(text)) return true;
+  if (!/^\d+$/.test(esc)) return false;
+  const n = Number(esc);
+  return [...text.matchAll(/\bss?\.\s*(\d+)[A-Z]{0,2}\s*-\s*(\d+)[A-Z]{0,2}/gi)].some((m) => Number(m[1]) <= n && n <= Number(m[2]));
+}
+
+const actEffectsTool = defineTool({
+  name: "legislation_get_act_effects",
+  title: "Act amendments and commencement",
+  description:
+    "From the eISB Legislation Directory: when each section of an Act commenced, how later Acts and SIs have amended, repealed or applied it, and SIs made under it. Use it before relying on as-enacted text from legislation_get_act or legislation_get_section.",
+  inputSchema: {
+    year,
+    number,
+    section: z.string().regex(/^[0-9]{1,4}[A-Z]{0,2}$/).optional().describe("Only rows that mention this section (best-effort text match), e.g. '60'."),
+    limit: z.number().int().min(1).max(500).default(50).describe("Maximum rows per table.")
+  },
+  example: { year: 2018, number: 7, limit: 10 },
+  handler: async ({ year, number, section, limit }, ctx) => {
+    checkYear(year, ctx.now());
+    const url = `${EISB}/eli/isbc/${year}_${number}.html`;
+    const result = await ctx
+      .cachedText(url, TTL, { label: "Irish Statute Book", validate: expectMarker(/id="(?:effects|commencement)"/, "Legislation Directory") })
+      .catch(notFound(`No Legislation Directory entry for Act ${number} of ${year}.`, "Use legislation_list_acts to check the Act number."));
+    const effects = parseActEffects(result.value);
+    if (!effects) throw new ToolError("NOT_FOUND", `No Legislation Directory entry for Act ${number} of ${year}.`);
+    const keep = <T>(rows: T[], text: (row: T) => string) => (section ? rows.filter((r) => mentionsSection(text(r), section)) : rows);
+    const commencement = keep(effects.commencement, (r) => r.provision);
+    const amendments = keep(effects.effects, (r) => r.affected);
+    const madeUnder = keep(effects.made_under, (r) => r.provision);
+    const [c, e, m] = [bound(commencement, limit), bound(amendments, limit), bound(madeUnder, limit)];
+    return envelope(legislationInfo, {
+      data: {
+        act: { title: effects.title, year, number, eli: actUri(year, number) },
+        updated_to: effects.updated_to,
+        revised_note: effects.revised_note,
+        section: section ?? null,
+        counts: { commencement: commencement.length, effects: amendments.length, made_under: madeUnder.length },
+        commencement: c.items,
+        effects: e.items,
+        made_under: m.items,
+        licence_terms: LICENCE_TERMS,
+        warnings: [
+          NOT_LEGAL_ADVICE,
+          ENACTED_NOT_AMENDED,
+          "These are directory entries, not the amended text. Check the affecting provision itself; Law Reform Commission Revised Acts are not served here."
+        ]
+      },
+      url,
+      cached: result.cached,
+      stale: result.stale,
+      truncated: c.truncated || e.truncated || m.truncated
+    });
+  }
+});
+
 export const legislationModule: SourceModule = {
   info: legislationInfo,
-  summary: "Acts of the Oireachtas from the Irish Statute Book: list by year, contents and section text (as enacted).",
+  summary: "Irish Statute Book: Acts and SIs as enacted/made, the Constitution, and Act amendments and commencement.",
   domain: "law/politics",
-  coverage: "Acts of the Oireachtas as enacted, from 1922 to the current year (Irish Statute Book).",
-  tools: [listActsTool, getActTool, getSectionTool],
+  coverage:
+    "Acts of the Oireachtas as enacted and Statutory Instruments as made, from 1922 to the current year; the Constitution (eISB edition); Legislation Directory amendment and commencement entries (Irish Statute Book).",
+  tools: [listActsTool, getActTool, getSectionTool, actEffectsTool, listSisTool, getSiTool, constitutionTool],
   async search(query, limit, ctx): Promise<SearchHit[]> {
     const now = ctx.now().getUTCFullYear();
     const mentioned = [...query.matchAll(/\b(19[2-9]\d|20\d\d)\b/g)].map((m) => Number(m[1])).filter((y) => y >= FIRST_YEAR && y <= now);
