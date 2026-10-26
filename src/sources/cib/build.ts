@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { docxBlocks, paragraphs, tables, type DocxBlock } from "./docx.js";
+import { decode, docxBlocks, paragraphs, tables, type DocxBlock } from "./docx.js";
 import type { CheckResult, CipsRecord, CisAnnualRecord, CisCategoryRecord, CibDataset, SourceFile } from "./schema.js";
 import { CIB_ATTRIBUTION, CIB_LICENCE, CIB_LICENCE_URL, CIB_PSI_NOTICE, CIB_SCHEMA, categoryKey } from "./schema.js";
 
@@ -66,9 +66,8 @@ function mustMatch(texts: string[], re: RegExp, what: string): RegExpMatchArray 
   for (const t of texts) { const m = t.match(re); if (m) return m; }
   throw new Error(`Could not find ${what} (${re}).`);
 }
-const htmlText = (bytes: Uint8Array) => Buffer.from(bytes).toString("utf8")
-  .replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ")
-  .replace(/&#39;|&rsquo;/g, "'").replace(/&amp;/g, "&").replace(/&nbsp;/g, " ").replace(/\s+/g, " ");
+export const htmlText = (bytes: Uint8Array) => decode(Buffer.from(bytes).toString("utf8")
+  .replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ");
 const check = (name: string, ok: boolean, detail: string): CheckResult => ({ name, ok, detail });
 
 interface CategoryRow { category: string; category_key: string; count: number; share_pct_published: number | null }

@@ -48,8 +48,9 @@ export function readZipEntry(zip: Uint8Array, name: string): Buffer {
   throw new Error(`ZIP entry ${name} not found.`);
 }
 
-const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'" };
-const decode = (s: string) => s.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, e: string) =>
+const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", rsquo: "'", lsquo: "'" };
+/** Decodes XML/HTML character references in one pass, so "&amp;nbsp;" stays "&nbsp;". */
+export const decode = (s: string) => s.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, e: string) =>
   e[0] === "#" ? String.fromCodePoint(e[1]?.toLowerCase() === "x" ? parseInt(e.slice(2), 16) : Number(e.slice(1))) : ENTITIES[e] ?? m);
 const tidy = (s: string) => s.replace(/\s+/g, " ").trim();
 

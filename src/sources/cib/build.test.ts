@@ -1,6 +1,6 @@
 import { crc32 } from "node:zlib";
 import { describe, expect, it } from "vitest";
-import { buildCipsRecords, buildCisRecords, count, pinnedUrls, type Downloads } from "./build.js";
+import { buildCipsRecords, buildCisRecords, count, htmlText, pinnedUrls, type Downloads } from "./build.js";
 import { docxBlocks, readZipEntry } from "./docx.js";
 import { KNOWN_FAILED_CHECKS } from "./refresh.js";
 import { categoryKey } from "./schema.js";
@@ -62,6 +62,10 @@ describe("CIB DOCX reader", () => {
     corrupt[30 + "word/document.xml".length] = "X".charCodeAt(0);
     expect(() => readZipEntry(corrupt, "word/document.xml")).toThrow(/CRC/);
     expect(() => readZipEntry(zip({ "word/document.xml": "<a/>", "x": "" }), "word/document.xml")).not.toThrow();
+  });
+
+  it("decodes HTML entities exactly once", () => {
+    expect(htmlText(Buffer.from("<p>394,400 callers&nbsp;were assisted by the Citizen&#39;s &amp;nbsp; Services</p><script>x</script>"))).toBe(" 394,400 callers were assisted by the Citizen's &nbsp; Services ");
   });
 
   it("parses published counts strictly and normalises category labels", () => {
