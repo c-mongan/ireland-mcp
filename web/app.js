@@ -95,6 +95,7 @@ const SOURCE_DETAILS = {
   lobbying: { licence: "SIPO PSI reuse policy", example: "Find published lobbying returns about housing this year." },
   paygap: { licence: "CC0 1.0", example: "Find AIB's 2025 gender pay-gap reports." },
   "council-budgets": { licence: "CC BY-SA 4.0", example: "Show Carlow County Council's 2026 housing budget." },
+  cib: { licence: "CC BY 4.0", example: "How many Citizens Information queries were about housing in 2025?" },
   oireachtas: { licence: "Oireachtas (Open Data) PSI Licence", example: "Find recent bills mentioning housing." },
   legislation: { licence: "Oireachtas (Open Data) PSI Licence (CC BY 4.0)", example: "What does Article 40.3 of the Constitution say?" },
   "irish-legal": { licence: "Per-document publisher licence", coverage: "Optional pilot: only ingested pages, seeded with annual leave and working time. Current law is unverified. Revised Acts indexing requires explicit publisher reuse permission.", example: "Retrieve the indexed enacted annual-leave section with its version and currentness warnings." },

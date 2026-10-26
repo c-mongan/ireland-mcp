@@ -21,9 +21,19 @@ async function download(source) {
   if (url.protocol !== "https:" || url.hostname !== CIB_HOST) throw new Error(`Refusing non-CIB URL ${source.url}`);
   const response = await fetch(url, { headers: { "user-agent": "ireland-mcp snapshot refresh (+https://github.com/c-mongan/ireland-mcp)" }, redirect: "error", signal: AbortSignal.timeout(30_000) });
   if (!response.ok) throw new Error(`${source.url} returned HTTP ${response.status}`);
-  const bytes = Buffer.from(await response.arrayBuffer());
-  if (bytes.length === 0 || bytes.length > MAX_BYTES) throw new Error(`${source.url} returned ${bytes.length} bytes`);
-  return bytes;
+  const declared = Number(response.headers.get("content-length"));
+  if (declared > MAX_BYTES) throw new Error(`${source.url} declares ${declared} bytes; the limit is ${MAX_BYTES}`);
+  // Read incrementally; leaving the loop early cancels the stream before an oversized body is buffered.
+  const chunks = [];
+  let size = 0;
+  for await (const chunk of response.body) {
+    size += chunk.length;
+    if (size > MAX_BYTES) break;
+    chunks.push(chunk);
+  }
+  if (size > MAX_BYTES) throw new Error(`${source.url} exceeded ${MAX_BYTES} bytes`);
+  if (size === 0) throw new Error(`${source.url} returned an empty body`);
+  return Buffer.concat(chunks);
 }
 
 const files = new Map();
