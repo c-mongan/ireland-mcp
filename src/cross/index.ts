@@ -40,6 +40,7 @@ function settledSection<T>(r: PromiseSettledResult<T>): T | { error: { code: str
 
 export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
   const searchable = modules.filter((m) => m.search);
+  const fetchable = modules.filter((m) => m.fetchById);
   const byId = new Map(modules.map((m) => [m.info.id, m]));
 
   const search = defineTool({
@@ -70,10 +71,12 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
       const module = at > 0 ? byId.get(id.slice(0, at)) : undefined;
       if (!module?.fetchById) {
         throw new ToolError("NOT_FOUND", `No source can fetch "${id}".`, {
-          hint: `Ids look like '<source>:<key>'. Fetchable sources: ${searchable.map((m) => m.info.id).join(", ")}.`
+          hint: `Ids look like '<source>:<key>'. Fetchable sources: ${fetchable.map((m) => m.info.id).join(", ")}.`
         });
       }
-      return module.fetchById(id.slice(at + 1), ctx);
+      const key = id.slice(at + 1);
+      if (!key.trim()) throw new ToolError("BAD_ARGS", `"${id}" has no key after the source prefix.`, { hint: "Ids look like '<source>:<key>', e.g. 'cso:F1001'." });
+      return module.fetchById(key, ctx);
     }
   });
 

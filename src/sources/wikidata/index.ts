@@ -3,7 +3,7 @@ import { entitySummary } from "./entity.js";
 import { DAY } from "../../gateway/context.js";
 import { bound, envelope, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
-import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { defineTool, type FetchedDocument, type SourceModule, type ToolContext } from "../../gateway/module.js";
 
 const ENDPOINT = "https://query.wikidata.org/sparql";
 const USER_AGENT = "ireland-mcp/1.0 (templated Irish public-data lookup; https://github.com/c-mongan/ireland-mcp)";
@@ -140,11 +140,25 @@ async function search(term: string, max: number, ctx: ToolContext) {
   return data.matches.filter((m) => m.qid && m.url).map((m) => ({ id: `wikidata:${m.qid}`, title: `${m.label ?? m.qid} (Wikidata ${m.qid})`, url: m.url! }));
 }
 
+async function fetchById(key: string, ctx: ToolContext): Promise<FetchedDocument> {
+  if (!/^Q\d{1,12}$/.test(key)) throw new ToolError("NOT_FOUND", `"${key}" is not a Wikidata QID.`, { hint: "Use ids like 'wikidata:Q27' from search." });
+  const result = await entitySummary(ctx, key, wikidataInfo);
+  const { data } = result;
+  return {
+    id: `wikidata:${data.qid}`,
+    title: `${data.label} (Wikidata ${data.qid})`,
+    text: JSON.stringify(data, null, 2),
+    url: data.url,
+    metadata: { source: "Wikidata", licence: wikidataInfo.licence, attribution: wikidataInfo.attribution, api: result.url, cached: result.cached, stale: result.stale }
+  };
+}
+
 export const wikidataModule: SourceModule = {
   info: wikidataInfo,
   summary: "Safe Wikidata templates for Irish places and entity summaries (no arbitrary SPARQL exposed).",
   domain: "places/property",
   coverage: "Wikidata entities, with place lookup constrained to items whose country is Ireland (wd:Q27).",
   tools: [placeTool, entityTool],
-  search
+  search,
+  fetchById
 };
