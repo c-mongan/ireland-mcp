@@ -11,11 +11,23 @@
 
 ## Try it in 60 seconds
 
-1. Add the server to your client. For GitHub Copilot CLI:
-   `copilot mcp add --transport http ireland https://mcp.irishopendata.ie/mcp`
-   For VS Code, add `.vscode/mcp.json`: `{ "servers": { "ireland": { "type": "http", "url": "https://mcp.irishopendata.ie/mcp" } } }`.
-2. Ask: *"Using the ireland MCP tools, give me the Census 2022 profile of Ennis, Co Clare, and the Met Éireann forecast for Galway. Cite the sources."*
-3. Check the answer cites `https://data.cso.ie/table/F1015` and the Met Éireann location-forecast URL. The forecast URL is `http://`; Met Éireann's `https://` host currently redirects to an origin that fails TLS.
+**1. Add the server.** GitHub Copilot CLI:
+
+```sh
+copilot mcp add --transport http ireland https://mcp.irishopendata.ie/mcp
+```
+
+VS Code (`.vscode/mcp.json`):
+
+```json
+{ "servers": { "ireland": { "type": "http", "url": "https://mcp.irishopendata.ie/mcp" } } }
+```
+
+**2. Ask:** *"Using the ireland MCP tools, give me the Census 2022 profile of Ennis, Co Clare, and the Met Éireann forecast for Galway. Cite the sources."*
+
+**3. Check the citations.** The answer should link `https://data.cso.ie/table/F1015` and the Met Éireann location-forecast URL.<sup>†</sup>
+
+<sub>† The forecast URL is `http://`: Met Éireann's `https://` host currently redirects to an origin that fails TLS.</sub>
 
 <p align="center">
   <img src="docs/demo/vscode-copilot-chat.png" alt="VS Code Copilot agent mode answering with the Ennis Census 2022 profile and a Met Éireann forecast, each with a source citation" width="800">
