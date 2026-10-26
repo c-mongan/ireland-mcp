@@ -324,7 +324,7 @@ export interface CardFilter {
   geo_level?: GeoLevel;
   has_time_series?: boolean;
   join_key?: JoinKey;
-  /** Folded words that must all appear in the card's text. */
+  /** Folded words that must all start a word in the card's text. */
   words?: string[];
 }
 
@@ -354,7 +354,8 @@ export function cardMatches(card: DatasetCard, filter: CardFilter, extraText = "
   if (filter.has_time_series !== undefined && card.time.series !== filter.has_time_series) return false;
   if (filter.words?.length) {
     const haystack = ` ${cardText(card)} ${fold(extraText)} `;
-    if (!filter.words.every((w) => haystack.includes(w))) return false;
+    // Word-prefix match: "rent" finds "rents" and "rental" but not "current".
+    if (!filter.words.every((w) => haystack.includes(` ${w}`))) return false;
   }
   return true;
 }

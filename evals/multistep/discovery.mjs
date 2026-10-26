@@ -58,6 +58,11 @@ export async function runDiscovery(client) {
   return { search, catalogue };
 }
 
+function listedLabel(c) {
+  if (!c.supported) return "filters unsupported";
+  return c.listed ? "yes" : "no";
+}
+
 export function renderDiscovery({ search, catalogue }) {
   const hit = (k) => search.filter((s) => s.rank !== null && s.rank <= k).length;
   const lines = [
@@ -71,7 +76,7 @@ export function renderDiscovery({ search, catalogue }) {
     "",
     "| Item | ireland_catalogue arguments | Needed operation | Listed | Operations returned |",
     "| --- | --- | --- | --- | ---: |",
-    ...catalogue.map((c) => `| ${c.item} | \`${JSON.stringify(c.args)}\` | ${c.expect} | ${c.supported ? (c.listed ? "yes" : "no") : "filters unsupported"} | ${c.operations ?? "all"} |`)
+    ...catalogue.map((c) => `| ${c.item} | \`${JSON.stringify(c.args)}\` | ${c.expect} | ${listedLabel(c)} | ${c.operations ?? "all"} |`)
   ];
   return lines.join("\n");
 }

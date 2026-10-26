@@ -89,6 +89,8 @@ describe("CSO module", () => {
     const { ok, body } = await callTool(csoModule, "cso_search_tables", { query: "Ukraine LEA", limit: 3 }, createContext({ fetch, env: {} }));
     expect(ok).toBe(true);
     expect(body.data[0].code).toBe("UA05");
+    expect(body.partial).toBe(true);
+    expect(body.note).toMatch(/may miss tables/);
   });
 
   it("cso_search_tables returns an empty list for no matches", async () => {

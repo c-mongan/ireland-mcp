@@ -110,17 +110,21 @@ const tokens = (text: string) =>
     .map((t) => (t.length > 3 && t.endsWith("s") ? t.slice(0, -1) : t));
 
 /**
- * Ranks the merged search results for a level: tables broken down by that level first, then related levels,
- * then the rest. Within a group: titles that contain more of the topic words, then titles with fewer extra
- * words, then tables with fewer dimensions (headline tables), then the upstream order.
+ * Ranks the merged search results for a level. Tables whose title shares a topic word come first; among
+ * them, tables broken down by that level, then related levels, then the rest. Within a group: titles that
+ * contain more of the topic words, then titles with fewer extra words, then tables with fewer dimensions
+ * (headline tables), then the upstream order. Tables found only by the geography wording (`fromCore` lacks
+ * them) and sharing no topic word with the title are dropped: they match the place word, not the topic.
  */
-export function rankByLevel(results: readonly CsoSearchResult[], level: GeoLevel, core: string): CsoSearchResult[] {
+export function rankByLevel(results: readonly CsoSearchResult[], level: GeoLevel, core: string, fromCore?: ReadonlySet<string>): CsoSearchResult[] {
   const wanted = new Set(tokens(core));
   const related = RELATED[level] ?? [];
   const scored = results.map((table, position) => {
     const levels = tableLevels(table);
     const exact = level === "national" ? levels.length === 0 : levels.includes(level);
-    const group = exact ? 2 : levels.some((l) => related.includes(l)) ? 1 : 0;
+    let group = 0;
+    if (exact) group = 2;
+    else if (levels.some((l) => related.includes(l))) group = 1;
     const title = new Set(tokens(table.MtrTitle));
     const hits = [...wanted].filter((t) => title.has(t)).length;
     return {
@@ -132,10 +136,19 @@ export function rankByLevel(results: readonly CsoSearchResult[], level: GeoLevel
       position
     };
   });
-  scored.sort(
-    (a, b) => b.group - a.group || b.recall - a.recall || b.precision - a.precision || a.dims - b.dims || a.position - b.position
-  );
-  return scored.map((s) => s.table);
+  const onTopic = (s: (typeof scored)[number]) => (s.recall > 0 ? 1 : 0);
+  return scored
+    .filter((s) => s.recall > 0 || !fromCore || fromCore.has(s.table.MtrCode))
+    .sort(
+      (a, b) =>
+        onTopic(b) - onTopic(a) ||
+        b.group - a.group ||
+        b.recall - a.recall ||
+        b.precision - a.precision ||
+        a.dims - b.dims ||
+        a.position - b.position
+    )
+    .map((s) => s.table);
 }
 
 /** Interleaves result lists, keeping each table's first appearance. */

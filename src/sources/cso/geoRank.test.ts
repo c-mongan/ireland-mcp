@@ -30,15 +30,28 @@ describe("CSO geography ranking", () => {
     expect(geoIntent("leasing")).toEqual({ level: undefined, core: "leasing" });
   });
 
-  it("ranks the requested level first, then related levels, then headline tables", () => {
+  it("ranks on-topic tables at the requested level first, then related levels, then headline tables", () => {
     const results = [
       table("A", "Population Aged 15 Years and Over", ["Sex", "Administrative Counties", "Age Group"]),
       table("B", "Deaths Registered", ["County of Residence", "Sex"]),
       table("C", "Population", ["Sex", "Administrative Counties"]),
       table("D", "Population", ["NUTS 3 Region"])
     ];
-    expect(rankByLevel(results, "local_authority", "population").map((t) => t.MtrCode)).toEqual(["C", "A", "B", "D"]);
-    expect(rankByLevel(results, "county", "population").map((t) => t.MtrCode)).toEqual(["B", "C", "A", "D"]);
+    expect(rankByLevel(results, "local_authority", "population").map((t) => t.MtrCode)).toEqual(["C", "A", "D", "B"]);
+    expect(rankByLevel(results, "county", "population").map((t) => t.MtrCode)).toEqual(["C", "A", "D", "B"]);
+    expect(rankByLevel(results, "county", "deaths").map((t) => t.MtrCode)).toEqual(["B", "C", "A", "D"]);
+  });
+
+  it("keeps on-topic tables above off-topic tables at the requested level", () => {
+    // Live evidence: "house prices county" pulled in county tables about penalty points via "house prices County".
+    const results = [
+      table("HPM09", "Residential Property Price Index", ["Type of Residential Property"]),
+      table("PPM04", "Penalty Point Offences", ["County"]),
+      table("HPA99", "House Prices", ["County"])
+    ];
+    const ranked = rankByLevel(results, "county", "house prices", new Set(["HPM09", "HPA99"])).map((t) => t.MtrCode);
+    expect(ranked).toEqual(["HPA99", "HPM09"]);
+    expect(rankByLevel(results, "county", "house prices").map((t) => t.MtrCode)).toEqual(["HPA99", "HPM09", "PPM04"]);
   });
 
   it("merges result lists without duplicates", () => {

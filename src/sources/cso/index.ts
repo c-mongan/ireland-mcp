@@ -33,17 +33,19 @@ const tableCode = z.string().min(2).max(40).describe("CSO table code, e.g. F1001
  */
 export async function searchByLevel(ctx: ToolContext, query: string, explicit?: GeoLevel) {
   const intent = geoIntent(query, explicit);
-  if (!intent.level) return { ...(await searchTables(ctx, query)), level: undefined };
+  if (!intent.level) return { ...(await searchTables(ctx, query)), partial: false, level: undefined };
   const vocabulary = LEVEL_VOCABULARY[intent.level];
   const queries = [...new Set([intent.core, ...(vocabulary ? [`${intent.core} ${vocabulary}`] : [])])];
   const settled = await Promise.allSettled(queries.map((q) => searchTables(ctx, q)));
   const done = settled.flatMap((s) => (s.status === "fulfilled" ? [s.value] : []));
   if (done.length === 0) throw (settled[0] as PromiseRejectedResult).reason;
+  const core = settled[0]?.status === "fulfilled" ? settled[0].value.value ?? [] : undefined;
   const merged = mergeResults(done.map((d) => d.value ?? []));
   return {
-    value: rankByLevel(merged, intent.level, intent.core),
+    value: rankByLevel(merged, intent.level, intent.core, core ? new Set(core.map((t) => t.MtrCode)) : undefined),
     cached: done.every((d) => d.cached),
     stale: done.some((d) => d.stale),
+    partial: done.length < settled.length,
     level: intent.level
   };
 }
@@ -91,7 +93,8 @@ const searchTool = defineTool({
         stale: result.stale,
         truncated
       }),
-      ...(result.level ? { ranked_by_geo_level: result.level } : {})
+      ...(result.level ? { ranked_by_geo_level: result.level } : {}),
+      ...(result.partial ? { partial: true, note: "One of the two CSO searches failed, so the geography ranking may miss tables. Retry later." } : {})
     };
   }
 });

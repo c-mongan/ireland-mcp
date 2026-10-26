@@ -91,6 +91,9 @@ describe("dataset cards", () => {
     expect(cardMatches(operationCard(cso, "cso_get_data"), { geo_level: "lea", topic: "housing" })).toBe(true);
     expect(cardMatches(profile, { geo_level: "lea" })).toBe(false);
     expect(cardMatches(profile, { topic: "census", has_time_series: true, words: ["population"] })).toBe(true);
+    expect(cardMatches(profile, { words: ["opulation"] })).toBe(false);
+    expect(cardMatches(profile, { words: ["rent"] }, "current figures")).toBe(false);
+    expect(cardMatches(profile, { words: ["rent"] }, "rental figures")).toBe(true);
     expect(timeLabel({ start: "2010", end: "present", series: true })).toBe("2010–present");
     expect(timeLabel({ start: "live", end: "live", series: false })).toBe("live");
   });
