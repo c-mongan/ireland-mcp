@@ -87,7 +87,12 @@ export function docxText(buffer) {
 
 /** Visible text of an HTML page with scripts, styles and tags removed. */
 export function htmlText(html) {
-  const stripped = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<!--[\s\S]*?-->/gi, " ").replace(/<[^>]+>/g, " ");
+  // Text extraction for figure checks only; the output is never rendered as HTML.
+  const stripped = html
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script[^>]*>/gi, " ")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style[^>]*>/gi, " ")
+    .replace(/<!--[\s\S]*?--!?>/g, " ")
+    .replace(/<[^>]+>/g, " ");
   return decodeEntities(stripped).replace(/\s+/g, " ").trim();
 }
 

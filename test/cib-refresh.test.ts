@@ -73,6 +73,7 @@ describe("CIB refresh helpers", () => {
   it("matches a figure only as a whole printed number", () => {
     const text = htmlText("<p>Overview 394,400 callers</p><script>var x = 999;</script><p>over 788,900. Total 6,382.</p>");
     expect(text).not.toContain("999");
+    expect(htmlText("<p>1</p><script type=x>var a = 7;</script >2<style>p{}</style\n>3<!-- 8 --!>")).toBe("1 2 3");
     expect(textContainsFigure(text, "394,400")).toBe(true);
     expect(textContainsFigure(text, "6,382")).toBe(true);
     expect(textContainsFigure(text, "94,400")).toBe(false);
