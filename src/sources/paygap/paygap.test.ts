@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFile } from "node:fs/promises";
 import { fakeFetch, type Route } from "../../../test/helpers/fakeFetch.js";
 import { callTool, fixturePath } from "../../../test/helpers/callTool.js";
-import { createContext, DAY } from "../../gateway/context.js";
+import { createContext, DAY, HOUR } from "../../gateway/context.js";
 import { paygapModule as mod } from "./index.js";
 import { parseGithubReports } from "./github.js";
 
@@ -15,7 +15,10 @@ const route: Route = {
 const tool = "paygap_search_reports";
 const snapshot = "a35d6c57d54528d1bd2e339179eab048543fd993";
 const githubBase = `https://raw.githubusercontent.com/zenbuffy/irishGenderPayGap/${snapshot}/`;
+const commitsUrl = "https://api.github.com/repos/zenbuffy/irishGenderPayGap/commits?sha=main&path=fullDenormalised.csv&per_page=1";
+const commitBody = (sha = snapshot, date = "2026-10-12T03:00:09Z") => JSON.stringify([{ sha, commit: { committer: { date } } }]);
 const fallbackRoutes: Route[] = [
+  { match: (url) => url === commitsUrl, body: commitBody() },
   { match: /paygap\.ie\/downloads\/annotated$/, status: 403 },
   { match: (url) => url === `${githubBase}fullDenormalised.csv`, file: f("github-curated.csv") }
 ];
@@ -24,7 +27,7 @@ describe("PayGap reports module", () => {
   it("uses the publisher GitHub snapshot after HTTP 403 with source, metrics and exclusion evidence", async () => {
     const fetch = fakeFetch(fallbackRoutes);
     const { ok, body } = await callTool(mod, tool, { year: 2025 }, fetch);
-    expect(fetch.calls).toHaveLength(2);
+    expect(fetch.calls).toHaveLength(3);
     expect(ok).toBe(true);
     expect(body.url).toBe(`${githubBase}fullDenormalised.csv`);
     expect(body.data.dataset).toMatchObject({ total_reports: 2, available_years: [2026, 2025], fallback: true,
@@ -41,13 +44,14 @@ describe("PayGap reports module", () => {
     const fetch = fakeFetch([route]);
     const ctx = createContext({ fetch });
     await ctx.cache.getOrLoad("GET https://paygap.ie/downloads/annotated", DAY, async () => []);
+    await ctx.cache.getOrLoad("paygap:dataset:v2:https://paygap.ie/downloads/annotated", DAY, async () => ({ reports: [], url: "old-snapshot" }));
     const result = await callTool(mod, tool, { company: "Acme", limit: 1 }, ctx);
     expect(result.ok).toBe(true);
     expect(result.body.data.reports).toHaveLength(1);
     expect(fetch.calls).toHaveLength(1);
   });
 
-  it("caches a validated snapshot for one day and keeps its original source identity", async () => {
+  it("caches a validated snapshot for one hour and keeps its original source identity", async () => {
     const fetch = fakeFetch(fallbackRoutes);
     let now = new Date("2026-10-25T12:00:00Z");
     const ctx = createContext({ fetch, now: () => now });
@@ -57,13 +61,13 @@ describe("PayGap reports module", () => {
     expect(second.body.cached).toBe(true);
     expect(second.body.url).toBe(`${githubBase}fullDenormalised.csv`);
     const calls = fetch.calls.length;
-    now = new Date(now.getTime() + DAY + 1);
+    now = new Date(now.getTime() + HOUR + 1);
     expect((await callTool(mod, tool, { limit: 1 }, ctx)).ok).toBe(true);
     expect(fetch.calls.length).toBeGreaterThan(calls);
   });
 
   it("fails closed for a malformed GitHub schema and does not fallback on other HTTP statuses", async () => {
-    const malformed = fakeFetch([fallbackRoutes[0]!, { match: /raw\.githubusercontent\.com/, body: "unexpected,header\n1,2" }]);
+    const malformed = fakeFetch([{ match: (url) => new URL(url).hostname === "raw.githubusercontent.com", body: "unexpected,header\n1,2" }, ...fallbackRoutes]);
     expect((await callTool(mod, tool, {}, malformed)).ok).toBe(false);
     for (const status of [401, 404]) {
       const fetch = fakeFetch([{ match: () => true, status }]);
@@ -88,6 +92,11 @@ describe("PayGap reports module", () => {
     }
   });
 
+  it("rejects a snapshot with no valid report years instead of publishing an empty dataset", async () => {
+    const csv = (await readFile(f("github-curated.csv"), "utf8")).replace(",2025,", ",0,").replace(",2026,", ",0,");
+    expect(() => parseGithubReports(csv)).toThrow("no valid report years");
+  });
+
   it("rejects malformed GitHub rows instead of silently losing fields", async () => {
     const curated = await readFile(f("github-curated.csv"), "utf8");
     expect(() => parseGithubReports(`${curated}broken,row\n`)).toThrow("wrong field count");
@@ -96,7 +105,7 @@ describe("PayGap reports module", () => {
   it("serves a stale validated fallback snapshot when its refresh has an availability failure", async () => {
     let unavailable = false;
     const fetch = fakeFetch([
-      { match: (url) => unavailable && new URL(url).hostname === "raw.githubusercontent.com", status: 503 },
+      { match: (url) => unavailable && new URL(url).hostname === "api.github.com", status: 503 },
       ...fallbackRoutes
     ]);
     let now = new Date("2026-10-25T12:00:00Z");
@@ -109,6 +118,89 @@ describe("PayGap reports module", () => {
     expect(result.body.cached).toBe(true);
     expect(result.body.stale).toBe(true);
     expect(result.body.url).toBe(`${githubBase}fullDenormalised.csv`);
+  });
+
+  it("adopts a new data commit after one hour while keeping snapshot and check dates distinct", async () => {
+    const next = "b".repeat(40);
+    let now = new Date("2026-10-26T12:00:00Z");
+    let current = snapshot;
+    let metadataCalls = 0;
+    let csvCalls = 0;
+    const csv = await readFile(f("github-curated.csv"), "utf8");
+    const fetch = async (url: string) => {
+      if (new URL(url).hostname === "paygap.ie") return new Response("denied", { status: 403 });
+      if (url === commitsUrl) { metadataCalls++; return new Response(commitBody(current, current === snapshot ? "2026-10-12T03:00:09Z" : "2026-10-26T12:30:00Z")); }
+      if (url === `${githubBase}fullDenormalised.csv` || url === `https://raw.githubusercontent.com/zenbuffy/irishGenderPayGap/${next}/fullDenormalised.csv`) {
+        csvCalls++;
+        return new Response(current === snapshot ? csv : csv.replace("Mirror Example Ltd", "Updated Example Ltd"));
+      }
+      throw new Error("Unexpected URL");
+    };
+    const ctx = createContext({ fetch, now: () => now });
+    const first = await callTool(mod, tool, { year: 2025, limit: 1 }, ctx);
+    expect(first.body.data.dataset).toMatchObject({ snapshot_commit: snapshot, snapshot_checked_at: "2026-10-26T12:00:00.000Z", refresh_interval_seconds: 3600, refresh_mode: "on_request", snapshot_date_basis: "git_committer_timestamp" });
+    current = next;
+    now = new Date("2026-10-26T12:59:00Z");
+    expect((await callTool(mod, tool, { limit: 1 }, ctx)).body.data.dataset.snapshot_commit).toBe(snapshot);
+    expect(metadataCalls).toBe(1);
+    now = new Date("2026-10-26T13:00:01Z");
+    const results = await Promise.all([callTool(mod, tool, { year: 2025, limit: 1 }, ctx), callTool(mod, tool, { year: 2025, limit: 1 }, ctx)]);
+    for (const result of results) {
+      expect(result.ok).toBe(true);
+      expect(result.body.data.dataset).toMatchObject({ snapshot_commit: next, snapshot_published_at: "2026-10-26T12:30:00Z", snapshot_checked_at: now.toISOString(), annotations_available: false });
+      expect(result.body.data.reports[0]).toMatchObject({ company_name: "Updated Example Ltd", annotations_available: false });
+      expect(Object.values(result.body.data.reports[0].annotations).every((value) => value === null)).toBe(true);
+      expect(result.body.url).toContain(`/${next}/fullDenormalised.csv`);
+      expect(result.body.attribution).toContain("2026-10-26T12:30:00Z");
+    }
+    expect(metadataCalls).toBe(2);
+    expect(csvCalls).toBe(2);
+  });
+
+  it("rechecks the file commit without downloading an unchanged immutable CSV", async () => {
+    const fetch = fakeFetch(fallbackRoutes);
+    let now = new Date("2026-10-26T12:00:00Z");
+    const ctx = createContext({ fetch, now: () => now });
+    await callTool(mod, tool, { limit: 1 }, ctx);
+    now = new Date(now.getTime() + HOUR + 1);
+    const refreshed = await callTool(mod, tool, { limit: 1 }, ctx);
+    expect(refreshed.ok).toBe(true);
+    expect(refreshed.body.data.dataset.snapshot_checked_at).toBe(now.toISOString());
+    expect(fetch.calls.filter(({url}) => url === commitsUrl)).toHaveLength(2);
+    expect(fetch.calls.filter(({url}) => new URL(url).hostname === "raw.githubusercontent.com")).toHaveLength(1);
+  });
+
+  it("rejects invalid revision metadata without requesting a CSV", async () => {
+    for (const body of ["[]", commitBody("../../other"), commitBody(snapshot, "2026-02-30T00:00:00Z"), '{"sha":"bad"}']) {
+      const fetch = fakeFetch([{ match: (url) => url === commitsUrl, body }, ...fallbackRoutes]);
+      const result = await callTool(mod, tool, {}, fetch);
+      expect(result.ok).toBe(false);
+      expect(result.body.error.code).toBe("UPSTREAM_DOWN");
+      expect(fetch.calls.some(({url}) => new URL(url).hostname === "raw.githubusercontent.com")).toBe(false);
+    }
+  });
+
+  it("never replaces valid cached data or its dates with a malformed newer snapshot", async () => {
+    let now = new Date("2026-10-26T12:00:00Z");
+    let phase = 0;
+    const next = "b".repeat(40);
+    const fetch = fakeFetch([
+      { match: (url) => phase === 2 && url === commitsUrl, status: 503 },
+      { match: (url) => phase === 1 && url === commitsUrl, body: commitBody(next, "2026-10-26T12:30:00Z") },
+      { match: (url) => url.includes(`/${next}/`), body: "broken,header\n1,2" },
+      ...fallbackRoutes
+    ]);
+    const ctx = createContext({ fetch, now: () => now });
+    const first = await callTool(mod, tool, { limit: 1 }, ctx);
+    expect(first.ok).toBe(true);
+    phase = 1;
+    now = new Date(now.getTime() + HOUR + 1);
+    expect((await callTool(mod, tool, { limit: 1 }, ctx)).ok).toBe(false);
+    phase = 2;
+    const stale = await callTool(mod, tool, { limit: 1 }, ctx);
+    expect(stale.ok).toBe(true);
+    expect(stale.body.stale).toBe(true);
+    expect(stale.body.data.dataset).toMatchObject({ snapshot_commit: snapshot, snapshot_checked_at: "2026-10-26T12:00:00.000Z", refresh_status: "failed_using_last_valid" });
   });
 
   it("retains source row identity, blank and zero values, negative gaps, and annotation flags", async () => {

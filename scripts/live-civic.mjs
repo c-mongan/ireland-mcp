@@ -30,7 +30,17 @@ const checks = [
       && /^\d{4}-\d{2}-\d{2}$/.test(d.returns[0].submitted_date);
   }],
   ["lobbying", "lobbying_search_returns", { limit: 1, page: 2 }, (d) => d.returns.length === 1 && d.returns[0].id !== firstLobbyingId],
-  ["paygap", "paygap_search_reports", { year: 2025, limit: 1 }, (d) => d.total_reports > 0 && d.reports.length === 1 && d.reports[0].report_year === 2025 && d.metric_unit === "percent"],
+  ["paygap", "paygap_search_reports", { year: 2025, limit: 1 }, (d) => {
+    const reportsOk = d.total_reports > 0 && d.reports.length === 1 && d.reports[0].report_year === 2025 && d.metric_unit === "percent";
+    if (!d.dataset?.fallback) return reportsOk;
+    return reportsOk && /^[a-f0-9]{40}$/.test(d.dataset.snapshot_commit)
+      && d.dataset.source_urls?.[0] === `https://raw.githubusercontent.com/zenbuffy/irishGenderPayGap/${d.dataset.snapshot_commit}/fullDenormalised.csv`
+      && Number.isFinite(Date.parse(d.dataset.snapshot_checked_at))
+      && Number.isFinite(Date.parse(d.dataset.snapshot_published_at))
+      && d.dataset.snapshot_date_basis === "git_committer_timestamp"
+      && d.dataset.refresh_interval_seconds === 3600 && d.dataset.refresh_mode === "on_request"
+      && d.dataset.annotations_available === false && Object.values(d.reports[0].annotations).every((value) => value === null);
+  }],
   ["council-budgets", "council_budgets_list_years", {}, (d) => d.years.some((year) => year.year === 2026 && year.supported) && d.years.some((year) => year.year === 2013 && !year.supported)],
   ["council-budgets", "council_budgets_get", { year: 2026, authority: "Carlow County Council", division: "A", limit: 1 }, (d) => d.amount_unit === "EUR" && d.rows.length === 1 && d.rows[0].amount === 4309186.99],
   ["council-budgets", "council_budgets_get", { year: 2016, authority: "Carlow County Council", division: "A", limit: 1 }, (d) => d.amount_unit === "EUR" && d.rows.length === 1 && d.rows[0].amount === 1753628.36]
