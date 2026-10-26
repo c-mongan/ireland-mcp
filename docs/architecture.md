@@ -1,6 +1,6 @@
 # Architecture
 
-Ireland MCP is a read-only Model Context Protocol (MCP) server for Irish public data. An AI client asks a question, the server calls one or more official public APIs, and every answer comes back with the publisher, source URL, licence, attribution and retrieval time attached.
+Ireland MCP is a read-only Model Context Protocol (MCP) server for Irish public data. An AI client asks a question, the server calls one or more official public APIs, and each operation result comes back with the publisher, source URL, licence, attribution and retrieval time attached. The raw `search` and `fetch` tools follow the ChatGPT connector shape instead: `search` returns `{ results: [{ id, title, url }] }`, and `fetch` returns `{ id, title, text, url, metadata }`. `metadata` always identifies the source; most adapters also include the licence and attribution, but EPA, Pobal, TED and World Bank do not yet ([#127](https://github.com/c-mongan/ireland-mcp/issues/127)).
 
 The hosted server is a stateless Azure Functions Flex app at `https://mcp.irishopendata.ie/mcp`. The same code runs locally over stdio (`ireland-mcp`) or HTTP (`npm run dev:http`).
 
@@ -126,3 +126,4 @@ These come from the 2026-10-26 architecture audit.
 | Packaged skills have no evals. | [#119](https://github.com/c-mongan/ireland-mcp/issues/119) |
 | The production CSP allows `localhost`. | [#120](https://github.com/c-mongan/ireland-mcp/issues/120) |
 | The deploy smoke test does not verify the deployed revision. | [#121](https://github.com/c-mongan/ireland-mcp/issues/121) |
+| `fetch` documents from EPA, Pobal, TED and World Bank omit licence and attribution. | [#127](https://github.com/c-mongan/ireland-mcp/issues/127) |
