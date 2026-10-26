@@ -25,8 +25,8 @@ be called directly with the same `args`.
 
 ## Steps
 
-1. **Search broadly.** Call `ireland_search` with the topic to see hits across all sources, then
-   use `ireland_fetch` on a promising id. With typed tools, `search` and `fetch` do the same.
+1. **Search broadly.** Call `search` with the topic to see hits across all sources, then call
+   `fetch` with a promising id (for example `data-gov-ie:moby-bikes`).
 2. **Search the portals.** Call `data-gov-ie/datagov_search_datasets` (national) and, for Dublin topics,
    `smart-dublin/smartdublin_search_datasets` with the topic words.
 3. **Inspect.** Call `data-gov-ie/datagov_get_dataset` (or `smart-dublin/smartdublin_get_dataset`) for the
