@@ -46,7 +46,7 @@ const SOURCE_FALLBACK = [
   { domain: "law/politics", sources: [
     { id: "lobbying", name: "SIPO Register of Lobbying", summary: "Published lobbying returns with bounded date windows and paged search.", operations: ["lobbying_search_returns"] },
     { id: "oireachtas", name: "Houses of the Oireachtas Open Data API", summary: "Members, bills, debates, parliamentary questions and votes.", operations: ["oireachtas_search_members", "oireachtas_search_bills", "oireachtas_get_debates", "oireachtas_search_questions", "oireachtas_get_votes"] },
-    { id: "legislation", name: "Irish Statute Book via ELI", summary: "Acts of the Oireachtas by year, contents and section text.", operations: ["legislation_list_acts", "legislation_get_act", "legislation_get_section"] },
+    { id: "legislation", name: "Irish Statute Book via ELI", summary: "Acts of the Oireachtas by year, contents and section text.", operations: ["legislation_list_acts", "legislation_get_act", "legislation_get_section", "legislation_get_act_effects", "legislation_list_sis", "legislation_get_si", "legislation_get_constitution_article"] },
     { id: "irish-legal", name: "Irish legal evidence corpus", optional: true, summary: "Optional pilot of indexed source versions and Act sections, seeded with annual leave and working time. Current law is unverified; Revised Acts indexing requires explicit publisher reuse permission.", operations: ["irish_legal_catalogue", "irish_legal_search", "irish_legal_fetch", "irish_legal_get_provision", "irish_legal_get_changes", "irish_legal_research"] },
     { id: "citizens-info", name: "Citizens Information", optional: true, summary: "Optional pilot of indexed explanatory guidance, limited to ingested pages; verify the underlying legal provisions and source versions.", operations: ["citizens_info_search", "citizens_info_get_article"] }
   ] },
@@ -95,7 +95,7 @@ const SOURCE_DETAILS = {
   paygap: { licence: "CC0 1.0", example: "Find AIB's 2025 gender pay-gap reports." },
   "council-budgets": { licence: "CC BY-SA 4.0", example: "Show Carlow County Council's 2026 housing budget." },
   oireachtas: { licence: "Oireachtas (Open Data) PSI Licence", example: "Find recent bills mentioning housing." },
-  legislation: { licence: "PSI General Licence / CC BY 4.0", example: "Show section 1 of a 2024 Act." },
+  legislation: { licence: "Oireachtas (Open Data) PSI Licence (CC BY 4.0)", example: "What does Article 40.3 of the Constitution say?" },
   "irish-legal": { licence: "Per-document publisher licence", coverage: "Optional pilot: only ingested pages, seeded with annual leave and working time. Current law is unverified. Revised Acts indexing requires explicit publisher reuse permission.", example: "Retrieve the indexed enacted annual-leave section with its version and currentness warnings." },
   "citizens-info": { licence: "CC BY 4.0; third-party material excluded", coverage: "Optional pilot: indexed explanatory guidance from ingested pages only; verify the underlying legal provisions and their versions.", example: "Find indexed Citizens Information annual-leave guidance and cite its source version." },
   geohive: { licence: "CC BY 4.0", example: "Which constituency contains 53.27,-9.05?" },

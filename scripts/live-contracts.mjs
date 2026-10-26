@@ -105,6 +105,10 @@ export const operationContracts = {
   legislation_list_acts: shape({ year: number, acts: records }),
   legislation_get_act: shape({ title: text, sections: records, eli: text }),
   legislation_get_section: shape({ text, eli: text }),
+  legislation_get_act_effects: (data) => shape({ act: object, counts: object, commencement: records, effects: records, made_under: records, warnings: Array.isArray })(data) && text(data.updated_to),
+  legislation_list_sis: shape({ year: number, total: number, sis: records }),
+  legislation_get_si: shape({ title: text, citation: text, text, eli: text }),
+  legislation_get_constitution_article: (data) => shape({ article: text, heading: text, paragraphs: records })(data) && data.paragraphs.length > 0 && data.paragraphs.every((p) => text(p.ref) && text(p.text)),
   irish_legal_catalogue: (data) => shape({ sources: records, coverage: legalCoverage })(data) && data.sources.length > 0
     && data.sources.every(shape({ id: text, publisher: text, type: text, licence: text, attribution: text, terms: text, storage_allowed: (value) => typeof value === "boolean" })),
   irish_legal_search: legalSearch,

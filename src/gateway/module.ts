@@ -8,6 +8,12 @@ export interface CachedJsonOptions<T> extends HttpOptions {
   validate?: (value: T) => void;
 }
 
+export interface CachedTextOptions extends HttpOptions {
+  cacheKey?: string;
+  /** Runs before caching; throw a ToolError for soft-error pages served with HTTP 200 so they are never cached. */
+  validate?: (value: string) => void;
+}
+
 export interface ToolContext {
   http: HttpClient;
   cache: TieredCache;
@@ -18,8 +24,8 @@ export interface ToolContext {
    * should throw a ToolError for error bodies sent with HTTP 200, so they are never cached.
    */
   cachedJson<T>(url: string, ttlMs: number, options?: CachedJsonOptions<T>): Promise<CacheResult<T>>;
-  /** Fetches text through the cache with stale fallback. */
-  cachedText(url: string, ttlMs: number, options?: HttpOptions & { cacheKey?: string }): Promise<CacheResult<string>>;
+  /** Fetches text through the cache with stale fallback. `validate` runs before caching, as for cachedJson. */
+  cachedText(url: string, ttlMs: number, options?: CachedTextOptions): Promise<CacheResult<string>>;
 }
 
 export interface ToolDefinition<Shape extends z.ZodRawShape = z.ZodRawShape> {

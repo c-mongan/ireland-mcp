@@ -499,6 +499,23 @@ describe("createContext", () => {
     expect(fetch.calls.filter((c) => c.url.endsWith("other"))).toHaveLength(2);
   });
 
+  it("never caches text rejected by validate", async () => {
+    let body = "<html>maintenance</html>";
+    const fetch = fakeFetch([{ match: () => true, body: "" }]);
+    const fetchImpl = Object.assign(async (url: string, init?: RequestInit) => {
+      await fetch(url, init);
+      return new Response(body);
+    }, { calls: fetch.calls });
+    const ctx = createContext({ fetch: fetchImpl });
+    const validate = (v: string) => {
+      if (!v.includes("<act")) throw new ToolError("UPSTREAM_DOWN", "not an act page");
+    };
+    await expect(ctx.cachedText("https://x.ie/t", 1000, { validate })).rejects.toThrow("not an act page");
+    body = "<act>ok</act>";
+    expect((await ctx.cachedText("https://x.ie/t", 1000, { validate })).value).toBe("<act>ok</act>");
+    expect(fetch.calls).toHaveLength(2);
+  });
+
   it("caches JSON and text by URL", async () => {
     const fetch = fakeFetch([
       { match: /json/, body: '{"n":1}' },
