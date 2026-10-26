@@ -91,7 +91,7 @@ Last full run of every operation then in the catalogue against the hosted endpoi
 The default profile covers statistics (CSO, Eurostat, ECB, World Bank), the Oireachtas and Irish Statute Book, Met Éireann, transport (Irish Rail, Luas, NTA, TFI stops, bikes), property, planning, heritage, environment, energy, tourism, lobbying, pay-gap reports, council budgets and more. An optional [Irish legal and Citizens Information pilot](packages/irish-legal-mcp/README.md) is off by default.
 
 <details>
-<summary><strong>All 36 sources, publishers and licences</strong></summary>
+<summary><strong>All 37 sources, publishers and licences</strong></summary>
 
 The default profile registers 36 source modules in `src/registry.ts`. The default `nearby`, `search` and `fetch` shortcuts sit above these sources. The optional pilot rows require `LEGAL_ENABLED=true` and an ingested corpus; check `ireland_catalogue` for the modules available on an endpoint. See [new provider access and limits](docs/public-source-additions.md).
 
@@ -111,6 +111,7 @@ The default profile registers 36 source modules in `src/registry.ts`. The defaul
 | economy | `cro` | [Companies Registration Office open data](https://opendata.cro.ie) | 3 | CC BY 4.0 |
 | economy | `kohesio` | [European Commission Kohesio](https://kohesio.ec.europa.eu/) — packaged, dated Irish CSV exports; not live data ([refresh guide](docs/kohesio-exports.md)) | 2 | EU reuse policy / CC BY 4.0 compatible |
 | stats | `smart-dublin` | [Smart Dublin open data](https://data.smartdublin.ie) | 3 | Per dataset, mostly CC BY 4.0 |
+| stats | `cib` | [Citizens Information Board Data Hub](https://www.citizensinformationboard.ie/en/data-hub/) — CIS and phone-service statistics, dated snapshot in [`web/data/cib/`](web/data/cib/) ([notes](docs/cib-source.md)) | 3 | CC BY 4.0 |
 | stats | `census-areas` | [CSO Census 2022 small areas / Tailte Éireann](https://data-osi.opendata.arcgis.com/datasets/osi::cso-small-areas-national-statistical-boundaries-2022-generalised-20m) | 1 | CC BY 4.0 |
 | law/politics | `lobbying` | [SIPO Register of Lobbying](https://www.lobbying.ie/) — published returns ([notes](docs/lobbying-source.md)) | 1 | SIPO PSI reuse policy |
 | economy | `paygap` | [PayGap.ie](https://paygap.ie/downloads) — employer reports with annotations ([notes](docs/civic-sources.md)) | 1 | CC0 1.0 |

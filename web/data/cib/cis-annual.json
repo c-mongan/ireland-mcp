@@ -1,0 +1,396 @@
+{
+  "schema_version": 1,
+  "dataset": "cib-cis-annual",
+  "title": "Citizens Information Services (CIS): annual callers and queries",
+  "publisher": "Citizens Information Board",
+  "as_of": "2026-10-26",
+  "licence": {
+    "name": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "notice_url": "https://www.citizensinformationboard.ie/en/notices/psi.html",
+    "attribution": "Contains Irish Public Sector Data licensed under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence",
+    "credit": "Citizens Information Board"
+  },
+  "data_hub_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/",
+  "sources": [
+    {
+      "id": "psi-notice",
+      "url": "https://www.citizensinformationboard.ie/en/notices/psi.html",
+      "page_url": "https://www.citizensinformationboard.ie/en/notices/psi.html",
+      "format": "html",
+      "description": "CIB re-use of public sector information notice (licence)",
+      "sha256": "41c30fe7438ccf94dc15e4d28840cdd60ee30d29173d91c046733d6e41f9a560",
+      "bytes": 18697
+    },
+    {
+      "id": "cis-caller-profile-2021",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/caller-profile2021.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/2021-statistical-summary/",
+      "format": "docx",
+      "description": "CIS caller demand 2021",
+      "sha256": "2264195b86ece6e9bd10c88bb24ceb3de12f8ceb397731b913b8c5194b733c8f",
+      "bytes": 36450
+    },
+    {
+      "id": "cis-summary-2022",
+      "url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/2022-statistical-summary/",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/2022-statistical-summary/",
+      "format": "html",
+      "description": "CIS 2022 statistical summary page",
+      "sha256": "882f64af0eb8bbbfa7f22324f72f635fb7af71aaeb3eed6f8903fb1ea0c00c92",
+      "bytes": 50223
+    },
+    {
+      "id": "cis-summary-2023",
+      "url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/2023-statistical-summary/",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/2023-statistical-summary/",
+      "format": "html",
+      "description": "CIS 2023 statistical summary page",
+      "sha256": "226806a632843beeb290425490e1196d68a487aa24839b99eff09d8b269c1f83",
+      "bytes": 55433
+    },
+    {
+      "id": "cis-summary-2024",
+      "url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/2024-statistical-summary/",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/2024-statistical-summary/",
+      "format": "html",
+      "description": "CIS 2024 statistical summary page",
+      "sha256": "93488219f3b9ab064b2a6b51865173ec449d195a0cf59a176feef05d5edaf4b6",
+      "bytes": 87960
+    },
+    {
+      "id": "cis-query-categories-2021",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories2021.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/2021-statistical-summary/",
+      "format": "docx",
+      "description": "CIS query profile 2021",
+      "sha256": "dc1964cdada2e964a31683856593e22a6f1f67c973ee17d4372b6a22b92b31d9",
+      "bytes": 92771
+    },
+    {
+      "id": "cis-query-categories-2022",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2022.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/2022-statistical-summary/",
+      "format": "docx",
+      "description": "CIS query profile 2022",
+      "sha256": "590bd9c04839428e4adff191d24891aa56e17ee6fb3b16c3e3dbbfda6143f28a",
+      "bytes": 111600
+    },
+    {
+      "id": "cis-query-categories-2023",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2023-v3.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/2023-statistical-summary/",
+      "format": "docx",
+      "description": "CIS query profile 2023",
+      "sha256": "9737b74b3a2a195f78d96be21372f0e2e57c8e879f34aa4e176fe1457d49dbfc",
+      "bytes": 131568
+    },
+    {
+      "id": "cis-query-categories-2024",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2024.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/2024-statistical-summary/",
+      "format": "docx",
+      "description": "CIS query profile 2024",
+      "sha256": "ba80297c638af7d16f242a9269dd7f3ee8681d21a1d4bce4bcc684c5263ba168",
+      "bytes": 137453
+    },
+    {
+      "id": "cis-query-categories-2025",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2025.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/2025-statistical-summary/",
+      "format": "docx",
+      "description": "CIS query and caller data 2025",
+      "sha256": "54c8213efe06112ed38376a60b3dc7d78f97a27508efa4b7b61c2f722d13a97e",
+      "bytes": 111749
+    },
+    {
+      "id": "cis-q1-2023",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/q1-2023.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/",
+      "format": "docx",
+      "description": "CIS statistical report Q1 2023",
+      "sha256": "83bec2fa7d51aca72a505e9af8ce3d04c37b129dbbbc38622898481060996645",
+      "bytes": 234466
+    },
+    {
+      "id": "cis-q2-2023",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/q2-2023-cis.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/",
+      "format": "docx",
+      "description": "CIS statistical report Q2 2023",
+      "sha256": "16a77b8dc4f95c88c0fccdf9863e3f4aa369e5d476f90c57eda6abe51fda1979",
+      "bytes": 173702
+    },
+    {
+      "id": "cis-q3-2023",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/q3-2023-1.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/",
+      "format": "docx",
+      "description": "CIS statistical report Q3 2023",
+      "sha256": "51721b08ab5e0c881b95f5586a0275f16808660f4b1474c3a075027a0124b2b0",
+      "bytes": 104052
+    },
+    {
+      "id": "cis-q4-2023",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/q4-2023-cis.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/",
+      "format": "docx",
+      "description": "CIS statistical report Q4 2023",
+      "sha256": "d1322be79305bea7e57f75ab98cff8aef18a7e03c9078a9fc5d1e77d705b3805",
+      "bytes": 98820
+    },
+    {
+      "id": "cis-q1-2024",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/q1-2024-v3.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/",
+      "format": "docx",
+      "description": "CIS statistical report Q1 2024",
+      "sha256": "011145cd441db0f8c18f12a8d95414c46070a493ed0c0d195c16de22bde563e0",
+      "bytes": 128274
+    },
+    {
+      "id": "cis-q2-2024",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/q2-2024.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/",
+      "format": "docx",
+      "description": "CIS statistical report Q2 2024",
+      "sha256": "5a2be62e77e2c7aa50905f6ac5d40c6b3a1785897a49fcdf2b224c1713c96839",
+      "bytes": 115565
+    },
+    {
+      "id": "cis-q3-2024",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/q3-2024.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/",
+      "format": "docx",
+      "description": "CIS statistical report Q3 2024",
+      "sha256": "00cfe5e813cfd3c4ecf8b10a446dbc3d094f56045541dc7f85b00c3de81f63a9",
+      "bytes": 106103
+    },
+    {
+      "id": "cis-q4-2024",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/q4-2024.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/",
+      "format": "docx",
+      "description": "CIS statistical report Q4 2024",
+      "sha256": "35125c3798b306e1d5374e630a99f73b6ed73f7db22ed73f4e6434b2e54e22ae",
+      "bytes": 108265
+    },
+    {
+      "id": "cis-q1-2025",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/q1-2025.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/",
+      "format": "docx",
+      "description": "CIS statistical report Q1 2025",
+      "sha256": "405218442e078eebe567097ef2dfe29a753ef1d5da3ad29a300128915be3d705",
+      "bytes": 1700018
+    },
+    {
+      "id": "cis-q2-2025",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/Q2-2025-CIS-statistical-report.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/",
+      "format": "docx",
+      "description": "CIS statistical report Q2 2025",
+      "sha256": "38c1aa7c64bba26bcfbc93dea59f142c0e99201e745df6cceac98ce7efb4df02",
+      "bytes": 1737521
+    },
+    {
+      "id": "cis-q3-2025",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/Q3-2025-CIS-statistical-report.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/",
+      "format": "docx",
+      "description": "CIS statistical report Q3 2025",
+      "sha256": "522a4db56ecff709a0a1c3733c378b7ce99cb72bc913304d7315635895d69e53",
+      "bytes": 2207236
+    },
+    {
+      "id": "cis-q4-2025",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/Q4-2025-CIS-statistical-report.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/",
+      "format": "docx",
+      "description": "CIS statistical report Q4 2025",
+      "sha256": "8306e5f76a989f04eaa943cf51d095f91c1b09fb9307ceec100471047076a862",
+      "bytes": 1459055
+    }
+  ],
+  "notes": [
+    "Callers are CIS client contacts recorded by the eight regional Citizens Information Service companies; one caller can raise several queries.",
+    "Queries are the Table 1 total of each year's query-category file and match the overview text of the same file.",
+    "2025 callers are derived: the four 2025 quarterly reports are summed because no annual caller total is printed. The same method reproduces the published 2023 and 2024 annual totals exactly.",
+    "The 2022 summary page rounds queries to \"over 788,900\"; the exact 788,902 comes from the 2022 query-category file."
+  ],
+  "years": [
+    {
+      "year": 2021,
+      "queries": {
+        "value": 693918,
+        "printed": "693,918",
+        "source": "cis-query-categories-2021"
+      },
+      "callers": {
+        "value": 338167,
+        "printed": "338,167",
+        "source": "cis-caller-profile-2021",
+        "derived": false
+      }
+    },
+    {
+      "year": 2022,
+      "queries": {
+        "value": 788902,
+        "printed": "788,902",
+        "source": "cis-query-categories-2022"
+      },
+      "callers": {
+        "value": 394400,
+        "printed": "394,400",
+        "source": "cis-summary-2022",
+        "derived": false
+      }
+    },
+    {
+      "year": 2023,
+      "queries": {
+        "value": 795278,
+        "printed": "795,278",
+        "source": "cis-query-categories-2023"
+      },
+      "callers": {
+        "value": 397605,
+        "printed": "397,605",
+        "source": "cis-summary-2023",
+        "derived": false
+      },
+      "quarterly_callers": [
+        {
+          "quarter": 1,
+          "callers": {
+            "value": 107403,
+            "printed": "107,403",
+            "source": "cis-q1-2023"
+          }
+        },
+        {
+          "quarter": 2,
+          "callers": {
+            "value": 95678,
+            "printed": "95,678",
+            "source": "cis-q2-2023"
+          }
+        },
+        {
+          "quarter": 3,
+          "callers": {
+            "value": 103478,
+            "printed": "103,478",
+            "source": "cis-q3-2023"
+          }
+        },
+        {
+          "quarter": 4,
+          "callers": {
+            "value": 91046,
+            "printed": "91,046",
+            "source": "cis-q4-2023"
+          }
+        }
+      ]
+    },
+    {
+      "year": 2024,
+      "queries": {
+        "value": 767168,
+        "printed": "767,168",
+        "source": "cis-query-categories-2024"
+      },
+      "callers": {
+        "value": 395017,
+        "printed": "395,017",
+        "source": "cis-summary-2024",
+        "derived": false
+      },
+      "quarterly_callers": [
+        {
+          "quarter": 1,
+          "callers": {
+            "value": 106122,
+            "printed": "106,122",
+            "source": "cis-q1-2024"
+          }
+        },
+        {
+          "quarter": 2,
+          "callers": {
+            "value": 99181,
+            "printed": "99,181",
+            "source": "cis-q2-2024"
+          }
+        },
+        {
+          "quarter": 3,
+          "callers": {
+            "value": 101610,
+            "printed": "101,610",
+            "source": "cis-q3-2024"
+          }
+        },
+        {
+          "quarter": 4,
+          "callers": {
+            "value": 88104,
+            "printed": "88,104",
+            "source": "cis-q4-2024"
+          }
+        }
+      ]
+    },
+    {
+      "year": 2025,
+      "queries": {
+        "value": 708862,
+        "printed": "708,862",
+        "source": "cis-query-categories-2025"
+      },
+      "callers": {
+        "value": 384091,
+        "printed": null,
+        "source": null,
+        "derived": true,
+        "method": "Sum of the callers stated in the four 2025 CIS quarterly statistical reports. The annual summary for 2025 does not print a caller total. For 2023 and 2024 the same sum equals the published annual figure."
+      },
+      "quarterly_callers": [
+        {
+          "quarter": 1,
+          "callers": {
+            "value": 101462,
+            "printed": "101,462",
+            "source": "cis-q1-2025"
+          }
+        },
+        {
+          "quarter": 2,
+          "callers": {
+            "value": 94372,
+            "printed": "94,372",
+            "source": "cis-q2-2025"
+          }
+        },
+        {
+          "quarter": 3,
+          "callers": {
+            "value": 102062,
+            "printed": "102,062",
+            "source": "cis-q3-2025"
+          }
+        },
+        {
+          "quarter": 4,
+          "callers": {
+            "value": 86195,
+            "printed": "86,195",
+            "source": "cis-q4-2025"
+          }
+        }
+      ]
+    }
+  ]
+}

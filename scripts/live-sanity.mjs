@@ -36,6 +36,7 @@ const CASES = [
   ["met-eireann", "met_get_warnings", {}, (d) => Array.isArray(d.warnings)],
   ["lobbying", "lobbying_search_returns", { limit: 1 }, (d) => d.returns?.length === 1 && /^\d+$/.test(d.returns[0].id)],
   ["paygap", "paygap_search_reports", { year: 2025, limit: 1 }, (d) => d.total_reports > 0 && d.reports?.[0]?.report_year === 2025],
+  ["cib", "cib_cis_annual_summary", { year: 2025 }, (d) => d.years?.[0]?.queries > 0 && d.as_of && d.source_urls?.length > 0],
   ["council-budgets", "council_budgets_get", { year: 2026, authority: "Carlow County Council", division: "A", limit: 1 }, (d) => d.amount_unit === "EUR" && d.rows?.length === 1],
   ["nta", "nta_get_realtime_summary", { limit: 3 }, ntaSummarySample, { needsEnv: "NTA_API_KEY" }],
   ["legislation", "legislation_list_acts", { year: year - 1, limit: 3 }, (d) => JSON.stringify(d).includes("title")],

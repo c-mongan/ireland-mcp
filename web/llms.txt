@@ -6,7 +6,7 @@ Endpoint: [Ireland MCP Streamable HTTP endpoint](https://mcp.irishopendata.ie/mc
 Docs: [Ireland MCP documentation and playground](https://irishopendata.ie/)
 Transport: Streamable HTTP JSON-RPC over POST
 Auth: none
-Default tool surface: 7 tools, 8,407 characters, about 2.1k tokens
+Default tool surface: 7 tools, 8,747 characters, about 2.2k tokens
 Full surface: use ?toolsets=all only when a client needs all typed tools listed
 
 Install:
@@ -49,3 +49,11 @@ policy blocks setup, report the exact step and required user action.
 - [API guide and source catalogue](https://github.com/c-mongan/ireland-mcp/blob/main/README.md): supported sources, operations and self-hosting.
 - [Privacy policy](https://github.com/c-mongan/ireland-mcp/blob/main/PRIVACY.md): request handling and telemetry.
 - [Source attribution](https://github.com/c-mongan/ireland-mcp/blob/main/NOTICE): publisher licences and reuse requirements.
+
+## Data snapshots
+
+Dated JSON snapshots that the server answers from. Each file carries as_of, licence and attribution, source URLs with SHA-256 checksums, and notes. Schema: https://github.com/c-mongan/ireland-mcp/blob/main/docs/cib-source.md
+
+- [CIS annual callers and queries](https://irishopendata.ie/data/cib/cis-annual.json): Citizens Information Board Data Hub, CC BY 4.0.
+- [CIS queries by category](https://irishopendata.ie/data/cib/cis-query-categories.json): Citizens Information Board Data Hub, CC BY 4.0.
+- [Citizens Information Phone Service contacts and categories](https://irishopendata.ie/data/cib/cips.json): Citizens Information Board Data Hub, CC BY 4.0.

@@ -1,0 +1,1165 @@
+{
+  "schema_version": 1,
+  "dataset": "cib-cips",
+  "title": "Citizens Information Phone Service (CIPS): contacts and call categories",
+  "publisher": "Citizens Information Board",
+  "as_of": "2026-10-26",
+  "licence": {
+    "name": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "notice_url": "https://www.citizensinformationboard.ie/en/notices/psi.html",
+    "attribution": "Contains Irish Public Sector Data licensed under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence",
+    "credit": "Citizens Information Board"
+  },
+  "data_hub_url": "https://www.citizensinformationboard.ie/en/data-hub/cips-data-hub/",
+  "sources": [
+    {
+      "id": "psi-notice",
+      "url": "https://www.citizensinformationboard.ie/en/notices/psi.html",
+      "page_url": "https://www.citizensinformationboard.ie/en/notices/psi.html",
+      "format": "html",
+      "description": "CIB re-use of public sector information notice (licence)",
+      "sha256": "41c30fe7438ccf94dc15e4d28840cdd60ee30d29173d91c046733d6e41f9a560",
+      "bytes": 18697
+    },
+    {
+      "id": "cips-summary-2021",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/CIPS-statistical-summary-2021-1.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cips-data-hub/",
+      "format": "docx",
+      "description": "CIPS statistical summary 2021",
+      "sha256": "3d24ba339a1d9380391374514d593f1e64c4fbd6f1227d4e9ef0bbe3b7a42ce7",
+      "bytes": 57682
+    },
+    {
+      "id": "cips-summary-2022",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/CIPS-statistical-summary-2022-1.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cips-data-hub/",
+      "format": "docx",
+      "description": "CIPS statistical summary 2022",
+      "sha256": "514021877fe7d298044e3d4fde093fac6b28628e873428ab2427e01166f026eb",
+      "bytes": 57188
+    },
+    {
+      "id": "cips-summary-2023",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/CIPS-statistical-summary-2023.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cips-data-hub/",
+      "format": "docx",
+      "description": "CIPS statistical summary 2023",
+      "sha256": "b04cd02bd6a11fd6b88a9d82b9fbc5b8735b7764a7c31679fbf61c026d3ee13c",
+      "bytes": 46885
+    },
+    {
+      "id": "cips-summary-2024",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/CIPS-statistical-summary-2024.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cips-data-hub/",
+      "format": "docx",
+      "description": "CIPS statistical summary 2024",
+      "sha256": "a4c6e49b1a8490e831576d63eaeab2c7d6762722a956535ffac9823a877b9a76",
+      "bytes": 56290
+    },
+    {
+      "id": "cips-summary-2025",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/CIPS-statistical-summary-2025.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cips-data-hub/",
+      "format": "docx",
+      "description": "CIPS statistical summary 2025",
+      "sha256": "70ff0ba09c8dca1d57aa95bb513da849a5bd497eb1e8a6b02670aae09e65f10b",
+      "bytes": 1098824
+    }
+  ],
+  "notes": [
+    "contacts counts every answered telephone call, webchat and social media enquiry. categorised_calls counts the calls assigned a main category, a subset of contacts.",
+    "Where a sub-category table total disagrees with the main category table, the main table value is kept and the difference is recorded on the category and in the year's notes."
+  ],
+  "years": [
+    {
+      "year": 2021,
+      "source": "cips-summary-2021",
+      "contacts": {
+        "telephone": {
+          "value": 161683,
+          "printed": "161,683",
+          "source": "cips-summary-2021"
+        },
+        "webchat": {
+          "value": 2789,
+          "printed": "2,789",
+          "source": "cips-summary-2021"
+        },
+        "social_media": {
+          "value": 575,
+          "printed": "575",
+          "source": "cips-summary-2021"
+        },
+        "total": {
+          "value": 165047,
+          "printed": "165,047",
+          "source": "cips-summary-2021",
+          "basis": "text"
+        }
+      },
+      "categorised_calls": {
+        "value": 92027,
+        "printed": "92,027",
+        "source": "cips-summary-2021"
+      },
+      "categories": [
+        {
+          "category": "Social Welfare",
+          "source_label": "Social Welfare",
+          "calls": {
+            "value": 28626,
+            "printed": "28,626",
+            "source": "cips-summary-2021"
+          },
+          "share_percent": 31.1
+        },
+        {
+          "category": "Covid-19",
+          "source_label": "Covid-19",
+          "calls": {
+            "value": 15085,
+            "printed": "15,085",
+            "source": "cips-summary-2021"
+          },
+          "share_percent": 16.4
+        },
+        {
+          "category": "Employment",
+          "source_label": "Employment",
+          "calls": {
+            "value": 10323,
+            "printed": "10,323",
+            "source": "cips-summary-2021"
+          },
+          "share_percent": 11.2
+        },
+        {
+          "category": "Housing",
+          "source_label": "Housing",
+          "calls": {
+            "value": 6737,
+            "printed": "6,737",
+            "source": "cips-summary-2021"
+          },
+          "share_percent": 7.3
+        },
+        {
+          "category": "Money and Tax",
+          "source_label": "Money and Tax",
+          "calls": {
+            "value": 5658,
+            "printed": "5,658",
+            "source": "cips-summary-2021"
+          },
+          "share_percent": 6.1
+        },
+        {
+          "category": "Travel and Recreation",
+          "source_label": "Travel and Recreation",
+          "calls": {
+            "value": 4016,
+            "printed": "4,016",
+            "source": "cips-summary-2021"
+          },
+          "share_percent": 4.4
+        },
+        {
+          "category": "Local",
+          "source_label": "Local",
+          "calls": {
+            "value": 3878,
+            "printed": "3,878",
+            "source": "cips-summary-2021"
+          },
+          "share_percent": 4.2
+        },
+        {
+          "category": "Health",
+          "source_label": "Health",
+          "calls": {
+            "value": 3531,
+            "printed": "3,531",
+            "source": "cips-summary-2021"
+          },
+          "share_percent": 3.8
+        },
+        {
+          "category": "Moving Country",
+          "source_label": "Moving Country",
+          "calls": {
+            "value": 2923,
+            "printed": "2,923",
+            "source": "cips-summary-2021"
+          },
+          "share_percent": 3.2
+        },
+        {
+          "category": "Justice",
+          "source_label": "Justice",
+          "calls": {
+            "value": 2856,
+            "printed": "2,856",
+            "source": "cips-summary-2021"
+          },
+          "share_percent": 3.1
+        },
+        {
+          "category": "Consumer Affairs",
+          "source_label": "Consumer Affairs",
+          "calls": {
+            "value": 2685,
+            "printed": "2,685",
+            "source": "cips-summary-2021"
+          },
+          "share_percent": 2.9
+        },
+        {
+          "category": "Birth, Family and Relationships",
+          "source_label": "Birth Family and Relationship",
+          "calls": {
+            "value": 2447,
+            "printed": "2,447",
+            "source": "cips-summary-2021"
+          },
+          "share_percent": 2.7
+        },
+        {
+          "category": "Education and Training",
+          "source_label": "Education and Training",
+          "calls": {
+            "value": 1757,
+            "printed": "1,757",
+            "source": "cips-summary-2021"
+          },
+          "share_percent": 1.9
+        },
+        {
+          "category": "Death and Bereavement",
+          "source_label": "Death and Bereavement",
+          "calls": {
+            "value": 961,
+            "printed": "961",
+            "source": "cips-summary-2021"
+          },
+          "share_percent": 1
+        },
+        {
+          "category": "Environment",
+          "source_label": "Environment",
+          "calls": {
+            "value": 291,
+            "printed": "291",
+            "source": "cips-summary-2021"
+          },
+          "share_percent": 0.3
+        },
+        {
+          "category": "Government in Ireland",
+          "source_label": "Government in Ireland",
+          "calls": {
+            "value": 253,
+            "printed": "253",
+            "source": "cips-summary-2021"
+          },
+          "share_percent": 0.3
+        }
+      ],
+      "sum_of_categories": 92027,
+      "matches_total": true,
+      "notes": [
+        "The contact-mode table has no total row; the total is the report text \"There were 165,047 calls answered by CIPS during 2021\", which equals telephone + webchat + social media.",
+        "\"Table 7: Breakdown of Moving Country Call Sub-Categories answered by CIPS in 2021\" ends with a total row labelled \"Total Money and Tax Calls\" (5,658); it is treated as the Money and Tax breakdown."
+      ]
+    },
+    {
+      "year": 2022,
+      "source": "cips-summary-2022",
+      "contacts": {
+        "telephone": {
+          "value": 135046,
+          "printed": "135,046",
+          "source": "cips-summary-2022"
+        },
+        "webchat": {
+          "value": 2386,
+          "printed": "2,386",
+          "source": "cips-summary-2022"
+        },
+        "social_media": {
+          "value": 397,
+          "printed": "397",
+          "source": "cips-summary-2022"
+        },
+        "total": {
+          "value": 137829,
+          "printed": "137,829",
+          "source": "cips-summary-2022",
+          "basis": "text"
+        }
+      },
+      "categorised_calls": {
+        "value": 91134,
+        "printed": "91,134",
+        "source": "cips-summary-2022"
+      },
+      "categories": [
+        {
+          "category": "Social Welfare",
+          "source_label": "Social Welfare",
+          "calls": {
+            "value": 33141,
+            "printed": "33,141",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 36.4
+        },
+        {
+          "category": "Employment",
+          "source_label": "Employment",
+          "calls": {
+            "value": 12386,
+            "printed": "12,386",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 13.6
+        },
+        {
+          "category": "Housing",
+          "source_label": "Housing",
+          "calls": {
+            "value": 7115,
+            "printed": "7,115",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 7.8
+        },
+        {
+          "category": "Money and Tax",
+          "source_label": "Money and Tax",
+          "calls": {
+            "value": 5440,
+            "printed": "5,440",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 6
+        },
+        {
+          "category": "Moving Country",
+          "source_label": "Moving Country",
+          "calls": {
+            "value": 4822,
+            "printed": "4,822",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 5.3
+        },
+        {
+          "category": "Covid-19",
+          "source_label": "Covid-19",
+          "calls": {
+            "value": 4693,
+            "printed": "4,693",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 5.1
+        },
+        {
+          "category": "Local",
+          "source_label": "Local",
+          "calls": {
+            "value": 4475,
+            "printed": "4,475",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 4.9
+        },
+        {
+          "category": "Health",
+          "source_label": "Health",
+          "calls": {
+            "value": 3711,
+            "printed": "3,711",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 4.1
+        },
+        {
+          "category": "Travel and Recreation",
+          "source_label": "Travel and Recreation",
+          "calls": {
+            "value": 3669,
+            "printed": "3,669",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 4
+        },
+        {
+          "category": "Consumer Affairs",
+          "source_label": "Consumer Affairs",
+          "calls": {
+            "value": 3001,
+            "printed": "3,001",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 3.3
+        },
+        {
+          "category": "Justice",
+          "source_label": "Justice",
+          "calls": {
+            "value": 2546,
+            "printed": "2,546",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 2.8
+        },
+        {
+          "category": "Birth, Family and Relationships",
+          "source_label": "Birth Family and Relationship",
+          "calls": {
+            "value": 2369,
+            "printed": "2,369",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 2.6
+        },
+        {
+          "category": "Education and Training",
+          "source_label": "Education and Training",
+          "calls": {
+            "value": 1586,
+            "printed": "1,586",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 1.7
+        },
+        {
+          "category": "Death and Bereavement",
+          "source_label": "Death and Bereavement",
+          "calls": {
+            "value": 1082,
+            "printed": "1,082",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 1.2
+        },
+        {
+          "category": "Budget 2023",
+          "source_label": "Budget 2023",
+          "calls": {
+            "value": 510,
+            "printed": "510",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 0.6
+        },
+        {
+          "category": "Environment",
+          "source_label": "Environment",
+          "calls": {
+            "value": 252,
+            "printed": "252",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 0.3
+        },
+        {
+          "category": "Government in Ireland",
+          "source_label": "Government in Ireland",
+          "calls": {
+            "value": 234,
+            "printed": "234",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 0.3
+        },
+        {
+          "category": "Ukraine",
+          "source_label": "Ukraine",
+          "calls": {
+            "value": 102,
+            "printed": "102",
+            "source": "cips-summary-2022"
+          },
+          "share_percent": 0.1
+        }
+      ],
+      "sum_of_categories": 91134,
+      "matches_total": true,
+      "notes": [
+        "The contact-mode table has no total row; the total is the report text \"There were 137,829 calls answered by CIPS during 2022\", which equals telephone + webchat + social media."
+      ]
+    },
+    {
+      "year": 2023,
+      "source": "cips-summary-2023",
+      "contacts": {
+        "telephone": {
+          "value": 133258,
+          "printed": "133,258",
+          "source": "cips-summary-2023"
+        },
+        "webchat": {
+          "value": 1981,
+          "printed": "1,981",
+          "source": "cips-summary-2023"
+        },
+        "social_media": {
+          "value": 238,
+          "printed": "238",
+          "source": "cips-summary-2023"
+        },
+        "total": {
+          "value": 135477,
+          "printed": "135,477",
+          "source": "cips-summary-2023",
+          "basis": "text"
+        }
+      },
+      "categorised_calls": {
+        "value": 81890,
+        "printed": "81,890",
+        "source": "cips-summary-2023"
+      },
+      "categories": [
+        {
+          "category": "Social Welfare",
+          "source_label": "Social Welfare",
+          "calls": {
+            "value": 31982,
+            "printed": "31,982",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 39.1
+        },
+        {
+          "category": "Employment",
+          "source_label": "Employment",
+          "calls": {
+            "value": 11595,
+            "printed": "11,595",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 14.2
+        },
+        {
+          "category": "Housing",
+          "source_label": "Housing",
+          "calls": {
+            "value": 7025,
+            "printed": "7,025",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 8.6
+        },
+        {
+          "category": "Money and Tax",
+          "source_label": "Money and Tax",
+          "calls": {
+            "value": 6208,
+            "printed": "6,208",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 7.6
+        },
+        {
+          "category": "Moving Country",
+          "source_label": "Moving Country",
+          "calls": {
+            "value": 5237,
+            "printed": "5,237",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 6.4
+        },
+        {
+          "category": "Health",
+          "source_label": "Health",
+          "calls": {
+            "value": 3538,
+            "printed": "3,538",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 4.3
+        },
+        {
+          "category": "Consumer Affairs",
+          "source_label": "Consumer Affairs",
+          "calls": {
+            "value": 2731,
+            "printed": "2,731",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 3.3
+        },
+        {
+          "category": "Justice",
+          "source_label": "Justice",
+          "calls": {
+            "value": 2621,
+            "printed": "2,621",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 3.2
+        },
+        {
+          "category": "Travel and Recreation",
+          "source_label": "Travel and Recreation",
+          "calls": {
+            "value": 2488,
+            "printed": "2,488",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 3
+        },
+        {
+          "category": "Local",
+          "source_label": "Local",
+          "calls": {
+            "value": 2197,
+            "printed": "2,197",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 2.7
+        },
+        {
+          "category": "Birth, Family and Relationships",
+          "source_label": "Birth Family and Relationship",
+          "calls": {
+            "value": 2044,
+            "printed": "2,044",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 2.5
+        },
+        {
+          "category": "Education and Training",
+          "source_label": "Education and Training",
+          "calls": {
+            "value": 1511,
+            "printed": "1,511",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 1.8
+        },
+        {
+          "category": "Death and Bereavement",
+          "source_label": "Death and Bereavement",
+          "calls": {
+            "value": 930,
+            "printed": "930",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 1.1
+        },
+        {
+          "category": "Ukraine",
+          "source_label": "Ukraine",
+          "calls": {
+            "value": 419,
+            "printed": "419",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 0.5
+        },
+        {
+          "category": "Covid-19",
+          "source_label": "Covid-19",
+          "calls": {
+            "value": 366,
+            "printed": "366",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 0.4
+        },
+        {
+          "category": "Environment",
+          "source_label": "Environment",
+          "calls": {
+            "value": 323,
+            "printed": "323",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 0.4
+        },
+        {
+          "category": "Budget 2024",
+          "source_label": "Budget 2024",
+          "calls": {
+            "value": 446,
+            "printed": "446",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 0.5
+        },
+        {
+          "category": "Government in Ireland",
+          "source_label": "Government in Ireland",
+          "calls": {
+            "value": 229,
+            "printed": "229",
+            "source": "cips-summary-2023"
+          },
+          "share_percent": 0.3
+        }
+      ],
+      "sum_of_categories": 81890,
+      "matches_total": true,
+      "notes": [
+        "The contact-mode table has no total row; the total is the report text \"There were 135,477 calls answered by CIPS during 2023\", which equals telephone + webchat + social media.",
+        "The contact-mode table header reads \"Number of Callers (Q1 2023)\", but the figures are the full-year 2023 totals stated in the report text."
+      ]
+    },
+    {
+      "year": 2024,
+      "source": "cips-summary-2024",
+      "contacts": {
+        "telephone": {
+          "value": 142583,
+          "printed": "142,583",
+          "source": "cips-summary-2024"
+        },
+        "webchat": {
+          "value": 1926,
+          "printed": "1,926",
+          "source": "cips-summary-2024"
+        },
+        "social_media": {
+          "value": 200,
+          "printed": "200",
+          "source": "cips-summary-2024"
+        },
+        "total": {
+          "value": 144709,
+          "printed": "144,709",
+          "source": "cips-summary-2024",
+          "basis": "table"
+        }
+      },
+      "categorised_calls": {
+        "value": 74181,
+        "printed": "74,181",
+        "source": "cips-summary-2024"
+      },
+      "categories": [
+        {
+          "category": "Social Welfare",
+          "source_label": "Social Welfare",
+          "calls": {
+            "value": 27010,
+            "printed": "27,010",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 36.4
+        },
+        {
+          "category": "Employment",
+          "source_label": "Employment",
+          "calls": {
+            "value": 11774,
+            "printed": "11,774",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 15.9
+        },
+        {
+          "category": "Housing",
+          "source_label": "Housing",
+          "calls": {
+            "value": 7280,
+            "printed": "7,280",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 9.8
+        },
+        {
+          "category": "Money and Tax",
+          "source_label": "Money and Tax",
+          "calls": {
+            "value": 5506,
+            "printed": "5,506",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 7.4
+        },
+        {
+          "category": "Moving Country",
+          "source_label": "Moving Country",
+          "calls": {
+            "value": 4996,
+            "printed": "4,996",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 6.7
+        },
+        {
+          "category": "Health",
+          "source_label": "Health",
+          "calls": {
+            "value": 3490,
+            "printed": "3,490",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 4.7
+        },
+        {
+          "category": "Consumer Affairs",
+          "source_label": "Consumer Affairs",
+          "calls": {
+            "value": 2589,
+            "printed": "2,589",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 3.5
+        },
+        {
+          "category": "Justice",
+          "source_label": "Justice",
+          "calls": {
+            "value": 2311,
+            "printed": "2,311",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 3.1
+        },
+        {
+          "category": "Travel and Recreation",
+          "source_label": "Travel and Recreation",
+          "calls": {
+            "value": 1923,
+            "printed": "1,923",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 2.6
+        },
+        {
+          "category": "Birth, Family and Relationships",
+          "source_label": "Birth Family and Relationship",
+          "calls": {
+            "value": 1922,
+            "printed": "1,922",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 2.6
+        },
+        {
+          "category": "Local",
+          "source_label": "Local",
+          "calls": {
+            "value": 1808,
+            "printed": "1,808",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 2.4
+        },
+        {
+          "category": "Education and Training",
+          "source_label": "Education and Training",
+          "calls": {
+            "value": 1281,
+            "printed": "1,281",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 1.7
+        },
+        {
+          "category": "Death and Bereavement",
+          "source_label": "Death and Bereavement",
+          "calls": {
+            "value": 820,
+            "printed": "820",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 1.1
+        },
+        {
+          "category": "Government in Ireland",
+          "source_label": "Government in Ireland",
+          "calls": {
+            "value": 626,
+            "printed": "626",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 0.8
+        },
+        {
+          "category": "Ukraine",
+          "source_label": "Ukraine",
+          "calls": {
+            "value": 355,
+            "printed": "355",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 0.5
+        },
+        {
+          "category": "Environment",
+          "source_label": "Environment",
+          "calls": {
+            "value": 249,
+            "printed": "249",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 0.3
+        },
+        {
+          "category": "Covid-19",
+          "source_label": "Covid-19",
+          "calls": {
+            "value": 140,
+            "printed": "140",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 0.2
+        },
+        {
+          "category": "Budget 2025",
+          "source_label": "Budget 2025",
+          "calls": {
+            "value": 101,
+            "printed": "101",
+            "source": "cips-summary-2024"
+          },
+          "share_percent": 0.1
+        }
+      ],
+      "sum_of_categories": 74181,
+      "matches_total": true,
+      "notes": []
+    },
+    {
+      "year": 2025,
+      "source": "cips-summary-2025",
+      "contacts": {
+        "telephone": {
+          "value": 111472,
+          "printed": "111,472",
+          "source": "cips-summary-2025"
+        },
+        "webchat": {
+          "value": 1792,
+          "printed": "1,792",
+          "source": "cips-summary-2025"
+        },
+        "social_media": {
+          "value": 240,
+          "printed": "240",
+          "source": "cips-summary-2025"
+        },
+        "total": {
+          "value": 113504,
+          "printed": "113,504",
+          "source": "cips-summary-2025",
+          "basis": "table"
+        }
+      },
+      "categorised_calls": {
+        "value": 63609,
+        "printed": "63,609",
+        "source": "cips-summary-2025"
+      },
+      "categories": [
+        {
+          "category": "Social Welfare",
+          "source_label": "Social Welfare",
+          "calls": {
+            "value": 26291,
+            "printed": "26,291",
+            "source": "cips-summary-2025"
+          },
+          "share_percent": 41.3
+        },
+        {
+          "category": "Employment",
+          "source_label": "Employment",
+          "calls": {
+            "value": 8970,
+            "printed": "8,970",
+            "source": "cips-summary-2025"
+          },
+          "share_percent": 14.1
+        },
+        {
+          "category": "Housing",
+          "source_label": "Housing",
+          "calls": {
+            "value": 6382,
+            "printed": "6,382",
+            "source": "cips-summary-2025"
+          },
+          "share_percent": 10,
+          "subcategory_table_total": {
+            "value": 6381,
+            "printed": "6,381",
+            "source": "cips-summary-2025",
+            "table": "Table 5: Housing call sub-categories"
+          },
+          "note": "The main category table states 6,382; the Housing sub-category table totals 6,381. The main table value is used."
+        },
+        {
+          "category": "Money and Tax",
+          "source_label": "Money and Tax",
+          "calls": {
+            "value": 6014,
+            "printed": "6,014",
+            "source": "cips-summary-2025"
+          },
+          "share_percent": 9.5,
+          "subcategory_table_total": {
+            "value": 6012,
+            "printed": "6,012",
+            "source": "cips-summary-2025",
+            "table": "Table 6: Money & Tax call sub-categories"
+          },
+          "note": "The main category table states 6,014; the Money and Tax sub-category table totals 6,012. The main table value is used."
+        },
+        {
+          "category": "Moving Country",
+          "source_label": "Moving Country",
+          "calls": {
+            "value": 4108,
+            "printed": "4,108",
+            "source": "cips-summary-2025"
+          },
+          "share_percent": 6.5,
+          "subcategory_table_total": {
+            "value": 4105,
+            "printed": "4,105",
+            "source": "cips-summary-2025",
+            "table": "Table 7: Moving Country call sub-categories"
+          },
+          "note": "The main category table states 4,108; the Moving Country sub-category table totals 4,105. The main table value is used."
+        },
+        {
+          "category": "Health",
+          "source_label": "Health",
+          "calls": {
+            "value": 2539,
+            "printed": "2,539",
+            "source": "cips-summary-2025"
+          },
+          "share_percent": 4
+        },
+        {
+          "category": "Justice",
+          "source_label": "Justice",
+          "calls": {
+            "value": 2040,
+            "printed": "2,040",
+            "source": "cips-summary-2025"
+          },
+          "share_percent": 3.2
+        },
+        {
+          "category": "Consumer Affairs",
+          "source_label": "Consumer Affairs",
+          "calls": {
+            "value": 1744,
+            "printed": "1,744",
+            "source": "cips-summary-2025"
+          },
+          "share_percent": 2.7
+        },
+        {
+          "category": "Birth, Family and Relationships",
+          "source_label": "Birth Family and Relationship",
+          "calls": {
+            "value": 1386,
+            "printed": "1,386",
+            "source": "cips-summary-2025"
+          },
+          "share_percent": 2.2
+        },
+        {
+          "category": "Travel and Recreation",
+          "source_label": "Travel and Recreation",
+          "calls": {
+            "value": 1177,
+            "printed": "1,177",
+            "source": "cips-summary-2025"
+          },
+          "share_percent": 1.9
+        },
+        {
+          "category": "Local",
+          "source_label": "Local",
+          "calls": {
+            "value": 961,
+            "printed": "961",
+            "source": "cips-summary-2025"
+          },
+          "share_percent": 1.5
+        },
+        {
+          "category": "Education and Training",
+          "source_label": "Education and Training",
+          "calls": {
+            "value": 895,
+            "printed": "895",
+            "source": "cips-summary-2025"
+          },
+          "share_percent": 1.4
+        },
+        {
+          "category": "Death and Bereavement",
+          "source_label": "Death and Bereavement",
+          "calls": {
+            "value": 463,
+            "printed": "463",
+            "source": "cips-summary-2025"
+          },
+          "share_percent": 0.7
+        },
+        {
+          "category": "Government in Ireland",
+          "source_label": "Government in Ireland",
+          "calls": {
+            "value": 253,
+            "printed": "253",
+            "source": "cips-summary-2025"
+          },
+          "share_percent": 0.4
+        },
+        {
+          "category": "Ukraine",
+          "source_label": "Ukraine",
+          "calls": {
+            "value": 235,
+            "printed": "235",
+            "source": "cips-summary-2025"
+          },
+          "share_percent": 0.4
+        },
+        {
+          "category": "Environment",
+          "source_label": "Environment",
+          "calls": {
+            "value": 139,
+            "printed": "139",
+            "source": "cips-summary-2025"
+          },
+          "share_percent": 0.2
+        },
+        {
+          "category": "Covid-19",
+          "source_label": "Covid-19",
+          "calls": {
+            "value": 12,
+            "printed": "12",
+            "source": "cips-summary-2025"
+          },
+          "share_percent": 0
+        }
+      ],
+      "sum_of_categories": 63609,
+      "matches_total": true,
+      "notes": [
+        "Housing: The main category table states 6,382; the Housing sub-category table totals 6,381. The main table value is used.",
+        "Money and Tax: The main category table states 6,014; the Money and Tax sub-category table totals 6,012. The main table value is used.",
+        "Moving Country: The main category table states 4,108; the Moving Country sub-category table totals 4,105. The main table value is used."
+      ]
+    }
+  ]
+}

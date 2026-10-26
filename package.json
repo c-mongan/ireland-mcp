@@ -12,6 +12,7 @@
   "files": [
     "dist/src",
     "dist/packages/irish-legal-mcp",
+    "dist/web/data",
     "!dist/src/**/*.test.js",
     "README.md",
     "LICENSE",

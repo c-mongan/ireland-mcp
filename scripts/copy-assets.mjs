@@ -8,6 +8,9 @@ const kohesio = new URL("../dist/src/sources/kohesio/", import.meta.url);
 mkdirSync(kohesio, { recursive: true });
 copyFileSync(new URL("../src/sources/kohesio/snapshot.json", import.meta.url), new URL("snapshot.json", kohesio));
 
+// Snapshot data shared by the site and the server; tools resolve ../../../web/data from dist/src/sources/<id>/.
+cpSync(new URL("../web/data/", import.meta.url), new URL("../dist/web/data/", import.meta.url), { recursive: true });
+
 const legal = new URL("../dist/packages/irish-legal-mcp/", import.meta.url);
 mkdirSync(legal, { recursive: true });
 for (const directory of ["src", "ui"]) cpSync(new URL(`../packages/irish-legal-mcp/${directory}/`, import.meta.url), new URL(`${directory}/`, legal), { recursive: true });

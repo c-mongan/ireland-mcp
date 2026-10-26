@@ -16,7 +16,8 @@ const SOURCE_FALLBACK = [
     { id: "pobal", name: "Pobal HP Deprivation Index", summary: "Small-area deprivation scores and lookup for Irish places.", operations: ["pobal_deprivation_search"] },
     { id: "data-gov-ie", name: "data.gov.ie", summary: "National open-data catalogue from Irish public bodies.", operations: ["datagov_search_datasets", "datagov_get_dataset", "datagov_query_datastore"] },
     { id: "smart-dublin", name: "Smart Dublin", summary: "Dublin city and county datasets: counters, parking, footfall, planning and environment.", operations: ["smartdublin_search_datasets", "smartdublin_get_dataset", "smartdublin_query_datastore"] },
-    { id: "census-areas", name: "CSO Census 2022 small areas", summary: "Small-area boundary lookup for census geography.", operations: ["census_small_area_at"] }
+    { id: "census-areas", name: "CSO Census 2022 small areas", summary: "Small-area boundary lookup for census geography.", operations: ["census_small_area_at"] },
+    { id: "cib", name: "Citizens Information Board service statistics", summary: "Dated CIB Data Hub snapshot: CIS callers and queries by category, and Citizens Information Phone Service contacts, 2021–2025.", operations: ["cib_cis_annual_summary", "cib_cis_query_categories", "cib_cips_summary"] }
   ] },
   { domain: "economy", sources: [
     { id: "paygap", name: "PayGap.ie employer reports", summary: "Employer pay-gap reports with original report links and data-quality annotations.", operations: ["paygap_search_reports"] },

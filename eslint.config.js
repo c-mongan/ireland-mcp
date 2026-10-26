@@ -12,7 +12,7 @@ export default tseslint.config(
     }
   },
   {
-    files: ["scripts/deploy-legal.mjs"],
+    files: ["scripts/deploy-legal.mjs", "scripts/refresh-*.mjs"],
     languageOptions: { globals: { AbortSignal: "readonly" } }
   },
   {

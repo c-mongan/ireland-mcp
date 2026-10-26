@@ -1,0 +1,938 @@
+{
+  "schema_version": 1,
+  "dataset": "cib-cis-query-categories",
+  "title": "Citizens Information Services (CIS): queries by top-level category",
+  "publisher": "Citizens Information Board",
+  "as_of": "2026-10-26",
+  "licence": {
+    "name": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "notice_url": "https://www.citizensinformationboard.ie/en/notices/psi.html",
+    "attribution": "Contains Irish Public Sector Data licensed under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence",
+    "credit": "Citizens Information Board"
+  },
+  "data_hub_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/",
+  "sources": [
+    {
+      "id": "psi-notice",
+      "url": "https://www.citizensinformationboard.ie/en/notices/psi.html",
+      "page_url": "https://www.citizensinformationboard.ie/en/notices/psi.html",
+      "format": "html",
+      "description": "CIB re-use of public sector information notice (licence)",
+      "sha256": "41c30fe7438ccf94dc15e4d28840cdd60ee30d29173d91c046733d6e41f9a560",
+      "bytes": 18697
+    },
+    {
+      "id": "cis-query-categories-2021",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories2021.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/2021-statistical-summary/",
+      "format": "docx",
+      "description": "CIS query profile 2021",
+      "sha256": "dc1964cdada2e964a31683856593e22a6f1f67c973ee17d4372b6a22b92b31d9",
+      "bytes": 92771
+    },
+    {
+      "id": "cis-query-categories-2022",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2022.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/2022-statistical-summary/",
+      "format": "docx",
+      "description": "CIS query profile 2022",
+      "sha256": "590bd9c04839428e4adff191d24891aa56e17ee6fb3b16c3e3dbbfda6143f28a",
+      "bytes": 111600
+    },
+    {
+      "id": "cis-query-categories-2023",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2023-v3.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/2023-statistical-summary/",
+      "format": "docx",
+      "description": "CIS query profile 2023",
+      "sha256": "9737b74b3a2a195f78d96be21372f0e2e57c8e879f34aa4e176fe1457d49dbfc",
+      "bytes": 131568
+    },
+    {
+      "id": "cis-query-categories-2024",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2024.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/2024-statistical-summary/",
+      "format": "docx",
+      "description": "CIS query profile 2024",
+      "sha256": "ba80297c638af7d16f242a9269dd7f3ee8681d21a1d4bce4bcc684c5263ba168",
+      "bytes": 137453
+    },
+    {
+      "id": "cis-query-categories-2025",
+      "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2025.docx",
+      "page_url": "https://www.citizensinformationboard.ie/en/data-hub/cis-data-hub/2025-statistical-summary/",
+      "format": "docx",
+      "description": "CIS query and caller data 2025",
+      "sha256": "54c8213efe06112ed38376a60b3dc7d78f97a27508efa4b7b61c2f722d13a97e",
+      "bytes": 111749
+    }
+  ],
+  "notes": [
+    "Values are Table 1 of each year's CIS query-category file. Category sums equal the stated total in every year.",
+    "category is a normalised name for comparing years; source_label is the label printed in the file.",
+    "share_percent is the percentage printed in the file, not recomputed."
+  ],
+  "years": [
+    {
+      "year": 2021,
+      "source": "cis-query-categories-2021",
+      "table": "Table 1 – CIS Query Categories 2021",
+      "total_queries": {
+        "value": 693918,
+        "printed": "693,918",
+        "source": "cis-query-categories-2021"
+      },
+      "categories": [
+        {
+          "category": "Social Welfare",
+          "source_label": "Social Welfare",
+          "queries": {
+            "value": 300644,
+            "printed": "300,644",
+            "source": "cis-query-categories-2021"
+          },
+          "share_percent": 43.33
+        },
+        {
+          "category": "Housing",
+          "source_label": "Housing",
+          "queries": {
+            "value": 61577,
+            "printed": "61,577",
+            "source": "cis-query-categories-2021"
+          },
+          "share_percent": 8.87
+        },
+        {
+          "category": "Employment",
+          "source_label": "Employment",
+          "queries": {
+            "value": 59305,
+            "printed": "59,305",
+            "source": "cis-query-categories-2021"
+          },
+          "share_percent": 8.55
+        },
+        {
+          "category": "Health",
+          "source_label": "Health",
+          "queries": {
+            "value": 43372,
+            "printed": "43,372",
+            "source": "cis-query-categories-2021"
+          },
+          "share_percent": 6.25
+        },
+        {
+          "category": "Covid-19",
+          "source_label": "Covid-19",
+          "queries": {
+            "value": 41422,
+            "printed": "41,422",
+            "source": "cis-query-categories-2021"
+          },
+          "share_percent": 5.97
+        },
+        {
+          "category": "Money and Tax",
+          "source_label": "Money and Tax",
+          "queries": {
+            "value": 38047,
+            "printed": "38,047",
+            "source": "cis-query-categories-2021"
+          },
+          "share_percent": 5.48
+        },
+        {
+          "category": "Local",
+          "source_label": "Local",
+          "queries": {
+            "value": 32636,
+            "printed": "32,636",
+            "source": "cis-query-categories-2021"
+          },
+          "share_percent": 4.7
+        },
+        {
+          "category": "Moving Country",
+          "source_label": "Moving Country",
+          "queries": {
+            "value": 24100,
+            "printed": "24,100",
+            "source": "cis-query-categories-2021"
+          },
+          "share_percent": 3.47
+        },
+        {
+          "category": "Birth, Family and Relationships",
+          "source_label": "Birth, Family and Relationships",
+          "queries": {
+            "value": 21091,
+            "printed": "21,091",
+            "source": "cis-query-categories-2021"
+          },
+          "share_percent": 3.04
+        },
+        {
+          "category": "Justice",
+          "source_label": "Justice",
+          "queries": {
+            "value": 19340,
+            "printed": "19,340",
+            "source": "cis-query-categories-2021"
+          },
+          "share_percent": 2.79
+        },
+        {
+          "category": "Travel and Recreation",
+          "source_label": "Travel and Recreation",
+          "queries": {
+            "value": 17935,
+            "printed": "17,935",
+            "source": "cis-query-categories-2021"
+          },
+          "share_percent": 2.58
+        },
+        {
+          "category": "Education and Training",
+          "source_label": "Education and Training",
+          "queries": {
+            "value": 12707,
+            "printed": "12,707",
+            "source": "cis-query-categories-2021"
+          },
+          "share_percent": 1.83
+        },
+        {
+          "category": "Consumer Affairs",
+          "source_label": "Consumer Affairs",
+          "queries": {
+            "value": 11199,
+            "printed": "11,199",
+            "source": "cis-query-categories-2021"
+          },
+          "share_percent": 1.61
+        },
+        {
+          "category": "Death and Bereavement",
+          "source_label": "Death and Bereavement",
+          "queries": {
+            "value": 5413,
+            "printed": "5,413",
+            "source": "cis-query-categories-2021"
+          },
+          "share_percent": 0.78
+        },
+        {
+          "category": "Government in Ireland",
+          "source_label": "Government in Ireland",
+          "queries": {
+            "value": 3394,
+            "printed": "3,394",
+            "source": "cis-query-categories-2021"
+          },
+          "share_percent": 0.49
+        },
+        {
+          "category": "Environment",
+          "source_label": "Environment",
+          "queries": {
+            "value": 1736,
+            "printed": "1,736",
+            "source": "cis-query-categories-2021"
+          },
+          "share_percent": 0.25
+        }
+      ],
+      "sum_of_categories": 693918,
+      "matches_total": true
+    },
+    {
+      "year": 2022,
+      "source": "cis-query-categories-2022",
+      "table": "Table 1 – CIS Query Categories 2022",
+      "total_queries": {
+        "value": 788902,
+        "printed": "788,902",
+        "source": "cis-query-categories-2022"
+      },
+      "categories": [
+        {
+          "category": "Social Welfare",
+          "source_label": "Social Welfare",
+          "queries": {
+            "value": 371736,
+            "printed": "371,736",
+            "source": "cis-query-categories-2022"
+          },
+          "share_percent": 47.1
+        },
+        {
+          "category": "Housing",
+          "source_label": "Housing",
+          "queries": {
+            "value": 75414,
+            "printed": "75,414",
+            "source": "cis-query-categories-2022"
+          },
+          "share_percent": 9.6
+        },
+        {
+          "category": "Health",
+          "source_label": "Health",
+          "queries": {
+            "value": 57059,
+            "printed": "57,059",
+            "source": "cis-query-categories-2022"
+          },
+          "share_percent": 7.2
+        },
+        {
+          "category": "Employment",
+          "source_label": "Employment",
+          "queries": {
+            "value": 49667,
+            "printed": "49,667",
+            "source": "cis-query-categories-2022"
+          },
+          "share_percent": 6.3
+        },
+        {
+          "category": "Local",
+          "source_label": "Local",
+          "queries": {
+            "value": 47690,
+            "printed": "47,690",
+            "source": "cis-query-categories-2022"
+          },
+          "share_percent": 6.1
+        },
+        {
+          "category": "Moving Country",
+          "source_label": "Moving Country",
+          "queries": {
+            "value": 41824,
+            "printed": "41,824",
+            "source": "cis-query-categories-2022"
+          },
+          "share_percent": 5.3
+        },
+        {
+          "category": "Money and Tax",
+          "source_label": "Money and Tax",
+          "queries": {
+            "value": 41561,
+            "printed": "41,561",
+            "source": "cis-query-categories-2022"
+          },
+          "share_percent": 5.3
+        },
+        {
+          "category": "Travel and Recreation",
+          "source_label": "Travel and Recreation",
+          "queries": {
+            "value": 22462,
+            "printed": "22,462",
+            "source": "cis-query-categories-2022"
+          },
+          "share_percent": 2.9
+        },
+        {
+          "category": "Birth, Family and Relationships",
+          "source_label": "Birth, Family and Relationships",
+          "queries": {
+            "value": 18701,
+            "printed": "18,701",
+            "source": "cis-query-categories-2022"
+          },
+          "share_percent": 2.4
+        },
+        {
+          "category": "Justice",
+          "source_label": "Justice",
+          "queries": {
+            "value": 18313,
+            "printed": "18,313",
+            "source": "cis-query-categories-2022"
+          },
+          "share_percent": 2.3
+        },
+        {
+          "category": "Education and Training",
+          "source_label": "Education and Training",
+          "queries": {
+            "value": 13417,
+            "printed": "13,417",
+            "source": "cis-query-categories-2022"
+          },
+          "share_percent": 1.7
+        },
+        {
+          "category": "Consumer Affairs",
+          "source_label": "Consumer Affairs",
+          "queries": {
+            "value": 12134,
+            "printed": "12,134",
+            "source": "cis-query-categories-2022"
+          },
+          "share_percent": 1.5
+        },
+        {
+          "category": "Covid-19",
+          "source_label": "Covid-19",
+          "queries": {
+            "value": 7467,
+            "printed": "7,467",
+            "source": "cis-query-categories-2022"
+          },
+          "share_percent": 1
+        },
+        {
+          "category": "Death and Bereavement",
+          "source_label": "Death and Bereavement",
+          "queries": {
+            "value": 5422,
+            "printed": "5,422",
+            "source": "cis-query-categories-2022"
+          },
+          "share_percent": 0.7
+        },
+        {
+          "category": "Government in Ireland",
+          "source_label": "Government in Ireland",
+          "queries": {
+            "value": 4566,
+            "printed": "4,566",
+            "source": "cis-query-categories-2022"
+          },
+          "share_percent": 0.6
+        },
+        {
+          "category": "Environment",
+          "source_label": "Environment",
+          "queries": {
+            "value": 1469,
+            "printed": "1,469",
+            "source": "cis-query-categories-2022"
+          },
+          "share_percent": 0.2
+        }
+      ],
+      "sum_of_categories": 788902,
+      "matches_total": true
+    },
+    {
+      "year": 2023,
+      "source": "cis-query-categories-2023",
+      "table": "Table 1 – CIS Query Categories 2023",
+      "total_queries": {
+        "value": 795278,
+        "printed": "795,278",
+        "source": "cis-query-categories-2023"
+      },
+      "categories": [
+        {
+          "category": "Social Welfare",
+          "source_label": "Social Welfare",
+          "queries": {
+            "value": 372085,
+            "printed": "372,085",
+            "source": "cis-query-categories-2023"
+          },
+          "share_percent": 46.8
+        },
+        {
+          "category": "Housing",
+          "source_label": "Housing",
+          "queries": {
+            "value": 85447,
+            "printed": "85,447",
+            "source": "cis-query-categories-2023"
+          },
+          "share_percent": 10.7
+        },
+        {
+          "category": "Health",
+          "source_label": "Health",
+          "queries": {
+            "value": 58529,
+            "printed": "58,529",
+            "source": "cis-query-categories-2023"
+          },
+          "share_percent": 7.4
+        },
+        {
+          "category": "Local",
+          "source_label": "Local",
+          "queries": {
+            "value": 50364,
+            "printed": "50,364",
+            "source": "cis-query-categories-2023"
+          },
+          "share_percent": 6.3
+        },
+        {
+          "category": "Money and Tax",
+          "source_label": "Money and Tax",
+          "queries": {
+            "value": 48112,
+            "printed": "48,112",
+            "source": "cis-query-categories-2023"
+          },
+          "share_percent": 6.1
+        },
+        {
+          "category": "Employment",
+          "source_label": "Employment",
+          "queries": {
+            "value": 47288,
+            "printed": "47,288",
+            "source": "cis-query-categories-2023"
+          },
+          "share_percent": 6
+        },
+        {
+          "category": "Moving Country",
+          "source_label": "Moving Country",
+          "queries": {
+            "value": 37367,
+            "printed": "37,367",
+            "source": "cis-query-categories-2023"
+          },
+          "share_percent": 4.7
+        },
+        {
+          "category": "Justice",
+          "source_label": "Justice",
+          "queries": {
+            "value": 20061,
+            "printed": "20,061",
+            "source": "cis-query-categories-2023"
+          },
+          "share_percent": 2.5
+        },
+        {
+          "category": "Travel and Recreation",
+          "source_label": "Travel and Recreation",
+          "queries": {
+            "value": 19820,
+            "printed": "19,820",
+            "source": "cis-query-categories-2023"
+          },
+          "share_percent": 2.5
+        },
+        {
+          "category": "Birth, Family and Relationships",
+          "source_label": "Birth, Family and Relationships",
+          "queries": {
+            "value": 18101,
+            "printed": "18,101",
+            "source": "cis-query-categories-2023"
+          },
+          "share_percent": 2.3
+        },
+        {
+          "category": "Education and Training",
+          "source_label": "Education and Training",
+          "queries": {
+            "value": 14018,
+            "printed": "14,018",
+            "source": "cis-query-categories-2023"
+          },
+          "share_percent": 1.8
+        },
+        {
+          "category": "Consumer Affairs",
+          "source_label": "Consumer Affairs",
+          "queries": {
+            "value": 11733,
+            "printed": "11,733",
+            "source": "cis-query-categories-2023"
+          },
+          "share_percent": 1.5
+        },
+        {
+          "category": "Death and Bereavement",
+          "source_label": "Death and Bereavement",
+          "queries": {
+            "value": 5546,
+            "printed": "5,546",
+            "source": "cis-query-categories-2023"
+          },
+          "share_percent": 0.7
+        },
+        {
+          "category": "Government in Ireland",
+          "source_label": "Government in Ireland",
+          "queries": {
+            "value": 4885,
+            "printed": "4,885",
+            "source": "cis-query-categories-2023"
+          },
+          "share_percent": 0.6
+        },
+        {
+          "category": "Environment",
+          "source_label": "Environment",
+          "queries": {
+            "value": 1441,
+            "printed": "1,441",
+            "source": "cis-query-categories-2023"
+          },
+          "share_percent": 0.2
+        },
+        {
+          "category": "Covid-19",
+          "source_label": "Covid-19",
+          "queries": {
+            "value": 481,
+            "printed": "481",
+            "source": "cis-query-categories-2023"
+          },
+          "share_percent": 0.1
+        }
+      ],
+      "sum_of_categories": 795278,
+      "matches_total": true
+    },
+    {
+      "year": 2024,
+      "source": "cis-query-categories-2024",
+      "table": "Table 1 – CIS Query Categories",
+      "total_queries": {
+        "value": 767168,
+        "printed": "767,168",
+        "source": "cis-query-categories-2024"
+      },
+      "categories": [
+        {
+          "category": "Social Welfare",
+          "source_label": "Social Welfare",
+          "queries": {
+            "value": 346054,
+            "printed": "346,054",
+            "source": "cis-query-categories-2024"
+          },
+          "share_percent": 45.1
+        },
+        {
+          "category": "Housing",
+          "source_label": "Housing",
+          "queries": {
+            "value": 85148,
+            "printed": "85,148",
+            "source": "cis-query-categories-2024"
+          },
+          "share_percent": 11.1
+        },
+        {
+          "category": "Health",
+          "source_label": "Health",
+          "queries": {
+            "value": 62496,
+            "printed": "62,496",
+            "source": "cis-query-categories-2024"
+          },
+          "share_percent": 8.2
+        },
+        {
+          "category": "Local",
+          "source_label": "Local",
+          "queries": {
+            "value": 55086,
+            "printed": "55,086",
+            "source": "cis-query-categories-2024"
+          },
+          "share_percent": 7.2
+        },
+        {
+          "category": "Money and Tax",
+          "source_label": "Money and Tax",
+          "queries": {
+            "value": 44702,
+            "printed": "44,702",
+            "source": "cis-query-categories-2024"
+          },
+          "share_percent": 5.8
+        },
+        {
+          "category": "Employment",
+          "source_label": "Employment",
+          "queries": {
+            "value": 44326,
+            "printed": "44,326",
+            "source": "cis-query-categories-2024"
+          },
+          "share_percent": 5.8
+        },
+        {
+          "category": "Moving Country",
+          "source_label": "Moving Country",
+          "queries": {
+            "value": 36979,
+            "printed": "36,979",
+            "source": "cis-query-categories-2024"
+          },
+          "share_percent": 4.8
+        },
+        {
+          "category": "Travel and Recreation",
+          "source_label": "Travel and Recreation",
+          "queries": {
+            "value": 19534,
+            "printed": "19,534",
+            "source": "cis-query-categories-2024"
+          },
+          "share_percent": 2.6
+        },
+        {
+          "category": "Justice",
+          "source_label": "Justice",
+          "queries": {
+            "value": 18705,
+            "printed": "18,705",
+            "source": "cis-query-categories-2024"
+          },
+          "share_percent": 2.4
+        },
+        {
+          "category": "Birth, Family and Relationships",
+          "source_label": "Birth, Family & Relationships",
+          "queries": {
+            "value": 16358,
+            "printed": "16,358",
+            "source": "cis-query-categories-2024"
+          },
+          "share_percent": 2.1
+        },
+        {
+          "category": "Education and Training",
+          "source_label": "Education and Training",
+          "queries": {
+            "value": 13802,
+            "printed": "13,802",
+            "source": "cis-query-categories-2024"
+          },
+          "share_percent": 1.8
+        },
+        {
+          "category": "Consumer Affairs",
+          "source_label": "Consumer Affairs",
+          "queries": {
+            "value": 10717,
+            "printed": "10,717",
+            "source": "cis-query-categories-2024"
+          },
+          "share_percent": 1.4
+        },
+        {
+          "category": "Government in Ireland",
+          "source_label": "Government in Ireland",
+          "queries": {
+            "value": 6113,
+            "printed": "6,113",
+            "source": "cis-query-categories-2024"
+          },
+          "share_percent": 0.8
+        },
+        {
+          "category": "Death and Bereavement",
+          "source_label": "Death and Bereavement",
+          "queries": {
+            "value": 5657,
+            "printed": "5,657",
+            "source": "cis-query-categories-2024"
+          },
+          "share_percent": 0.7
+        },
+        {
+          "category": "Environment",
+          "source_label": "Environment",
+          "queries": {
+            "value": 1477,
+            "printed": "1,477",
+            "source": "cis-query-categories-2024"
+          },
+          "share_percent": 0.2
+        },
+        {
+          "category": "Covid-19",
+          "source_label": "Covid 19",
+          "queries": {
+            "value": 14,
+            "printed": "14",
+            "source": "cis-query-categories-2024"
+          },
+          "share_percent": 0
+        }
+      ],
+      "sum_of_categories": 767168,
+      "matches_total": true
+    },
+    {
+      "year": 2025,
+      "source": "cis-query-categories-2025",
+      "table": "Table 1 – CIS Query Categories",
+      "total_queries": {
+        "value": 708862,
+        "printed": "708,862",
+        "source": "cis-query-categories-2025"
+      },
+      "categories": [
+        {
+          "category": "Social Welfare",
+          "source_label": "Social Welfare",
+          "queries": {
+            "value": 315200,
+            "printed": "315,200",
+            "source": "cis-query-categories-2025"
+          },
+          "share_percent": 44.5
+        },
+        {
+          "category": "Housing",
+          "source_label": "Housing",
+          "queries": {
+            "value": 82209,
+            "printed": "82,209",
+            "source": "cis-query-categories-2025"
+          },
+          "share_percent": 11.6
+        },
+        {
+          "category": "Local",
+          "source_label": "Local",
+          "queries": {
+            "value": 51733,
+            "printed": "51,733",
+            "source": "cis-query-categories-2025"
+          },
+          "share_percent": 7.3
+        },
+        {
+          "category": "Health",
+          "source_label": "Health",
+          "queries": {
+            "value": 51513,
+            "printed": "51,513",
+            "source": "cis-query-categories-2025"
+          },
+          "share_percent": 7.3
+        },
+        {
+          "category": "Money and Tax",
+          "source_label": "Money and Tax",
+          "queries": {
+            "value": 47635,
+            "printed": "47,635",
+            "source": "cis-query-categories-2025"
+          },
+          "share_percent": 6.7
+        },
+        {
+          "category": "Employment",
+          "source_label": "Employment",
+          "queries": {
+            "value": 39265,
+            "printed": "39,265",
+            "source": "cis-query-categories-2025"
+          },
+          "share_percent": 5.5
+        },
+        {
+          "category": "Moving Country",
+          "source_label": "Moving Country",
+          "queries": {
+            "value": 38364,
+            "printed": "38,364",
+            "source": "cis-query-categories-2025"
+          },
+          "share_percent": 5.4
+        },
+        {
+          "category": "Travel and Recreation",
+          "source_label": "Travel and Recreation",
+          "queries": {
+            "value": 18385,
+            "printed": "18,385",
+            "source": "cis-query-categories-2025"
+          },
+          "share_percent": 2.6
+        },
+        {
+          "category": "Justice",
+          "source_label": "Justice",
+          "queries": {
+            "value": 17691,
+            "printed": "17,691",
+            "source": "cis-query-categories-2025"
+          },
+          "share_percent": 2.5
+        },
+        {
+          "category": "Birth, Family and Relationships",
+          "source_label": "Birth, Family and Relationships",
+          "queries": {
+            "value": 13653,
+            "printed": "13,653",
+            "source": "cis-query-categories-2025"
+          },
+          "share_percent": 1.9
+        },
+        {
+          "category": "Education and Training",
+          "source_label": "Education and Training",
+          "queries": {
+            "value": 11975,
+            "printed": "11,975",
+            "source": "cis-query-categories-2025"
+          },
+          "share_percent": 1.7
+        },
+        {
+          "category": "Consumer Affairs",
+          "source_label": "Consumer Affairs",
+          "queries": {
+            "value": 9459,
+            "printed": "9,459",
+            "source": "cis-query-categories-2025"
+          },
+          "share_percent": 1.3
+        },
+        {
+          "category": "Death and Bereavement",
+          "source_label": "Death and Bereavement",
+          "queries": {
+            "value": 5310,
+            "printed": "5,310",
+            "source": "cis-query-categories-2025"
+          },
+          "share_percent": 0.7
+        },
+        {
+          "category": "Government in Ireland",
+          "source_label": "Government in Ireland",
+          "queries": {
+            "value": 5233,
+            "printed": "5,233",
+            "source": "cis-query-categories-2025"
+          },
+          "share_percent": 0.7
+        },
+        {
+          "category": "Environment",
+          "source_label": "Environment",
+          "queries": {
+            "value": 1237,
+            "printed": "1,237",
+            "source": "cis-query-categories-2025"
+          },
+          "share_percent": 0.2
+        }
+      ],
+      "sum_of_categories": 708862,
+      "matches_total": true
+    }
+  ]
+}

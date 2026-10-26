@@ -81,6 +81,16 @@ Kohesio — https://kohesio.ec.europa.eu/
   Snapshot provenance and source URLs: src/sources/kohesio/snapshot.json
   and docs/kohesio-exports.md.
 
+Citizens Information Board Data Hub — https://www.citizensinformationboard.ie/en/data-hub/
+  Licence: Creative Commons Attribution 4.0 International (CC BY 4.0), per
+  https://www.citizensinformationboard.ie/en/notices/psi.html
+  Attribution: Contains Irish Public Sector Data licensed under a Creative
+  Commons Attribution 4.0 International (CC BY 4.0) licence. Credit: Citizens
+  Information Board.
+  Dated snapshot of published CIS and CIPS statistics; not live data.
+  Snapshot provenance, SHA-256 checksums and source URLs: web/data/cib/
+  and docs/cib-source.md.
+
 Smart Dublin (CKAN) — https://data.smartdublin.ie
   Licence: per dataset, mostly CC BY 4.0. Check each dataset's licence field.
   Data from the four Dublin local authorities.
