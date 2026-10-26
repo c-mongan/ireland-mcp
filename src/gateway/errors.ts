@@ -23,8 +23,10 @@ export class ToolError extends Error {
   readonly retryable: boolean;
   readonly retryAfterSeconds?: number;
   readonly upstreamFailure?: UpstreamFailure;
+  /** HTTP response status for source-specific handling; independent of retry eligibility. */
+  readonly httpStatus?: number;
 
-  constructor(code: ErrorCode, message: string, options: { hint?: string; retryAfterSeconds?: number; retryable?: boolean; upstreamFailure?: UpstreamFailure } = {}) {
+  constructor(code: ErrorCode, message: string, options: { hint?: string; retryAfterSeconds?: number; retryable?: boolean; upstreamFailure?: UpstreamFailure; httpStatus?: number } = {}) {
     super(message);
     this.name = "ToolError";
     this.code = code;
@@ -32,6 +34,7 @@ export class ToolError extends Error {
     this.hint = options.hint ?? DEFAULT_HINTS[code];
     if (options.retryAfterSeconds !== undefined) this.retryAfterSeconds = options.retryAfterSeconds;
     if (options.upstreamFailure) this.upstreamFailure = options.upstreamFailure;
+    if (options.httpStatus !== undefined) this.httpStatus = options.httpStatus;
   }
 
   toJSON(): { error: { code: ErrorCode; message: string; hint: string; retry_after_seconds?: number; upstream_failure?: UpstreamFailure } } {

@@ -10,6 +10,7 @@ import { WARNINGS_URL } from "../sources/met-eireann/index.js";
 import { TRIP_UPDATES_URL } from "../sources/nta/index.js";
 import { OIREACHTAS_API } from "../sources/oireachtas/index.js";
 import { OPW_BASE } from "../sources/opw-water/index.js";
+import { GITHUB_SOURCE as PAYGAP_SNAPSHOT } from "../sources/paygap/github.js";
 import { PPR_DOWNLOADS } from "../sources/ppr/parse.js";
 import { ARCGIS_LAYERS } from "../sources/arcgis/client.js";
 import type { FetchLike } from "./http.js";
@@ -55,7 +56,8 @@ export function defaultProbes(env: Record<string, string | undefined>): Probe[] 
   });
   return [
     { source: "lobbying", url: `https://api.lobbying.ie/api/Search?${lobbyingQuery}` },
-    { source: "paygap", url: "https://paygap.ie/downloads/annotated" },
+    // The website refuses Azure; the publisher snapshot is the available fallback.
+    { source: "paygap", url: PAYGAP_SNAPSHOT.source_urls[0] },
     { source: "council-budgets", url: budgetResourceUrl(BUDGET_RESOURCES.at(-1)!) },
     { source: "cso", url: `${CSO_REST}/PxStat.Data.Cube_API.ReadMetadata/F1001/JSON-stat/2.0/en` },
     { source: "world-bank", url: "https://data360api.worldbank.org/data360/data?DATABASE_ID=WB_WDI&INDICATOR=WB_WDI_SP_POP_TOTL&REF_AREA=IRL&top=1" },

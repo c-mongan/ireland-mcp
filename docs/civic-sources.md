@@ -22,6 +22,8 @@ The adapter reads the [annotated combined CSV](https://paygap.ie/downloads/annot
 
 This is a collection of employer reports, not a representative census or proof of unequal pay for equivalent work. The [dataset repository](https://github.com/zenbuffy/irishGenderPayGap) states CC0 1.0; the original employer reports retain their own terms. Credit PayGap.ie and link the original report when using a figure.
 
+If Azure receives HTTP 403 from the primary export, the tool uses the publisher’s pinned GitHub snapshot and identifies that source and date in the response. Annotation flags are unavailable in that snapshot and are returned as null. See [fallback provenance and refresh notes](paygap-source-fallback.md).
+
 ## Council budgets
 
 Use source `council-budgets`, then `council_budgets_list_years` and `council_budgets_get`. The source parses official Excel workbooks and preserves budget year, authority, service division, measure, units and source resource. These are budget estimates, not actual expenditure. Do not combine income and expenditure into a spend total. See [workbook coverage and verification](council-budgets-source.md).
