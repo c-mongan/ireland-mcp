@@ -5,6 +5,9 @@ import { inflateRawSync } from "node:zlib";
 
 export const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 
+/** Largest uncompressed entry accepted, so a small deflate stream cannot expand without bound. */
+export const MAX_ENTRY_BYTES = 20 * 1024 * 1024;
+
 /** Reads one entry from a ZIP archive (stored or deflated) via its central directory. */
 export function readZipEntry(buffer, name) {
   const bytes = Buffer.from(buffer);
@@ -20,6 +23,7 @@ export function readZipEntry(buffer, name) {
     if (bytes.readUInt32LE(offset) !== 0x02014b50) throw new Error("Corrupt ZIP central directory.");
     const method = bytes.readUInt16LE(offset + 10);
     const compressedSize = bytes.readUInt32LE(offset + 20);
+    const uncompressedSize = bytes.readUInt32LE(offset + 24);
     const nameLength = bytes.readUInt16LE(offset + 28);
     const extraLength = bytes.readUInt16LE(offset + 30);
     const commentLength = bytes.readUInt16LE(offset + 32);
@@ -28,10 +32,12 @@ export function readZipEntry(buffer, name) {
     if (entryName === name) {
       if (bytes.readUInt32LE(localOffset) !== 0x04034b50) throw new Error("Corrupt ZIP local header.");
       const start = localOffset + 30 + bytes.readUInt16LE(localOffset + 26) + bytes.readUInt16LE(localOffset + 28);
+      if (uncompressedSize > MAX_ENTRY_BYTES) throw new Error(`ZIP entry ${name} is ${uncompressedSize} bytes uncompressed; the limit is ${MAX_ENTRY_BYTES}.`);
       const data = bytes.subarray(start, start + compressedSize);
-      if (method === 0) return Buffer.from(data);
-      if (method === 8) return inflateRawSync(data);
-      throw new Error(`Unsupported ZIP compression method ${method} for ${name}.`);
+      if (method !== 0 && method !== 8) throw new Error(`Unsupported ZIP compression method ${method} for ${name}.`);
+      const out = method === 0 ? Buffer.from(data) : inflateRawSync(data, { maxOutputLength: MAX_ENTRY_BYTES });
+      if (out.length !== uncompressedSize) throw new Error(`ZIP entry ${name} inflated to ${out.length} bytes, expected ${uncompressedSize}.`);
+      return out;
     }
     offset += 46 + nameLength + extraLength + commentLength;
   }
@@ -103,5 +109,5 @@ export function parsePercent(text) {
 /** True when the exact printed figure occurs in the source text as a whole number token. */
 export function textContainsFigure(text, printed) {
   const escaped = printed.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return new RegExp(`(^|[^0-9,.])${escaped}($|[^0-9]|[.,](?![0-9]))`).test(text.replace(/\u00a0/g, " "));
+  return new RegExp(`(^|[^0-9,.])${escaped}($|[^0-9.,]|[.,](?![0-9]))`).test(text.replace(/\u00a0/g, " "));
 }

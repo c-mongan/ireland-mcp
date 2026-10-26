@@ -1,7 +1,7 @@
 import { crc32, deflateRawSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 // @ts-expect-error -- plain ESM script without type declarations
-import { docxBlocks, docxText, htmlText, parseCount, parsePercent, readZipEntry, textContainsFigure } from "../scripts/lib/docx.mjs";
+import { docxBlocks, docxText, htmlText, MAX_ENTRY_BYTES, parseCount, parsePercent, readZipEntry, textContainsFigure } from "../scripts/lib/docx.mjs";
 // @ts-expect-error -- plain ESM script without type declarations
 import { canonicalCategory, CIB_HOST, CIB_SOURCES, listFigures, verifyFigures } from "../scripts/lib/cib.mjs";
 
@@ -45,6 +45,9 @@ describe("CIB refresh helpers", () => {
     expect(readZipEntry(zip({ "a.txt": "hello" }, false), "a.txt").toString()).toBe("hello");
     expect(() => readZipEntry(Buffer.from("not a zip at all, definitely not"), "a.txt")).toThrow("Not a ZIP");
     expect(() => readZipEntry(zip({ "a.txt": "x" }), "b.txt")).toThrow("not found");
+    const bomb = zip({ "a.txt": "x" });
+    bomb.writeUInt32LE(MAX_ENTRY_BYTES + 1, bomb.length - 22 - 46 - 5 + 24);
+    expect(() => readZipEntry(bomb, "a.txt")).toThrow("limit");
   });
 
   it("extracts paragraphs and captioned tables from a docx in document order", () => {
@@ -75,6 +78,9 @@ describe("CIB refresh helpers", () => {
     expect(textContainsFigure(text, "94,400")).toBe(false);
     expect(textContainsFigure(text, "788,90")).toBe(false);
     expect(textContainsFigure(text, "788,902")).toBe(false);
+    expect(textContainsFigure("total 1,792,345 calls", "1,792")).toBe(false);
+    expect(textContainsFigure("share 240.5%", "240")).toBe(false);
+    expect(textContainsFigure("Total 1,792.", "1,792")).toBe(true);
   });
 
   it("maps only reviewed category labels", () => {
