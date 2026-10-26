@@ -1,7 +1,7 @@
 import { initIrelandCube } from "./ireland-cube.js?v=20261013-redesign-v2";
 import { initDemoPlayer } from "./demo-player.js?v=20261013-preview";
 import { createAnalytics } from "./analytics.js?v=20261026-page-views";
-import { buildResultView, decodeToolPayload, renderResultView } from "./result-view.js?v=20261013-sources";
+import { buildResultView, decodeToolPayload, renderResultView } from "./result-view.js?v=20261026-nowrap-dates";
 
 const MCP_URL = "https://mcp.irishopendata.ie/mcp";
 const STATUS_URL = "https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json";

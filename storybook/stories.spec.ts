@@ -21,6 +21,12 @@ for (const theme of ["dark", "light"]) {
         return new Set(Array.from(range.getClientRects(), (rect) => rect.top)).size;
       }));
       expect(lineCounts).toEqual([1, 1, 1, 1, 1]);
+      const dateLines = await frame.locator("#pg-result tbody td:nth-child(3)").evaluateAll((cells) => cells.map((cell) => {
+        const range = cell.ownerDocument.createRange();
+        range.selectNodeContents(cell);
+        return new Set(Array.from(range.getClientRects(), (rect) => rect.top)).size;
+      }));
+      expect(dateLines).toEqual([1, 1, 1, 1, 1]);
       const overflow = await frame.locator("html").evaluate((node) => node.scrollWidth - node.clientWidth);
       expect(overflow).toBeLessThanOrEqual(1);
     });

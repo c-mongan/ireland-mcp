@@ -33,72 +33,11 @@ VS Code (`.vscode/mcp.json`):
   <img src="docs/demo/vscode-copilot-chat.png" alt="VS Code Copilot agent mode answering with the Ennis Census 2022 profile and a Met Éireann forecast, each with a source citation" width="800">
 </p>
 
-Hosted endpoint: `https://mcp.irishopendata.ie/mcp` (origin fallback: `https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp`)
+Hosted endpoint: `https://mcp.irishopendata.ie/mcp`
 Transport: Streamable HTTP. Auth: none. Writes: none.
 Registry: [`io.github.c-mongan/ireland-mcp`](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.c-mongan%2Fireland-mcp/versions/latest) on the official MCP Registry.
 
-## Evidence and example runs
-
-<p align="center">
-  <img src="docs/demo/inspector.gif" alt="MCP Inspector calling the hosted endpoint: nearby Galway, CSO profile for Ennis, Met Éireann forecast and Property Price Register stats, each with a source citation" width="800">
-</p>
-
-| Client (tested 7 Oct 2026 against the hosted endpoint) | Result |
-| --- | --- |
-| MCP Inspector (Playwright, [`scripts/demo-inspector.mjs`](scripts/demo-inspector.mjs)) | 4/4 calls (`nearby`, CSO, Met Éireann, PPR) returned data with citations. [CSO Ennis](docs/demo/inspector-cso-ennis.png), [PPR Galway 2024](docs/demo/inspector-ppr-galway-2024.png). |
-| VS Code Insiders, Copilot agent mode | Census 2022 Ennis (27,923 people) and Galway forecast, with CSO and Met Éireann citations. [Screenshot](docs/demo/vscode-copilot-chat.png). |
-| GitHub Copilot CLI | 3/3 questions answered with citations: Met Éireann Galway, PPR Cork, CSO Ennis. [Evidence](docs/demo/README.md). |
-| Every catalogue operation | <!-- live-ops:start -->[docs/live-all-ops.md](docs/live-all-ops.md) (2026-10-08): 72 of 74 pass, 0 fail; 2 need the NTA key.<!-- live-ops:end --> |
-
-How a call flows:
-
-```mermaid
-flowchart TD
-  Q[Client question] --> T[ireland_call / nearby / search]
-  T --> V[Schema validation]
-  V --> C{Cache hit?}
-  C -- yes --> E[Evidence envelope]
-  C -- no --> B{Circuit breaker open?}
-  B -- yes --> S{Stale cache available?}
-  B -- no --> U[Upstream public API: CSO, Met Éireann, PPR, ...]
-  U -- ok --> E
-  U -- 5xx or timeout --> R[One jittered retry]
-  R -- ok --> E
-  R -- still failing --> S
-  U -- other error --> S
-  S -- yes --> F[Stale cached result: stale=true]
-  F --> E
-  S -- no --> X["MCP error: isError=true, UPSTREAM_DOWN with hint; no cited result"]
-  E --> A[Answer with source URL, licence, attribution, retrieved_at]
-```
-
-<p align="center">
-  <a href="docs/architecture/ireland-mcp-arch-v5.drawio">
-    <img src="docs/architecture/ireland-mcp-arch-v5.png" alt="Ireland MCP architecture: clients, Azure Functions gateway, observability and public data sources" width="900">
-  </a>
-</p>
-
-## Try asking
-
-- “What is the latest population profile for Galway city or County Cork?”
-- “Are there Met Éireann weather warnings near Dublin today?”
-- “What did houses sell for in Ennis last year?”
-- “When is the next train from Heuston, and are there disruptions?”
-- “Who are the current TDs for my constituency, and what bills are active?”
-- “What protected habitats, monuments, planning applications or census areas are near this point?”
-
-## See it work
-
-| Proof | Screenshot |
-| --- | --- |
-| Live landing page, desktop | <img src="docs/screenshots/landing-desktop.png" alt="Ireland MCP live landing page on desktop" width="360"> |
-| Live landing page, mobile | <img src="docs/screenshots/landing-mobile.png" alt="Ireland MCP live landing page on mobile" width="180"> |
-| Install section with one-click client setup | <img src="docs/screenshots/install-section.png" alt="One-click install section for VS Code, Cursor, Claude, ChatGPT and Copilot CLI" width="360"> |
-| Playground populated from a real live MCP call | <img src="docs/screenshots/playground-live-call.png" alt="Playground showing a real cso_search_tables result from the live MCP endpoint" width="360"> |
-| MCP Inspector connected to the live endpoint | <img src="docs/screenshots/mcp-inspector-live.png" alt="MCP Inspector showing tools/list and an ireland_call result" width="360"> |
-| Real model transcript: question → tool calls → answer | <img src="docs/screenshots/agent-transcript.png" alt="Azure OpenAI agent transcript using Ireland MCP tools" width="360"> |
-
-## Install
+## Connect your assistant
 
 | Client | Current setup |
 | --- | --- |
@@ -109,7 +48,7 @@ flowchart TD
 | Cursor | Deeplink: [`cursor://anysphere.cursor-deeplink/mcp/install?name=ireland&config=...`](cursor://anysphere.cursor-deeplink/mcp/install?name=ireland&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vbWNwLmlyaXNob3BlbmRhdGEuaWUvbWNwIn0=). Decoded config: `{ "type": "http", "url": "https://mcp.irishopendata.ie/mcp" }`. |
 | GitHub Copilot CLI | `copilot mcp add --transport http ireland https://mcp.irishopendata.ie/mcp` or put the JSON below in `~/.copilot/mcp-config.json`. |
 | Claude Code | `claude mcp add --transport http ireland https://mcp.irishopendata.ie/mcp` |
-| Local stdio | npm package target: `npx -y ireland-mcp` after npm publication. Today, run from source: `npm ci && npm run build && node dist/src/cli.js`. To list typed tools locally, run `node dist/src/cli.js --toolsets=cso,irish-rail` or `IRELAND_MCP_TOOLSETS=all node dist/src/cli.js` after building. |
+| Local (stdio, no hosted endpoint) | `npx -y ireland-mcp`. Add typed tools with `--toolsets=cso,irish-rail`. See [self-hosting](docs/self-hosting.md). |
 
 Portable Copilot / MCP JSON:
 
@@ -125,33 +64,16 @@ Portable Copilot / MCP JSON:
 }
 ```
 
-## Why it is lean
+## Try asking
 
-Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **7 tools, 8,674 characters, about 2,169 tokens** (`toolsets=all` is 88 tools, about 25k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
+- “What is the latest population profile for Galway city or County Cork?”
+- “Are there Met Éireann weather warnings near Dublin today?”
+- “What did houses sell for in Ennis last year?”
+- “When is the next train from Heuston, and are there disruptions?”
+- “Who are the current TDs for my constituency, and what bills are active?”
+- “What protected habitats, monuments, planning applications or census areas are near this point?”
 
-<p align="center">
-  <a href="docs/architecture/ireland-mcp-lean-surface.drawio">
-    <img src="docs/architecture/ireland-mcp-lean-surface.png" alt="Token-cost comparison: 7 default tools versus all typed tools and one-server-per-source routing" width="800">
-  </a>
-</p>
-
-Need typed tools anyway?
-
-| Surface | Use |
-| --- | --- |
-| Default HTTP | `/mcp` lists only `ireland_catalogue`, `ireland_describe`, `ireland_call`, `ireland_about`, `search`, `fetch`, `nearby`. |
-| Source toolsets | `/mcp?toolsets=cso,irish-rail` lists selected typed tools too. |
-| One source path | `/mcp/x/{source}` lists that source's typed tools, for example `/mcp/x/met-eireann`. |
-| Everything | `/mcp?toolsets=all` lists all available tools and is useful for debugging, not routine chat. |
-| Local stdio | From source: `node dist/src/cli.js --toolsets=cso` or `IRELAND_MCP_TOOLSETS=all node dist/src/cli.js` (npm package not yet published). |
-
-`max_tokens` defaults to about 2,000 output tokens and can be set from 100 to 8,000. Large results return `truncated`, counts and narrowing hints instead of flooding the context.
-
-## Counts, aliases and extras
-
-Website: <https://irishopendata.ie> (canonical). `https://irishopendata.com` and `https://mcp.irishopendata.com/mcp` remain working aliases; see [docs/domain-go-live.md](docs/domain-go-live.md).
-
-The generated counts below describe the default source profile with `LEGAL_ENABLED` unset. Enabled legal pilot modules appear separately in the live catalogue and source table.
+## What's inside
 
 <!-- counts:start (generated by `npm run counts`; CI checks it) -->
 | Count | Value | Definition |
@@ -164,30 +86,12 @@ The generated counts below describe the default source profile with `LEGAL_ENABL
 | Prompts | 3 | `area_profile`, `commute_check`, `compare_counties`. |
 <!-- counts:end -->
 
-The optional [Irish legal and Citizens Information pilot corpus](packages/irish-legal-mcp/README.md) adds stored source versions, exact Act sections, cited research, CLI/stdio MCP and a citizen/lawyer chat page. Start with `npm run legal:check`, `npm run legal:sync`, then `npm run legal:serve`. Its seed coverage is annual leave and working time; Azure integration requires `LEGAL_ENABLED=true` and an ingested corpus. Revised Acts indexing requires explicit publisher reuse permission. Stored enacted text, guidance and consolidation cutoffs do not certify current law or comprehensive legal coverage.
+Last full run of every operation then in the catalogue against the hosted endpoint: <!-- live-ops:start -->[docs/live-all-ops.md](docs/live-all-ops.md) (2026-10-08): 72 of 74 pass, 0 fail; 2 need the NTA key.<!-- live-ops:end -->
 
-<!-- portfolio-video:start -->
+The default profile covers statistics (CSO, Eurostat, ECB, World Bank), the Oireachtas and Irish Statute Book, Met Éireann, transport (Irish Rail, Luas, NTA, TFI stops, bikes), property, planning, heritage, environment, energy, tourism, lobbying, pay-gap reports, council budgets and more. An optional [Irish legal and Citizens Information pilot](packages/irish-legal-mcp/README.md) is off by default.
 
-## Short video overview
-
-**21 seconds.** Recorded MCP Inspector example. Figures and forecasts are historical.
-
-[![Watch the 21-second video overview](docs/portfolio-video/poster.jpg)](https://github.com/c-mongan/ireland-mcp/releases/tag/portfolio-overview-2026-10-23)
-
-[Watch on GitHub](https://github.com/c-mongan/ireland-mcp/releases/tag/portfolio-overview-2026-10-23) · [Download MP4](https://github.com/c-mongan/ireland-mcp/releases/download/portfolio-overview-2026-10-23/ireland.mp4) · [Transcript](docs/portfolio-video/transcript.txt) · [Captions](docs/portfolio-video/captions.srt) · [Credits and source notes](docs/portfolio-video/README.md)
-<!-- portfolio-video:end -->
-
-## Architecture
-
-The server is a stateless Azure Functions Flex app with a lean gateway in front of the source modules. The gateway owns the operation index, response budgets, cache, upstream budgets, circuit breakers, one jittered retry for transient 5xx/timeout failures and evidence envelope; every normal result includes source URL, licence, attribution and retrieval metadata.
-
-| Diagram | Editable source |
-| --- | --- |
-| <img src="docs/architecture/ireland-mcp-arch-v5.png" alt="Architecture v5" width="360"> | [`ireland-mcp-arch-v5.drawio`](docs/architecture/ireland-mcp-arch-v5.drawio) |
-| <img src="docs/architecture/ireland-mcp-request-flow.png" alt="Ballymun request flow" width="360"> | [`ireland-mcp-request-flow.drawio`](docs/architecture/ireland-mcp-request-flow.drawio) |
-| <img src="docs/architecture/ireland-mcp-lean-surface.png" alt="Lean surface comparison" width="360"> | [`ireland-mcp-lean-surface.drawio`](docs/architecture/ireland-mcp-lean-surface.drawio) |
-
-## Sources
+<details>
+<summary><strong>All 36 sources, publishers and licences</strong></summary>
 
 The default profile registers 36 source modules in `src/registry.ts`. The default `nearby`, `search` and `fetch` shortcuts sit above these sources. The optional pilot rows require `LEGAL_ENABLED=true` and an ingested corpus; check `ireland_catalogue` for the modules available on an endpoint. See [new provider access and limits](docs/public-source-additions.md).
 
@@ -234,6 +138,67 @@ The default profile registers 36 source modules in `src/registry.ts`. The defaul
 
 The civic-source additions and GeoHive layer selection are described in [civic source notes](docs/civic-sources.md). Counts describe the code in this revision, not a deployment receipt. Check the connected server with `ireland_catalogue`; verify a release with `node scripts/live-civic.mjs --url https://mcp.irishopendata.ie/mcp`.
 
+</details>
+
+## Why it's lean
+
+Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **7 tools, 8,674 characters, about 2,169 tokens** (`toolsets=all` is 88 tools, about 25k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
+
+<p align="center">
+  <a href="docs/architecture/ireland-mcp-lean-surface.drawio">
+    <img src="docs/architecture/ireland-mcp-lean-surface.png" alt="Token-cost comparison: 7 default tools versus all typed tools and one-server-per-source routing" width="800">
+  </a>
+</p>
+
+Need typed tools anyway?
+
+| Surface | Use |
+| --- | --- |
+| Default HTTP | `/mcp` lists only `ireland_catalogue`, `ireland_describe`, `ireland_call`, `ireland_about`, `search`, `fetch`, `nearby`. |
+| Source toolsets | `/mcp?toolsets=cso,irish-rail` lists selected typed tools too. |
+| One source path | `/mcp/x/{source}` lists that source's typed tools, for example `/mcp/x/met-eireann`. |
+| Everything | `/mcp?toolsets=all` lists all available tools and is useful for debugging, not routine chat. |
+| Local stdio | `npx -y ireland-mcp --toolsets=cso` or `--toolsets=all`. |
+
+`max_tokens` defaults to about 2,000 output tokens and can be set from 100 to 8,000. Large results return `truncated`, counts and narrowing hints instead of flooding the context.
+
+## Hosted or self-hosted
+
+- **Use the hosted endpoint** (`https://mcp.irishopendata.ie/mcp`) unless you have a reason not to. It's free, needs no keys, and the maintainer keeps it running.
+- **Run it yourself** with `npx -y ireland-mcp` (stdio), `npm run dev:http` (local HTTP), or your own Azure deployment. See [docs/self-hosting.md](docs/self-hosting.md).
+- **Contribute a source** if something Irish and public is missing. See [Contributing](#contributing).
+
+## Privacy and usage counts
+
+- Read-only, no accounts, and no argument values or IP addresses in logs or telemetry.
+- The hosted service keeps aggregate usage counts in PostHog: which sources and client apps are used, with no identities. The website counts anonymous page views without cookies. [PRIVACY.md](PRIVACY.md) lists every field.
+- Self-hosted copies never send usage counts unless you configure PostHog. An Azure deployment from the templates exports traces and metrics to your own Application Insights; set `IRELAND_MCP_OTEL=off` to stop that. Local stdio and HTTP send nothing.
+- `GET /healthz` (add `?deep=1` for per-source checks) and a public [status feed](https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json) report service health.
+
+## Limits
+
+- Read-only public data only. No login-gated, paid or key-required user data.
+- NTA realtime and Logainm placenames need server-side operator keys; every other source works without one.
+- Upstream data can be delayed, provisional, incomplete or temporarily down. Stale cache is labelled `stale: true` and is used only for retryable failures. Permanent request, access and missing-resource errors remain visible.
+- Property Price Register values are declared sale prices, not valuations.
+- Legislation text is for retrieval and analysis, not legal advice. The optional legal pilot covers only ingested pages. Enacted text, Citizens Information guidance and any permitted consolidation require verification of amendments, commencement and source currency; they do not certify current law.
+- Large tables are paginated or truncated. Use `fields`, `limit`, `cursor` and source filters.
+
+## Contributing
+
+New sources are the most useful contribution. [Request one](https://github.com/c-mongan/ireland-mcp/issues/new?template=source_request.yml), or add it yourself:
+
+1. Create `src/sources/<id>/index.ts` exporting a `SourceModule` with `info`, `summary`, `domain`, `coverage`, tools, optional `search()` and `fetchById()`.
+2. Keep every tool name source-prefixed, validate args with zod and return the evidence envelope with source URL, licence and attribution.
+3. Use `ctx.cachedJson` / `ctx.cachedText` so upstream budgets, caching, circuit breakers and stale fallback apply.
+4. Add fixtures and tests at the module seam, then add a server-level `ireland_call` test when useful.
+5. Register the module in `src/registry.ts`, update `scripts/live-sanity.mjs`, eval cases and docs.
+6. Run lint, typecheck, tests, build, inspector and live sanity before opening a PR.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full checklist.
+
+Development commands, evals and the quality loop are in [docs/development.md](docs/development.md).
+
 ## Licence and attribution
 
 | Layer | Licence / attribution |
@@ -246,85 +211,8 @@ The civic-source additions and GeoHive layer selection are described in [civic s
 | Weather, transport, environment, business and maps | Cite Met Éireann, NTA, Iarnród Éireann, TII/Luas, EirGrid, Marine Institute, Tailte Éireann, NMS, NPWS, EPA, Pobal, CRO, Kohesio/TED and JCDecaux/CityBikes/GBFS as applicable. |
 | Full notice | See [NOTICE](NOTICE). Not affiliated with any government body, data publisher or transport operator. |
 
-## Observability and privacy
-
-- `GET /healthz` is fast liveness; `GET /healthz?deep=1` performs one cheap check per source.
-- A status workflow publishes [`status/status.json`](https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json) and 7-day history.
-- OpenTelemetry can export MCP semantic-convention spans and operation-duration metrics to Azure Monitor.
-- Tool logs and telemetry avoid argument values and IP addresses. See [PRIVACY.md](PRIVACY.md).
-- Optional PostHog usage metrics and Chromatic visual checks are described in [observability](docs/observability.md) and the [quality loop](docs/quality-loop.md).
-- Browser CORS is restricted by `MCP_ALLOWED_ORIGINS`; non-browser MCP clients are unaffected.
-
-## Limits
-
-- Read-only public data only. No login-gated, paid or key-required user data.
-- NTA realtime tools need a server-side NTA operator key; other tools work without keys.
-- Upstream data can be delayed, provisional, incomplete or temporarily down. Stale cache is labelled `stale: true` and is used only for retryable failures. Permanent request, access and missing-resource errors remain visible.
-- Property Price Register values are declared sale prices, not valuations.
-- Legislation text is for retrieval and analysis, not legal advice. The optional legal pilot covers only ingested pages. Enacted text, Citizens Information guidance and any permitted consolidation require verification of amendments, commencement and source currency; they do not certify current law.
-- Large tables are paginated or truncated. Use `fields`, `limit`, `cursor` and source filters.
-
-## Run from source
-
-Needs Node 22.12 or later.
-
-```bash
-git clone https://github.com/c-mongan/ireland-mcp
-cd ireland-mcp
-npm ci
-npm run build
-node dist/src/cli.js
-npm run dev:http     # local HTTP dev server, MCP at /mcp
-```
-
-## Development
-
-| Command | What it does |
-| --- | --- |
-| `npm test` | Unit tests against recorded fixtures; no network. |
-| `npm run typecheck && npm run lint` | TypeScript and ESLint. |
-| `npm run build` | Compile production JS and copy runtime assets. |
-| `npm run inspector:check` | MCP Inspector conformance. |
-| `npm run check` | Lint, types, unit tests, package/deployment contracts and a real stdio MCP client check. |
-| `npm run check:ui` | Storybook MCP, visual fixtures, accessibility and production website browser checks. Install Chromium first with `npx playwright install chromium`. |
-| `npm run check:mcp -- --url https://mcp.irishopendata.ie/mcp` | Hosted MCP protocol and catalogue checks. It makes no upstream data requests. |
-| `npm run measure:tools [-- all]` | Measure default or all-tool `tools/list`. |
-| `npm run live:sanity` | Real source calls through `ireland_call`; includes the stored legal pilot when `LEGAL_ENABLED=true` or the root catalogue advertises it. Prints a Markdown receipt. See [docs/live-sanity.md](docs/live-sanity.md). |
-| `npm run live:all [-- --url https://mcp.irishopendata.ie/mcp]` | Real MCP client proof for every catalogue operation; writes [docs/live-all-ops.md](docs/live-all-ops.md). |
-| `npm run eval` | Promptfoo evaluation; default surface unless `EVAL_TOOLSETS=all`. |
-
-The [quality loop](docs/quality-loop.md) explains local, hosted, semantic and visual proof. The [playground access guide](docs/playground-auth.md) distinguishes the public query playground from ChatGPT sign-in and subscription use.
-
-### Eval results
-
-69 routing questions, run through a multi-round agent loop that sends the server instructions as the system prompt (2026-10-05, Azure OpenAI):
-
-| Model | Default surface (7 tools) | `all` surface (74 tools at the time) |
-| --- | --- | --- |
-| gpt-5.6-luna | **100%** | **100%** |
-| gpt-5.4-mini | 91% | 97% |
-| gpt-4.1-nano (worst-case floor) | 84% | 90% |
-
-A 2026-10-07 rerun of the expanded 79-question set with 29 sources at the time scored gpt-4.1-nano at 85% on the default surface.
-
-gpt-5.x models reject `temperature: 0`. For them, set `EVAL_TEMPERATURE=default`, for example: `AZURE_DEPLOYMENT=gpt-56-luna EVAL_TEMPERATURE=default npm run eval`.
-
-## Contributing: add a source
-
-1. Create `src/sources/<id>/index.ts` exporting a `SourceModule` with `info`, `summary`, `domain`, `coverage`, tools, optional `search()` and `fetchById()`.
-2. Keep every tool name source-prefixed, validate args with zod and return the evidence envelope with source URL, licence and attribution.
-3. Use `ctx.cachedJson` / `ctx.cachedText` so upstream budgets, caching, circuit breakers and stale fallback apply.
-4. Add fixtures and tests at the module seam, then add a server-level `ireland_call` test when useful.
-5. Register the module in `src/registry.ts`, update `scripts/live-sanity.mjs`, eval cases and docs.
-6. Run lint, typecheck, tests, build, inspector and live sanity before opening a PR.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full checklist.
-
-## Registry and publishing
-
-Ireland MCP is **listed on the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.c-mongan%2Fireland-mcp/versions/latest)** as a remote-only Streamable HTTP server named `io.github.c-mongan/ireland-mcp` (v1.1.3). Clients that browse the registry can install it by name. The future domain name is planned as `ie.irishopendata/ireland` after DNS verification. Publishing notes and directory checklists are in [docs/publishing.md](docs/publishing.md). Do not publish from a fork without changing the name and endpoint.
-
-## Credits and prior art
+<details>
+<summary><strong>Credits and prior art</strong></summary>
 
 Thank you to the maintainers of Irish-data and public-data MCP projects that helped shape the direction:
 
@@ -341,7 +229,15 @@ Thank you to the maintainers of Irish-data and public-data MCP projects that hel
 
 Data comes from the publishers listed above, including CSO, data.gov.ie, Met Éireann, OPW, Irish Rail, Oireachtas, GeoHive/Tailte Éireann, National Monuments Service, NPWS, EPA, Pobal, CRO, World Bank, Eurostat, ECB, Wikidata, Kohesio, TED, JCDecaux/CityBikes and others. Please cite the publisher shown in each response.
 
+</details>
+
+## More
+
+- [Evidence: clients tested, screenshots and demo video](docs/evidence.md)
+- [Architecture and request flow](docs/architecture.md)
+- [Self-hosting](docs/self-hosting.md) · [Deploying to Azure](docs/deploy.md) · [Publishing](docs/publishing.md)
+- [Observability](docs/observability.md) · [Privacy](PRIVACY.md) · [Security](SECURITY.md)
+
 ## Security
 
 Security reports: [SECURITY.md](SECURITY.md). This project is read-only, but MCP servers can still retrieve untrusted web content; clients should follow their normal MCP trust and approval model.
-

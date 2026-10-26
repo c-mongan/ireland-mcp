@@ -16,6 +16,8 @@ concurrency:
 
 jobs:
   smoke:
+    # Maintainer-only: skipped on forks.
+    if: github.repository == 'c-mongan/ireland-mcp'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
