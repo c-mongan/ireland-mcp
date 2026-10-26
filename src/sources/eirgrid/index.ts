@@ -96,7 +96,17 @@ const statusTool = defineTool({
     const pairMissing = missing[0] || missing[1];
     const needed = areas.map((_area, index) => missing[index] || (index < 2 && pairMissing));
     // Fetch only the series still needed, and let each fallback fail on its own so today's readings survive.
-    const previous = await Promise.all(areas.map((area, index) => (needed[index] ? load(area, yesterday).catch(() => undefined) : undefined)));
+    const fallbackFailed = new Set<number>();
+    const previous = await Promise.all(
+      areas.map((area, index) =>
+        needed[index]
+          ? load(area, yesterday).catch(() => {
+              fallbackFailed.add(index);
+              return undefined;
+            })
+          : undefined
+      )
+    );
     const pick = (index: number) => {
       const fromToday = latest(current[index]!.value.Rows);
       return fromToday ? { row: fromToday, date: today } : { row: latest(previous[index]?.value.Rows), date: yesterday };
@@ -120,13 +130,20 @@ const statusTool = defineTool({
       throw new ToolError("UPSTREAM_DOWN", "EirGrid returned no readings for today or yesterday.", {
         hint: "EirGrid's chart API is intermittently empty; empty charts are retried once and never cached. Try again in a few minutes."
       });
-    const unavailable = areas.filter((_area, index) => ![d, w, c][index]).map((area) => SERIES_LABELS[area]);
+    const missingNow = areas.map((_area, index) => ![d, w, c][index]);
+    const labels = (failed: boolean) =>
+      areas.filter((_area, index) => missingNow[index] && fallbackFailed.has(index) === failed).map((area) => SERIES_LABELS[area]).join(" or ");
+    const unavailable = labels(false);
+    const unreachable = labels(true);
     const notes = [
       ...(usedYesterday
         ? [`Some ${today} charts came back empty, even after a retry; those values are the latest from ${yesterday}. This is expected just after midnight; at other times it is an intermittent EirGrid gap.`]
         : []),
-      ...(unavailable.length
-        ? [`No ${unavailable.join(" or ")} reading: EirGrid returned no readings for ${today} or ${yesterday} (empty charts are retried once and not cached). This is usually transient; try again in a few minutes.`]
+      ...(unavailable
+        ? [`No ${unavailable} reading: EirGrid returned no readings for ${today} or ${yesterday} (empty charts are retried once and not cached). This is usually transient; try again in a few minutes.`]
+        : []),
+      ...(unreachable
+        ? [`No ${unreachable} reading: EirGrid's ${today} chart had no readings and the ${yesterday} chart could not be fetched. Try again in a few minutes.`]
         : [])
     ];
     return envelope(eirgridInfo, {

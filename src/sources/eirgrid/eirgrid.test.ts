@@ -112,6 +112,9 @@ describe("EirGrid module", () => {
     const { ok, body } = await callTool(mod, "grid_get_status", { region: "ALL" }, createContext({ fetch: fakeFetch(routes), now }));
     expect(ok).toBe(true);
     expect(body.data).toMatchObject({ demand_mw: 5753, co2_g_per_kwh: null });
+    expect(body.data.note).toContain("No CO2 intensity reading");
+    expect(body.data.note).toContain("could not be fetched");
+    expect(body.data.note).not.toContain("returned no readings for");
   });
 
   it("never reports yesterday's wind share without saying so", async () => {
