@@ -2,7 +2,7 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { endMcpOperations, startMcpOperations, withOperationContext } from "./mcpTelemetry.js";
 import { DEFAULT_ALLOWED_ORIGINS, isOriginAllowed } from "./origin.js";
-import { captureConnectPostHog } from "./posthog.js";
+import { captureConnectPostHog, type ConnectEvent } from "./posthog.js";
 import { clientBucket, clientInfoFrom, hashedClientKey, protocolBucket } from "./privacy.js";
 import type { RateLimiter } from "./rateLimit.js";
 import { SECURITY_HEADERS } from "./securityHeaders.js";
@@ -127,15 +127,22 @@ async function handleRequest(request: Request, options: McpHttpOptions, headers:
 }
 
 /** One usage count per `initialize`, with the client reduced to a fixed label. */
+export function connectEvents(bodyText: string, synthetic: boolean): ConnectEvent[] {
+  let parsed: unknown;
+  try { parsed = JSON.parse(bodyText); } catch { return []; }
+  return (Array.isArray(parsed) ? parsed : [parsed]).flatMap((message) => {
+    if (!message || typeof message !== "object" || (message as { method?: unknown }).method !== "initialize") return [];
+    const params = (message as { params?: unknown }).params;
+    const name = clientInfoFrom(params).name;
+    // Our Azure availability test predates the header; its fixed client name also marks it.
+    const probe = name === "azure-availability";
+    return [{ client: clientBucket(name), protocol: protocolBucket(params), synthetic: synthetic || probe }];
+  });
+}
+
 function recordConnects(bodyText: string, synthetic: boolean): void {
   if (process.env.IRELAND_MCP_TELEMETRY === "off") return;
-  let parsed: unknown;
-  try { parsed = JSON.parse(bodyText); } catch { return; }
-  for (const message of Array.isArray(parsed) ? parsed : [parsed]) {
-    if (!message || typeof message !== "object" || (message as { method?: unknown }).method !== "initialize") continue;
-    const params = (message as { params?: unknown }).params;
-    captureConnectPostHog({ client: clientBucket(clientInfoFrom(params).name), protocol: protocolBucket(params), synthetic });
-  }
+  for (const event of connectEvents(bodyText, synthetic)) captureConnectPostHog(event);
 }
 
 async function serve(

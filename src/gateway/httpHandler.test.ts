@@ -7,7 +7,7 @@ import { z } from "zod";
 import { createContext } from "./context.js";
 import { envelope } from "./envelope.js";
 import { ToolError } from "./errors.js";
-import { handleMcpHttp } from "./httpHandler.js";
+import { connectEvents, handleMcpHttp } from "./httpHandler.js";
 import { defineTool, type SourceModule } from "./module.js";
 import { RateLimiter } from "./rateLimit.js";
 import { currentSynthetic } from "./requestScope.js";
@@ -329,5 +329,16 @@ describe("synthetic traffic", () => {
     await handleMcpHttp(post(body, { "x-ireland-mcp-synthetic": "1" }), { createServer: tagged });
     await handleMcpHttp(post(body), { createServer: tagged });
     expect(seen).toEqual([true, false]);
+  });
+});
+
+describe("client connection counts", () => {
+  const init = (name: string) => ({ jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", clientInfo: { name, version: "9.9 private" } } });
+
+  it("labels clients and treats our availability probe as synthetic", () => {
+    expect(connectEvents(JSON.stringify(init("claude-ai")), false)).toEqual([{ client: "claude", protocol: "2025-06-18", synthetic: false }]);
+    expect(connectEvents(JSON.stringify(init("azure-availability")), false)).toEqual([{ client: "other", protocol: "2025-06-18", synthetic: true }]);
+    expect(connectEvents(JSON.stringify([init("cursor-vscode"), { jsonrpc: "2.0", id: 2, method: "tools/list" }]), true)).toEqual([{ client: "cursor", protocol: "2025-06-18", synthetic: true }]);
+    expect(connectEvents("not json", false)).toEqual([]);
   });
 });

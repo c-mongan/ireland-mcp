@@ -145,6 +145,8 @@ describe("Production infrastructure replay contracts", () => {
     ]);
     expect([...availability.matchAll(/method: '([^']+)'/g)].map((match) => match[1])).toEqual(["GET", "POST"]);
     expect(availability).not.toContain("irishopendata-com-healthz");
+    // Availability probes are first-party traffic and must not count as real usage.
+    expect(availability).toContain("{ key: 'x-ireland-mcp-synthetic', value: '1' }");
     expect(service).toContain("name: 'healthz-${token}'");
     expect(service).toContain("RequestUrl: empty(healthCheckUrl) ? 'https://${app.properties.defaultHostName}/healthz' : healthCheckUrl");
     expect(main).toContain("healthCheckUrl: enableProductionDomains ? 'https://mcp.irishopendata.com/healthz' : ''");
