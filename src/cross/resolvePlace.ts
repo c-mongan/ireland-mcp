@@ -99,8 +99,9 @@ export const resolvePlaceTool = defineTool({
     } else if (place) {
       const text = place.trim();
       const district = dublinDistrict(text);
-      if (/^A?\d{9}(\/\d{2})?$/i.test(text)) {
-        const sa = await smallAreaByCode(ctx, text.replace(/\/\d{2}$/, ""));
+      // Census 2022 small-area codes: "268098009", split areas "267065001/02", merged "037083001/037083002".
+      if (/^A?\d{9}(\/(\d{2}|\d{9}))?$/i.test(text)) {
+        const sa = await smallAreaByCode(ctx, text);
         url = sa.url;
         cached = sa.cached;
         stale = sa.stale;

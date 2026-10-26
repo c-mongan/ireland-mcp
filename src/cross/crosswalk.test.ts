@@ -185,6 +185,16 @@ describe("ireland_resolve_place", () => {
     expect(body.data.codes.lea[0].name).toBe("Galway City East");
   });
 
+  it("resolves split and merged small-area codes without rewriting them", async () => {
+    const fetch = fakeFetch([
+      { match: (url) => url.includes("SMALL_AREA_2022") && decodeURIComponent(url).includes("'267065001/02'"), body: features([{ SA_PUB2022: "267065001/02", SA_GEOGID_2022: "A267065001/02", ED_ID_STR: "268106" }]) }
+    ]);
+    const { ok, body } = await resolve({ place: "267065001/02" }, fetch);
+    expect(ok).toBe(true);
+    expect(body.data.match.via).toBe("small_area_code");
+    expect(body.data.small_area.code).toBe("267065001/02");
+  });
+
   it("rejects bad combinations", async () => {
     expect((await resolve({ lat: 53.3 })).body.error.code).toBe("BAD_ARGS");
     expect((await resolve({})).body.error.code).toBe("BAD_ARGS");

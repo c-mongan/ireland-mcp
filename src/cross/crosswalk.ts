@@ -144,17 +144,17 @@ const LEVEL_RANK: Record<CrosswalkLevel, number> = { county: 0, local_authority:
 export function findEntities(query: string, level?: CrosswalkLevel): Entity[] {
   const x = loadCrosswalk();
   const q = query.trim();
-  const direct = x.byKey.get(placeKey(/^\d{5}$/.test(q) ? q.padStart(6, "0") : q)) ?? [];
+  const direct = (x.byKey.get(placeKey(/^\d{5}$/.test(q) ? q.padStart(6, "0") : q)) ?? []).filter((e) => !level || e.level === level);
   let hits = direct;
   if (!hits.length) {
     // "Ballybane, Galway" (RTB) or "Athlone, Roscommon": the qualifier names a county or council.
     const parts = splitQualifier(query);
     if (parts) {
       const within = x.byKey.get(placeKey(parts.qualifier))?.filter((e) => e.level === "county" || e.level === "local_authority") ?? [];
-      hits = (x.byKey.get(placeKey(parts.name)) ?? []).filter((e) => within.some((w) => contains(w, e)));
+      hits = (x.byKey.get(placeKey(parts.name)) ?? []).filter((e) => (!level || e.level === level) && within.some((w) => contains(w, e)));
     }
   }
-  return hits.filter((e) => !level || e.level === level).sort((a, b) => LEVEL_RANK[a.level] - LEVEL_RANK[b.level] || a.name.localeCompare(b.name));
+  return [...hits].sort((a, b) => LEVEL_RANK[a.level] - LEVEL_RANK[b.level] || a.name.localeCompare(b.name));
 }
 
 export function edById(id: string): Entity | undefined {
