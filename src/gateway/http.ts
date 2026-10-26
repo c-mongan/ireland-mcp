@@ -112,7 +112,8 @@ export class HttpClient {
       timer = setTimeout(() => {
         // A known argument rejection stays strict even if its explanatory body stalls.
         reject(receivedStatus !== undefined && CALLER_ERROR_STATUSES.has(receivedStatus)
-          ? rejectedArgs(label, receivedStatus) : timedOut());
+          ? rejectedArgs(label, receivedStatus)
+          : receivedStatus === 403 ? refused(label, 403) : timedOut());
         controller.abort();
       }, timeoutMs);
     });
@@ -153,6 +154,18 @@ export class HttpClient {
       const reason = await upstreamReason(response, controller, timedOut);
       throw rejectedArgs(label, response.status, reason);
     }
+    if (response.status === 403 && !options.retryStatuses?.includes(403)) {
+      // Azure API Management answers an exhausted shared quota with 403, not 429. Its body says so.
+      const quota = quotaExhaustion(await briefly(upstreamReason(response, controller, timedOut), FORBIDDEN_REASON_MS, ""));
+      if (quota) {
+        throw new ToolError("RATE_LIMITED", `${label} has used up its upstream usage quota (HTTP 403).`, {
+          hint: "The publisher's shared open-data quota is exhausted and refills on its own schedule. Retrying before retry_after_seconds will not help.",
+          httpStatus: 403,
+          ...(quota.retryAfterSeconds !== undefined ? { retryAfterSeconds: quota.retryAfterSeconds } : {})
+        });
+      }
+      throw refused(label, 403);
+    }
     if (!response.ok) void response.body?.cancel().catch(() => undefined);
     if (response.status === 404) throw new ToolError("NOT_FOUND", `${label} has no matching resource.`);
     if (response.status === 429) {
@@ -162,10 +175,9 @@ export class HttpClient {
       });
     }
     if (!response.ok) {
-      const message = `${label} returned HTTP ${response.status}.`;
       const transient = TRANSIENT_STATUSES.has(response.status) || options.retryStatuses?.includes(response.status);
-      if (transient) throw new TransientUpstreamError(message, { kind: "http", status: response.status });
-      throw new ToolError("UPSTREAM_DOWN", message, { hint: hintForStatus(response.status), retryable: false, httpStatus: response.status });
+      if (transient) throw new TransientUpstreamError(`${label} returned HTTP ${response.status}.`, { kind: "http", status: response.status });
+      throw refused(label, response.status);
     }
 
     const maxBytes = options.maxBytes ?? DEFAULT_MAX_BYTES;
@@ -190,6 +202,31 @@ function rejectedArgs(label: string, status: number, reason = ""): ToolError {
   return new ToolError("BAD_ARGS", `${label} rejected the request parameters (HTTP ${status})${reason ? `: ${reason}` : "."}`, {
     hint: "Fix the arguments (check field or column names, values and formats against the tool schema or the dataset's fields) and retry."
   });
+}
+
+/** A 403 explanation is optional evidence; a stalled body must not delay the refusal. */
+const FORBIDDEN_REASON_MS = 1_000;
+
+async function briefly<T>(work: Promise<T>, ms: number, fallback: T): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([work, new Promise<T>((resolve) => { timer = setTimeout(() => resolve(fallback), ms); })]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function refused(label: string, status: number): ToolError {
+  return new ToolError("UPSTREAM_DOWN", `${label} returned HTTP ${status}.`, { hint: hintForStatus(status), retryable: false, httpStatus: status });
+}
+
+/** Recognises an exhausted usage quota (e.g. Azure API Management "Out of bandwidth quota"). */
+export function quotaExhaustion(reason: string): { retryAfterSeconds?: number } | undefined {
+  if (!/out of [a-z ]*quota|quota (?:will be )?replenished|quota (?:has been |is )?(?:exceeded|exhausted)/i.test(reason)) return undefined;
+  const wait = /replenished in (?:(\d+)\.)?(\d{1,2}):(\d{2}):(\d{2})/i.exec(reason);
+  if (!wait) return {};
+  const [, days = "0", h, m, sec] = wait;
+  return { retryAfterSeconds: Number(days) * 86_400 + Number(h) * 3_600 + Number(m) * 60 + Number(sec) };
 }
 
 function hintForStatus(status: number): string {

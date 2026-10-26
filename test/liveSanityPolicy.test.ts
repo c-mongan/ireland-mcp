@@ -21,6 +21,16 @@ describe("live smoke policy", () => {
     expect(assessed.note).toContain("timeout; attempts=2");
     expect(exitCode([assessed])).toBe(1);
   });
+  it("reports an exhausted publisher quota as QUOTA, distinct from other failures, and still fails the run", () => {
+    const quota = { error: { code: "RATE_LIMITED", message: "Fáilte Ireland CSV has used up its upstream usage quota (HTTP 403).", hint: "refills", retry_after_seconds: 37287 } };
+    const assessed = assessSmokeResult(result(quota, true), { ...sample, source: "failte-ireland", tool: "failte_search" });
+    expect(assessed).toMatchObject({ status: "QUOTA", note: expect.stringContaining("refills in ~11h") });
+    expect(exitCode([assessed])).toBe(1);
+    // Generic rate limiting and misrouted errors are not quota exhaustion.
+    expect(assessSmokeResult(result({ error: { code: "RATE_LIMITED", message: "Too many requests" } }, true), sample).status).toBe("FAIL");
+    expect(assessSmokeResult({ ...result(quota, true), _meta: { "ireland/source": "wrong" } }, sample).status).toBe("FAIL");
+    expect(assessSmokeResult(result(quota), sample).status).toBe("FAIL");
+  });
   it("does not classify generic upstream errors or conflicting metadata as transport degradation", () => {
     const error = { error: { code: "UPSTREAM_DOWN", message: "Unexpected handler failure" } };
     expect(assessSmokeResult(result(error, true), sample).status).toBe("FAIL");

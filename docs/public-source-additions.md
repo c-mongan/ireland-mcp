@@ -35,7 +35,12 @@ These are dated observations, not completeness or hosted-availability guarantees
 The published counts keep the new sources in `HOSTED_LIMITS` until their hosted
 operations are verified. Health probes check HTTP liveness, not dataset accuracy.
 
-Fáilte imports are limited to 5 MiB and 10,000 records and cached for one hour.
+Fáilte imports are limited to 5 MiB and 10,000 records and cached for 12 hours,
+because the publisher's API has a shared daily bandwidth quota. When that quota is
+exhausted (HTTP 403 "Out of bandwidth quota"), the tool returns `RATE_LIMITED` with
+`retry_after_seconds`. A process that already holds a good snapshot serves it marked
+stale, but the CSV is too large for the durable Table Storage cache, so a cold or newly
+scaled hosted instance has no snapshot and returns the error.
 NaPTAN is limited to 30 MiB and 100,000 stops and cached for one day. Its observed
 download is about 21.7 MB; only compact normalized records enter the cache.
 GSI uses a 10-second timeout, one-day cache and at most 10 point matches.

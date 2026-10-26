@@ -44,8 +44,12 @@ Only the exact marked tool error `UPSTREAM_DOWN: Kohesio returned HTTP 403.`
 can become WARN for the known cloud-runner restriction. Wrong data, stale data,
 other HTTP errors, and unclassified upstream errors remain FAIL. Structured
 transport failures (timeout, network failure, or transient HTTP exhaustion)
-are DEGRADED. DEGRADED is a failing result, not an outage exemption. One WARN
-is tolerated; any FAIL, any DEGRADED, or more than one WARN exits with code 1.
+are DEGRADED. DEGRADED is a failing result, not an outage exemption. A
+publisher that refuses requests because its shared usage quota is exhausted
+(for example Fáilte Ireland's Azure API Management "Out of bandwidth quota"
+403, surfaced as `RATE_LIMITED`) is QUOTA, with the refill time in the note.
+QUOTA also fails the run. One WARN is tolerated; any FAIL, any DEGRADED, any
+QUOTA, or more than one WARN exits with code 1.
 
 ArcGIS (including heritage) and Marine Institute calls use the shared HTTP
 client: two attempts by default, each bounded to 10 seconds, with 125–250 ms

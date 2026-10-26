@@ -105,6 +105,8 @@ else {
   const warned = results.filter((r) => r.status === "WARN");
   if (warned.length) console.log(`\nWARN: ${warned.length} known-flaky upstream failure(s) reported but not failing the run.`);
   const degraded = results.filter((r) => r.status === "DEGRADED");
+  const quota = results.filter((r) => r.status === "QUOTA");
+  if (quota.length) console.log(`\nQUOTA: ${quota.length} source(s) refused because the publisher's shared usage quota is exhausted. The run fails; the source recovers when the quota refills; only warm instances holding a snapshot can serve it stale meanwhile.`);
   if (degraded.length) console.log(`\nDEGRADED: ${degraded.length} transport failure(s) after bounded retries. The run fails; provider availability or network connectivity needs investigation.`);
 }
 process.exit(exitCode(results));

@@ -49,7 +49,7 @@ export const failteIreland: SourceModule = {
     example: {dataset:"accommodation",county:"Galway",limit:10},
     async handler(args, ctx) {
       const url = `${BASE}/${args.dataset}/csv`;
-      const r = await ctx.cache.getOrLoad(`failte-ireland:csv:v1:${args.dataset}`, HOUR, async () => {
+      const r = await ctx.cache.getOrLoad(`failte-ireland:csv:v1:${args.dataset}`, 12 * HOUR, async () => {
         const bytes = await ctx.http.bytes(url, {maxBytes: MAX_EXPORT_BYTES, label:"Fáilte Ireland CSV",headers:{accept:"text/csv"}});
         let csv: string;
         try { csv = new TextDecoder("utf-8", {fatal:true}).decode(bytes); } catch { return invalid(); }

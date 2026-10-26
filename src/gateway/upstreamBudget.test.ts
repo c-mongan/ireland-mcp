@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createContext } from "./context.js";
 import { ToolError } from "./errors.js";
-import { HttpClient } from "./http.js";
+import { HttpClient, quotaExhaustion } from "./http.js";
 import { budgetConfigFromEnv, CircuitBreaker, sourceForUrl, UpstreamBudgets } from "./upstreamBudget.js";
 import { fakeFetch } from "../../test/helpers/fakeFetch.js";
 
@@ -234,5 +234,22 @@ describe("HttpClient with budgets", () => {
     const error = await http.text("https://kohesio.ec.europa.eu/api", { retries: 0 }).catch((e: unknown) => e);
     expect(error).toMatchObject({ code: "UPSTREAM_DOWN", message: expect.stringContaining("HTTP 403"), hint: expect.stringContaining("refused access") });
     expect((error as ToolError).hint).not.toContain("did not respond");
+  });
+
+  it("reports an exhausted upstream quota (Azure API Management 403) as RATE_LIMITED with the refill time", async () => {
+    const body = JSON.stringify({ statusCode: 403, message: "Out of bandwidth quota. Quota will be replenished in 10:21:27." });
+    const fetch = fakeFetch([{ match: /failteireland/, status: 403, body }]);
+    const error = await new HttpClient(fetch).bytes("https://failteireland.azure-api.net/opendata-api/v2/accommodation/csv", { label: "Fáilte Ireland CSV" }).catch((e: unknown) => e);
+    expect(error).toMatchObject({ code: "RATE_LIMITED", retryable: true, httpStatus: 403, retryAfterSeconds: 10 * 3600 + 21 * 60 + 27 });
+    expect((error as ToolError).message).toBe("Fáilte Ireland CSV has used up its upstream usage quota (HTTP 403).");
+    expect((error as ToolError).hint).not.toContain("Out of bandwidth");
+    expect(fetch.calls).toHaveLength(1);
+  });
+
+  it("recognises quota wording, including a days prefix, and ignores other 403 bodies", () => {
+    expect(quotaExhaustion("Out of call volume quota. Quota will be replenished in 1.02:03:04.")).toEqual({ retryAfterSeconds: 86_400 + 2 * 3600 + 3 * 60 + 4 });
+    expect(quotaExhaustion("Quota exceeded")).toEqual({});
+    expect(quotaExhaustion("Forbidden")).toBeUndefined();
+    expect(quotaExhaustion("Access denied: quota parameter missing")).toBeUndefined();
   });
 });

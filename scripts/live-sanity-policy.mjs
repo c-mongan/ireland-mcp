@@ -32,6 +32,11 @@ export function assessSmokeResult(result, { source, tool, check, raw = false, ty
     const routed = (body?.operation === undefined || body.operation === tool)
       && (result?._meta?.["ireland/source"] === undefined || result._meta["ireland/source"] === source)
       && (result?._meta?.["ireland/operation"] === undefined || result._meta["ireland/operation"] === tool);
+    // An exhausted publisher quota is reported distinctly, but it is still a failing live check.
+    if (result?.isError && routed && body?.error?.code === "RATE_LIMITED" && /usage quota/i.test(body.error.message ?? "")) {
+      const refill = Number.isInteger(body.error.retry_after_seconds) ? ` [refills in ~${Math.ceil(body.error.retry_after_seconds / 3600)}h]` : "";
+      return { ...failure, status: "QUOTA", note: `${failure.note}${refill}` };
+    }
     if (result?.isError && routed && body?.error?.code === "UPSTREAM_DOWN"
       && ["timeout", "network", "http"].includes(transport?.kind)
       && Number.isInteger(transport.attempts) && transport.attempts > 0) {
@@ -71,7 +76,7 @@ export function classify(result, knownFlaky = KNOWN_FLAKY) {
 
 /** Returns the process exit code: 0 when everything passed or only tolerated known-flaky warnings remain. */
 export function exitCode(results, maxTolerated = MAX_TOLERATED_FLAKY) {
-  if (results.some((r) => r.status === "FAIL" || r.status === "DEGRADED")) return 1;
+  if (results.some((r) => r.status === "FAIL" || r.status === "DEGRADED" || r.status === "QUOTA")) return 1;
   return results.filter((r) => r.status === "WARN").length > maxTolerated ? 1 : 0;
 }
 

@@ -78,7 +78,7 @@ describe("Fáilte Ireland public CSV", () => {
     const valid = await callTool(failteIreland,"failte_search",{dataset:"accommodation"},ctx);
     expect(valid.ok).toBe(true);
     expect(valid.body.cached).toBe(false);
-    now = new Date(now.getTime() + HOUR + 1);
+    now = new Date(now.getTime() + 12 * HOUR + 1);
     const stale = await callTool(failteIreland,"failte_search",{dataset:"accommodation"},ctx);
     expect(stale.ok).toBe(true);
     expect(stale.body.stale).toBe(true);
@@ -96,6 +96,30 @@ describe("Fáilte Ireland public CSV", () => {
     const result = await callTool(failteIreland,"failte_search",{dataset:"accommodation"},fakeFetch([{match:/\/accommodation\/csv$/,body:new Uint8Array([0xff,0xfe,0xff])}]));
     expect(result.ok).toBe(false);
     expect(result.body.error).toMatchObject({code:"UPSTREAM_DOWN",message:"Fáilte Ireland returned an invalid CSV export."});
+  });
+  it("keeps the CSV for 12 hours and serves it stale, not failing, when the upstream quota is exhausted", async () => {
+    let now = new Date("2026-10-26T12:00:00Z");
+    const quota = JSON.stringify({ statusCode: 403, message: "Out of bandwidth quota. Quota will be replenished in 10:21:27." });
+    let exhausted = false;
+    const fetch = fakeFetch([{ match: () => exhausted, status: 403, body: quota }, { match: /accommodation\/csv/, body: accommodation }]);
+    const ctx = createContext({ now: () => now, fetch });
+    expect((await callTool(failteIreland,"failte_search",{dataset:"accommodation"},ctx)).ok).toBe(true);
+    exhausted = true;
+    now = new Date(now.getTime() + 11 * HOUR);
+    expect((await callTool(failteIreland,"failte_search",{dataset:"accommodation"},ctx)).body.cached).toBe(true);
+    expect(fetch.calls).toHaveLength(1);
+    now = new Date(now.getTime() + 2 * HOUR);
+    const stale = await callTool(failteIreland,"failte_search",{dataset:"accommodation"},ctx);
+    expect(stale.ok).toBe(true);
+    expect(stale.body.stale).toBe(true);
+  });
+
+  it("reports an exhausted quota with no snapshot as RATE_LIMITED", async () => {
+    const quota = JSON.stringify({ statusCode: 403, message: "Out of bandwidth quota. Quota will be replenished in 10:21:27." });
+    const { ok, body } = await callTool(failteIreland,"failte_search",{dataset:"attractions"},createContext({ fetch: fakeFetch([{ match: /failteireland/, status: 403, body: quota }]) }));
+    expect(ok).toBe(false);
+    expect(body.error).toMatchObject({ code: "RATE_LIMITED", retry_after_seconds: 37287 });
+    expect(body.error.message).toContain("usage quota");
   });
 });
 
