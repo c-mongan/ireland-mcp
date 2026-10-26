@@ -80,9 +80,9 @@ Portable Copilot / MCP JSON:
 | --- | ---: | --- |
 | Data sources | 38 | Upstream public-data sources, one module each. The `cross` combiner is not a source. |
 | Available without an operator key | 36 of 38 | NTA realtime needs an operator key. Logainm needs a Gaois operator account and API key. |
-| Catalogue operations | 86 | 83 source operations plus 3 cross-source ones (`list_sources`, `nearby`, `ireland_snapshot`), all callable through `ireland_call`. |
+| Catalogue operations | 90 | 87 source operations plus 3 cross-source ones (`list_sources`, `nearby`, `ireland_snapshot`), all callable through `ireland_call`. |
 | Default tools | 7 | What `tools/list` returns: 4 meta tools plus `search`, `fetch` and `nearby`. |
-| Tools with `?toolsets=all` | 92 | Every operation as a typed tool, plus the 4 meta tools, `search` and `fetch`. |
+| Tools with `?toolsets=all` | 96 | Every operation as a typed tool, plus the 4 meta tools, `search` and `fetch`. |
 | Prompts | 3 | `area_profile`, `commute_check`, `compare_counties`. |
 <!-- counts:end -->
 
@@ -154,7 +154,7 @@ Read the [beta assessment](docs/legal-beta-assessment.md) for coverage, licences
 
 ## Why it's lean
 
-Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **7 tools, 8,832 characters, about 2,208 tokens** (`toolsets=all` is 92 tools, about 26k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
+Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **7 tools, 8,941 characters, about 2,235 tokens** (`toolsets=all` is 96 tools, about 28k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
 
 <p align="center">
   <a href="docs/architecture/ireland-mcp-lean-surface.drawio">
