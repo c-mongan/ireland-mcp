@@ -1,14 +1,14 @@
 {
-  "sources": 36,
-  "hosted_working": 34,
+  "sources": 37,
+  "hosted_working": 35,
   "hosted_limited": [
     "nta",
     "logainm"
   ],
-  "operations": 86,
-  "source_operations": 83,
+  "operations": 89,
+  "source_operations": 86,
   "cross_operations": 3,
   "default_tools": 7,
-  "all_tools": 92,
+  "all_tools": 95,
   "prompts": 3
 }

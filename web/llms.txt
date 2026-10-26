@@ -6,7 +6,7 @@ Endpoint: [Ireland MCP Streamable HTTP endpoint](https://mcp.irishopendata.ie/mc
 Docs: [Ireland MCP documentation and playground](https://irishopendata.ie/)
 Transport: Streamable HTTP JSON-RPC over POST
 Auth: none
-Default tool surface: 7 tools, 8,747 characters, about 2.2k tokens
+Default tool surface: 7 tools, 8,856 characters, about 2.2k tokens
 Full surface: use ?toolsets=all only when a client needs all typed tools listed
 
 Install:
