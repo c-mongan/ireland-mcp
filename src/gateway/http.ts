@@ -1,4 +1,4 @@
-import { ToolError } from "./errors.js";
+import { ToolError, type UpstreamFailure } from "./errors.js";
 import { instruments, SpanKind, withSpan } from "./otel.js";
 import { sourceForUrl, type UpstreamBudgets } from "./upstreamBudget.js";
 
@@ -78,6 +78,7 @@ export class HttpClient {
       try {
         return await this.once(url, options);
       } catch (error) {
+        if (error instanceof TransientUpstreamError && error.upstreamFailure) error.upstreamFailure.attempts = attempt + 1;
         // Only transient failures are retried; 403s, 501s, bad payloads and size bounds fail fast.
         if (!(error instanceof TransientUpstreamError) || attempt >= retries) throw error;
         await sleep(backoffMs(attempt, this.timing.random));
@@ -101,65 +102,95 @@ export class HttpClient {
   private async once(url: string, options: HttpOptions): Promise<Uint8Array> {
     const label = options.label ?? hostOf(url);
     const controller = new AbortController();
-    const timedOut = () => new TransientUpstreamError(`${label} could not be reached or did not respond in time.`);
-    // The timer covers headers and body, so a slow-dripping body cannot hang a tool call.
-    const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+    const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+    const timedOut = () => new TransientUpstreamError(`${label} could not be reached or did not respond in time.`, { kind: "timeout", timeout_ms: timeoutMs });
+    let receivedStatus: number | undefined;
+    // Race the whole attempt, including error-body reads and cancellation. Abort alone
+    // is cooperative and cannot enforce a deadline on an unresponsive transport.
+    let timer: ReturnType<typeof setTimeout>;
+    const deadline = new Promise<never>((_resolve, reject) => {
+      timer = setTimeout(() => {
+        // A known argument rejection stays strict even if its explanatory body stalls.
+        reject(receivedStatus !== undefined && CALLER_ERROR_STATUSES.has(receivedStatus)
+          ? rejectedArgs(label, receivedStatus) : timedOut());
+        controller.abort();
+      }, timeoutMs);
+    });
     try {
-      let response: Response;
-      try {
-        response = await this.fetchImpl(url, {
-          method: options.method ?? "GET",
-          headers: { "user-agent": USER_AGENT, ...options.headers },
-          ...(options.body !== undefined ? { body: options.body } : {}),
-          signal: controller.signal
-        });
-      } catch {
-        throw timedOut();
-      }
-
-      if (CALLER_ERROR_STATUSES.has(response.status)) {
-        // The caller's arguments were rejected (bad column, invalid value, oversized query). This is
-        // not an outage, so it is BAD_ARGS and never counts toward the source's circuit breaker.
-        const reason = await upstreamReason(response);
-        throw new ToolError("BAD_ARGS", `${label} rejected the request parameters (HTTP ${response.status})${reason ? `: ${reason}` : "."}`, {
-          hint: "Fix the arguments (check field or column names, values and formats against the tool schema or the dataset's fields) and retry."
-        });
-      }
-      if (!response.ok) await response.body?.cancel().catch(() => undefined);
-      if (response.status === 404) throw new ToolError("NOT_FOUND", `${label} has no matching resource.`);
-      if (response.status === 429) {
-        const retryAfter = Number(response.headers.get("retry-after") ?? "60");
-        throw new ToolError("RATE_LIMITED", `${label} is rate limiting requests.`, {
-          retryAfterSeconds: Number.isFinite(retryAfter) ? retryAfter : 60
-        });
-      }
-      if (!response.ok) {
-        const message = `${label} returned HTTP ${response.status}.`;
-        const transient = TRANSIENT_STATUSES.has(response.status) || options.retryStatuses?.includes(response.status);
-        if (transient) throw new TransientUpstreamError(message, response.status);
-        throw new ToolError("UPSTREAM_DOWN", message, { hint: hintForStatus(response.status), retryable: false });
-      }
-
-      const maxBytes = options.maxBytes ?? DEFAULT_MAX_BYTES;
-      const tooLarge = () =>
-        new ToolError("UPSTREAM_DOWN", `${label} response is larger than the ${maxBytes} byte bound.`, {
-          hint: "Narrow the query (fewer dimensions, a smaller limit or a filter).",
-          retryable: false
-        });
-      const declared = Number(response.headers.get("content-length") ?? "0");
-      if (declared > maxBytes) {
-        await response.body?.cancel().catch(() => undefined);
-        throw tooLarge();
-      }
-      return await readBounded(response, maxBytes, controller, tooLarge, timedOut, label);
+      return await Promise.race([this.request(url, options, controller, timedOut, (status) => { receivedStatus = status; }), deadline]);
     } finally {
-      clearTimeout(timer);
+      clearTimeout(timer!);
+      // Release any transport still active after an early rejection or stalled cancel.
+      controller.abort();
     }
+  }
+
+  private async request(url: string, options: HttpOptions, controller: AbortController, timedOut: () => ToolError, onHeaders: (status: number) => void): Promise<Uint8Array> {
+    const label = options.label ?? hostOf(url);
+    let response: Response;
+    try {
+      response = await this.fetchImpl(url, {
+        method: options.method ?? "GET",
+        headers: { "user-agent": USER_AGENT, ...options.headers },
+        ...(options.body !== undefined ? { body: options.body } : {}),
+        signal: controller.signal
+      });
+    } catch (error) {
+      if (controller.signal.aborted) throw timedOut();
+      if (error instanceof ToolError) throw error;
+      throw new TransientUpstreamError(`${label} could not be reached (network failure).`, { kind: "network" });
+    }
+
+    if (controller.signal.aborted) {
+      void response.body?.cancel().catch(() => undefined);
+      throw timedOut();
+    }
+    onHeaders(response.status);
+
+    if (CALLER_ERROR_STATUSES.has(response.status)) {
+      // The caller's arguments were rejected (bad column, invalid value, oversized query). This is
+      // not an outage, so it is BAD_ARGS and never counts toward the source's circuit breaker.
+      const reason = await upstreamReason(response, controller, timedOut);
+      throw rejectedArgs(label, response.status, reason);
+    }
+    if (!response.ok) void response.body?.cancel().catch(() => undefined);
+    if (response.status === 404) throw new ToolError("NOT_FOUND", `${label} has no matching resource.`);
+    if (response.status === 429) {
+      const retryAfter = Number(response.headers.get("retry-after") ?? "60");
+      throw new ToolError("RATE_LIMITED", `${label} is rate limiting requests.`, {
+        retryAfterSeconds: Number.isFinite(retryAfter) ? retryAfter : 60
+      });
+    }
+    if (!response.ok) {
+      const message = `${label} returned HTTP ${response.status}.`;
+      const transient = TRANSIENT_STATUSES.has(response.status) || options.retryStatuses?.includes(response.status);
+      if (transient) throw new TransientUpstreamError(message, { kind: "http", status: response.status });
+      throw new ToolError("UPSTREAM_DOWN", message, { hint: hintForStatus(response.status), retryable: false, httpStatus: response.status });
+    }
+
+    const maxBytes = options.maxBytes ?? DEFAULT_MAX_BYTES;
+    const tooLarge = () =>
+      new ToolError("UPSTREAM_DOWN", `${label} response is larger than the ${maxBytes} byte bound.`, {
+        hint: "Narrow the query (fewer dimensions, a smaller limit or a filter).",
+        retryable: false
+      });
+    const declared = Number(response.headers.get("content-length") ?? "0");
+    if (declared > maxBytes) {
+      void response.body?.cancel().catch(() => undefined);
+      throw tooLarge();
+    }
+    return await readBounded(response, maxBytes, controller, tooLarge, timedOut, label);
   }
 }
 
 /** 4xx statuses that mean "your request was wrong", not "the source is down". */
 const CALLER_ERROR_STATUSES = new Set([400, 409, 413, 414, 422]);
+
+function rejectedArgs(label: string, status: number, reason = ""): ToolError {
+  return new ToolError("BAD_ARGS", `${label} rejected the request parameters (HTTP ${status})${reason ? `: ${reason}` : "."}`, {
+    hint: "Fix the arguments (check field or column names, values and formats against the tool schema or the dataset's fields) and retry."
+  });
+}
 
 function hintForStatus(status: number): string {
   if (status === 401 || status === 403)
@@ -169,10 +200,11 @@ function hintForStatus(status: number): string {
 }
 
 /** Pulls a short, single-line reason out of an upstream error body (CKAN, ArcGIS, plain text). */
-async function upstreamReason(response: Response): Promise<string> {
+async function upstreamReason(response: Response, controller: AbortController, timedOut: () => ToolError): Promise<string> {
   let text: string;
   try {
-    text = (await response.text()).slice(0, 4000);
+    text = new TextDecoder().decode(await readBounded(response, 4000, controller,
+      () => new ToolError("BAD_ARGS", "Error detail exceeded its byte bound."), timedOut, "Upstream error detail"));
   } catch {
     return "";
   }
@@ -198,8 +230,8 @@ function leaves(value: unknown, key = ""): string[] {
 
 /** Network errors, timeouts and gateway-style statuses: worth one bounded, backed-off retry. */
 class TransientUpstreamError extends ToolError {
-  constructor(message: string, status?: number) {
-    super("UPSTREAM_DOWN", message, status ? { hint: hintForStatus(status) } : {});
+  constructor(message: string, failure: Omit<UpstreamFailure, "attempts">) {
+    super("UPSTREAM_DOWN", message, { ...(failure.status ? { hint: hintForStatus(failure.status) } : {}), upstreamFailure: { ...failure, attempts: 1 } });
   }
 }
 
@@ -232,7 +264,7 @@ async function readBounded(
         next = await Promise.race([reader.read(), aborted]);
       } catch (error) {
         if (error instanceof ToolError) throw error;
-        throw new TransientUpstreamError(`${label} failed while sending its response.`);
+        throw new TransientUpstreamError(`${label} failed while sending its response.`, { kind: "network" });
       }
       if (next.done) break;
       total += next.value.byteLength;
@@ -243,7 +275,7 @@ async function readBounded(
       chunks.push(next.value);
     }
   } catch (error) {
-    await reader.cancel().catch(() => undefined);
+    void reader.cancel().catch(() => undefined);
     throw error;
   }
   const out = new Uint8Array(total);

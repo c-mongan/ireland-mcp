@@ -100,6 +100,8 @@ else {
   for (const r of results) console.log(`| ${r.source} | ${r.tool} | ${r.status} | ${r.ms} | ${r.note.replace(/\|/g, "/").slice(0, 160)} |`);
   const warned = results.filter((r) => r.status === "WARN");
   if (warned.length) console.log(`\nWARN: ${warned.length} known-flaky upstream failure(s) reported but not failing the run.`);
+  const degraded = results.filter((r) => r.status === "DEGRADED");
+  if (degraded.length) console.log(`\nDEGRADED: ${degraded.length} transport failure(s) after bounded retries. The run fails; provider availability or network connectivity needs investigation.`);
 }
 process.exit(exitCode(results));
 

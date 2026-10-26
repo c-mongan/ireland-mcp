@@ -1,5 +1,6 @@
 import { CSO_REST } from "../sources/cso/client.js";
 import { dublinDate, EIRGRID_BASE } from "../sources/eirgrid/index.js";
+import { BUDGET_RESOURCES, budgetResourceUrl } from "../sources/council-budgets/manifest.js";
 import { ARCGIS_BASE } from "../sources/geohive/index.js";
 import { snapshotHealth as kohesioSnapshotHealth } from "../sources/kohesio/index.js";
 import { RAIL_BASE } from "../sources/irish-rail/index.js";
@@ -9,6 +10,7 @@ import { WARNINGS_URL } from "../sources/met-eireann/index.js";
 import { TRIP_UPDATES_URL } from "../sources/nta/index.js";
 import { OIREACHTAS_API } from "../sources/oireachtas/index.js";
 import { OPW_BASE } from "../sources/opw-water/index.js";
+import { GITHUB_SOURCE as PAYGAP_SNAPSHOT } from "../sources/paygap/github.js";
 import { PPR_DOWNLOADS } from "../sources/ppr/parse.js";
 import { ARCGIS_LAYERS } from "../sources/arcgis/client.js";
 import type { FetchLike } from "./http.js";
@@ -46,7 +48,17 @@ const USER_AGENT = "ireland-mcp-healthcheck/1.0 (+https://github.com/c-mongan/ir
 /** One cheap, real request per source: small documents or metadata endpoints only. */
 export function defaultProbes(env: Record<string, string | undefined>): Probe[] {
   const ntaKey = env.NTA_API_KEY;
+  const year = new Date().getUTCFullYear();
+  const lobbyingQuery = new URLSearchParams({
+    currentPage: "1", pageSize: "1", queryText: "", subjectMatters: "", subjectMatterAreas: "",
+    publicBodys: "", jobTitles: "", returnDateFrom: `01-01-${year}`, returnDateTo: `31-12-${year}`,
+    period: "", dpo: "", client: "", responsible: "", lobbyist: "", lobbyistId: ""
+  });
   return [
+    { source: "lobbying", url: `https://api.lobbying.ie/api/Search?${lobbyingQuery}` },
+    // The website refuses Azure; the publisher snapshot is the available fallback.
+    { source: "paygap", url: PAYGAP_SNAPSHOT.source_urls[0] },
+    { source: "council-budgets", url: budgetResourceUrl(BUDGET_RESOURCES.at(-1)!) },
     { source: "cso", url: `${CSO_REST}/PxStat.Data.Cube_API.ReadMetadata/F1001/JSON-stat/2.0/en` },
     { source: "world-bank", url: "https://data360api.worldbank.org/data360/data?DATABASE_ID=WB_WDI&INDICATOR=WB_WDI_SP_POP_TOTL&REF_AREA=IRL&top=1" },
     { source: "eurostat", url: "https://ec.europa.eu/eurostat/api/dissemination/catalogue/toc/txt?lang=en" },

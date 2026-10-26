@@ -9,7 +9,9 @@ const pointRoutes: Route[] = BOUNDARY_LAYERS.map((layer) => ({
   match: (url: string) => url.includes(`/services/${layer.service}/`) && url.includes("geometry=-6.2603"),
   file: f(`point-${layer.service}.json`)
 }));
+const serviceMetadata: Route = { match: /Counties___OSi_National_Statutory_Boundaries\/FeatureServer\?f=json$/, body: JSON.stringify({ layers: [{ id: 0, name: "Counties", type: "Feature Layer" }] }) };
 const routes: Route[] = [
+  serviceMetadata,
   ...pointRoutes,
   { match: (url) => url.includes("geometry=-10.5"), body: '{"features":[]}' },
   { match: /services\?f=json$/, file: f("catalog.json") },
@@ -93,6 +95,66 @@ describe("GeoHive module", () => {
     ]);
   });
 
+  it("discovers and queries a sole nonzero layer without a caller knowing its ID", async () => {
+    const fetch = fakeFetch([
+      { match: /Cadastral_Parcels_Freehold\/FeatureServer\?f=json$/, body: JSON.stringify({ layers: [{ id: 12, name: "Freehold parcels", type: "Feature Layer" }] }) },
+      { match: /FeatureServer\/12\/query/, body: JSON.stringify({ features: [{ attributes: { SP_ID: 52854 } }], exceededTransferLimit: true }) }
+    ]);
+    const result = await callTool(mod, "geohive_query_layer", { service: "Cadastral_Parcels_Freehold", limit: 1 }, fetch);
+    expect(result.ok).toBe(true);
+    expect(result.body.data).toMatchObject({ layer_id: 12, count: 1, features: [{ SP_ID: 52854 }] });
+    expect(result.body.truncated).toBe(true);
+    expect(result.body.url).toContain("/12/query");
+  });
+
+  it("lists the layers of one service and honours an explicit layer ID", async () => {
+    const fetch = fakeFetch([
+      { match: /FeatureServer\?f=json$/, body: JSON.stringify({ layers: [{ id: 4, name: "East", type: "Feature Layer" }, { id: 12, name: "West", type: "Feature Layer" }] }) },
+      { match: /FeatureServer\/12\/query/, body: JSON.stringify({ features: [{ attributes: { name: "West" } }] }) }
+    ]);
+    const listed = await callTool(mod, "geohive_list_layers", { service: "Example_Parcels", limit: 1 }, fetch);
+    expect(listed.ok).toBe(true);
+    expect(listed.body.data.layers).toEqual([{ id: 4, name: "East", type: "Feature Layer", url: expect.stringContaining("/4") }]);
+    expect(listed.body.truncated).toBe(true);
+    const queried = await callTool(mod, "geohive_query_layer", { service: "Example_Parcels", layer_id: 12 }, fetch);
+    expect(queried.ok).toBe(true);
+    expect(queried.body.data.features).toEqual([{ name: "West" }]);
+  });
+
+  it("requires a choice for ambiguous nonzero layers, and rejects invalid IDs", async () => {
+    const fetch = fakeFetch([{ match: /FeatureServer\?f=json$/, body: JSON.stringify({ layers: [{ id: 4, name: "East" }, { id: 12, name: "West" }] }) }]);
+    const ambiguous = await callTool(mod, "geohive_query_layer", { service: "Example_Parcels" }, fetch);
+    expect(ambiguous.body.error.code).toBe("BAD_ARGS");
+    expect(ambiguous.body.error.hint).toContain("layer_id");
+    for (const layer_id of [-1, 1.5]) {
+      const bad = await callTool(mod, "geohive_query_layer", { service: "Example_Parcels", layer_id }, fetch);
+      expect(bad.body.error.code).toBe("BAD_ARGS");
+    }
+  });
+
+  it("preserves layer zero for multi-layer services and rejects an unknown explicit layer", async () => {
+    const fetch = fakeFetch([
+      { match: /FeatureServer\?f=json$/, body: JSON.stringify({ layers: [{ id: 8, name: "Other" }, { id: 0, name: "Default" }] }) },
+      { match: /FeatureServer\/0\/query/, body: JSON.stringify({ features: [{ attributes: { name: "Default" } }] }) }
+    ]);
+    const ctx = createContext({ fetch });
+    const result = await callTool(mod, "geohive_query_layer", { service: "Example_Parcels" }, ctx);
+    expect(result.body.data).toMatchObject({ layer_id: 0, features: [{ name: "Default" }] });
+    const bad = await callTool(mod, "geohive_query_layer", { service: "Example_Parcels", layer_id: 99 }, ctx);
+    expect(bad.body.error.code).toBe("BAD_ARGS");
+    expect(fetch.calls.filter((call) => call.url.includes("/query"))).toHaveLength(1);
+  });
+
+  it("does not cache malformed service metadata as an empty result", async () => {
+    const fetch = fakeFetch([{ match: /FeatureServer\?f=json$/, body: "{}" }]);
+    const ctx = createContext({ fetch });
+    for (let i = 0; i < 2; i++) {
+      const result = await callTool(mod, "geohive_list_layers", { service: "Example_Parcels" }, ctx);
+      expect(result.body.error.code).toBe("UPSTREAM_DOWN");
+    }
+    expect(fetch.calls).toHaveLength(2);
+  });
+
   it("queries a layer and maps ArcGIS errors to BAD_ARGS", async () => {
     const fetch = fakeFetch(routes);
     const { body } = await callTool(
@@ -102,19 +164,36 @@ describe("GeoHive module", () => {
       fetch
     );
     expect(body.data.features[0]).toMatchObject({ ENGLISH: "CLARE", PROVINCE: "Munster" });
-    expect(fetch.calls[0]?.url).toContain("resultRecordCount=3");
+    expect(fetch.calls.find((call) => call.url.includes("/query"))?.url).toContain("resultRecordCount=3");
     const bad = await callTool(mod, "geohive_query_layer", { service: "Counties___OSi_National_Statutory_Boundaries", where: "bad==" }, fetch);
     expect(bad.body.error.code).toBe("BAD_ARGS");
     const injection = await callTool(mod, "geohive_query_layer", { service: "../../evil", where: "1=1" }, fetch);
     expect(injection.body.error.code).toBe("BAD_ARGS");
   });
 
+  it("rejects malformed successful query bodies and fetches again after recovery", async () => {
+    let queries = 0;
+    const fetch = async (url: string) => {
+      if (url.includes("/query")) {
+        queries += 1;
+        return new Response(JSON.stringify(queries === 1 ? {} : { features: [{ attributes: { SP_ID: 1 } }] }));
+      }
+      return new Response(JSON.stringify({ layers: [{ id: 12, name: "Parcels" }] }));
+    };
+    const ctx = createContext({ fetch });
+    const args = { service: "Example_Parcels", limit: 1 };
+    expect((await callTool(mod, "geohive_query_layer", args, ctx)).body.error?.code).toBe("UPSTREAM_DOWN");
+    const recovered = await callTool(mod, "geohive_query_layer", args, ctx);
+    expect(recovered.body.data.features).toEqual([{ SP_ID: 1 }]);
+    expect(queries).toBe(2);
+  });
+
   it("does not cache transient ArcGIS error bodies", async () => {
-    const fetch = fakeFetch([{ match: /where=busy/, body: '{"error":{"code":500,"message":"Service busy"}}' }]);
+    const fetch = fakeFetch([serviceMetadata, { match: /where=busy/, body: '{"error":{"code":500,"message":"Service busy"}}' }]);
     const ctx = createContext({ fetch });
     const args = { service: "Counties___OSi_National_Statutory_Boundaries", where: "busy" };
     expect((await callTool(mod, "geohive_query_layer", args, ctx)).body.error.code).toBe("UPSTREAM_DOWN");
     expect((await callTool(mod, "geohive_query_layer", args, ctx)).body.error.code).toBe("UPSTREAM_DOWN");
-    expect(fetch.calls).toHaveLength(2);
+    expect(fetch.calls.filter((call) => call.url.includes("/query"))).toHaveLength(2);
   });
 });

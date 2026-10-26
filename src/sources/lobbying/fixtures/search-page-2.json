@@ -1,0 +1,45 @@
+{
+  "SearchTimeMilliseconds": 13,
+  "Total": 2,
+  "Data": [
+    {
+      "Id": 148314,
+      "LobbyistNameResolved": "Fictional Lobbyist Two",
+      "PeriodName": "2026-09-01 to 2026-12-31",
+      "SubjectMatterText": "Fictional detail",
+      "SubjectMatterName": "Fictional matter",
+      "PublicPolicyAreaName": "Fictional policy area",
+      "ReturnIntendedResults": [
+        "Fictional result"
+      ],
+      "IntendedResultsText": "Fictional result",
+      "IsGrassRootsCampaign": false,
+      "GrassRootsDirective": null,
+      "IsOnBehalfOfClient": true,
+      "LobbyingActivity": [
+        "Written submission"
+      ],
+      "LobbyingActivityText": "Written submission",
+      "Dpos": [],
+      "ClientsText": "Fictional public client",
+      "IsPublished": true,
+      "IsDraft": false,
+      "NilReturn": false,
+      "SummaryFormat": false,
+      "CeasedLobbying": false,
+      "SubmittedDate": "2026-10-23T14:20:00+00:00",
+      "ReturnVisiblePublic": true,
+      "ReturnVersionType": 1,
+      "PublishStatus": "Published",
+      "DidAnyDposCarryOutLobbying": "No",
+      "exDPOs": [],
+      "AllExDpos": [],
+      "FormattedUrl": "lobbying.ie/return/148314/fictional-lobbyist-two",
+      "DPONameResolved": null,
+      "AllDpos": [],
+      "OnBehalfOfClient": "",
+      "IsAwaitingPublication": false
+    }
+  ],
+  "Facets": {}
+}

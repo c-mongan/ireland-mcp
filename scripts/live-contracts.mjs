@@ -33,6 +33,10 @@ const legalCoverage = shape({ document_count: (value) => Number.isInteger(value)
 const legalSearch = (data) => shape({ hits: records, coverage: legalCoverage })(data) && data.hits.every(legalEvidence);
 
 export const operationContracts = {
+  lobbying_search_returns: shape({ returns: records, page: number }),
+  paygap_search_reports: shape({ reports: records, total_reports: number }),
+  council_budgets_list_years: shape({ years: records }),
+  council_budgets_get: shape({ budget_year: number, rows: records, amount_unit: text }),
   cso_search_tables: (data) => records(data) && data.every((row) => text(row.code) && text(row.title)),
   cso_get_table_metadata: shape({ code: text, title: text, dimensions: records }),
   cso_get_data: shape({ code: text, rows: records, total_rows: number }),
@@ -105,7 +109,7 @@ export const operationContracts = {
   citizens_info_get_article: (data) => legalDocument(data) && data.source_id === "citizens-info" && data.source_type === "guidance",
   geohive_boundaries_at_point: (data) => geographicPoint(data) && Object.hasOwn(data, "county"),
   geohive_locate: shape({ count: number, places: records }),
-  geohive_list_layers: shape({ total: number, services: records }),
+  geohive_list_layers: (data) => shape({ total: number })(data) && (records(data.services) || records(data.layers)),
   geohive_query_layer: shape({ count: number, features: records }),
   wikidata_place: shape({ total: number, matches: records }),
   wikidata_entity: shape({ qid: text, label: text }),
