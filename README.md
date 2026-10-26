@@ -66,7 +66,7 @@ An optional pilot finds Irish employment-law evidence and quotes it with links. 
 - **Citizens Information blocks automated access today.** Its firewall refused the pilot's requests on 26 October 2026, so a sync may fetch only the Irish Statute Book pages. We will not disguise the pilot as a browser. Wider coverage needs permission or an official export from the Citizens Information Board; we are asking.
 - **AI summaries can be wrong.** Every answer quotes its sources. Read them.
 
-The always-on server already quotes Irish law as enacted: Acts, statutory instruments and the Constitution, live from the Irish Statute Book. The beta adds Citizens Information guidance and stored, versioned evidence.
+Without the beta, the default `legislation` source quotes Irish law as enacted, live from the Irish Statute Book. In this revision that covers Acts, statutory instruments and the Constitution; check `ireland_describe` for what a given server offers. The beta adds Citizens Information guidance and stored, versioned evidence.
 
 Try it on your own machine:
 

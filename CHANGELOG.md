@@ -15,6 +15,7 @@ All notable changes to this project are documented here. The format follows
 - Hard multi-step benchmark (`npm run eval:multistep`): 41 questions across three tiers that each combine at least two sources. Reference answers are pinned and recomputed through the real tools. Each failing question is tagged with the capability that would unlock it: dataset cards, place crosswalk, server-side query or knowledge index. A nightly references-only workflow needs no model key. See `docs/evals-multistep.md`.
 
 ### Changed
+- Website rewritten in plain English: "Ask AI about Ireland. See the source.", sample questions, three-step setup, a "Built to be checked" trust section, an FAQ and a clearly labelled **Beta: Irish law and your rights** section (off on the hosted server, not legal advice).
 - README opens in plain English: what you can ask, a 30-second setup, how to check an answer and a **Beta features** section near the top. Developer detail sits lower.
 
 ### Fixed
