@@ -86,9 +86,10 @@ Before you deploy a fork:
 - **Keep `ENABLE_PRODUCTION_DOMAINS` unset (false).** The custom-domain resources are for
   `irishopendata.ie` only.
 - **Set `MCP_ALLOWED_ORIGINS`** if you host your own website that calls the endpoint from a browser.
-- **Rename the registry identity before publishing a fork.** That's `mcpName` in
-  `package.json`, `name` in `server.json`, and the endpoint URLs. Don't publish under
-  `io.github.c-mongan/ireland-mcp`.
+- **Rename everything you publish before publishing a fork.** That's `name` and `mcpName` in
+  `package.json`, plus `name`, `remotes` and `packages[0].identifier`/`version` in `server.json`.
+  Use an npm name you own, and update the `npm view` lookup in `publish-registry.yml` if you
+  adapt it. Don't publish under `ireland-mcp` or `io.github.c-mongan/ireland-mcp`.
 - **GitHub Actions:** deploy, status, live-smoke and registry workflows only run in
   `c-mongan/ireland-mcp`. Copy and adapt them, with your own OIDC identity, if you want automated deploys.
 

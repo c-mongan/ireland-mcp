@@ -86,7 +86,7 @@ Portable Copilot / MCP JSON:
 | Prompts | 3 | `area_profile`, `commute_check`, `compare_counties`. |
 <!-- counts:end -->
 
-Every catalogue operation has been exercised against the hosted endpoint: <!-- live-ops:start -->[docs/live-all-ops.md](docs/live-all-ops.md) (2026-10-08): 72 of 74 pass, 0 fail; 2 need the NTA key.<!-- live-ops:end -->
+Last full run of every operation then in the catalogue against the hosted endpoint: <!-- live-ops:start -->[docs/live-all-ops.md](docs/live-all-ops.md) (2026-10-08): 72 of 74 pass, 0 fail; 2 need the NTA key.<!-- live-ops:end -->
 
 The default profile covers statistics (CSO, Eurostat, ECB, World Bank), the Oireachtas and Irish Statute Book, Met Éireann, transport (Irish Rail, Luas, NTA, TFI stops, bikes), property, planning, heritage, environment, energy, tourism, lobbying, pay-gap reports, council budgets and more. An optional [Irish legal and Citizens Information pilot](packages/irish-legal-mcp/README.md) is off by default.
 
@@ -172,7 +172,7 @@ Need typed tools anyway?
 
 - Read-only, no accounts, and no argument values or IP addresses in logs or telemetry.
 - The hosted service keeps aggregate usage counts in PostHog: which sources and client apps are used, with no identities. The website counts anonymous page views without cookies. [PRIVACY.md](PRIVACY.md) lists every field.
-- Self-hosted copies send nothing unless you configure it.
+- Self-hosted copies never send usage counts unless you configure PostHog. An Azure deployment from the templates exports traces and metrics to your own Application Insights; set `IRELAND_MCP_OTEL=off` to stop that. Local stdio and HTTP send nothing.
 - `GET /healthz` (add `?deep=1` for per-source checks) and a public [status feed](https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json) report service health.
 
 ## Limits
