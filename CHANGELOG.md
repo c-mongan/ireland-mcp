@@ -11,6 +11,10 @@ All notable changes to this project are documented here. The format follows
 - Skills pack 0.2.0: 16 cross-dataset skills (area comparison, where-to-live shortlist, local election brief, Oireachtas tracker, lobbying watch, council budgets, public money, EU funding, pay gap, planning and heritage, transport reliability, safety stats, energy, housing supply, dereliction and vacancy, rights check), with related Irish civic-tech projects credited in `skills/_shared/inspirations.md`.
 - Irish law coverage in the `legislation` source: `legislation_get_constitution_article` (Bunreacht na hÉireann in English or Irish, by Article and section), `legislation_list_sis` and `legislation_get_si` (Statutory Instruments as made, with parent-Act powers, amended SIs and transposed EU acts), and `legislation_get_act_effects` (Legislation Directory commencement, amendments and SIs made under an Act). Responses carry "Not legal advice" and "enacted text is not amended text" warnings.
 - `cachedText` accepts `validate`, so HTML soft-error pages are rejected before caching.
+- The legal beta assessment records the 26 October 2026 finding that Citizens Information returns HTTP 403 to automated clients, including the pilot's own user-agent, and what wider coverage needs.
+
+### Changed
+- README opens in plain English: what you can ask, a 30-second setup, how to check an answer and a **Beta features** section near the top. Developer detail sits lower.
 
 ### Fixed
 - CKAN portals (data.gov.ie, Smart Dublin, CRO, NCSE) no longer cache a `success:false` response for the cache TTL; the next call retries upstream.
