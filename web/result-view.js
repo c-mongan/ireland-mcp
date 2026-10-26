@@ -151,7 +151,7 @@ export function renderResultView(container, model) {
   }
   container.append(provenance);
   if (model.provenance.url) {
-    const link = element("a", model.provenance.url); link.href = model.provenance.url; link.rel = "noreferrer"; link.dataset.resultAction = "open_source"; link.setAttribute("aria-label", "Open the source response"); container.append(link);
+    const link = element("a", model.provenance.url); link.href = model.provenance.url; link.rel = "noreferrer"; link.dataset.resultAction = "open_source"; link.setAttribute("aria-label", `${model.provenance.url} (open the source response)`); container.append(link);
   } else { container.append(element("p", "No safe source URL was supplied.", "result-description")); }
   if (model.provenance.attribution) container.append(element("p", model.provenance.attribution, "result-attribution"));
 }
