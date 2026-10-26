@@ -1,0 +1,40 @@
+name: Bug report
+description: Something returned wrong, missing or uncited data, or the server misbehaved
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you ask, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: The tool or `ireland_call` source and operation, with arguments.
+      placeholder: 'ireland_call {"source":"cso","operation":"cso_area_profile","args":{...}}'
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where are you running it?
+      options:
+        - Hosted endpoint
+        - Local stdio (npx or from source)
+        - Local HTTP (npm run dev:http)
+    validations:
+      required: true
+  - type: input
+    id: client
+    attributes:
+      label: Client and version
+      placeholder: Claude, ChatGPT, VS Code Copilot, MCP Inspector ...
+  - type: textarea
+    id: output
+    attributes:
+      label: Output or error
+      description: Paste the response or error. Remove anything private.
+      render: text

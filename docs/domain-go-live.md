@@ -31,7 +31,7 @@ The canonical site comes from the Function App setting `CANONICAL_SITE_URL`:
 ## Replay-safe infrastructure (2026-10-08)
 
 The production profile is **opt-in**: `infra/production.parameters.json` targets subscription
-`0222a208-955a-45fd-b6d8-ca4704421bf0`, environment `ireland-mcp`, resource group
+`<SUBSCRIPTION_ID>`, environment `ireland-mcp`, resource group
 `rg-ireland-mcp`, region `northeurope`, and resource suffix `aofsjpwgy4hva`.
 The subscription is selected on the CLI, not inferred from the parameter file.
 Generic `azd` environments keep `enableProductionDomains=false` and do not adopt production DNS or domains.
@@ -48,7 +48,7 @@ its Free SKU, GitHub repository/branch and staging policy. Azure reports deploym
 authentication; `deploymentAuthPolicy` is absent from the official 2024-11-01 writable
 StaticSite schema, so no undocumented setter or deployment-token rotation is introduced.
 Both DNS zones, aliases, CNAMEs and Function ownership TXT records are managed. The `.com`
-apex and `_dnsauth` TXT token is `_h6b8rofq6ozlaihstd6ok0u95bkmf6z`, verified from Azure DNS.
+apex and `_dnsauth` TXT token is `<STATIC_WEB_APP_VALIDATION_TOKEN>`, verified from Azure DNS.
 This is public domain-verification data, not a secret. The SWA binding is `dns-txt-token`;
 its certificate is issued and renewed by SWA, not a separate App Service certificate resource.
 
@@ -162,13 +162,13 @@ These commands do not deploy resources:
 npm test -- test/infrastructure.test.ts
 az bicep build --file infra/main.bicep --stdout >/dev/null
 export AVAILABILITY_CONTACT_EMAIL="$(az consumption budget show \
-  --subscription 0222a208-955a-45fd-b6d8-ca4704421bf0 \
+  --subscription <SUBSCRIPTION_ID> \
   --resource-group rg-ireland-mcp \
   --budget-name budget-ireland-mcp \
   --query 'notifications.actual80.contactEmails[0]' -o tsv)"
 : "${AVAILABILITY_CONTACT_EMAIL:?Existing budget contact not returned}"
 az deployment sub what-if \
-  --subscription 0222a208-955a-45fd-b6d8-ca4704421bf0 \
+  --subscription <SUBSCRIPTION_ID> \
   --location northeurope --name ireland-mcp-domain-hardening-preview \
   --template-file infra/main.bicep --parameters @infra/production.parameters.json \
     availabilityAlertEmail="$AVAILABILITY_CONTACT_EMAIL"
@@ -178,14 +178,14 @@ For a focused domain replay preview without unresolved Function-output expressio
 
 ```bash
 az deployment group what-if \
-  --subscription 0222a208-955a-45fd-b6d8-ca4704421bf0 \
+  --subscription <SUBSCRIPTION_ID> \
   --resource-group rg-ireland-mcp \
   --template-file infra/production-domains.bicep \
   --parameters \
     functionAppName=func-ireland-mcp-aofsjpwgy4hva \
     functionDefaultHost=func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net \
     functionVerificationId=3DFC22AB3CDA2A0D651205D528769953BA3DE464D8F1EFF9A920C2A53C2B5F6A \
-    staticWebAppValidationToken=_h6b8rofq6ozlaihstd6ok0u95bkmf6z \
+    staticWebAppValidationToken=<STATIC_WEB_APP_VALIDATION_TOKEN> \
     location=northeurope
 ```
 
@@ -195,11 +195,11 @@ against production and assume it enables production resources. With azd, configu
 existing `ireland-mcp` environment first:
 
 ```bash
-azd env set AZURE_SUBSCRIPTION_ID 0222a208-955a-45fd-b6d8-ca4704421bf0
+azd env set AZURE_SUBSCRIPTION_ID <SUBSCRIPTION_ID>
 azd env set AZURE_LOCATION northeurope
 azd env set AZURE_RESOURCE_NAME_SUFFIX aofsjpwgy4hva
 azd env set ENABLE_PRODUCTION_DOMAINS true
-azd env set SWA_DOMAIN_VALIDATION_TOKEN _h6b8rofq6ozlaihstd6ok0u95bkmf6z
+azd env set SWA_DOMAIN_VALIDATION_TOKEN <STATIC_WEB_APP_VALIDATION_TOKEN>
 azd env set CANONICAL_SITE_URL https://irishopendata.com
 azd env set AVAILABILITY_CONTACT_EMAIL "$AVAILABILITY_CONTACT_EMAIL"
 ```
