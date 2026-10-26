@@ -1,6 +1,7 @@
 import { htmlText } from "./text.js";
 
 export const EISB_HOST = "www.irishstatutebook.ie";
+export const siUri = (year: number, number: number, language: "en" | "ga" = "en") => `https://${EISB_HOST}/eli/${year}/si/${number}/made/${language}/html`;
 
 export interface SiListing {
   /** Number used by the instrument's ELI. */
@@ -25,7 +26,11 @@ export function parseSiListing(html: string): SiListing[] {
       const language = m[2] === "ga" ? ("ga" as const) : ("en" as const);
       return { number, ...(listed === String(number) ? {} : { listed_number: listed || null }), title: htmlText(m[4]!), language };
     })
-    .filter((r) => r.number > 0 && r.title);
+    .filter((r, _i, all) => {
+      if (!(r.number > 0) || !r.title || /^missing title$/i.test(r.title)) return false;
+      // Some years list an Irish placeholder row beside the English row for the same instrument.
+      return r.language === "en" || !all.some((o) => o.number === r.number && o.language === "en");
+    });
 }
 
 export interface SiDocument {

@@ -5,7 +5,7 @@ import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type FetchedDocument, type SearchHit, type SourceModule, type ToolContext } from "../../gateway/module.js";
 import { parseConstitution, selectArticle, type ConstitutionSegment } from "./constitution.js";
 import { parseActEffects } from "./effects.js";
-import { parseSiListing, parseSiPage } from "./instruments.js";
+import { parseSiListing, parseSiPage, siUri } from "./instruments.js";
 import { toText } from "./text.js";
 
 // Approach adapted from ie-eli-mcp (Apache-2.0): address Acts by their ELI URI and read the eISB XML rendering.
@@ -278,7 +278,6 @@ async function loadSiListing(ctx: ToolContext, year: number) {
   return { url, items: parseSiListing(result.value), cached: result.cached, stale: result.stale };
 }
 
-export const siUri = (year: number, number: number) => `${EISB}/eli/${year}/si/${number}/made/en/html`;
 
 const listSisTool = defineTool({
   name: "legislation_list_sis",
@@ -295,7 +294,7 @@ const listSisTool = defineTool({
     const r = await loadSiListing(ctx, year);
     const words = (query ?? "").toLowerCase().split(/\s+/).filter(Boolean);
     const matching = r.items.filter((i) => words.every((w) => i.title.toLowerCase().includes(w)));
-    const page = bound(matching.map((i) => ({ ...i, url: siUri(year, i.number) })), limit);
+    const page = bound(matching.map((i) => ({ ...i, url: siUri(year, i.number, i.language) })), limit);
     return envelope(legislationInfo, {
       data: { year, total: matching.length, sis: page.items, licence_terms: LICENCE_TERMS, warnings: [NOT_LEGAL_ADVICE] },
       url: r.url,
@@ -352,14 +351,36 @@ const getSiTool = defineTool({
   }
 });
 
-/** Best-effort match of a section number in eISB provision text such as "S. 60(3A) inserted" or "Ss. 2-6". */
+const SECTION_ITEM = /^\s*(\d+)([A-Z]{0,2})(?:\([0-9A-Za-z]+\))*(?:\s*[-–]\s*(\d+)([A-Z]{0,2})(?:\([0-9A-Za-z]+\))*)?\s*(,|and\b)?/;
+
+/**
+ * Best-effort match of a section in eISB provision text such as "S. 60(3A) inserted", "Ss. 71, 72",
+ * "Ss. 2-6" or "Part 5 ch. 2 (ss. 62-64A)". Schedules ("Sch.") are not sections.
+ */
 export function mentionsSection(text: string, section: string): boolean {
   if (/^whole act$/i.test(text.trim())) return true;
-  const esc = section.replace(/[^0-9A-Za-z]/g, "");
-  if (new RegExp(`\\bss?\\.\\s*${esc}(?![0-9A-Za-z])`, "i").test(text)) return true;
-  if (!/^\d+$/.test(esc)) return false;
-  const n = Number(esc);
-  return [...text.matchAll(/\bss?\.\s*(\d+)[A-Z]{0,2}\s*-\s*(\d+)[A-Z]{0,2}/gi)].some((m) => Number(m[1]) <= n && n <= Number(m[2]));
+  const [, wantNumber, wantSuffix = ""] = section.toUpperCase().match(/^(\d+)([A-Z]{0,2})$/) ?? [];
+  if (!wantNumber) return false;
+  const want = Number(wantNumber);
+  for (const prefix of text.matchAll(/\bss?\.\s*/gi)) {
+    let rest = text.slice(prefix.index + prefix[0].length);
+    for (let guard = 0; guard < 50; guard += 1) {
+      const item = rest.match(SECTION_ITEM);
+      if (!item) break;
+      const [from, fromSuffix = "", to, toSuffix = ""] = [Number(item[1]), item[2]?.toUpperCase(), item[3], item[4]?.toUpperCase()];
+      if (to === undefined) {
+        if (from === want && fromSuffix === wantSuffix) return true;
+      } else {
+        const upper = Number(to);
+        // A lettered section such as 64A sits after 64, so "62-64A" includes 64 and 64A.
+        const inside = (want > from || (want === from && wantSuffix >= fromSuffix)) && (want < upper || (want === upper && wantSuffix <= toSuffix));
+        if (inside) return true;
+      }
+      if (!item[5]) break;
+      rest = rest.slice(item[0].length);
+    }
+  }
+  return false;
 }
 
 const actEffectsTool = defineTool({

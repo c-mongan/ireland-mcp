@@ -97,9 +97,11 @@ https://developer.nationaltransport.ie
   Requires an API key held by the server operator.
 
 Irish Statute Book (eISB) — https://www.irishstatutebook.ie
-  Licence: re-use under the PSI General Licence / CC BY 4.0
-  Attribution: Contains Irish Statute Book data © Office of the Attorney
-  General. Not an official version of the legislation.
+  Licence: Oireachtas (Open Data) PSI Licence, which incorporates CC BY 4.0
+  (https://www.irishstatutebook.ie/eli/open-data.html)
+  Attribution: Contains Oireachtas information licensed under the Oireachtas
+  (Open Data) PSI Licence. Source: electronic Irish Statute Book (eISB),
+  Office of the Attorney General. Not an official version of the legislation.
 
 Citizens Information Board — https://www.citizensinformation.ie
   Licence: CC BY 4.0; third-party material excluded.

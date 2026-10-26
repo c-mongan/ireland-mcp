@@ -74,7 +74,10 @@ describe("SI and Legislation Directory parsers", () => {
   it("uses the link number for SI listings, keeping Irish-only and unnumbered rows", () => {
     const y2024 = parseSiListing(read("si-list-2024.html"));
     expect(y2024[0]).toEqual({ number: 1, title: "Income Tax (Employments) Regulations 2024", language: "en" });
-    expect(y2024.filter((r) => r.number === 253).map((r) => r.language)).toEqual(["ga", "en"]);
+    expect(y2024.filter((r) => r.number === 253)).toEqual([
+      { number: 253, title: "Tourism, Culture, Arts, Gaeltacht, Sport and Media (Delegation of Ministerial Functions) Order 2024", language: "en" }
+    ]);
+    expect(y2024.some((r) => r.title === "Missing Title")).toBe(false);
     const y1930 = parseSiListing(read("si-list-1930.html"));
     expect(y1930.slice(2)).toEqual([
       { number: 895, listed_number: "95", title: "Portal Inspection Order of 1924. Amendment Order of 1930.", language: "en" },
@@ -128,6 +131,14 @@ describe("SI and Legislation Directory parsers", () => {
     expect(mentionsSection("S. 19A inserted", "19A")).toBe(true);
     expect(mentionsSection("S. 19A inserted", "19")).toBe(false);
     expect(mentionsSection("Whole Act", "5")).toBe(true);
+    expect(mentionsSection("Ss. 71, 72", "72")).toBe(true);
+    expect(mentionsSection("Ss. 189, 190", "190")).toBe(true);
+    expect(mentionsSection("Ss. 135A, 135B inserted", "135B")).toBe(true);
+    expect(mentionsSection("Ss. 135A, 135B inserted", "135")).toBe(false);
+    expect(mentionsSection("S. 7 and 9 amended", "9")).toBe(true);
+    expect(mentionsSection("Ss. 62-64A", "64A")).toBe(true);
+    expect(mentionsSection("Schs. 1, 2, 3", "2")).toBe(false);
+    expect(mentionsSection("S. 72(1)(a), (b) amended", "1")).toBe(false);
   });
 });
 
