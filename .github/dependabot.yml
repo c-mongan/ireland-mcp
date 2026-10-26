@@ -5,6 +5,13 @@ updates:
     schedule:
       interval: weekly
     groups:
+      # OpenTelemetry packages share a pinned @opentelemetry/api peer range, so a
+      # lone bump fails npm ERESOLVE. Update them with the Azure Monitor distro,
+      # which pins the runtime SDK (and therefore the api) version.
+      opentelemetry:
+        patterns:
+          - "@opentelemetry/*"
+          - "@azure/monitor-opentelemetry"
       minor-and-patch:
         update-types: [minor, patch]
     ignore:
