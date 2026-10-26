@@ -5,6 +5,9 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- A "Website or docs feedback" issue template, so feedback about irishopendata.ie and the docs has a clear route.
+
 ## [1.1.4] - 2026-10-08
 
 ### Changed
