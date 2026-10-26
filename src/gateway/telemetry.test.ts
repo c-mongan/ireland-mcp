@@ -13,7 +13,7 @@ describe("telemetry", () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => undefined);
     consoleSink(event);
     expect(spy).toHaveBeenCalledOnce();
-    expect(JSON.parse(spy.mock.calls[0]![0] as string)).toEqual({ type: "tool_call", ...event });
+    expect(JSON.parse(spy.mock.calls[0]![0] as string)).toEqual({ type: "tool_call", ...event, synthetic: false, channel: "client" });
   });
 
   it("is silenced by IRELAND_MCP_TELEMETRY=off, and noopSink does nothing", () => {

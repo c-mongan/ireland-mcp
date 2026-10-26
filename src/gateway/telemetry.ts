@@ -1,4 +1,5 @@
 import { capturePostHog } from "./posthog.js";
+import { currentChannel, currentSynthetic, type Channel } from "./requestScope.js";
 
 export interface ToolCallEvent {
   tool: string;
@@ -8,6 +9,9 @@ export interface ToolCallEvent {
   errorCode?: string;
   cached?: boolean;
   stale?: boolean;
+  /** Set from the request scope, never from tool input. */
+  synthetic?: boolean;
+  channel?: Channel;
 }
 
 export type TelemetrySink = (event: ToolCallEvent) => void;
@@ -18,8 +22,9 @@ export type TelemetrySink = (event: ToolCallEvent) => void;
  */
 export const consoleSink: TelemetrySink = (event) => {
   if (process.env.IRELAND_MCP_TELEMETRY === "off") return;
-  console.error(JSON.stringify({ type: "tool_call", ...event }));
-  capturePostHog(event);
+  const scoped = { ...event, synthetic: currentSynthetic(), channel: currentChannel() };
+  console.error(JSON.stringify({ type: "tool_call", ...scoped }));
+  capturePostHog(scoped);
 };
 
 export const noopSink: TelemetrySink = () => undefined;

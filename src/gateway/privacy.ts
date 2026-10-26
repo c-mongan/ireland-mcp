@@ -59,3 +59,28 @@ export function clientInfoFrom(params: unknown): { name?: string; version?: stri
   const version = bounded((info as { version?: unknown }).version);
   return { ...(name ? { name } : {}), ...(version ? { version } : {}) };
 }
+
+/** Fixed client labels for usage counts. Raw client names and versions never leave the process. */
+const CLIENT_BUCKETS: ReadonlyArray<readonly [RegExp, string]> = [
+  [/claude[-_ ]?code/i, "claude-code"],
+  [/claude/i, "claude"],
+  [/openai|chatgpt/i, "chatgpt"],
+  [/codex/i, "codex"],
+  [/cursor/i, "cursor"],
+  [/windsurf|codeium/i, "windsurf"],
+  [/copilot/i, "copilot-cli"],
+  [/visual studio code|vscode/i, "vscode"],
+  [/gemini/i, "gemini"],
+  [/inspector/i, "inspector"]
+];
+
+export function clientBucket(name: string | undefined): string {
+  if (!name) return "unknown";
+  return CLIENT_BUCKETS.find(([pattern]) => pattern.test(name))?.[1] ?? "other";
+}
+
+/** MCP protocol revisions are dates; anything else is redacted. */
+export function protocolBucket(params: unknown): string {
+  const value = params && typeof params === "object" ? (params as { protocolVersion?: unknown }).protocolVersion : undefined;
+  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : "_OTHER";
+}

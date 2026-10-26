@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 // @ts-expect-error The website module has no generated TypeScript declaration.
-import { safeProperties } from "../web/analytics.js";
+import { pageViewProperties, safeProperties } from "../web/analytics.js";
 
 const operations = new Map([["cso", new Set(["cso_search_tables"])]]);
 const labels = { source: "cso", operation: "cso_search_tables" };
@@ -32,5 +32,30 @@ describe("first-use analytics property projection", () => {
   it("preserves the completed-query schema and rejects arbitrary event names", () => {
     expect(safeProperties("ireland_query_completed", { ...labels, ...privateFields, outcome: "ok", duration_ms: 12.6 }, operations)).toEqual({ ...labels, outcome: "ok", duration_ms: 13 });
     expect(safeProperties("private-event", privateFields, operations)).toBeUndefined();
+  });
+});
+
+describe("anonymous page view projection", () => {
+  const base = { path: "/", referrer: "", utmSource: null, width: 1280, ownHost: "irishopendata.ie" };
+
+  it.each([
+    ["https://www.google.ie/search?q=private-query", "google"],
+    ["https://github.com/private-user/private-repo", "github"],
+    ["https://news.ycombinator.com/item?id=1", "hn"],
+    ["https://chatgpt.com/c/private-chat", "chatgpt"],
+    ["https://irishopendata.ie/#playground", "internal"],
+    ["https://private-blog.example/post", "other"],
+    ["not a url", "other"],
+    ["", "direct"]
+  ])("reduces referrer %s to %s", (referrer, bucket) => {
+    const properties = pageViewProperties({ ...base, referrer });
+    expect(properties.referrer).toBe(bucket);
+    expect(JSON.stringify(properties)).not.toMatch(/private|search|item|http/);
+  });
+
+  it("keeps only allow-listed paths, campaign sources and viewport classes", () => {
+    expect(pageViewProperties({ ...base, path: "/private/path", utmSource: "private-campaign", width: 375 })).toEqual({ path: "_OTHER", referrer: "direct", utm_source: "other", viewport: "mobile" });
+    expect(pageViewProperties({ ...base, path: "/index.html", utmSource: "Twitter", width: 800 })).toEqual({ path: "/", referrer: "direct", utm_source: "x", viewport: "tablet" });
+    expect(pageViewProperties({ ...base, width: NaN })).toMatchObject({ path: "/", utm_source: "none", viewport: "_OTHER" });
   });
 });

@@ -27,9 +27,9 @@ ZIP deployment preserves existing Function settings. If you provision the enviro
 
 For the website, `/analytics-config.json` contains `{ "enabled": false }` by default. The deployment process can replace this with `enabled: true`, the project's public ingestion `token`, and its exact `host`. Optional `release` uses the same commit validation. The ingestion token can only submit events. Do not put a personal API key in this file. Both official ingestion hosts are in the site's content security policy.
 
-Visitors must select **Enable usage metrics** before any usage event is sent. This choice lasts for the open page only. A reload resets the choice and creates a new random identity after the next opt-in. The module uses no analytics cookies, local storage, or session storage. DNT and Global Privacy Control override the choice. **Disable usage metrics** stops capture and cancels pending requests. Existing events cannot be recalled.
+Each page load sends one anonymous `ireland_page_viewed` event with a fresh random id that is never stored or reused; Do Not Track and Global Privacy Control suppress it. Visitors must select **Enable usage metrics** before any other website event is sent. This choice lasts for the open page only. A reload resets the choice and creates a new random identity after the next opt-in. The module uses no analytics cookies, local storage, or session storage. DNT and Global Privacy Control override the choice. **Disable usage metrics** stops capture and cancels pending requests. Existing events cannot be recalled.
 
-The browser sends requests directly to PostHog after opt-in. PostHog receives the network connection and its IP address; the project setting controls IP removal from stored events. The site's referrer policy prevents page URL disclosure. The browser sends no URL, referrer, browser metadata, user-entered label, query arguments, result, error message, header, or account identifier in the event payload. No SDK, automatic event capture, session replay, or remote script is loaded.
+The browser sends the page-view request to PostHog on load (unless DNT or GPC is on) and other events only after opt-in. Both go directly to PostHog. PostHog receives the network connection and its IP address; the project setting controls IP removal from stored events. The site's referrer policy prevents page URL disclosure. Apart from the page view's fixed labels, the browser sends no URL, referrer, browser metadata, user-entered label, query arguments, result, error message, header, or account identifier in the event payload. No SDK, automatic event capture, session replay, or remote script is loaded.
 
 ## Event contract
 
@@ -37,7 +37,9 @@ All events have `schema_version: 1`, `surface: mcp|web`, and the three privacy p
 
 | Event | Allowed product properties |
 | --- | --- |
-| `ireland_mcp_tool_completed` | `source`, `operation`, `outcome: ok|error`, `duration_ms`, optional Boolean `cached` and `stale`, optional `error_code` |
+| `ireland_mcp_tool_completed` | `source`, `operation`, `outcome: ok|error`, `duration_ms`, optional Boolean `cached` and `stale`, optional `error_code`, Boolean `synthetic`, `channel: client|playground` |
+| `ireland_mcp_client_connected` | `client: claude|claude-code|chatgpt|codex|cursor|windsurf|copilot-cli|vscode|gemini|inspector|other|unknown`, `protocol` (date-shaped or `_OTHER`), Boolean `synthetic` |
+| `ireland_page_viewed` | `path: /|_OTHER`, `referrer: direct|internal|google|bing|duckduckgo|github|reddit|x|linkedin|hn|chatgpt|claude|other`, `utm_source` label, `viewport: mobile|tablet|desktop` |
 | `ireland_query_started` | `source`, `operation` |
 | `ireland_query_completed` | `source`, `operation`, `outcome: ok|error`, `duration_ms` |
 | `ireland_result_action` | `source`, `operation`, `action: inspect_raw|open_source|connect` |
@@ -79,3 +81,11 @@ ZIP tests inspect the archived release module and verify clean, dirty, changed-s
 After deployment, read back the Function configuration without printing tokens. Verify the site's configuration by its enabled state and host only. Trigger one known source operation and one opted-in website action. Confirm their safe event properties in the dedicated PostHog project. Local mocked tests alone do not prove live ingestion.
 
 References: [PostHog capture and batch API](https://posthog.com/docs/api/capture), [PostHog IP handling](https://posthog.com/tutorials/web-redact-properties#hiding-customer-ip-address), and the [PostHog core privacy property implementation](https://github.com/PostHog/posthog-js/blob/main/packages/core/src/posthog-core-stateless.ts).
+
+## Separating real use from our own checks
+
+First-party scripts (`check:mcp`, `live:all`, `live-civic`, the nightly live smoke and the
+maintainer's quality loop) send `x-ireland-mcp-synthetic: 1`. Filter dashboards on
+`synthetic = false` to see real use. Website playground calls arrive from this project's own site origins and are labelled
+`channel: playground`. Everything else, including browser-based clients such as claude.ai, is
+`channel: client`.

@@ -1,5 +1,6 @@
 import type { Attributes, Span } from "@opentelemetry/api";
 import { argumentNames, clientInfoFrom } from "./privacy.js";
+import { isSyntheticRequest } from "./requestScope.js";
 import { context, instruments, SpanKind, SpanStatusCode, trace, tracer } from "./otel.js";
 
 /** MCP methods recorded by name; anything else becomes "_OTHER" so attribute cardinality stays bounded. */
@@ -73,6 +74,7 @@ export function startMcpOperations(bodyText: string, headers: Headers): Operatio
         "network.protocol.name": "http"
       };
       const attributes: Attributes = { ...metricAttributes };
+      if (isSyntheticRequest(headers)) attributes["ireland_mcp.synthetic"] = true;
       if (sessionId) attributes["mcp.session.id"] = sessionId.slice(0, 128);
       if (message.id !== undefined && message.id !== null) attributes["jsonrpc.request.id"] = String(message.id).slice(0, 64);
       if (tool) attributes["ireland_mcp.tool.argument_names"] = argumentNames(params.arguments);

@@ -14,6 +14,29 @@ no personal data. This page lists exactly what the hosted endpoint records.
 | Upstream calls: source id, host name, HTTP method, status, cache hit/stale | Client spans (`ireland_mcp.source.id`), `http.client.request.duration` | Same |
 | MCP session id, if a client sends one | Span attribute `mcp.session.id` (the server is stateless and issues none) | Same |
 
+## Usage counts (PostHog)
+
+The hosted service also sends aggregate usage counts to a dedicated PostHog project in the EU,
+so the maintainer can see whether the service is used. Server events use one fixed service
+identity; each website page view uses a fresh random id, and opted-in website events use a separate
+id that lasts only for the open page. No event has a person profile or GeoIP, every event sets
+`$ip: 0.0.0.0`, and the project discards IP data.
+
+| Event | Fields |
+| --- | --- |
+| `ireland_mcp_tool_completed` | Known source and operation labels, outcome, duration, cache flags, typed error code, `synthetic`, `channel` (`playground` for this project's website, otherwise `client`) |
+| `ireland_mcp_client_connected` | Client app reduced to a fixed label (`claude`, `chatgpt`, `vscode`, `cursor`, … or `other`), protocol version, `synthetic` |
+| `ireland_page_viewed` (website) | Page (`/` or `_OTHER`), referring site reduced to a fixed label (`google`, `github`, … `other`, `direct`), `utm_source` label, viewport class |
+
+`synthetic` is `true` only when a request carries `x-ireland-mcp-synthetic: 1`. The project's
+own checks send it so they are not counted as real use. Raw client names, versions, URLs, full
+referrers and query strings are never sent.
+
+The website counts one anonymous page view per load without cookies or storage, and sends
+nothing when Do Not Track or Global Privacy Control is on. Detailed website events (queries,
+install clicks) still need **Enable usage metrics**. Forks and self-hosted copies send nothing
+unless `IRELAND_MCP_POSTHOG_*` and `web/analytics-config.json` are configured.
+
 ## What is never recorded
 
 - **Argument values.** Search terms, place names, coordinates, Eircodes and table codes
@@ -37,7 +60,8 @@ or exported.
 ## Origin checks
 
 Browser requests to `/mcp` must come from an allowed origin (see `MCP_ALLOWED_ORIGINS` in the
-README). The `Origin` header is compared and then discarded; it is not recorded.
+README). The `Origin` header is compared and then discarded. Only the fact that a request came
+from a browser (`channel: playground`) is counted.
 
 ## Status feed
 

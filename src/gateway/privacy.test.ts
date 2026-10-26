@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { argumentNames, clientInfoFrom, DailySalt, hashedClientKey } from "./privacy.js";
+import { argumentNames, clientBucket, clientInfoFrom, DailySalt, hashedClientKey, protocolBucket } from "./privacy.js";
 
 const headers = (map: Record<string, string>) => new Headers(map);
 
@@ -48,5 +48,22 @@ describe("clientInfoFrom", () => {
     expect(clientInfoFrom({ clientInfo: { name: "x".repeat(200) } })).toEqual({ name: "x".repeat(64) });
     expect(clientInfoFrom({ clientInfo: { name: 42 } })).toEqual({});
     expect(clientInfoFrom(undefined)).toEqual({});
+  });
+});
+
+describe("clientBucket", () => {
+  it.each([
+    ["claude-ai", "claude"], ["claude-code", "claude-code"], ["openai-mcp", "chatgpt"], ["Visual Studio Code", "vscode"],
+    ["Visual Studio Code - Insiders", "vscode"], ["cursor-vscode", "cursor"], ["github-copilot-developer", "copilot-cli"],
+    ["windsurf-client", "windsurf"], ["gemini-cli-mcp-client", "gemini"], ["mcp-inspector", "inspector"],
+    ["codex-mcp-client", "codex"], ["someone@example.com", "other"], [undefined, "unknown"]
+  ])("maps %s to %s", (name, bucket) => {
+    expect(clientBucket(name)).toBe(bucket);
+  });
+
+  it("keeps only date-shaped protocol versions", () => {
+    expect(protocolBucket({ protocolVersion: "2025-06-18" })).toBe("2025-06-18");
+    expect(protocolBucket({ protocolVersion: "private" })).toBe("_OTHER");
+    expect(protocolBucket(undefined)).toBe("_OTHER");
   });
 });

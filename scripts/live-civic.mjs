@@ -7,11 +7,14 @@ import { fileURLToPath } from "node:url";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 
+// First-party checks are tagged so usage metrics count only real clients.
+const SYNTHETIC = { requestInit: { headers: { "x-ireland-mcp-synthetic": "1" } } };
+
 const { values } = parseArgs({ options: { url: { type: "string" } } });
 const endpoint = values.url ? new URL(values.url) : undefined;
 if (endpoint) assert.ok(["https:", "http:"].includes(endpoint.protocol) && !endpoint.username && !endpoint.password && !endpoint.search && !endpoint.hash, "Use a plain HTTP(S) MCP URL without credentials, query or fragment");
 const client = new Client({ name: "ireland-civic-live-check", version: "1.0.0" });
-const transport = endpoint ? new StreamableHTTPClientTransport(endpoint) : new StdioClientTransport({
+const transport = endpoint ? new StreamableHTTPClientTransport(endpoint, SYNTHETIC) : new StdioClientTransport({
   command: process.execPath,
   args: [fileURLToPath(new URL("../dist/src/cli.js", import.meta.url))],
   env: { ...process.env, IRELAND_MCP_TOOLSETS: "" },

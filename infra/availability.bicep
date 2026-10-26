@@ -42,6 +42,7 @@ var tests = [
     headers: [
       { key: 'Content-Type', value: 'application/json' }
       { key: 'Accept', value: 'application/json, text/event-stream' }
+      { key: 'x-ireland-mcp-synthetic', value: '1' }
     ]
     body: base64('{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"azure-availability","version":"1"}}}')
   }

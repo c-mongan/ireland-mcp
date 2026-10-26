@@ -2,9 +2,11 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { endMcpOperations, startMcpOperations, withOperationContext } from "./mcpTelemetry.js";
 import { DEFAULT_ALLOWED_ORIGINS, isOriginAllowed } from "./origin.js";
-import { hashedClientKey } from "./privacy.js";
+import { captureConnectPostHog, type ConnectEvent } from "./posthog.js";
+import { clientBucket, clientInfoFrom, hashedClientKey, protocolBucket } from "./privacy.js";
 import type { RateLimiter } from "./rateLimit.js";
 import { SECURITY_HEADERS } from "./securityHeaders.js";
+import { channelOf, isSyntheticRequest, withRequestScope } from "./requestScope.js";
 import { reportHandlerError } from "./telemetry.js";
 import { UnknownToolsetError } from "./toolsets.js";
 
@@ -108,17 +110,45 @@ async function handleRequest(request: Request, options: McpHttpOptions, headers:
     throw error;
   }
 
+  const synthetic = isSyntheticRequest(request.headers);
   const operations = startMcpOperations(bodyText, request.headers);
   let status = 500;
   let body: string | null = null;
   try {
-    const response = await withOperationContext(operations, () => serve(server, request, bodyText, cors));
+    const response = await withRequestScope({ synthetic, channel: channelOf(request.headers) }, () =>
+      withOperationContext(operations, () => serve(server, request, bodyText, cors)));
     status = response.status;
     body = response.body;
     return new Response(body, { status, headers: response.headers });
   } finally {
     endMcpOperations(operations, status, body);
+    if (process.env.IRELAND_MCP_TELEMETRY !== "off") {
+      for (const event of connectEvents(bodyText, body, status, synthetic)) captureConnectPostHog(event);
+    }
   }
+}
+
+/**
+ * One usage count per successful `initialize`, with the client reduced to a fixed label.
+ * Requests whose initialize failed (HTTP error, JSON-RPC error or no matching reply) are not counted.
+ */
+export function connectEvents(bodyText: string, responseText: string | null, status: number, synthetic: boolean): ConnectEvent[] {
+  if (status >= 400 || !responseText) return [];
+  const list = (text: string): unknown[] => {
+    try { const parsed: unknown = JSON.parse(text); return Array.isArray(parsed) ? parsed : [parsed]; } catch { return []; }
+  };
+  const succeeded = new Set(list(responseText).flatMap((reply) => {
+    const r = reply as { id?: unknown; result?: unknown; error?: unknown } | null;
+    return r && typeof r === "object" && r.result !== undefined && r.error === undefined && r.id !== undefined && r.id !== null ? [String(r.id)] : [];
+  }));
+  return list(bodyText).flatMap((message) => {
+    const m = message as { method?: unknown; id?: unknown; params?: unknown } | null;
+    if (!m || typeof m !== "object" || m.method !== "initialize" || m.id === undefined || m.id === null || !succeeded.has(String(m.id))) return [];
+    const name = clientInfoFrom(m.params).name;
+    // Our Azure availability test predates the header; its fixed client name also marks it.
+    const probe = name === "azure-availability";
+    return [{ client: clientBucket(name), protocol: protocolBucket(m.params), synthetic: synthetic || probe }];
+  });
 }
 
 async function serve(

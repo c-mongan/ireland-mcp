@@ -7,9 +7,10 @@ import { z } from "zod";
 import { createContext } from "./context.js";
 import { envelope } from "./envelope.js";
 import { ToolError } from "./errors.js";
-import { handleMcpHttp } from "./httpHandler.js";
+import { connectEvents, handleMcpHttp } from "./httpHandler.js";
 import { defineTool, type SourceModule } from "./module.js";
 import { RateLimiter } from "./rateLimit.js";
+import { currentSynthetic } from "./requestScope.js";
 import { buildServer } from "./server.js";
 import { SECURITY_HEADERS } from "./securityHeaders.js";
 import { UnknownToolsetError } from "./toolsets.js";
@@ -317,5 +318,45 @@ describe("OpenTelemetry", () => {
       .getMetrics()
       .flatMap((m) => m.scopeMetrics.flatMap((s) => s.metrics.map((x) => x.descriptor.name)));
     expect(names).toContain("mcp.server.operation.duration");
+  });
+});
+
+describe("synthetic traffic", () => {
+  it("scopes the synthetic header to tool calls in that request only", async () => {
+    const seen: boolean[] = [];
+    const tagged = () => buildServer({ modules: [demo], context: ctx, toolsets: "all", telemetry: () => seen.push(currentSynthetic()) });
+    const body = { jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: "demo_lookup", arguments: { query: "x" } } };
+    await handleMcpHttp(post(body, { "x-ireland-mcp-synthetic": "1" }), { createServer: tagged });
+    await handleMcpHttp(post(body), { createServer: tagged });
+    expect(seen).toEqual([true, false]);
+  });
+});
+
+describe("client connection counts", () => {
+  const init = (name: string, id = 1) => ({ jsonrpc: "2.0", id, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name, version: "9.9 private" } } });
+  const ok = (id = 1) => JSON.stringify({ jsonrpc: "2.0", id, result: { protocolVersion: "2025-06-18" } });
+
+  it("labels successful handshakes and treats our availability probe as synthetic", () => {
+    expect(connectEvents(JSON.stringify(init("claude-ai")), ok(), 200, false)).toEqual([{ client: "claude", protocol: "2025-06-18", synthetic: false }]);
+    expect(connectEvents(JSON.stringify(init("azure-availability")), ok(), 200, false)).toEqual([{ client: "other", protocol: "2025-06-18", synthetic: true }]);
+    expect(connectEvents(JSON.stringify([init("cursor-vscode", 7), { jsonrpc: "2.0", id: 8, method: "tools/list" }]), JSON.stringify([JSON.parse(ok(7)), JSON.parse(ok(8))]), 200, true))
+      .toEqual([{ client: "cursor", protocol: "2025-06-18", synthetic: true }]);
+  });
+
+  it("does not count rejected or unanswered handshakes", () => {
+    const body = JSON.stringify(init("claude-ai"));
+    expect(connectEvents(body, JSON.stringify({ jsonrpc: "2.0", id: 1, error: { code: -32602, message: "bad" } }), 200, false)).toEqual([]);
+    expect(connectEvents(body, ok(2), 200, false)).toEqual([]);
+    expect(connectEvents(body, ok(), 429, false)).toEqual([]);
+    expect(connectEvents(body, null, 200, false)).toEqual([]);
+    expect(connectEvents("not json", ok(), 200, false)).toEqual([]);
+  });
+
+  it("counts a real initialize handled by the server, but not one the server rejects", async () => {
+    const response = await handleMcpHttp(post(init("claude-ai")), { createServer });
+    expect(connectEvents(JSON.stringify(init("claude-ai")), await response.text(), response.status, false)).toEqual([{ client: "claude", protocol: "2025-06-18", synthetic: false }]);
+    const malformed = { ...init("claude-ai"), params: { protocolVersion: "2025-06-18", clientInfo: { name: "claude-ai", version: "1" } } };
+    const rejected = await handleMcpHttp(post(malformed), { createServer });
+    expect(connectEvents(JSON.stringify(malformed), await rejected.text(), rejected.status, false)).toEqual([]);
   });
 });
