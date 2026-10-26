@@ -10,8 +10,11 @@ limits or operator keys, or a modified source list.
 | [Local HTTP](#local-http) | Testing HTTP clients, the website and the playground | Node 22.12+ and a clone |
 | [Your own Azure deployment](#your-own-azure-deployment) | A shared endpoint for a team | An Azure subscription |
 
-Nothing below sends usage data anywhere. Usage counts are off unless you set the
-`IRELAND_MCP_POSTHOG_*` settings described in [observability](observability.md).
+Local stdio and local HTTP send no telemetry. Product usage counts (PostHog) stay off unless you
+set the `IRELAND_MCP_POSTHOG_*` settings described in [observability](observability.md). An Azure
+deployment from the templates also creates Application Insights, which receives the gateway's
+OpenTelemetry traces and metrics (no argument values or IP addresses; see [PRIVACY.md](../PRIVACY.md)).
+Set `IRELAND_MCP_OTEL=off` on the Function app to turn that export off.
 
 ## Local stdio
 
@@ -45,6 +48,11 @@ npm run dev:http        # http://127.0.0.1:7071/mcp, plus the website at /
 
 `PORT`, `HOST`, `RATE_LIMIT_PER_MINUTE` and `MCP_ALLOWED_ORIGINS` are read from the environment.
 
+The website's playground calls the endpoint named in `<meta name="mcp-endpoint">` in
+`web/index.html`, which is the hosted service. To try your local server from the playground,
+change it to `http://127.0.0.1:7071/mcp` locally (don't commit that). MCP clients pointed at
+`http://127.0.0.1:7071/mcp` use your local server directly.
+
 ## Operator keys
 
 Every source works without keys except these two:
@@ -62,12 +70,16 @@ The repository includes the Bicep templates and an `azd` project used for the ho
 They create a Flex Consumption Function app, storage, Application Insights and a budget alert.
 
 ```bash
-azd auth login
+azd auth login && az login
 azd env new my-ireland-mcp
 azd env set AZURE_LOCATION northeurope
 azd env set BUDGET_CONTACT_EMAIL you@example.com   # optional cost alert
-azd up
+azd provision          # creates the resources
+npm run deploy:zip     # builds locally and uploads the code
 ```
+
+Don't use `azd up` or `azd deploy` for the code. They ask Flex Consumption for a remote build,
+which fails for this project; `scripts/deploy-zip.sh` builds locally instead.
 
 Before you deploy a fork:
 
