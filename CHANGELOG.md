@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 - A "Website or docs feedback" issue template, so feedback about irishopendata.ie and the docs has a clear route.
+- The legal pilot now appears as a beta on the website and in the README, with a plain-English [assessment](docs/legal-beta-assessment.md) of coverage, licences and risks. `LEGAL_ENABLED` stays off by default.
 
 ### Fixed
 - `fetch` now resolves the `eurostat:` and `wikidata:` ids that `search` returns; before, it answered NOT_FOUND. The NOT_FOUND hint lists only sources that can fetch, and an empty key (`cso:`) returns BAD_ARGS.
