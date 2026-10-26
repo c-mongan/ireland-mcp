@@ -12,6 +12,7 @@ All notable changes to this project are documented here. The format follows
 - Irish law coverage in the `legislation` source: `legislation_get_constitution_article` (Bunreacht na hÉireann in English or Irish, by Article and section), `legislation_list_sis` and `legislation_get_si` (Statutory Instruments as made, with parent-Act powers, amended SIs and transposed EU acts), and `legislation_get_act_effects` (Legislation Directory commencement, amendments and SIs made under an Act). Responses carry "Not legal advice" and "enacted text is not amended text" warnings.
 - `cachedText` accepts `validate`, so HTML soft-error pages are rejected before caching.
 - The legal beta assessment records the 26 October 2026 finding that Citizens Information returns HTTP 403 to automated clients, including the pilot's own user-agent, and what wider coverage needs.
+- Hard multi-step benchmark (`npm run eval:multistep`): 41 questions across three tiers that each combine at least two sources. Reference answers are pinned and recomputed through the real tools. Each failing question is tagged with the capability that would unlock it: dataset cards, place crosswalk, server-side query or knowledge index. A nightly references-only workflow needs no model key. See `docs/evals-multistep.md`.
 
 ### Changed
 - README opens in plain English: what you can ask, a 30-second setup, how to check an answer and a **Beta features** section near the top. Developer detail sits lower.

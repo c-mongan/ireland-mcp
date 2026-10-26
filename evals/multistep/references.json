@@ -1,0 +1,2404 @@
+{
+  "as_of": "2026-10-26",
+  "server": "stdio dist/src/cli.js",
+  "git_sha": "6624f73",
+  "items": {
+    "t1-galway-pop-tds": {
+      "tier": "T1",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "population_2022": 277737,
+        "tds": [
+          "Connolly",
+          "Farrell",
+          "Grealish",
+          "Kyne",
+          "Naughton"
+        ]
+      },
+      "calls": [
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Galway"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:53:24.141Z"
+        },
+        {
+          "source": "oireachtas",
+          "operation": "oireachtas_search_members",
+          "args": {
+            "constituency": "Galway West",
+            "limit": 20
+          },
+          "url": "https://api.oireachtas.ie/v1/members?chamber=dail&house_no=34&limit=300",
+          "retrieved_at": "2026-10-26T13:53:24.290Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t1-planning-act-bill": {
+      "tier": "T1",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "act_number": 34,
+        "enacted": "2024-10-17",
+        "bill": "2023/81"
+      },
+      "calls": [
+        {
+          "source": "legislation",
+          "operation": "legislation_list_acts",
+          "args": {
+            "year": 2024,
+            "query": "Planning and Development"
+          },
+          "url": "https://www.irishstatutebook.ie/eli/2024/act/",
+          "retrieved_at": "2026-10-26T13:53:24.356Z"
+        },
+        {
+          "source": "legislation",
+          "operation": "legislation_get_act",
+          "args": {
+            "year": 2024,
+            "number": 34,
+            "limit": 1
+          },
+          "url": "https://www.irishstatutebook.ie/eli/2024/act/34/enacted/en/html",
+          "retrieved_at": "2026-10-26T13:53:24.556Z"
+        },
+        {
+          "source": "oireachtas",
+          "operation": "oireachtas_search_bills",
+          "args": {
+            "query": "Planning and Development",
+            "year": "2023",
+            "limit": 10
+          },
+          "url": "https://api.oireachtas.ie/v1/legislation?bill_year=2023&limit=250&lang=en",
+          "retrieved_at": "2026-10-26T13:53:24.614Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t1-unemployment-ie-eu-wb": {
+      "tier": "T1",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "ie_eurostat_pct": 4.3,
+        "eu27_pct": 6,
+        "ie_worldbank_pct": 4.3,
+        "gap_pp": 1.7
+      },
+      "calls": [
+        {
+          "source": "eurostat",
+          "operation": "eurostat_compare_ie_eu",
+          "args": {
+            "dataset": "une_rt_a",
+            "filters": {
+              "age": [
+                "Y15-74"
+              ],
+              "sex": [
+                "T"
+              ],
+              "unit": [
+                "PC_ACT"
+              ]
+            },
+            "since": "2024",
+            "until": "2024"
+          },
+          "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_a?format=JSON&lang=EN&geo=IE&geo=EU27_2020&age=Y15-74&sex=T&unit=PC_ACT&sinceTimePeriod=2024&untilTimePeriod=2024",
+          "retrieved_at": "2026-10-26T13:53:24.769Z"
+        },
+        {
+          "source": "world-bank",
+          "operation": "worldbank_get_indicator",
+          "args": {
+            "indicator": "SL.UEM.TOTL.ZS",
+            "country": "IRL",
+            "last": 5
+          },
+          "url": "https://data360api.worldbank.org/data360/data?DATABASE_ID=WB_WDI&INDICATOR=WB_WDI_SL_UEM_TOTL_ZS&REF_AREA=IRL&top=200",
+          "retrieved_at": "2026-10-26T13:53:25.766Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t1-tallaght-constituency-tds": {
+      "tier": "T1",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "constituency": "Dublin South-West",
+        "local_electoral_area": "Tallaght Central",
+        "tds": [
+          "Ahern",
+          "Brophy",
+          "Crowe",
+          "Lahart",
+          "Murphy"
+        ]
+      },
+      "calls": [
+        {
+          "source": "geohive",
+          "operation": "geohive_locate",
+          "args": {
+            "name": "Tallaght",
+            "limit": 10
+          },
+          "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/arcgis/rest/services/Centres_of_Population___OSi_National_Placenames_Gazetteer/FeatureServer/0/query?where=UPPER%28English_Na%29+%3D+%27TALLAGHT%27+OR+UPPER%28Irish_Name%29+%3D+%27TALLAGHT%27&outFields=English_Na%2CIrish_Name%2CCounty%2CClassifica&outSR=4326&returnGeometry=true&resultRecordCount=10&f=json",
+          "retrieved_at": "2026-10-26T13:53:25.943Z"
+        },
+        {
+          "source": "geohive",
+          "operation": "geohive_boundaries_at_point",
+          "args": {
+            "lat": 53.28659,
+            "lon": -6.36659
+          },
+          "url": "https://www.geohive.ie/",
+          "retrieved_at": "2026-10-26T13:53:26.195Z"
+        },
+        {
+          "source": "oireachtas",
+          "operation": "oireachtas_search_members",
+          "args": {
+            "constituency": "Dublin South-West",
+            "limit": 20
+          },
+          "url": "https://api.oireachtas.ie/v1/members?chamber=dail&house_no=34&limit=300",
+          "retrieved_at": "2026-10-26T13:53:26.201Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t1-heuston-rail-luas": {
+      "tier": "T1",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "rail_code": "HSTON",
+        "luas_line": "Red",
+        "luas_stop_code": "HEU"
+      },
+      "calls": [
+        {
+          "source": "irish-rail",
+          "operation": "rail_find_station",
+          "args": {
+            "query": "Heuston"
+          },
+          "url": "https://api.irishrail.ie/realtime/realtime.asmx/getAllStationsXML",
+          "retrieved_at": "2026-10-26T13:53:26.317Z"
+        },
+        {
+          "source": "luas",
+          "operation": "luas_list_stops",
+          "args": {},
+          "url": "https://luasforecasts.rpa.ie/xml/get.ashx?action=stops&encrypt=false",
+          "retrieved_at": "2026-10-26T13:53:26.510Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t1-salthill-bathing-protected": {
+      "tier": "T1",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "classification": "Excellent",
+        "protected_sites": [
+          "Inner Galway Bay SPA",
+          "Galway Bay Complex",
+          "Galway Bay Complex SAC"
+        ]
+      },
+      "calls": [
+        {
+          "source": "epa",
+          "operation": "epa_bathing_locations",
+          "args": {
+            "name": "Salthill"
+          },
+          "url": "https://data.epa.ie/bw/api/v1/locations?page=1&per_page=500",
+          "retrieved_at": "2026-10-26T13:53:27.386Z"
+        },
+        {
+          "source": "geohive",
+          "operation": "geohive_locate",
+          "args": {
+            "name": "Salthill",
+            "limit": 10
+          },
+          "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/arcgis/rest/services/Centres_of_Population___OSi_National_Placenames_Gazetteer/FeatureServer/0/query?where=UPPER%28English_Na%29+%3D+%27SALTHILL%27+OR+UPPER%28Irish_Name%29+%3D+%27SALTHILL%27&outFields=English_Na%2CIrish_Name%2CCounty%2CClassifica&outSR=4326&returnGeometry=true&resultRecordCount=10&f=json",
+          "retrieved_at": "2026-10-26T13:53:27.463Z"
+        },
+        {
+          "source": "environment-sites",
+          "operation": "protected_sites_near",
+          "args": {
+            "lat": 53.26256,
+            "lon": -9.07043,
+            "radius_m": 1000,
+            "limit": 50
+          },
+          "url": "https://experience.arcgis.com/experience/edf34d92e28040fd87d3d14f55d8d95f/",
+          "retrieved_at": "2026-10-26T13:53:31.098Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t1-athlone-river-now": {
+      "tier": "T1",
+      "drift": "live",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "athlone_level_m": 3.161,
+        "forecast_temp_c": 15.7
+      },
+      "calls": [
+        {
+          "source": "opw-water",
+          "operation": "water_get_level",
+          "args": {
+            "station": "Athlone",
+            "hours": 3
+          },
+          "url": "https://waterlevel.ie/data/day/26027_0001.csv",
+          "retrieved_at": "2026-10-26T13:53:31.649Z"
+        },
+        {
+          "source": "met-eireann",
+          "operation": "met_get_forecast",
+          "args": {
+            "lat": 53.421534,
+            "lon": -7.940756,
+            "hours": 2
+          },
+          "url": "http://openaccess.pf.api.met.ie/metno-wdb2ts/locationforecast?lat=53.4215;long=-7.9408",
+          "retrieved_at": "2026-10-26T13:53:32.040Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t1-grid-wind-now": {
+      "tier": "T1",
+      "drift": "live",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "wind_share_pct": 41.5,
+        "dublin_airport_wind_kmh": 26
+      },
+      "calls": [
+        {
+          "source": "eirgrid",
+          "operation": "grid_get_status",
+          "args": {
+            "region": "ALL"
+          },
+          "url": "https://www.smartgriddashboard.com/api/chart/?region=ALL&chartType=default&dateRange=day&dateFrom=25-Oct-2026+00:00&dateTo=25-Oct-2026+23:59&areas=demandactual",
+          "retrieved_at": "2026-10-26T13:53:34.511Z"
+        },
+        {
+          "source": "met-eireann",
+          "operation": "met_get_observations",
+          "args": {
+            "station": "Dublin Airport"
+          },
+          "url": "https://prodapi.metweb.ie/observations/Dublin%20Airport/today",
+          "retrieved_at": "2026-10-26T13:53:34.780Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t1-killarney-pop-constituency": {
+      "tier": "T1",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "population_2022": 14412,
+        "constituency": "Kerry"
+      },
+      "calls": [
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Killarney"
+          },
+          "url": "https://data.cso.ie/table/F1015",
+          "retrieved_at": "2026-10-26T13:53:35.124Z"
+        },
+        {
+          "source": "geohive",
+          "operation": "geohive_locate",
+          "args": {
+            "name": "Killarney",
+            "limit": 10
+          },
+          "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/arcgis/rest/services/Centres_of_Population___OSi_National_Placenames_Gazetteer/FeatureServer/0/query?where=UPPER%28English_Na%29+%3D+%27KILLARNEY%27+OR+UPPER%28Irish_Name%29+%3D+%27KILLARNEY%27&outFields=English_Na%2CIrish_Name%2CCounty%2CClassifica&outSR=4326&returnGeometry=true&resultRecordCount=10&f=json",
+          "retrieved_at": "2026-10-26T13:53:35.234Z"
+        },
+        {
+          "source": "geohive",
+          "operation": "geohive_boundaries_at_point",
+          "args": {
+            "lat": 52.06912,
+            "lon": -9.51647
+          },
+          "url": "https://www.geohive.ie/",
+          "retrieved_at": "2026-10-26T13:53:35.384Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t1-galway-city-wikidata-vs-cso": {
+      "tier": "T1",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "wikidata_population": 83456,
+        "cso_population_2022": 85910,
+        "difference": -2454
+      },
+      "calls": [
+        {
+          "source": "wikidata",
+          "operation": "wikidata_place",
+          "args": {
+            "name": "Galway",
+            "limit": 5
+          },
+          "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fplace+%3Fordinal+%3FplaceLabel+%3FplaceDescription+%3FirishLabel+%3Fpopulation+%3Fcounty+%3FcountyLabel+%3Fcoord+%3Fwebsite+WHERE+%7B%0A++SERVICE+wikibase%3Amwapi+%7B%0A++++bd%3AserviceParam+wikibase%3Aendpoint+%22www.wikidata.org%22%3B+wikibase%3Aapi+%22EntitySearch%22%3B%0A++++++mwapi%3Asearch+%22Galway%22%3B+mwapi%3Alanguage+%22en%22%3B+mwapi%3Alimit+%2250%22.%0A++++%3Fplace+wikibase%3AapiOutputItem+mwapi%3Aitem.%0A++++%3Fordinal+wikibase%3AapiOrdinal+true.%0A++%7D%0A++%3Fplace+wdt%3AP17+wd%3AQ27.%0A++OPTIONAL+%7B+%3Fplace+wdt%3AP1082+%3Fpopulation.+%7D%0A++OPTIONAL+%7B+%3Fplace+wdt%3AP131+%3Fcounty.+%7D%0A++OPTIONAL+%7B+%3Fplace+wdt%3AP625+%3Fcoord.+%7D%0A++OPTIONAL+%7B+%3Fplace+rdfs%3Alabel+%3FirishLabel+FILTER%28LANG%28%3FirishLabel%29+%3D+%22ga%22%29+%7D%0A++OPTIONAL+%7B+%3Fplace+wdt%3AP856+%3Fwebsite.+%7D%0A++SERVICE+wikibase%3Alabel+%7B+bd%3AserviceParam+wikibase%3Alanguage+%22en%22.+%7D%0A%7D+ORDER+BY+%3Fordinal+LIMIT+100&format=json",
+          "retrieved_at": "2026-10-26T13:53:39.798Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Galway City"
+          },
+          "url": "https://data.cso.ie/table/F1015",
+          "retrieved_at": "2026-10-26T13:53:40.044Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t1-galway-ppr-in-gbp": {
+      "tier": "T1",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "median_eur": 320000,
+        "median_gbp": 267930
+      },
+      "calls": [
+        {
+          "source": "ppr",
+          "operation": "ppr_price_stats",
+          "args": {
+            "county": "Galway",
+            "from": "2024-01-01",
+            "to": "2024-12-31"
+          },
+          "url": "https://www.propertypriceregister.ie/website/npsra/ppr/npsra-ppr.nsf/Downloads/PPR-2024-Galway.csv/$FILE/PPR-2024-Galway.csv",
+          "retrieved_at": "2026-10-26T13:53:40.567Z"
+        },
+        {
+          "source": "ecb",
+          "operation": "ecb_exchange_rate",
+          "args": {
+            "currency": "GBP",
+            "lastNObservations": 1
+          },
+          "url": "https://data-api.ecb.europa.eu/service/data/EXR/D.GBP.EUR.SP00.A?format=jsondata&lastNObservations=1",
+          "retrieved_at": "2026-10-26T13:53:41.637Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t2-galway-sales-per-1000": {
+      "tier": "T2",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "sales_2024": 2505,
+        "sales_per_1000": 9.02
+      },
+      "calls": [
+        {
+          "source": "ppr",
+          "operation": "ppr_price_stats",
+          "args": {
+            "county": "Galway",
+            "from": "2024-01-01",
+            "to": "2024-12-31"
+          },
+          "url": "https://www.propertypriceregister.ie/website/npsra/ppr/npsra-ppr.nsf/Downloads/PPR-2024-Galway.csv/$FILE/PPR-2024-Galway.csv",
+          "retrieved_at": "2026-10-26T13:54:08.596Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Galway"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:08.598Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t2-dublin-ppr-vs-rppi": {
+      "tier": "T2",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "ppr_median_change_pct": 29.2,
+        "rppi_change_pct": 34.9,
+        "difference_pp": -5.7
+      },
+      "calls": [
+        {
+          "source": "ppr",
+          "operation": "ppr_price_stats",
+          "args": {
+            "county": "Dublin",
+            "from": "2019-01-01",
+            "to": "2019-12-31"
+          },
+          "url": "https://www.propertypriceregister.ie/website/npsra/ppr/npsra-ppr.nsf/Downloads/PPR-2019-Dublin.csv/$FILE/PPR-2019-Dublin.csv",
+          "retrieved_at": "2026-10-26T13:54:10.890Z"
+        },
+        {
+          "source": "ppr",
+          "operation": "ppr_price_stats",
+          "args": {
+            "county": "Dublin",
+            "from": "2024-01-01",
+            "to": "2024-12-31"
+          },
+          "url": "https://www.propertypriceregister.ie/website/npsra/ppr/npsra-ppr.nsf/Downloads/PPR-2024-Dublin.csv/$FILE/PPR-2024-Dublin.csv",
+          "retrieved_at": "2026-10-26T13:54:12.012Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_data",
+          "args": {
+            "table_code": "HPM09",
+            "filters": {
+              "STATISTIC": [
+                "HPM09C01"
+              ],
+              "TLIST(M1)": [
+                "201912",
+                "202412"
+              ],
+              "C02803V03373": [
+                "05"
+              ]
+            },
+            "limit": 500
+          },
+          "url": "https://data.cso.ie/table/HPM09",
+          "retrieved_at": "2026-10-26T13:54:12.247Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t2-munster-unemployment-popchange": {
+      "tier": "T2",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "local_authority": "Waterford City & County",
+        "unemployment_rate_pct": 5.6,
+        "population_change_pct": 9.6
+      },
+      "calls": [
+        {
+          "source": "geohive",
+          "operation": "geohive_query_layer",
+          "args": {
+            "service": "Counties___OSi_National_Statutory_Boundaries",
+            "where": "PROVINCE='Munster'",
+            "out_fields": "ENGLISH,PROVINCE",
+            "limit": 20
+          },
+          "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/arcgis/rest/services/Counties___OSi_National_Statutory_Boundaries/FeatureServer/0/query?returnGeometry=false&f=json&where=PROVINCE%3D%27Munster%27&outFields=ENGLISH%2CPROVINCE&resultRecordCount=20",
+          "retrieved_at": "2026-10-26T14:09:28.265Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_table_metadata",
+          "args": {
+            "table_code": "CPNI37",
+            "max_categories": 100
+          },
+          "url": "https://data.cso.ie/table/CPNI37",
+          "retrieved_at": "2026-10-26T14:09:28.395Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_data",
+          "args": {
+            "table_code": "CPNI37",
+            "filters": {
+              "C04335V05114": [
+                "2ae19629-1434-13a3-e055-000000000001",
+                "2ae19629-14a3-13a3-e055-000000000001",
+                "2ae19629-14a2-13a3-e055-000000000001",
+                "2ae19629-14a6-13a3-e055-000000000001",
+                "2ae19629-148f-13a3-e055-000000000001",
+                "2ae19629-1499-13a3-e055-000000000001",
+                "2ae19629-149a-13a3-e055-000000000001"
+              ]
+            },
+            "limit": 500
+          },
+          "url": "https://data.cso.ie/table/CPNI37",
+          "retrieved_at": "2026-10-26T14:09:28.508Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_table_metadata",
+          "args": {
+            "table_code": "CPNI05",
+            "max_categories": 100
+          },
+          "url": "https://data.cso.ie/table/CPNI05",
+          "retrieved_at": "2026-10-26T14:09:28.545Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_data",
+          "args": {
+            "table_code": "CPNI05",
+            "filters": {
+              "C04335V05114": [
+                "2ae19629-149a-13a3-e055-000000000001"
+              ],
+              "STATISTIC": [
+                "CPNI05C05"
+              ],
+              "TLIST(A1)": [
+                "2022"
+              ]
+            },
+            "limit": 500
+          },
+          "url": "https://data.cso.ie/table/CPNI05",
+          "retrieved_at": "2026-10-26T14:09:28.748Z"
+        }
+      ],
+      "workarounds": [
+        "crosswalk:la-to-county"
+      ]
+    },
+    "t2-cork-housing-spend-per-capita": {
+      "tier": "T2",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "city_expenditure_eur": 121159408,
+        "county_expenditure_eur": 120551005,
+        "city_per_resident_eur": 541,
+        "county_per_resident_eur": 335,
+        "higher": "Cork City Council"
+      },
+      "calls": [
+        {
+          "source": "council-budgets",
+          "operation": "council_budgets_get",
+          "args": {
+            "year": 2025,
+            "authority": "Cork City Council",
+            "division": "A",
+            "limit": 500
+          },
+          "url": "https://opendata.housing.gov.ie/dataset/e55a1d32-c225-48e0-bb6f-43c86071841b/resource/69cb7558-f0d8-45f7-a08f-f1ab3b564d80/download/budget-publication-document-2025.xlsx",
+          "retrieved_at": "2026-10-26T13:54:14.269Z"
+        },
+        {
+          "source": "council-budgets",
+          "operation": "council_budgets_get",
+          "args": {
+            "year": 2025,
+            "authority": "Cork County Council",
+            "division": "A",
+            "limit": 500
+          },
+          "url": "https://opendata.housing.gov.ie/dataset/e55a1d32-c225-48e0-bb6f-43c86071841b/resource/69cb7558-f0d8-45f7-a08f-f1ab3b564d80/download/budget-publication-document-2025.xlsx",
+          "retrieved_at": "2026-10-26T13:54:14.290Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_table_metadata",
+          "args": {
+            "table_code": "FY003A",
+            "max_categories": 100
+          },
+          "url": "https://data.cso.ie/table/FY003A",
+          "retrieved_at": "2026-10-26T13:54:14.773Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_data",
+          "args": {
+            "table_code": "FY003A",
+            "filters": {
+              "C03789V04537": [
+                "2ae19629-1434-13a3-e055-000000000001",
+                "2ae19629-14a3-13a3-e055-000000000001"
+              ],
+              "C02199V02655": [
+                "-"
+              ]
+            },
+            "limit": 500
+          },
+          "url": "https://data.cso.ie/table/FY003A",
+          "retrieved_at": "2026-10-26T13:54:14.931Z"
+        }
+      ],
+      "workarounds": [
+        "dataset-card:hardcoded-table-code"
+      ]
+    },
+    "t2-connacht-completions-per-1000": {
+      "tier": "T2",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "ranking": [
+          "Galway",
+          "Mayo",
+          "Leitrim",
+          "Sligo",
+          "Roscommon"
+        ],
+        "top_rate_per_1000": 4.45
+      },
+      "calls": [
+        {
+          "source": "cso",
+          "operation": "cso_get_data",
+          "args": {
+            "table_code": "NDA05",
+            "filters": {
+              "TLIST(A1)": [
+                "2024"
+              ]
+            },
+            "limit": 500
+          },
+          "url": "https://data.cso.ie/table/NDA05",
+          "retrieved_at": "2026-10-26T13:54:15.059Z"
+        },
+        {
+          "source": "geohive",
+          "operation": "geohive_query_layer",
+          "args": {
+            "service": "Counties___OSi_National_Statutory_Boundaries",
+            "where": "PROVINCE='Connacht'",
+            "out_fields": "ENGLISH,PROVINCE",
+            "limit": 20
+          },
+          "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/arcgis/rest/services/Counties___OSi_National_Statutory_Boundaries/FeatureServer/0/query?returnGeometry=false&f=json&where=PROVINCE%3D%27Connacht%27&outFields=ENGLISH%2CPROVINCE&resultRecordCount=20",
+          "retrieved_at": "2026-10-26T13:54:16.970Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Roscommon"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:17.065Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Mayo"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:17.310Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Sligo"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:17.504Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Leitrim"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:17.601Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Galway"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:17.605Z"
+        }
+      ],
+      "workarounds": [
+        "crosswalk:lea-to-county"
+      ]
+    },
+    "t2-dsp-jobseekers-per-1000": {
+      "tier": "T2",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "top3": [
+          "Donegal",
+          "Longford",
+          "Louth"
+        ],
+        "top_rate_per_1000": 45.4,
+        "top_county_median_eur": 176750
+      },
+      "calls": [
+        {
+          "source": "cso",
+          "operation": "cso_get_table_metadata",
+          "args": {
+            "table_code": "DSP24",
+            "max_categories": 60
+          },
+          "url": "https://data.cso.ie/table/DSP24",
+          "retrieved_at": "2026-10-26T13:54:17.652Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_data",
+          "args": {
+            "table_code": "DSP24",
+            "filters": {
+              "TLIST(Q1)": [
+                "2026Q2"
+              ],
+              "C03824V04573": [
+                "110"
+              ]
+            },
+            "limit": 500
+          },
+          "url": "https://data.cso.ie/table/DSP24",
+          "retrieved_at": "2026-10-26T13:54:17.733Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Carlow"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:17.811Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Cavan"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:17.934Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Clare"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:18.333Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Cork"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:18.773Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Donegal"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:18.874Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Dublin"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:19.139Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Galway"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:19.143Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Kerry"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:19.233Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Kildare"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:19.613Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Kilkenny"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:19.776Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Laois"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:19.911Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Leitrim"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:19.933Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Limerick"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:20.026Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Longford"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:20.325Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Louth"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:20.977Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Mayo"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:20.989Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Meath"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:21.161Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Monaghan"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:21.774Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Offaly"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:21.850Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Roscommon"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:21.853Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Sligo"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:21.855Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Tipperary"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:22.258Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Waterford"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:22.352Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Westmeath"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:22.435Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Wexford"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:22.506Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Wicklow"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:22.611Z"
+        },
+        {
+          "source": "ppr",
+          "operation": "ppr_price_stats",
+          "args": {
+            "county": "Donegal",
+            "from": "2024-01-01",
+            "to": "2024-12-31"
+          },
+          "url": "https://www.propertypriceregister.ie/website/npsra/ppr/npsra-ppr.nsf/Downloads/PPR-2024-Donegal.csv/$FILE/PPR-2024-Donegal.csv",
+          "retrieved_at": "2026-10-26T13:54:23.099Z"
+        }
+      ],
+      "workarounds": [
+        "crosswalk:county-label-variants"
+      ]
+    },
+    "t2-real-deposit-rate-2025": {
+      "tier": "T2",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "deposit_rate_pct": 2,
+        "hicp_2025_pct": 2.1,
+        "real_rate_pct": -0.1
+      },
+      "calls": [
+        {
+          "source": "ecb",
+          "operation": "ecb_get_series",
+          "args": {
+            "key": "FM.B.U2.EUR.4F.KR.DFR.LEV",
+            "lastNObservations": 12
+          },
+          "url": "https://data-api.ecb.europa.eu/service/data/FM/B.U2.EUR.4F.KR.DFR.LEV?format=jsondata&lastNObservations=12",
+          "retrieved_at": "2026-10-26T13:54:23.823Z"
+        },
+        {
+          "source": "eurostat",
+          "operation": "eurostat_get_data",
+          "args": {
+            "dataset": "prc_hicp_aind",
+            "filters": {
+              "coicop": [
+                "CP00"
+              ],
+              "unit": [
+                "RCH_A_AVG"
+              ]
+            },
+            "since": "2025",
+            "until": "2025"
+          },
+          "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_aind?format=JSON&lang=EN&geo=IE&coicop=CP00&unit=RCH_A_AVG&sinceTimePeriod=2025&untilTimePeriod=2025",
+          "retrieved_at": "2026-10-26T13:54:24.052Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t2-gender-pay-gap-finance": {
+      "tier": "T2",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "aib_mean_gap_pct": 17.5,
+        "sector_median_pct": 19.06,
+        "eurostat_ie_pct": 8.3,
+        "eurostat_year": "2024"
+      },
+      "calls": [
+        {
+          "source": "paygap",
+          "operation": "paygap_search_reports",
+          "args": {
+            "company": "AIB",
+            "year": 2025,
+            "limit": 5
+          },
+          "url": "https://paygap.ie/downloads/annotated",
+          "retrieved_at": "2026-10-26T14:09:29.951Z"
+        },
+        {
+          "source": "paygap",
+          "operation": "paygap_search_reports",
+          "args": {
+            "industry": "Financial and Insurance",
+            "year": 2025,
+            "limit": 20,
+            "offset": 0
+          },
+          "url": "https://paygap.ie/downloads/annotated",
+          "retrieved_at": "2026-10-26T14:09:29.995Z"
+        },
+        {
+          "source": "paygap",
+          "operation": "paygap_search_reports",
+          "args": {
+            "industry": "Financial and Insurance",
+            "year": 2025,
+            "limit": 20,
+            "offset": 20
+          },
+          "url": "https://paygap.ie/downloads/annotated",
+          "retrieved_at": "2026-10-26T14:09:30.003Z"
+        },
+        {
+          "source": "paygap",
+          "operation": "paygap_search_reports",
+          "args": {
+            "industry": "Financial and Insurance",
+            "year": 2025,
+            "limit": 20,
+            "offset": 40
+          },
+          "url": "https://paygap.ie/downloads/annotated",
+          "retrieved_at": "2026-10-26T14:09:30.050Z"
+        },
+        {
+          "source": "paygap",
+          "operation": "paygap_search_reports",
+          "args": {
+            "industry": "Financial and Insurance",
+            "year": 2025,
+            "limit": 20,
+            "offset": 60
+          },
+          "url": "https://paygap.ie/downloads/annotated",
+          "retrieved_at": "2026-10-26T14:09:30.061Z"
+        },
+        {
+          "source": "paygap",
+          "operation": "paygap_search_reports",
+          "args": {
+            "industry": "Financial and Insurance",
+            "year": 2025,
+            "limit": 20,
+            "offset": 80
+          },
+          "url": "https://paygap.ie/downloads/annotated",
+          "retrieved_at": "2026-10-26T14:09:30.076Z"
+        },
+        {
+          "source": "paygap",
+          "operation": "paygap_search_reports",
+          "args": {
+            "industry": "Financial and Insurance",
+            "year": 2025,
+            "limit": 20,
+            "offset": 100
+          },
+          "url": "https://paygap.ie/downloads/annotated",
+          "retrieved_at": "2026-10-26T14:09:30.094Z"
+        },
+        {
+          "source": "paygap",
+          "operation": "paygap_search_reports",
+          "args": {
+            "industry": "Financial and Insurance",
+            "year": 2025,
+            "limit": 20,
+            "offset": 120
+          },
+          "url": "https://paygap.ie/downloads/annotated",
+          "retrieved_at": "2026-10-26T14:09:30.108Z"
+        },
+        {
+          "source": "paygap",
+          "operation": "paygap_search_reports",
+          "args": {
+            "industry": "Financial and Insurance",
+            "year": 2025,
+            "limit": 20,
+            "offset": 140
+          },
+          "url": "https://paygap.ie/downloads/annotated",
+          "retrieved_at": "2026-10-26T14:09:30.118Z"
+        },
+        {
+          "source": "paygap",
+          "operation": "paygap_search_reports",
+          "args": {
+            "industry": "Financial and Insurance",
+            "year": 2025,
+            "limit": 20,
+            "offset": 160
+          },
+          "url": "https://paygap.ie/downloads/annotated",
+          "retrieved_at": "2026-10-26T14:09:30.125Z"
+        },
+        {
+          "source": "eurostat",
+          "operation": "eurostat_get_data",
+          "args": {
+            "dataset": "earn_gr_gpgr2",
+            "filters": {
+              "nace_r2": [
+                "B-S_X_O"
+              ],
+              "unit": [
+                "PC"
+              ]
+            },
+            "since": "2018"
+          },
+          "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_gr_gpgr2?format=JSON&lang=EN&geo=IE&nace_r2=B-S_X_O&unit=PC&sinceTimePeriod=2018",
+          "retrieved_at": "2026-10-26T14:09:30.442Z"
+        }
+      ],
+      "workarounds": [
+        "server-query:pagination"
+      ]
+    },
+    "t2-dublin-top-lea-completions": {
+      "tier": "T2",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "top3_leas": [
+          "Donaghmede",
+          "Clondalkin",
+          "Killiney-Shankill"
+        ],
+        "top3_share_pct": 29.1,
+        "top_lea_constituency": "Dublin Bay North"
+      },
+      "calls": [
+        {
+          "source": "cso",
+          "operation": "cso_get_data",
+          "args": {
+            "table_code": "NDA05",
+            "filters": {
+              "TLIST(A1)": [
+                "2024"
+              ]
+            },
+            "limit": 500
+          },
+          "url": "https://data.cso.ie/table/NDA05",
+          "retrieved_at": "2026-10-26T13:54:25.050Z"
+        },
+        {
+          "source": "geohive",
+          "operation": "geohive_locate",
+          "args": {
+            "name": "Donaghmede",
+            "limit": 10
+          },
+          "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/arcgis/rest/services/Centres_of_Population___OSi_National_Placenames_Gazetteer/FeatureServer/0/query?where=UPPER%28English_Na%29+%3D+%27DONAGHMEDE%27+OR+UPPER%28Irish_Name%29+%3D+%27DONAGHMEDE%27&outFields=English_Na%2CIrish_Name%2CCounty%2CClassifica&outSR=4326&returnGeometry=true&resultRecordCount=10&f=json",
+          "retrieved_at": "2026-10-26T13:54:27.979Z"
+        },
+        {
+          "source": "geohive",
+          "operation": "geohive_boundaries_at_point",
+          "args": {
+            "lat": 53.39864,
+            "lon": -6.16165
+          },
+          "url": "https://www.geohive.ie/",
+          "retrieved_at": "2026-10-26T13:54:29.467Z"
+        }
+      ],
+      "workarounds": [
+        "crosswalk:lea-to-county",
+        "crosswalk:lea-to-constituency"
+      ]
+    },
+    "t2-kohesio-west-per-capita": {
+      "tier": "T2",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "project_count": 194,
+        "total_eu_budget_eur": 902123538,
+        "per_resident_eur": 1856.4
+      },
+      "calls": [
+        {
+          "source": "kohesio",
+          "operation": "kohesio_search_projects",
+          "args": {
+            "region": "IE042",
+            "limit": 50,
+            "offset": 0
+          },
+          "url": "https://kohesio.ec.europa.eu/en/data",
+          "retrieved_at": "2026-10-07T23:20:32.414Z"
+        },
+        {
+          "source": "kohesio",
+          "operation": "kohesio_search_projects",
+          "args": {
+            "region": "IE042",
+            "limit": 50,
+            "offset": 42
+          },
+          "url": "https://kohesio.ec.europa.eu/en/data",
+          "retrieved_at": "2026-10-07T23:20:32.414Z"
+        },
+        {
+          "source": "kohesio",
+          "operation": "kohesio_search_projects",
+          "args": {
+            "region": "IE042",
+            "limit": 50,
+            "offset": 85
+          },
+          "url": "https://kohesio.ec.europa.eu/en/data",
+          "retrieved_at": "2026-10-07T23:20:32.414Z"
+        },
+        {
+          "source": "kohesio",
+          "operation": "kohesio_search_projects",
+          "args": {
+            "region": "IE042",
+            "limit": 50,
+            "offset": 127
+          },
+          "url": "https://kohesio.ec.europa.eu/en/data",
+          "retrieved_at": "2026-10-07T23:20:32.414Z"
+        },
+        {
+          "source": "kohesio",
+          "operation": "kohesio_search_projects",
+          "args": {
+            "region": "IE042",
+            "limit": 50,
+            "offset": 152
+          },
+          "url": "https://kohesio.ec.europa.eu/en/data",
+          "retrieved_at": "2026-10-07T23:20:32.414Z"
+        },
+        {
+          "source": "kohesio",
+          "operation": "kohesio_search_projects",
+          "args": {
+            "region": "IE042",
+            "limit": 50,
+            "offset": 169
+          },
+          "url": "https://kohesio.ec.europa.eu/en/data",
+          "retrieved_at": "2026-10-07T23:20:32.414Z"
+        },
+        {
+          "source": "kohesio",
+          "operation": "kohesio_search_projects",
+          "args": {
+            "region": "IE042",
+            "limit": 50,
+            "offset": 190
+          },
+          "url": "https://kohesio.ec.europa.eu/en/data",
+          "retrieved_at": "2026-10-07T23:20:32.414Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Galway"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:29.603Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Mayo"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:29.604Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Roscommon"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:29.606Z"
+        }
+      ],
+      "workarounds": [
+        "server-query:pagination",
+        "crosswalk:nuts3-to-county"
+      ]
+    },
+    "t2-rent-law-rpz": {
+      "tier": "T2",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "acts": [
+          "Residential Tenancies Act 2021",
+          "Residential Tenancies (No. 2) Act 2021",
+          "Residential Tenancies (Amendment) Act 2021"
+        ],
+        "rent_change_pct": 16.9
+      },
+      "calls": [
+        {
+          "source": "legislation",
+          "operation": "legislation_list_acts",
+          "args": {
+            "year": 2021,
+            "query": "Residential Tenancies",
+            "limit": 20
+          },
+          "url": "https://www.irishstatutebook.ie/eli/2021/act/",
+          "retrieved_at": "2026-10-26T13:54:29.692Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_table_metadata",
+          "args": {
+            "table_code": "RIA02",
+            "max_categories": 500
+          },
+          "url": "https://data.cso.ie/table/RIA02",
+          "retrieved_at": "2026-10-26T13:54:29.788Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_data",
+          "args": {
+            "table_code": "RIA02",
+            "filters": {
+              "TLIST(A1)": [
+                "2021",
+                "2024"
+              ],
+              "C02970V03592": [
+                "-"
+              ],
+              "C02969V03591": [
+                "-"
+              ],
+              "C03004V03625": [
+                "120500"
+              ]
+            },
+            "limit": 500
+          },
+          "url": "https://data.cso.ie/table/RIA02",
+          "retrieved_at": "2026-10-26T13:54:29.891Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t2-lobbying-planning-bill": {
+      "tier": "T2",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "returns_2024": 37,
+        "bill_status": "Enacted"
+      },
+      "calls": [
+        {
+          "source": "lobbying",
+          "operation": "lobbying_search_returns",
+          "args": {
+            "query": "\"Planning and Development Bill\"",
+            "date_from": "2024-01-01",
+            "date_to": "2024-12-31",
+            "limit": 1
+          },
+          "url": "https://api.lobbying.ie/api/Search?currentPage=1&pageSize=1&queryText=%22Planning+and+Development+Bill%22&subjectMatters=&subjectMatterAreas=&publicBodys=&jobTitles=&returnDateFrom=01-01-2024&returnDateTo=31-12-2024&period=&dpo=&client=&responsible=&lobbyist=&lobbyistId=",
+          "retrieved_at": "2026-10-26T13:55:41.972Z"
+        },
+        {
+          "source": "oireachtas",
+          "operation": "oireachtas_search_bills",
+          "args": {
+            "query": "Planning and Development",
+            "year": "2023",
+            "limit": 10
+          },
+          "url": "https://api.oireachtas.ie/v1/legislation?bill_year=2023&limit=250&lang=en",
+          "retrieved_at": "2026-10-26T13:55:42.323Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t2-dataset-discovery-lea": {
+      "tier": "T2",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "completions_table": "NDA05",
+        "completions_top_lea": "Clondalkin",
+        "ukraine_table": "UA05",
+        "ukraine_top_lea": "Kenmare",
+        "completions_county_median_eur": 445881
+      },
+      "calls": [
+        {
+          "source": "cso",
+          "operation": "cso_get_table_metadata",
+          "args": {
+            "table_code": "NDA05",
+            "max_categories": 500
+          },
+          "url": "https://data.cso.ie/table/NDA05",
+          "retrieved_at": "2026-10-26T13:55:42.712Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_data",
+          "args": {
+            "table_code": "NDA05",
+            "filters": {
+              "TLIST(A1)": [
+                "2025"
+              ],
+              "STATISTIC": [
+                "NDA05C01"
+              ]
+            },
+            "limit": 500
+          },
+          "url": "https://data.cso.ie/table/NDA05",
+          "retrieved_at": "2026-10-26T13:55:43.345Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_table_metadata",
+          "args": {
+            "table_code": "UA05",
+            "max_categories": 500
+          },
+          "url": "https://data.cso.ie/table/UA05",
+          "retrieved_at": "2026-10-26T13:55:43.568Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_data",
+          "args": {
+            "table_code": "UA05",
+            "filters": {
+              "TLIST(D1)": [
+                "2026M06D23"
+              ],
+              "STATISTIC": [
+                "UA05C01"
+              ]
+            },
+            "limit": 500
+          },
+          "url": "https://data.cso.ie/table/UA05",
+          "retrieved_at": "2026-10-26T13:55:43.744Z"
+        },
+        {
+          "source": "ppr",
+          "operation": "ppr_price_stats",
+          "args": {
+            "county": "Dublin",
+            "from": "2024-01-01",
+            "to": "2024-12-31"
+          },
+          "url": "https://www.propertypriceregister.ie/website/npsra/ppr/npsra-ppr.nsf/Downloads/PPR-2024-Dublin.csv/$FILE/PPR-2024-Dublin.csv",
+          "retrieved_at": "2026-10-26T13:55:47.202Z"
+        }
+      ],
+      "workarounds": [
+        "dataset-card:hardcoded-table-code",
+        "crosswalk:lea-to-county"
+      ]
+    },
+    "t2-ed-deprivation-population": {
+      "tier": "T2",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "electoral_division": "NORTH CITY",
+        "relative_score": 6.43,
+        "deprivation_label": "Marginally Above Average",
+        "small_area_population": 1238
+      },
+      "calls": [
+        {
+          "source": "census-areas",
+          "operation": "census_small_area_at",
+          "args": {
+            "lat": 53.3498,
+            "lon": -6.2603
+          },
+          "url": "https://services-eu1.arcgis.com/BuS9rtTsYEV5C0xh/arcgis/rest/services/CensusHub2022_T1_1_SA/FeatureServer/0/query?f=json&where=SA_GEOGID_2022%3D%27A268106016%27&outFields=SA_GEOGID_2022%2CT1_1AGETT%2CT1_1AGETM%2CT1_1AGETF%2CGEOGDESC%2CLOCAL_AUTHORITY%2CCOUNTY%2CNUTS3_NAME&resultRecordCount=1&resultOffset=0&returnGeometry=false",
+          "retrieved_at": "2026-10-26T13:54:32.760Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "268106",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=268106&limit=5",
+          "retrieved_at": "2026-10-26T13:54:32.934Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t2-planning-near-luas-broombridge": {
+      "tier": "T2",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "applications": 13,
+        "residential_units": 20
+      },
+      "calls": [
+        {
+          "source": "luas",
+          "operation": "luas_list_stops",
+          "args": {
+            "line": "Green"
+          },
+          "url": "https://luasforecasts.rpa.ie/xml/get.ashx?action=stops&encrypt=false",
+          "retrieved_at": "2026-10-26T13:54:32.939Z"
+        },
+        {
+          "source": "planning",
+          "operation": "planning_search",
+          "args": {
+            "lat": 53.37223956,
+            "lon": -6.29768465,
+            "radius_m": 500,
+            "from": "2024-01-01",
+            "to": "2024-12-31",
+            "limit": 100
+          },
+          "url": "https://services.arcgis.com/NzlPQPKn5QF9v2US/arcgis/rest/services/IrishPlanningApplications/FeatureServer/0/query?f=json&where=%28ReceivedDate+%3E%3D+DATE+%272024-01-01%27%29+AND+%28ReceivedDate+%3C%3D+DATE+%272024-12-31%27%29&outFields=PlanningAuthority%2CApplicationNumber%2CDevelopmentDescription%2CDevelopmentAddress%2CApplicationStatus%2CApplicationType%2CDecision%2CReceivedDate%2CDecisionDate%2CGrantDate%2CExpiryDate%2CNumResidentialUnits%2CLinkAppDetails&resultRecordCount=50&resultOffset=0&returnGeometry=false&geometry=-6.29768465%2C53.37223956&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&distance=500&units=esriSRUnit_Meter&orderByFields=ReceivedDate+DESC",
+          "retrieved_at": "2026-10-26T13:54:33.219Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t2-galway-city-planning-volume": {
+      "tier": "T2",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "gap": "server-query:count",
+      "evidence": "planning_search returns at most 100 rows and no total; a council-year count needs server-side aggregation"
+    },
+    "t3-rent-growth-completions-tds": {
+      "tier": "T3",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "gap": "crosswalk:rtb-location-to-lea",
+      "evidence": "RTB locations for Galway City LEAs not found: Galway; Galway City; Athenry, Galway; Ballinasloe, Galway; Ballybane, Galway; Ballybrit, Galway; Barna, Galway; Bohermore, Galway; Claregalway, Galway; Clifden, Galway; Doughiska, Galway; Gort, Galway; Headford, Galway; Knocknacarra, Galway; Loughrea, Galway; Mervue, Galway; Monivea, Galway; Moycullen, Galway; Newcastle, Galway; Oranmore, Galway; Oughterard, Galway; Portumna, Galway; Rahoon, Galway; Renmore, Galway; Roscam, Galway; Salthill, Galway; Tuam, Galway; Wellpark, Galway; Woodquay, Galway"
+    },
+    "t3-ballymun-vs-tallaght": {
+      "tier": "T3",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "ballymun_weighted_score": -12.07,
+        "ballymun_stops_1km": 61,
+        "tallaght_weighted_score": -8.54,
+        "tallaght_stops_1km": 51,
+        "more_deprived": "Ballymun"
+      },
+      "calls": [
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "Ballymun",
+            "limit": 50
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=Ballymun&limit=50",
+          "retrieved_at": "2026-10-26T13:54:33.905Z"
+        },
+        {
+          "source": "geohive",
+          "operation": "geohive_locate",
+          "args": {
+            "name": "Ballymun",
+            "limit": 10
+          },
+          "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/arcgis/rest/services/Centres_of_Population___OSi_National_Placenames_Gazetteer/FeatureServer/0/query?where=UPPER%28English_Na%29+%3D+%27BALLYMUN%27+OR+UPPER%28Irish_Name%29+%3D+%27BALLYMUN%27&outFields=English_Na%2CIrish_Name%2CCounty%2CClassifica&outSR=4326&returnGeometry=true&resultRecordCount=10&f=json",
+          "retrieved_at": "2026-10-26T13:54:34.491Z"
+        },
+        {
+          "source": "tfi-static",
+          "operation": "tfi_static_search_stops",
+          "args": {
+            "lat": 53.39393,
+            "lon": -6.2641,
+            "radius": 1000,
+            "limit": 1
+          },
+          "url": "https://www.transportforireland.ie/transitData/Data/NaPTAN.json",
+          "retrieved_at": "2026-10-26T13:54:35.552Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "Tallaght",
+            "limit": 50
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=Tallaght&limit=50",
+          "retrieved_at": "2026-10-26T13:54:35.893Z"
+        },
+        {
+          "source": "geohive",
+          "operation": "geohive_locate",
+          "args": {
+            "name": "Tallaght",
+            "limit": 10
+          },
+          "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/arcgis/rest/services/Centres_of_Population___OSi_National_Placenames_Gazetteer/FeatureServer/0/query?where=UPPER%28English_Na%29+%3D+%27TALLAGHT%27+OR+UPPER%28Irish_Name%29+%3D+%27TALLAGHT%27&outFields=English_Na%2CIrish_Name%2CCounty%2CClassifica&outSR=4326&returnGeometry=true&resultRecordCount=10&f=json",
+          "retrieved_at": "2026-10-26T13:54:35.899Z"
+        },
+        {
+          "source": "tfi-static",
+          "operation": "tfi_static_search_stops",
+          "args": {
+            "lat": 53.28659,
+            "lon": -6.36659,
+            "radius": 1000,
+            "limit": 1
+          },
+          "url": "https://www.transportforireland.ie/transitData/Data/NaPTAN.json",
+          "retrieved_at": "2026-10-26T13:54:35.552Z"
+        }
+      ],
+      "workarounds": [
+        "crosswalk:place-to-eds"
+      ]
+    },
+    "t3-welfare-unemployment-law": {
+      "tier": "T3",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "ja_change_pct": -14.9,
+        "direction": "fell",
+        "donegal_unemployment_pct": 4.7,
+        "state_unemployment_pct": 4.6,
+        "act": "Social Welfare Consolidation Act 2005",
+        "act_number": 26
+      },
+      "calls": [
+        {
+          "source": "cso",
+          "operation": "cso_get_table_metadata",
+          "args": {
+            "table_code": "DSP24",
+            "max_categories": 60
+          },
+          "url": "https://data.cso.ie/table/DSP24",
+          "retrieved_at": "2026-10-26T14:54:13.355Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_data",
+          "args": {
+            "table_code": "DSP24",
+            "filters": {
+              "TLIST(Q1)": [
+                "2024Q2",
+                "2026Q2"
+              ],
+              "C03824V04573": [
+                "110"
+              ],
+              "C03788V04538": [
+                "2ae19629-1452-13a3-e055-000000000001"
+              ]
+            },
+            "limit": 500
+          },
+          "url": "https://data.cso.ie/table/DSP24",
+          "retrieved_at": "2026-10-26T14:54:13.456Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_table_metadata",
+          "args": {
+            "table_code": "CPNI37",
+            "max_categories": 100
+          },
+          "url": "https://data.cso.ie/table/CPNI37",
+          "retrieved_at": "2026-10-26T14:54:13.483Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_data",
+          "args": {
+            "table_code": "CPNI37",
+            "filters": {
+              "C04335V05114": [
+                "2ae19629-14a4-13a3-e055-000000000001",
+                "IE0"
+              ]
+            },
+            "limit": 500
+          },
+          "url": "https://data.cso.ie/table/CPNI37",
+          "retrieved_at": "2026-10-26T14:54:13.554Z"
+        },
+        {
+          "source": "legislation",
+          "operation": "legislation_list_acts",
+          "args": {
+            "year": 2005,
+            "query": "Social Welfare Consolidation"
+          },
+          "url": "https://www.irishstatutebook.ie/eli/2005/act/",
+          "retrieved_at": "2026-10-26T14:54:13.630Z"
+        }
+      ],
+      "workarounds": [
+        "knowledge:law-search"
+      ]
+    },
+    "t3-gdp-per-capita-three-ways": {
+      "tier": "T3",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "worldbank_usd": 112895,
+        "eurostat_eur": 104350,
+        "usd_per_eur_2024": 1.0824,
+        "difference_pct": 0
+      },
+      "calls": [
+        {
+          "source": "world-bank",
+          "operation": "worldbank_get_indicator",
+          "args": {
+            "indicator": "NY.GDP.PCAP.CD",
+            "country": "IRL",
+            "last": 5
+          },
+          "url": "https://data360api.worldbank.org/data360/data?DATABASE_ID=WB_WDI&INDICATOR=WB_WDI_NY_GDP_PCAP_CD&REF_AREA=IRL&top=200",
+          "retrieved_at": "2026-10-26T13:54:36.713Z"
+        },
+        {
+          "source": "eurostat",
+          "operation": "eurostat_get_data",
+          "args": {
+            "dataset": "nama_10_pc",
+            "filters": {
+              "unit": [
+                "CP_EUR_HAB"
+              ],
+              "na_item": [
+                "B1GQ"
+              ]
+            },
+            "since": "2024",
+            "until": "2024"
+          },
+          "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10_pc?format=JSON&lang=EN&geo=IE&unit=CP_EUR_HAB&na_item=B1GQ&sinceTimePeriod=2024&untilTimePeriod=2024",
+          "retrieved_at": "2026-10-26T13:54:36.886Z"
+        },
+        {
+          "source": "ecb",
+          "operation": "ecb_get_series",
+          "args": {
+            "key": "EXR.A.USD.EUR.SP00.A",
+            "lastNObservations": 5
+          },
+          "url": "https://data-api.ecb.europa.eu/service/data/EXR/A.USD.EUR.SP00.A?format=jsondata&lastNObservations=5",
+          "retrieved_at": "2026-10-26T13:54:37.687Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t3-athlone-vs-mullingar": {
+      "tier": "T3",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "athlone_population": 22869,
+        "athlone_median_eur": 251000,
+        "athlone_protected_sites": 10,
+        "mullingar_population": 22667,
+        "mullingar_median_eur": 297500,
+        "mullingar_protected_sites": 1,
+        "higher_median": "Mullingar"
+      },
+      "calls": [
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Athlone"
+          },
+          "url": "https://data.cso.ie/table/F1015",
+          "retrieved_at": "2026-10-26T13:54:37.795Z"
+        },
+        {
+          "source": "ppr",
+          "operation": "ppr_price_stats",
+          "args": {
+            "county": "Westmeath",
+            "address": "Athlone",
+            "from": "2024-01-01",
+            "to": "2024-12-31"
+          },
+          "url": "https://www.propertypriceregister.ie/website/npsra/ppr/npsra-ppr.nsf/Downloads/PPR-2024-Westmeath.csv/$FILE/PPR-2024-Westmeath.csv",
+          "retrieved_at": "2026-10-26T13:54:38.273Z"
+        },
+        {
+          "source": "geohive",
+          "operation": "geohive_locate",
+          "args": {
+            "name": "Athlone",
+            "limit": 10
+          },
+          "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/arcgis/rest/services/Centres_of_Population___OSi_National_Placenames_Gazetteer/FeatureServer/0/query?where=UPPER%28English_Na%29+%3D+%27ATHLONE%27+OR+UPPER%28Irish_Name%29+%3D+%27ATHLONE%27&outFields=English_Na%2CIrish_Name%2CCounty%2CClassifica&outSR=4326&returnGeometry=true&resultRecordCount=10&f=json",
+          "retrieved_at": "2026-10-26T13:54:38.458Z"
+        },
+        {
+          "source": "environment-sites",
+          "operation": "protected_sites_near",
+          "args": {
+            "lat": 53.42393,
+            "lon": -7.94069,
+            "radius_m": 2000,
+            "limit": 50
+          },
+          "url": "https://experience.arcgis.com/experience/edf34d92e28040fd87d3d14f55d8d95f/",
+          "retrieved_at": "2026-10-26T13:54:41.509Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Mullingar"
+          },
+          "url": "https://data.cso.ie/table/F1015",
+          "retrieved_at": "2026-10-26T13:54:42.027Z"
+        },
+        {
+          "source": "ppr",
+          "operation": "ppr_price_stats",
+          "args": {
+            "county": "Westmeath",
+            "address": "Mullingar",
+            "from": "2024-01-01",
+            "to": "2024-12-31"
+          },
+          "url": "https://www.propertypriceregister.ie/website/npsra/ppr/npsra-ppr.nsf/Downloads/PPR-2024-Westmeath.csv/$FILE/PPR-2024-Westmeath.csv",
+          "retrieved_at": "2026-10-26T13:54:42.039Z"
+        },
+        {
+          "source": "geohive",
+          "operation": "geohive_locate",
+          "args": {
+            "name": "Mullingar",
+            "limit": 10
+          },
+          "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/arcgis/rest/services/Centres_of_Population___OSi_National_Placenames_Gazetteer/FeatureServer/0/query?where=UPPER%28English_Na%29+%3D+%27MULLINGAR%27+OR+UPPER%28Irish_Name%29+%3D+%27MULLINGAR%27&outFields=English_Na%2CIrish_Name%2CCounty%2CClassifica&outSR=4326&returnGeometry=true&resultRecordCount=10&f=json",
+          "retrieved_at": "2026-10-26T13:54:42.210Z"
+        },
+        {
+          "source": "environment-sites",
+          "operation": "protected_sites_near",
+          "args": {
+            "lat": 53.52594,
+            "lon": -7.33815,
+            "radius_m": 2000,
+            "limit": 50
+          },
+          "url": "https://experience.arcgis.com/experience/edf34d92e28040fd87d3d14f55d8d95f/",
+          "retrieved_at": "2026-10-26T13:54:44.601Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t3-munster-housing-pressure": {
+      "tier": "T3",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "cork_median_eur": 321586,
+        "cork_completions_per_1000": 6.04,
+        "cork_pop_growth_pct": 7.6,
+        "kerry_median_eur": 250000,
+        "kerry_completions_per_1000": 3.06,
+        "kerry_pop_growth_pct": 5.9,
+        "limerick_median_eur": 280000,
+        "limerick_completions_per_1000": 4.79,
+        "limerick_pop_growth_pct": 7.5,
+        "ranking": [
+          "Cork",
+          "Limerick",
+          "Kerry"
+        ]
+      },
+      "calls": [
+        {
+          "source": "cso",
+          "operation": "cso_get_data",
+          "args": {
+            "table_code": "NDA05",
+            "filters": {
+              "TLIST(A1)": [
+                "2024"
+              ]
+            },
+            "limit": 500
+          },
+          "url": "https://data.cso.ie/table/NDA05",
+          "retrieved_at": "2026-10-26T13:54:44.607Z"
+        },
+        {
+          "source": "ppr",
+          "operation": "ppr_price_stats",
+          "args": {
+            "county": "Cork",
+            "from": "2024-01-01",
+            "to": "2024-12-31"
+          },
+          "url": "https://www.propertypriceregister.ie/website/npsra/ppr/npsra-ppr.nsf/Downloads/PPR-2024-Cork.csv/$FILE/PPR-2024-Cork.csv",
+          "retrieved_at": "2026-10-26T13:54:45.147Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Cork"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:45.149Z"
+        },
+        {
+          "source": "ppr",
+          "operation": "ppr_price_stats",
+          "args": {
+            "county": "Kerry",
+            "from": "2024-01-01",
+            "to": "2024-12-31"
+          },
+          "url": "https://www.propertypriceregister.ie/website/npsra/ppr/npsra-ppr.nsf/Downloads/PPR-2024-Kerry.csv/$FILE/PPR-2024-Kerry.csv",
+          "retrieved_at": "2026-10-26T13:54:45.314Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Kerry"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:45.318Z"
+        },
+        {
+          "source": "ppr",
+          "operation": "ppr_price_stats",
+          "args": {
+            "county": "Limerick",
+            "from": "2024-01-01",
+            "to": "2024-12-31"
+          },
+          "url": "https://www.propertypriceregister.ie/website/npsra/ppr/npsra-ppr.nsf/Downloads/PPR-2024-Limerick.csv/$FILE/PPR-2024-Limerick.csv",
+          "retrieved_at": "2026-10-26T13:54:45.426Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Limerick"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T13:54:45.428Z"
+        }
+      ],
+      "workarounds": [
+        "crosswalk:lea-to-county"
+      ]
+    },
+    "t3-lowest-deprivation-galway-city-td": {
+      "tier": "T3",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "gap": "crosswalk:la-to-eds",
+      "evidence": "no tool lists the electoral divisions of a local authority; pobal_deprivation_search needs a name or id and has no council filter"
+    },
+    "t3-energy-weather-now": {
+      "tier": "T3",
+      "drift": "live",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "wind_share_pct": 41.5,
+        "highest_wave_buoy": "M3",
+        "highest_wave_m": 4.57,
+        "active_warnings": 6,
+        "above_half": false
+      },
+      "calls": [
+        {
+          "source": "eirgrid",
+          "operation": "grid_get_status",
+          "args": {
+            "region": "ALL"
+          },
+          "url": "https://www.smartgriddashboard.com/api/chart/?region=ALL&chartType=default&dateRange=day&dateFrom=25-Oct-2026+00:00&dateTo=25-Oct-2026+23:59&areas=demandactual",
+          "retrieved_at": "2026-10-26T13:54:45.433Z"
+        },
+        {
+          "source": "marine",
+          "operation": "marine_get_buoys",
+          "args": {},
+          "url": "https://erddap.marine.ie/erddap/tabledap/IWBNetwork.csv?station_id%2Ctime%2Clongitude%2Clatitude%2CAtmosphericPressure%2CWindDirection%2CWindSpeed%2CGust%2CWaveHeight%2CWavePeriod%2CAirTemperature%2CSeaTemperature&time%3E=2026-10-26T07:00:00Z",
+          "retrieved_at": "2026-10-26T13:54:45.689Z"
+        },
+        {
+          "source": "met-eireann",
+          "operation": "met_get_warnings",
+          "args": {},
+          "url": "https://www.met.ie/warnings",
+          "retrieved_at": "2026-10-26T13:54:45.955Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t3-galway-planning-act-budget": {
+      "tier": "T3",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "gap": "server-query:count",
+      "evidence": "planning_search caps at 100 rows and has no total; a council-year filter + sum needs server-side aggregation"
+    },
+    "t3-cso-geography-mismatch": {
+      "tier": "T3",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "geohive_small_area": "267147025/02",
+        "cso_small_area": "267147025/03",
+        "cso_small_area_population": 513,
+        "deprivation_label": "Marginally Below Average"
+      },
+      "calls": [
+        {
+          "source": "geohive",
+          "operation": "geohive_boundaries_at_point",
+          "args": {
+            "lat": 53.2859,
+            "lon": -6.3733
+          },
+          "url": "https://www.geohive.ie/",
+          "retrieved_at": "2026-10-26T13:54:46.397Z"
+        },
+        {
+          "source": "census-areas",
+          "operation": "census_small_area_at",
+          "args": {
+            "lat": 53.2859,
+            "lon": -6.3733
+          },
+          "url": "https://services-eu1.arcgis.com/BuS9rtTsYEV5C0xh/arcgis/rest/services/CensusHub2022_T1_1_SA/FeatureServer/0/query?f=json&where=SA_GEOGID_2022%3D%27A267147025%2F03%27&outFields=SA_GEOGID_2022%2CT1_1AGETT%2CT1_1AGETM%2CT1_1AGETF%2CGEOGDESC%2CLOCAL_AUTHORITY%2CCOUNTY%2CNUTS3_NAME&resultRecordCount=1&resultOffset=0&returnGeometry=false",
+          "retrieved_at": "2026-10-26T13:54:47.938Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "267147",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=267147&limit=5",
+          "retrieved_at": "2026-10-26T13:54:48.095Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t3-cib-guidance-with-stats": {
+      "tier": "T3",
+      "drift": "slow",
+      "retrieved": "2026-10-26",
+      "gap": "knowledge:citizens-info",
+      "evidence": "no Citizens Information guidance search/get operation in the catalogue (cib_* tools are query statistics only)"
+    },
+    "t3-section-text-and-stats": {
+      "tier": "T3",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "act_number": 5,
+        "enacted": "2019-03-04",
+        "defines_public_body": true,
+        "acts_2019_total": 53,
+        "datagov_matches": 3103
+      },
+      "calls": [
+        {
+          "source": "legislation",
+          "operation": "legislation_list_acts",
+          "args": {
+            "year": 2019,
+            "query": "Data Sharing and Governance"
+          },
+          "url": "https://www.irishstatutebook.ie/eli/2019/act/",
+          "retrieved_at": "2026-10-26T13:54:48.150Z"
+        },
+        {
+          "source": "legislation",
+          "operation": "legislation_get_act",
+          "args": {
+            "year": 2019,
+            "number": 5,
+            "limit": 1
+          },
+          "url": "https://www.irishstatutebook.ie/eli/2019/act/5/enacted/en/html",
+          "retrieved_at": "2026-10-26T13:54:48.188Z"
+        },
+        {
+          "source": "legislation",
+          "operation": "legislation_get_section",
+          "args": {
+            "year": 2019,
+            "number": 5,
+            "section": "2"
+          },
+          "url": "https://www.irishstatutebook.ie/eli/2019/act/5/section/2/enacted/en/html",
+          "retrieved_at": "2026-10-26T13:54:48.192Z"
+        },
+        {
+          "source": "legislation",
+          "operation": "legislation_list_acts",
+          "args": {
+            "year": 2019,
+            "limit": 1
+          },
+          "url": "https://www.irishstatutebook.ie/eli/2019/act/",
+          "retrieved_at": "2026-10-26T13:54:48.194Z"
+        },
+        {
+          "source": "data-gov-ie",
+          "operation": "datagov_search_datasets",
+          "args": {
+            "query": "data sharing",
+            "limit": 1
+          },
+          "url": "https://data.gov.ie/dataset?q=data%20sharing",
+          "retrieved_at": "2026-10-26T13:54:48.248Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t1-kilkenny-monuments-protected": {
+      "tier": "T1",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "monuments_500m": 45,
+        "protected_sites_2km": 5
+      },
+      "calls": [
+        {
+          "source": "geohive",
+          "operation": "geohive_locate",
+          "args": {
+            "name": "Kilkenny",
+            "limit": 10
+          },
+          "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/arcgis/rest/services/Centres_of_Population___OSi_National_Placenames_Gazetteer/FeatureServer/0/query?where=UPPER%28English_Na%29+%3D+%27KILKENNY%27+OR+UPPER%28Irish_Name%29+%3D+%27KILKENNY%27&outFields=English_Na%2CIrish_Name%2CCounty%2CClassifica&outSR=4326&returnGeometry=true&resultRecordCount=10&f=json",
+          "retrieved_at": "2026-10-26T13:55:37.306Z"
+        },
+        {
+          "source": "heritage",
+          "operation": "heritage_monuments_near",
+          "args": {
+            "lat": 52.65415,
+            "lon": -7.24479,
+            "radius_m": 500,
+            "limit": 500
+          },
+          "url": "https://services-eu1.arcgis.com/HyjXgkV6KGMSF3jt/arcgis/rest/services/SMROpenData/FeatureServer/0/query?f=json&where=1%3D1&outFields=SMRS%2CCOUNTY%2CTOWNLAND%2CMONUMENT_CLASS%2CWEBSITE_LINK%2CLATITUDE%2CLONGITUDE&resultRecordCount=50&resultOffset=0&returnGeometry=false&geometry=-7.24479%2C52.65415&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&distance=500&units=esriSRUnit_Meter",
+          "retrieved_at": "2026-10-26T13:55:38.563Z"
+        },
+        {
+          "source": "environment-sites",
+          "operation": "protected_sites_near",
+          "args": {
+            "lat": 52.65415,
+            "lon": -7.24479,
+            "radius_m": 2000,
+            "limit": 50
+          },
+          "url": "https://experience.arcgis.com/experience/edf34d92e28040fd87d3d14f55d8d95f/",
+          "retrieved_at": "2026-10-26T13:55:41.745Z"
+        }
+      ],
+      "workarounds": []
+    },
+    "t2-cib-social-welfare-vs-ja": {
+      "tier": "T2",
+      "drift": "stable",
+      "retrieved": "2026-10-26",
+      "expected": {
+        "cib_social_welfare_change_pct": -15.3,
+        "social_welfare_share_2025_pct": 44.5,
+        "ja_change_pct": -13,
+        "same_direction": true
+      },
+      "calls": [
+        {
+          "source": "cib",
+          "operation": "cib_cis_query_categories",
+          "args": {
+            "year": 2023,
+            "category": "Social Welfare"
+          },
+          "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2023-v3.docx",
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
+        },
+        {
+          "source": "cib",
+          "operation": "cib_cis_query_categories",
+          "args": {
+            "year": 2025,
+            "category": "Social Welfare"
+          },
+          "url": "https://www.citizensinformationboard.ie/downloads/datahub/query-categories-2025.docx",
+          "retrieved_at": "2026-10-26T14:12:02.636Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_table_metadata",
+          "args": {
+            "table_code": "DSP24",
+            "max_categories": 60
+          },
+          "url": "https://data.cso.ie/table/DSP24",
+          "retrieved_at": "2026-10-26T14:54:13.003Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_get_data",
+          "args": {
+            "table_code": "DSP24",
+            "filters": {
+              "TLIST(Q1)": [
+                "2023Q2",
+                "2025Q2"
+              ],
+              "C03824V04573": [
+                "110"
+              ],
+              "C03788V04538": [
+                "IE0"
+              ]
+            },
+            "limit": 500
+          },
+          "url": "https://data.cso.ie/table/DSP24",
+          "retrieved_at": "2026-10-26T14:54:13.352Z"
+        }
+      ],
+      "workarounds": []
+    }
+  }
+}

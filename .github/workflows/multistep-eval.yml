@@ -1,0 +1,45 @@
+name: Multi-step benchmark
+
+# Nightly references-only run of the hard multi-step benchmark (evals/multistep). It needs no model
+# key: it recomputes every reference answer through the real tools and reports which items are
+# answerable, which need workarounds, and which are blocked by a capability gap. Upstream outages
+# show as upstream_error and never fail the run. The report is uploaded as an artifact.
+on:
+  schedule:
+    - cron: "45 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: multistep-eval
+  cancel-in-progress: true
+
+jobs:
+  references:
+    # Maintainer-only: skipped on forks.
+    if: github.repository == 'c-mongan/ireland-mcp'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Scorer and item checks (offline)
+        run: npm run eval:multistep:test
+      - name: Recompute references (local stdio server)
+        run: npm run -s eval:multistep -- --out multistep-out --delay-ms 200
+      - name: Keep the report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: multistep-references-${{ github.run_id }}
+          path: multistep-out/
+          retention-days: 30
+      - name: Summary
+        if: always()
+        run: cat multistep-out/*.md >> "$GITHUB_STEP_SUMMARY" || true
