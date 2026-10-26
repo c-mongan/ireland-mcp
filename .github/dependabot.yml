@@ -5,6 +5,13 @@ updates:
     schedule:
       interval: weekly
     groups:
+      # OpenTelemetry packages share a pinned @opentelemetry/api peer range, so a
+      # lone bump fails npm ERESOLVE. Update them with the Azure Monitor distro,
+      # which pins the runtime SDK (and therefore the api) version.
+      opentelemetry:
+        patterns:
+          - "@opentelemetry/*"
+          - "@azure/monitor-opentelemetry"
       minor-and-patch:
         update-types: [minor, patch]
     ignore:
@@ -12,6 +19,15 @@ updates:
       - dependency-name: "@types/node"
         update-types: [version-update:semver-major]
       - dependency-name: typescript
+        update-types: [version-update:semver-major]
+      # @azure/monitor-opentelemetry 1.20.1 still needs OpenTelemetry SDK 2.x,
+      # which requires @opentelemetry/api below 1.10. Remove these when the
+      # distro supports api 1.10 and SDK 3.x.
+      - dependency-name: "@opentelemetry/api"
+        versions: [">=1.10.0"]
+      - dependency-name: "@opentelemetry/sdk-metrics"
+        update-types: [version-update:semver-major]
+      - dependency-name: "@opentelemetry/sdk-trace-base"
         update-types: [version-update:semver-major]
   - package-ecosystem: github-actions
     directory: /
