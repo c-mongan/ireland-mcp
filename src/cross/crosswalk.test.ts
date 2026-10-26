@@ -123,6 +123,9 @@ describe("crosswalk lookups", () => {
   it("builds compact codes for the nearby and snapshot tools", () => {
     expect(codesForEd("268106")).toMatchObject({ ed: { id: "268106", name: "North City" }, lea: "North Inner City", dail_constituency: "Dublin Central", county: "Dublin", nuts3: "IE061 Dublin" });
     expect(codesForEd("nope")).toBeUndefined();
+    // GeoHive's pre-2022 id for Douglas now names only the Cork County remainder; a Cork City point must not get it.
+    expect(codesForEd("047132", "Cork County Council")).toBeTruthy();
+    expect(codesForEd("047132", "Cork City Council")).toBeUndefined();
   });
 });
 
@@ -193,6 +196,22 @@ describe("ireland_resolve_place", () => {
     expect(ok).toBe(true);
     expect(body.data.match.via).toBe("small_area_code");
     expect(body.data.small_area.code).toBe("267065001/02");
+  });
+
+  it("accepts a council as the qualifier for a gazetteer town", async () => {
+    const fetch = fakeFetch([
+      {
+        match: (url) => url.includes("Centres_of_Population") && url.includes("MALAHIDE"),
+        body: JSON.stringify({ features: [{ attributes: { English_Na: "Malahide", Irish_Name: "Mullach Íde", County: "DUBLIN", Classifica: "CoP" }, geometry: { x: -6.15, y: 53.45 } }] })
+      },
+      { match: (url) => url.includes("SMALL_AREA_2022"), body: features([{ SA_PUB2022: "267105001", SA_GEOGID_2022: "A267105001", ED_ID_STR: "267105" }]) },
+      { match: (url) => url.includes("CensusHub2022_T1_1_SA"), body: features([{ SA_GEOGID_2022: "A267105001", T1_1AGETT: 200 }]) }
+    ]);
+    const ok = await resolve({ place: "Malahide, Fingal" }, fetch);
+    expect(ok.body.data.match.gazetteer).toMatchObject({ name: "Malahide", county: "Dublin" });
+    expect(ok.body.data.codes.local_authority[0].name).toBe("Fingal County Council");
+    const wrong = await resolve({ place: "Malahide, Kerry" }, fetch);
+    expect(wrong.body.error.message).toMatch(/in the gazetteer, but not in Kerry/);
   });
 
   it("rejects bad combinations", async () => {

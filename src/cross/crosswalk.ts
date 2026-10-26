@@ -157,6 +157,24 @@ export function findEntities(query: string, level?: CrosswalkLevel): Entity[] {
   return [...hits].sort((a, b) => LEVEL_RANK[a.level] - LEVEL_RANK[b.level] || a.name.localeCompare(b.name));
 }
 
+/** Counties named by a county or council qualifier ("Fingal" → Dublin, "Co. Galway" → Galway). */
+export function countiesNamedBy(qualifier: string): string[] {
+  const x = loadCrosswalk();
+  const hits = x.byKey.get(placeKey(qualifier)) ?? [];
+  const names = hits.flatMap((e) => {
+    if (e.level === "county") return [e.name];
+    if (e.level === "local_authority") return [x.snapshot.counties[x.snapshot.local_authorities[e.index]!.county]!.name];
+    return [];
+  });
+  return [...new Set(names)];
+}
+
+/** The local authority an ED belongs to. */
+export function edLocalAuthority(ed: Entity): string {
+  const x = loadCrosswalk();
+  return x.snapshot.local_authorities[x.snapshot.eds[ed.index]![3]]!.name;
+}
+
 export function edById(id: string): Entity | undefined {
   const x = loadCrosswalk();
   // Pobal and some spreadsheets drop the leading zero ("68001" for "068001").

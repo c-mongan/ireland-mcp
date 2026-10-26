@@ -5,11 +5,13 @@ import { defineTool } from "../gateway/module.js";
 import { smallAreaAt, smallAreaByCode } from "../sources/census-areas/index.js";
 import { assertInIreland, locatePlace } from "../sources/geohive/index.js";
 import {
+  countiesNamedBy,
   crosswalkMeta,
   CROSSWALK_FILE,
   CROSSWALK_LEVELS,
   dublinDistrictEds,
   edById,
+  edLocalAuthority,
   findEntities,
   listChildren,
   profileEds,
@@ -17,7 +19,7 @@ import {
   type CrosswalkLevel,
   type Entity
 } from "./crosswalk.js";
-import { dublinDistrict, routingKey, splitQualifier, stripDecorations } from "./names.js";
+import { dublinDistrict, foldName, routingKey, splitQualifier, stripDecorations } from "./names.js";
 
 export const crosswalkInfo: SourceInfo = {
   id: "cross",
@@ -32,10 +34,15 @@ const MAX_CANDIDATES = 10;
 
 const describe = (e: Entity) => ({ level: e.level, name: e.name, ...(e.code ? { code: e.code } : {}) });
 
-/** Compact codes for an ED id, for the nearby and snapshot tools. Undefined when the id is unknown. */
-export function codesForEd(edId: string | null | undefined) {
+/**
+ * Compact codes for an ED id, for the nearby and snapshot tools. Undefined when the id is unknown.
+ * GeoHive's ED layer predates Census 2022: where the 2019 Cork city extension split an ED, the old id
+ * now names only the county remainder. Passing the boundary's local authority rejects such mismatches.
+ */
+export function codesForEd(edId: string | null | undefined, localAuthority?: string | null) {
   const ed = edId ? edById(edId) : undefined;
   if (!ed) return undefined;
+  if (localAuthority && foldName(localAuthority) !== foldName(edLocalAuthority(ed))) return undefined;
   const p = profileEntity(ed, 3);
   const one = (level: CrosswalkLevel) => p.codes[level]?.map((c) => (c.share < 1 ? `${c.name} (${Math.round(c.share * 100)}%)` : c.name)).join("; ") ?? null;
   return {
@@ -136,8 +143,13 @@ export const resolvePlaceTool = defineTool({
           const q = splitQualifier(text);
           const name = stripDecorations(q?.name ?? text);
           const found = await locatePlace(ctx, name, 10).catch(() => null);
-          const county = q ? stripDecorations(q.qualifier).toLowerCase().replace(/ (city|county)( and county)?$/, "") : null;
-          const hit = found?.places.find((p) => !county || p.county?.toLowerCase() === county) ?? (county ? undefined : found?.places[0]);
+          const counties = q ? countiesNamedBy(q.qualifier).map(foldName) : null;
+          const hit = found?.places.find((p) => !counties?.length || counties.includes(foldName(p.county ?? ""))) ?? (counties?.length ? undefined : found?.places[0]);
+          if (found && !hit) {
+            throw new ToolError("NOT_FOUND", `"${q?.name ?? text}" is in the gazetteer, but not in ${q?.qualifier}.`, {
+              hint: `Gazetteer matches: ${found.places.slice(0, 5).map((p) => `${p.name}, Co. ${p.county}`).join("; ")}.`
+            });
+          }
           if (!hit) {
             throw new ToolError("NOT_FOUND", `"${text}" is not a county, council, LEA, constituency, NUTS3 region or ED, and is not in the Tailte Éireann gazetteer.`, {
               hint: "Check the spelling, try the Irish name, or give lat and lon."

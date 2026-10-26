@@ -114,10 +114,12 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
   async function nearbyData(ctx: ToolContext, lat: number, lon: number, hours: number) {
     const station = nearestStation(lat, lon);
     const [bounds, forecast] = await Promise.allSettled([boundariesAt(ctx, lat, lon), forecastAt(ctx, lat, lon, hours)]);
-    const edId = bounds.status === "fulfilled" ? (bounds.value.boundaries.electoral_division as { ed_id?: string } | null)?.ed_id : undefined;
+    const b = bounds.status === "fulfilled" ? bounds.value.boundaries : undefined;
+    const edId = (b?.electoral_division as { ed_id?: string } | null | undefined)?.ed_id;
+    const la = (b?.local_authority as { name?: string } | null | undefined)?.name;
     return {
       boundaries: bounds.status === "fulfilled" ? bounds.value.boundaries : settledSection(bounds),
-      codes: codesForEd(edId) ?? null,
+      codes: codesForEd(edId, la) ?? null,
       nearest_met_station: station,
       forecast: forecast.status === "fulfilled" ? { model_run: forecast.value.model_run, hours: forecast.value.items } : settledSection(forecast),
       stale: [bounds, forecast].some((s) => s.status === "fulfilled" && s.value.stale),
