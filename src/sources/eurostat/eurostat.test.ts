@@ -24,6 +24,19 @@ describe("eurostat source", () => {
     expect(fetch.calls[0]?.url).toContain("catalogue/toc/txt");
   });
 
+  it("fetches the ids its search returns", async () => {
+    const ctx = createContext({ fetch: fakeFetch([{ match: /catalogue\/toc/, file: fixturePath(import.meta.url, "toc.txt") }]) });
+    const [hit] = await eurostatModule.search!("population", 1, ctx);
+    expect(hit?.id).toBe("eurostat:demo_pjan");
+    const doc = await eurostatModule.fetchById!(hit!.id.slice("eurostat:".length), ctx);
+    expect(doc).toMatchObject({ id: "eurostat:demo_pjan", title: "Population on 1 January by age and sex", url: hit!.url });
+    expect(doc.text).toContain("eurostat_get_data");
+    expect(doc.metadata).toMatchObject({ licence: eurostatModule.info.licence, attribution: eurostatModule.info.attribution });
+    expect((await eurostatModule.fetchById!("DEMO_PJAN", ctx)).id).toBe("eurostat:demo_pjan");
+    await expect(eurostatModule.fetchById!("nope", ctx)).rejects.toMatchObject({ code: "NOT_FOUND" });
+    await expect(eurostatModule.fetchById!("../x", ctx)).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+
   it("fetches and decodes compact JSON-stat data for Ireland", async () => {
     const fetch = fakeFetch([{ match: /statistics\/1\.0\/data\/demo_pjan/, file: fixturePath(import.meta.url, "demo_pjan-ie-2024.json") }]);
     const { body } = await callTool<EurostatBody>(

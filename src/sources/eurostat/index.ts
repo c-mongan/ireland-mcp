@@ -2,7 +2,7 @@ import { z } from "zod";
 import { DAY } from "../../gateway/context.js";
 import { bound, envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
-import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
+import { defineTool, type FetchedDocument, type SourceModule, type ToolContext } from "../../gateway/module.js";
 import { assertJsonStat, cellCount, dimensions, rows, type JsonStat } from "../cso/jsonStat.js";
 
 const API = "https://ec.europa.eu/eurostat/api/dissemination";
@@ -56,6 +56,8 @@ function parseToc(text: string): TocRow[] {
   });
 }
 
+const databrowserUrl = (code: string) => `https://ec.europa.eu/eurostat/databrowser/view/${code}/default/table?lang=en`;
+
 async function readToc(ctx: ToolContext) {
   return ctx.cachedText(TOC_URL, DAY, { label: "Eurostat catalogue", timeoutMs: 8_000, maxBytes: 8_000_000 });
 }
@@ -105,7 +107,7 @@ const searchTool = defineTool({
     const matches = parseToc(toc.value)
       .filter((row) => row.type === "table")
       .filter((row) => terms.every((t) => `${row.title} ${row.code}`.toLowerCase().includes(t)))
-      .map((row) => ({ ...row, url: `https://ec.europa.eu/eurostat/databrowser/view/${row.code}/default/table?lang=en` }));
+      .map((row) => ({ ...row, url: databrowserUrl(row.code) }));
     const { items, truncated } = bound(matches, max);
     return envelope(eurostatInfo, { data: { query, datasets: items, total: matches.length }, url: TOC_URL, cached: toc.cached, stale: toc.stale, truncated });
   }
@@ -173,7 +175,29 @@ async function search(query: string, max: number, ctx: ToolContext) {
     .filter((row) => row.type === "table")
     .filter((row) => `${row.title} ${row.code}`.toLowerCase().includes(query.toLowerCase()))
     .slice(0, max)
-    .map((row) => ({ id: `eurostat:${row.code}`, title: `${row.title} (Eurostat ${row.code})`, url: `https://ec.europa.eu/eurostat/databrowser/view/${row.code}/default/table?lang=en` }));
+    .map((row) => ({ id: `eurostat:${row.code}`, title: `${row.title} (Eurostat ${row.code})`, url: databrowserUrl(row.code) }));
+}
+
+async function fetchById(key: string, ctx: ToolContext): Promise<FetchedDocument> {
+  const toc = await readToc(ctx);
+  const row = /^[A-Za-z0-9_]{2,80}$/.test(key)
+    ? parseToc(toc.value).find((r) => r.type === "table" && r.code.toLowerCase() === key.toLowerCase())
+    : undefined;
+  if (!row) throw new ToolError("NOT_FOUND", `No Eurostat dataset "${key}" in the catalogue.`, { hint: "Use ids like 'eurostat:demo_pjan' from search." });
+  const text = [
+    `${row.title} (Eurostat ${row.code})`,
+    `Last data update: ${row.updated ?? "unknown"}`,
+    `Period: ${row.start ?? "?"} to ${row.end ?? "?"}`,
+    `Values: ${row.values ?? "unknown"}`,
+    `Query it with ireland_call {source:"eurostat", operation:"eurostat_get_data", args:{dataset:"${row.code}"}}.`
+  ].join("\n");
+  return {
+    id: `eurostat:${row.code}`,
+    title: row.title,
+    text,
+    url: databrowserUrl(row.code),
+    metadata: { source: eurostatInfo.name, licence: eurostatInfo.licence, attribution: eurostatInfo.attribution, api: TOC_URL, cached: toc.cached, stale: toc.stale }
+  };
 }
 
 export const eurostatModule: SourceModule = {
@@ -182,5 +206,6 @@ export const eurostatModule: SourceModule = {
   domain: "stats",
   coverage: "Eurostat datasets where Ireland (geo=IE) is published, with optional EU aggregate comparison and time filters.",
   tools: [searchTool, dataTool, compareTool],
-  search
+  search,
+  fetchById
 };

@@ -41,6 +41,21 @@ describe("wikidata source", () => {
     expect(result.body.cached).toBe(false);
   });
 
+  it("fetches the ids its search returns", async () => {
+    const entity = { id: "Q129610", labels: { en: { value: "Galway" } }, descriptions: { en: { value: "city in Ireland" } }, claims: {} };
+    const ctx = createContext({ fetch: fakeFetch([
+      { match: /query\.wikidata\.org\/sparql/, file: fixturePath(import.meta.url, "galway-simple.json") },
+      { match: /www\.wikidata\.org\/w\/api\.php/, body: JSON.stringify({ entities: { Q129610: entity } }) }
+    ]) });
+    const [hit] = await wikidataModule.search!("Galway", 1, ctx);
+    expect(hit?.id).toBe("wikidata:Q129610");
+    const doc = await wikidataModule.fetchById!(hit!.id.slice("wikidata:".length), ctx);
+    expect(doc).toMatchObject({ id: "wikidata:Q129610", title: "Galway (Wikidata Q129610)", url: "https://www.wikidata.org/wiki/Q129610" });
+    expect(doc.text).toContain("city in Ireland");
+    expect(doc.metadata).toMatchObject({ licence: wikidataModule.info.licence, attribution: wikidataModule.info.attribution });
+    await expect(wikidataModule.fetchById!("abc", ctx)).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+
   it.each([
     [{ entities: { Q27: { id: "Q27", missing: "" } } }, "NOT_FOUND"],
     [{ error: { code: "maxlag" } }, "UPSTREAM_DOWN"],

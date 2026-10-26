@@ -188,7 +188,7 @@ Need typed tools anyway?
 
 New sources are the most useful contribution. [Request one](https://github.com/c-mongan/ireland-mcp/issues/new?template=source_request.yml), or add it yourself:
 
-1. Create `src/sources/<id>/index.ts` exporting a `SourceModule` with `info`, `summary`, `domain`, `coverage`, tools, optional `search()` and `fetchById()`.
+1. Create `src/sources/<id>/index.ts` exporting a `SourceModule` with `info`, `summary`, `domain`, `coverage`, tools, optional `search()` and `fetchById()`. A source with `search()` must also implement `fetchById()` for the ids it returns.
 2. Keep every tool name source-prefixed, validate args with zod and return the evidence envelope with source URL, licence and attribution.
 3. Use `ctx.cachedJson` / `ctx.cachedText` so upstream budgets, caching, circuit breakers and stale fallback apply.
 4. Add fixtures and tests at the module seam, then add a server-level `ireland_call` test when useful.

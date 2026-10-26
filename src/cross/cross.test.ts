@@ -77,6 +77,22 @@ describe("cross-source tools", () => {
     expect((await call(tools, "fetch", { id: "zzz:1" }, ctx)).body.error.code).toBe("NOT_FOUND");
   });
 
+  it("fetch rejects an empty key and lists only fetchable sources in its hint", async () => {
+    const searchOnly: SourceModule = { ...fakeModule("s", 1), fetchById: undefined };
+    const tools = crossSourceTools([fakeModule("a", 1), searchOnly]);
+    for (const id of ["a:", "a:   "]) {
+      const { body } = await call(tools, "fetch", { id }, ctx);
+      expect(body.error.code).toBe("BAD_ARGS");
+    }
+    const unknown = (await call(tools, "fetch", { id: "nope:1" }, ctx)).body;
+    expect(unknown.error.code).toBe("NOT_FOUND");
+    expect(unknown.error.hint).toContain("Fetchable sources: a.");
+  });
+
+  it("every registered searchable source can fetch the ids its search returns", () => {
+    expect(sourceModules.filter((m) => m.search && !m.fetchById).map((m) => m.info.id)).toEqual([]);
+  });
+
   it("list_sources covers every registered module with licences and tools", async () => {
     const { body } = await call(crossSourceTools(sourceModules), "list_sources", { max_tokens: 8000 }, ctx);
     expect(body.truncated).toBe(false);
