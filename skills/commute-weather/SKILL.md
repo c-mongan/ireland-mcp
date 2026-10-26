@@ -8,6 +8,10 @@ license: MIT
 
 Answer "how is my journey looking right now?" with live, timestamped data.
 
+**Related projects:** [EZ Commute IE](https://ezcommute.ie/) (Rituraj Sambherao),
+[Live Dublin Trains](https://www.jake.ie/trains) (Jake McDermott). Not affiliated; see
+[../_shared/inspirations.md](../_shared/inspirations.md).
+
 ## Calling the tools
 
 Steps name each operation as source/operation (e.g. `ppr/ppr_price_stats`), using the typed tool name as the operation. On the

@@ -8,6 +8,9 @@ license: MIT
 
 Produce a short, sourced profile of one place in Ireland.
 
+**Related projects:** [Civgraph](https://civgraph.net/) (Scott Moore). Not affiliated; see
+[../_shared/inspirations.md](../_shared/inspirations.md).
+
 ## Calling the tools
 
 Steps name each operation as source/operation (e.g. `ppr/ppr_price_stats`), using the typed tool name as the operation. On the

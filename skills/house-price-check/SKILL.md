@@ -8,6 +8,11 @@ license: MIT
 
 Summarise what homes actually sold for, using the Residential Property Price Register.
 
+**Related projects:** [Property Price Register API](https://priceregister.civictech.ie/) (CivicTech.ie),
+[HousePrice.ie](https://houseprice.ie/) (u/hungry475), [PropertyLab](https://propertylab.ie/) (u/dylgarr),
+[Ireland Property Price Atlas](https://propertypriceireland.com) (Ireland Property Price Atlas). Not affiliated;
+see [../_shared/inspirations.md](../_shared/inspirations.md).
+
 ## Calling the tools
 
 Steps name each operation as source/operation (e.g. `ppr/ppr_price_stats`), using the typed tool name as the operation. On the

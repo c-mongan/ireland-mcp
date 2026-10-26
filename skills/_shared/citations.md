@@ -42,6 +42,16 @@ retrieved_at, and sometimes `stale`). Use it. These rules apply to every skill i
 | `epa` | Environmental Protection Agency Ireland | CC BY 4.0 | EPA Water Framework Directive open data |
 | `cro` | Companies Registration Office | CC BY 4.0 | Companies Registration Office open data |
 | `kohesio` | European Commission | EU reuse policy / CC BY 4.0 compatible | European Commission, Kohesio platform |
+| `lobbying` | Standards in Public Office Commission (Lobbying.ie) | PSI General Licence | Contains data from the Register of Lobbying, © Standards in Public Office Commission, published on Lobbying.ie |
+| `paygap` | PayGap.ie (Irish Gender Pay Gap Portal) | CC0 1.0 (attribution requested); employer reports keep their own terms | Source: Irish Gender Pay Gap Portal (PayGap.ie) |
+| `council-budgets` | Department of Housing, Local Government and Heritage | CC BY-SA 4.0 | Source: Department of Housing, Local Government and Heritage, Local Authority and Regional Assembly Annual Budgets, CC BY-SA 4.0 |
+| `ted` | Publications Office of the European Union | CC BY 4.0 (EU reuse policy) | Source: Tenders Electronic Daily (TED), Publications Office of the EU |
+| `eurostat` | Eurostat, European Commission | Eurostat reuse policy (acknowledgement) | Source: Eurostat |
+| `ncse` | National Council for Special Education | CC BY (see dataset) | School allocation data © National Council for Special Education |
+| `tfi-static` | National Transport Authority | CC BY 4.0 | Contains NTA (Transport for Ireland) data, CC BY 4.0 |
+| `gsi` | Geological Survey Ireland | CC BY 4.0 | Contains Irish Public Sector Data (Geological Survey Ireland), CC BY 4.0 |
+| `wikidata` | Wikidata contributors | CC0 1.0 | Source: Wikidata (CC0) |
+| CSO-hosted tables from other bodies (e.g. RTB rents RIQ02, RSA road tables ROA) | The body named in the table's publisher field | CC BY 4.0 | Name that body, then "via CSO PxStat" |
 | `data-gov-ie`, `smart-dublin` | Each dataset's publisher | Per dataset (mostly CC BY 4.0) | Name the dataset publisher and its licence field |
 
 If the tool's `source.attribution` differs from this table, the tool wins.

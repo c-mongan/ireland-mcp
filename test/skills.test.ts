@@ -7,9 +7,13 @@ import { appModules } from "../src/registry.js";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const skillsDir = join(root, "skills");
 
+// Opt-in beta sources (LEGAL_ENABLED) are not on the hosted endpoint, so skills must not depend on them.
+const BETA_SOURCES = new Set(["irish-legal", "citizens-info"]);
 // ireland_call dispatches to these (source -> operation) pairs; "cross" holds nearby, ireland_snapshot, list_sources.
 const ops = new Map<string, Set<string>>();
-for (const mod of appModules().modules) ops.set(mod.info.id, new Set(mod.tools.map((tool) => tool.name)));
+for (const mod of appModules().modules) {
+  if (!BETA_SOURCES.has(mod.info.id)) ops.set(mod.info.id, new Set(mod.tools.map((tool) => tool.name)));
+}
 const allOps = new Set([...ops.values()].flatMap((set) => [...set]));
 const META_TOOLS = ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about", "search", "fetch", "nearby"];
 
@@ -20,6 +24,24 @@ function skillFolders(): string[] {
     .filter((name) => statSync(join(skillsDir, name)).isDirectory())
     .sort();
 }
+
+interface InspirationRow { url: string; skills: string[] }
+
+/** Rows of the mapping table in skills/_shared/inspirations.md, keyed by project name. */
+function parseInspirations(): Map<string, InspirationRow> {
+  const rows = new Map<string, InspirationRow>();
+  const path = join(skillsDir, "_shared", "inspirations.md");
+  if (!existsSync(path)) return rows;
+  for (const line of readFileSync(path, "utf8").split(/\r?\n/)) {
+    const m = /^\| \[([^\]]+)\]\(([^)]+)\) \|(.*)\|\s*$/.exec(line);
+    if (!m) continue;
+    const cells = (m[3] ?? "").split(" | ").map((cell) => cell.trim());
+    const skills = (cells[3] ?? "").split(",").map((skill) => skill.trim()).filter(Boolean);
+    rows.set(m[1] ?? "", { url: m[2] ?? "", skills });
+  }
+  return rows;
+}
+const inspirationRows = parseInspirations();
 
 function parseFrontmatter(text: string): { meta: Record<string, string>; body: string } | undefined {
   const match = /^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/.exec(text);
@@ -71,6 +93,17 @@ function checkRef(ref: OpRef): void {
 describe("skills pack", () => {
   const folders = skillFolders();
 
+  it("ships the civic-data skills", () => {
+    for (const name of [
+      "compare-two-areas", "where-to-live-shortlist", "local-election-brief", "oireachtas-tracker", "lobbying-watch",
+      "council-budget-compare", "public-money-tracker", "eu-funding-finder", "pay-gap-compare", "planning-and-heritage-near-me",
+      "transport-reliability-check", "safety-stats", "energy-and-grid-explainer", "housing-supply-tracker", "derelict-and-vacancy",
+      "rights-check"
+    ]) {
+      expect(folders).toContain(name);
+    }
+  });
+
   it("ships the core skills", () => {
     for (const name of ["irish-area-report", "house-price-check", "td-briefing", "commute-weather", "grid-now", "flood-watch", "cso-chart"]) {
       expect(folders).toContain(name);
@@ -119,6 +152,50 @@ describe("skills pack", () => {
     for (const m of text.matchAll(/`(ireland_[a-z0-9_]+)\b/g)) {
       expect([...META_TOOLS, ...allOps], `${name}: unknown tool ${m[1]}`).toContain(m[1]);
     }
+  });
+
+  it.each(folders.map((name) => [name]))("%s does not depend on opt-in beta sources", (name) => {
+    const text = markdownFiles(join(skillsDir, name)).map((file) => readFileSync(file, "utf8")).join("\n");
+    for (const id of BETA_SOURCES) {
+      expect(text, `${name} names beta source ${id}`).not.toMatch(new RegExp(`\`${id}/|"source":\\s*"${id}"`));
+    }
+    expect(text).not.toMatch(/\b(citizens_info|irish_legal)_[a-z_]+/);
+  });
+
+  it.each(folders.map((name) => [name]))("%s credits related projects consistently with inspirations.md", (name) => {
+    const text = readFileSync(join(skillsDir, name, "SKILL.md"), "utf8");
+    const match = /^\*\*Related projects:\*\* ([\s\S]*?)(?:\r?\n\r?\n|(?![\s\S]))/m.exec(text);
+    expect(match, `${name}: missing "**Related projects:**" line`).not.toBeNull();
+    const line = (match?.[1] ?? "").replace(/\s+/g, " ");
+    const links = [...line.matchAll(/\[([^\]]+)\]\((https:\/\/[^)]+)\)/g)].filter((m) => !(m[2] ?? "").includes("inspirations.md"));
+    if (links.length === 0) {
+      expect(line, `${name}: no project links, so the line must start with "None"`).toMatch(/^None/);
+      return;
+    }
+    expect(line).toContain("Not affiliated");
+    for (const [, project, url] of links) {
+      const row = inspirationRows.get(project ?? "");
+      expect(row, `${name}: "${project}" is not a row in _shared/inspirations.md`).toBeDefined();
+      expect(row?.url).toBe(url);
+      expect(row?.skills, `${name}: inspirations.md row "${project}" does not list this skill`).toContain(name);
+    }
+  });
+
+  it("inspirations.md rows link https sites and name real skills that credit them back", () => {
+    expect(inspirationRows.size).toBeGreaterThanOrEqual(10);
+    for (const [project, row] of inspirationRows) {
+      expect(row.url, project).toMatch(/^https:\/\//);
+      for (const skill of row.skills) {
+        expect(folders, `${project}: unknown skill ${skill}`).toContain(skill);
+        expect(readFileSync(join(skillsDir, skill, "SKILL.md"), "utf8"), `${skill} should credit ${project}`).toContain(`[${project}](${row.url})`);
+      }
+    }
+  });
+
+  it("docs/plugins.md lists exactly the shipped skills", () => {
+    const docs = readFileSync(join(root, "docs", "plugins.md"), "utf8");
+    const listed = [...docs.matchAll(/^\| `([a-z0-9-]+)` \|/gm)].map((m) => m[1]).sort();
+    expect(listed).toEqual(folders);
   });
 
   it("shared references only name real ops", () => {
@@ -183,6 +260,14 @@ describe("plugin manifests", () => {
     const spec = readJson("mcp.json") as { mcpServers: Record<string, { type: string; url: string }> };
     expect(spec.mcpServers.ireland?.type).toBe("streamable-http");
     expect(spec.mcpServers.ireland?.url).toBe(claude.mcpServers.ireland?.url);
+  });
+
+  it("plugin versions agree across manifests", () => {
+    const { name, version } = readJson("plugin.json");
+    expect(version).toMatch(/^\d+\.\d+\.\d+$/);
+    expect(readJson(".claude-plugin/plugin.json").version).toBe(version);
+    const market = readJson(".claude-plugin/marketplace.json") as { plugins: { name: string; version?: string }[] };
+    expect(market.plugins.find((p) => p.name === name)?.version).toBe(version);
   });
 
   it("install docs exist", () => {
