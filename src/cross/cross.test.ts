@@ -111,7 +111,8 @@ describe("cross-source tools", () => {
     expect(body.data.national_warnings).toHaveLength(1);
     expect(body.data.national_warnings[0].type).toBe("Wind");
     expect(body.truncated).toBe(false);
-    expect(body.data.sources.map((s: { source: string }) => s.source)).toHaveLength(3);
+    expect(body.data.codes).toMatchObject({ ed: { id: "268106" }, lea: "North Inner City", dail_constituency: "Dublin Central", nuts3: "IE061 Dublin" });
+    expect(body.data.sources.map((s: { source: string }) => s.source)).toHaveLength(4);
   });
 
   it("ireland_snapshot finds places outside the built-in list through the Tailte Éireann gazetteer", async () => {
@@ -142,10 +143,12 @@ describe("cross-source tools", () => {
     const tools = crossSourceTools(sourceModules);
     const { body } = await call(tools, "nearby", { lat: 53.3498, lon: -6.2603, hours: 3 }, createContext({ fetch: fakeFetch(routes) }));
     expect(body.data.boundaries.local_authority).toBeTruthy();
+    expect(body.data.codes).toMatchObject({ ed: { id: "268106", name: "North City" }, local_authority: "Dublin City Council", county: "Dublin" });
     expect(body.data.forecast.hours).toHaveLength(3);
     expect(body.data.monuments.error).toBeTruthy();
     const far = await call(tools, "nearby", { lat: 48.85, lon: 2.35 }, ctx);
     expect(far.body.data.boundaries.error.code).toBe("BAD_ARGS");
+    expect(far.body.data.codes).toBeNull();
   });
 
   it("nearby adds monuments within 500 m and the protected sites at the point, with citations", async () => {

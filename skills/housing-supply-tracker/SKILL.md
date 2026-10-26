@@ -38,8 +38,10 @@ with the same `args`.
 
 ## Steps
 
-1. **Name the area.** For an address, `geohive/geohive_boundaries_at_point` gives local authority and
-   LEA. Keep exact names (e.g. "Galway City Council", "Galway City West").
+1. **Name the area.** Call `ireland_resolve_place` with the place, a council, an LEA, or `lat`/`lon` for
+   an address. Keep the exact local authority and LEA names (e.g. "Galway City Council", "Galway City
+   West"). NDA05 labels LEAs as "<LEA>, <council>" (e.g. "Galway City West, Galway City");
+   `ireland_resolve_place` accepts that form too. To list a council's LEAs, pass `"list": "lea"`.
 2. **Codes.** Call `cso/cso_get_table_metadata` for each table and note the area's category code
    (local authority codes look like "2ae19629-...") and the latest periods.
 3. **Completions.** `cso/cso_get_data` on NDQ05 (or NDA05 for an LEA) filtered to the area and the last
@@ -53,7 +55,10 @@ with the same `args`.
 7. **Pipeline (optional).** `planning/planning_search` with `{ "council", "text": "houses", "from" }` to list
    recent large residential applications; counts here are applications, not permissions or homes.
 8. **Ranking across LEAs (optional).** Fetch NDA05 for all LEAs in one council, sort by completions and
-   show the full list, not just the top or bottom.
+   show the full list, not just the top or bottom. To roll LEAs up to a county, list the county's LEAs
+   with `ireland_resolve_place` (`"list": "lea"`) rather than guessing from council names.
+9. **Rents by LEA are not available.** RTB rents in CSO (RIQ02/RIA02) are by county, town and
+   neighbourhood, not LEA. Report the town or county rent and say it is not an LEA figure.
 
 ## Output format
 

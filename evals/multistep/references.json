@@ -1,7 +1,7 @@
 {
   "as_of": "2026-10-26",
   "server": "stdio dist/src/cli.js",
-  "git_sha": "6624f73",
+  "git_sha": "51887c2",
   "items": {
     "t1-galway-pop-tds": {
       "tier": "T1",
@@ -535,7 +535,19 @@
             "limit": 20
           },
           "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/arcgis/rest/services/Counties___OSi_National_Statutory_Boundaries/FeatureServer/0/query?returnGeometry=false&f=json&where=PROVINCE%3D%27Munster%27&outFields=ENGLISH%2CPROVINCE&resultRecordCount=20",
-          "retrieved_at": "2026-10-26T14:09:28.265Z"
+          "retrieved_at": "2026-10-26T15:32:36.649Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Munster",
+            "level": "province",
+            "list": "local_authority"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:36.734Z"
         },
         {
           "source": "cso",
@@ -545,7 +557,7 @@
             "max_categories": 100
           },
           "url": "https://data.cso.ie/table/CPNI37",
-          "retrieved_at": "2026-10-26T14:09:28.395Z"
+          "retrieved_at": "2026-10-26T15:32:36.910Z"
         },
         {
           "source": "cso",
@@ -566,7 +578,7 @@
             "limit": 500
           },
           "url": "https://data.cso.ie/table/CPNI37",
-          "retrieved_at": "2026-10-26T14:09:28.508Z"
+          "retrieved_at": "2026-10-26T15:32:37.146Z"
         },
         {
           "source": "cso",
@@ -576,7 +588,7 @@
             "max_categories": 100
           },
           "url": "https://data.cso.ie/table/CPNI05",
-          "retrieved_at": "2026-10-26T14:09:28.545Z"
+          "retrieved_at": "2026-10-26T15:32:37.336Z"
         },
         {
           "source": "cso",
@@ -597,12 +609,10 @@
             "limit": 500
           },
           "url": "https://data.cso.ie/table/CPNI05",
-          "retrieved_at": "2026-10-26T14:09:28.748Z"
+          "retrieved_at": "2026-10-26T15:32:37.700Z"
         }
       ],
-      "workarounds": [
-        "crosswalk:la-to-county"
-      ]
+      "workarounds": []
     },
     "t2-cork-housing-spend-per-capita": {
       "tier": "T2",
@@ -702,55 +712,31 @@
             "limit": 500
           },
           "url": "https://data.cso.ie/table/NDA05",
-          "retrieved_at": "2026-10-26T13:54:15.059Z"
+          "retrieved_at": "2026-10-26T15:32:38.144Z"
         },
         {
-          "source": "geohive",
-          "operation": "geohive_query_layer",
+          "source": "cross",
+          "operation": "ireland_resolve_place",
           "args": {
-            "service": "Counties___OSi_National_Statutory_Boundaries",
-            "where": "PROVINCE='Connacht'",
-            "out_fields": "ENGLISH,PROVINCE",
-            "limit": 20
+            "limit": 500,
+            "place": "Connacht",
+            "level": "province",
+            "list": "county"
           },
-          "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/arcgis/rest/services/Counties___OSi_National_Statutory_Boundaries/FeatureServer/0/query?returnGeometry=false&f=json&where=PROVINCE%3D%27Connacht%27&outFields=ENGLISH%2CPROVINCE&resultRecordCount=20",
-          "retrieved_at": "2026-10-26T13:54:16.970Z"
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:38.161Z"
         },
         {
-          "source": "cso",
-          "operation": "cso_area_profile",
+          "source": "cross",
+          "operation": "ireland_resolve_place",
           "args": {
-            "area": "Roscommon"
+            "limit": 500,
+            "place": "Galway",
+            "level": "county",
+            "list": "lea"
           },
-          "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:17.065Z"
-        },
-        {
-          "source": "cso",
-          "operation": "cso_area_profile",
-          "args": {
-            "area": "Mayo"
-          },
-          "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:17.310Z"
-        },
-        {
-          "source": "cso",
-          "operation": "cso_area_profile",
-          "args": {
-            "area": "Sligo"
-          },
-          "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:17.504Z"
-        },
-        {
-          "source": "cso",
-          "operation": "cso_area_profile",
-          "args": {
-            "area": "Leitrim"
-          },
-          "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:17.601Z"
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:38.167Z"
         },
         {
           "source": "cso",
@@ -759,12 +745,94 @@
             "area": "Galway"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:17.605Z"
+          "retrieved_at": "2026-10-26T15:32:38.376Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Leitrim",
+            "level": "county",
+            "list": "lea"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:38.384Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Leitrim"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T15:32:38.477Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Mayo",
+            "level": "county",
+            "list": "lea"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:38.480Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Mayo"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T15:32:38.743Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Roscommon",
+            "level": "county",
+            "list": "lea"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:38.746Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Roscommon"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T15:32:38.877Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Sligo",
+            "level": "county",
+            "list": "lea"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:38.880Z"
+        },
+        {
+          "source": "cso",
+          "operation": "cso_area_profile",
+          "args": {
+            "area": "Sligo"
+          },
+          "url": "https://data.cso.ie/table/F1001",
+          "retrieved_at": "2026-10-26T15:32:38.966Z"
         }
       ],
-      "workarounds": [
-        "crosswalk:lea-to-county"
-      ]
+      "workarounds": []
     },
     "t2-dsp-jobseekers-per-1000": {
       "tier": "T2",
@@ -788,7 +856,7 @@
             "max_categories": 60
           },
           "url": "https://data.cso.ie/table/DSP24",
-          "retrieved_at": "2026-10-26T13:54:17.652Z"
+          "retrieved_at": "2026-10-26T15:32:38.993Z"
         },
         {
           "source": "cso",
@@ -806,7 +874,18 @@
             "limit": 500
           },
           "url": "https://data.cso.ie/table/DSP24",
-          "retrieved_at": "2026-10-26T13:54:17.733Z"
+          "retrieved_at": "2026-10-26T15:32:39.403Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Carlow",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:39.404Z"
         },
         {
           "source": "cso",
@@ -815,7 +894,18 @@
             "area": "Carlow"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:17.811Z"
+          "retrieved_at": "2026-10-26T15:32:39.634Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Cavan",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:39.643Z"
         },
         {
           "source": "cso",
@@ -824,7 +914,18 @@
             "area": "Cavan"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:17.934Z"
+          "retrieved_at": "2026-10-26T15:32:40.045Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Clare",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:40.058Z"
         },
         {
           "source": "cso",
@@ -833,7 +934,18 @@
             "area": "Clare"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:18.333Z"
+          "retrieved_at": "2026-10-26T15:32:40.154Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Cork",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:40.173Z"
         },
         {
           "source": "cso",
@@ -842,7 +954,18 @@
             "area": "Cork"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:18.773Z"
+          "retrieved_at": "2026-10-26T15:32:40.346Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Donegal",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:40.360Z"
         },
         {
           "source": "cso",
@@ -851,7 +974,18 @@
             "area": "Donegal"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:18.874Z"
+          "retrieved_at": "2026-10-26T15:32:40.527Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Dublin",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:40.536Z"
         },
         {
           "source": "cso",
@@ -860,7 +994,18 @@
             "area": "Dublin"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:19.139Z"
+          "retrieved_at": "2026-10-26T15:32:40.620Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Galway",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:40.623Z"
         },
         {
           "source": "cso",
@@ -869,7 +1014,18 @@
             "area": "Galway"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:19.143Z"
+          "retrieved_at": "2026-10-26T15:32:40.626Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Kerry",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:40.627Z"
         },
         {
           "source": "cso",
@@ -878,7 +1034,18 @@
             "area": "Kerry"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:19.233Z"
+          "retrieved_at": "2026-10-26T15:32:40.717Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Kildare",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:40.729Z"
         },
         {
           "source": "cso",
@@ -887,7 +1054,18 @@
             "area": "Kildare"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:19.613Z"
+          "retrieved_at": "2026-10-26T15:32:40.988Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Kilkenny",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:40.991Z"
         },
         {
           "source": "cso",
@@ -896,7 +1074,18 @@
             "area": "Kilkenny"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:19.776Z"
+          "retrieved_at": "2026-10-26T15:32:41.312Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Laois",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:41.315Z"
         },
         {
           "source": "cso",
@@ -905,7 +1094,18 @@
             "area": "Laois"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:19.911Z"
+          "retrieved_at": "2026-10-26T15:32:41.391Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Leitrim",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:41.395Z"
         },
         {
           "source": "cso",
@@ -914,7 +1114,18 @@
             "area": "Leitrim"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:19.933Z"
+          "retrieved_at": "2026-10-26T15:32:41.399Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Limerick",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:41.403Z"
         },
         {
           "source": "cso",
@@ -923,7 +1134,18 @@
             "area": "Limerick"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:20.026Z"
+          "retrieved_at": "2026-10-26T15:32:42.180Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Longford",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:42.191Z"
         },
         {
           "source": "cso",
@@ -932,7 +1154,18 @@
             "area": "Longford"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:20.325Z"
+          "retrieved_at": "2026-10-26T15:32:42.285Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Louth",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:42.289Z"
         },
         {
           "source": "cso",
@@ -941,7 +1174,18 @@
             "area": "Louth"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:20.977Z"
+          "retrieved_at": "2026-10-26T15:32:42.717Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Mayo",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:42.727Z"
         },
         {
           "source": "cso",
@@ -950,7 +1194,18 @@
             "area": "Mayo"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:20.989Z"
+          "retrieved_at": "2026-10-26T15:32:42.729Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Meath",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:42.731Z"
         },
         {
           "source": "cso",
@@ -959,7 +1214,18 @@
             "area": "Meath"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:21.161Z"
+          "retrieved_at": "2026-10-26T15:32:43.212Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Monaghan",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:43.215Z"
         },
         {
           "source": "cso",
@@ -968,7 +1234,18 @@
             "area": "Monaghan"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:21.774Z"
+          "retrieved_at": "2026-10-26T15:32:43.293Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Offaly",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:43.295Z"
         },
         {
           "source": "cso",
@@ -977,7 +1254,18 @@
             "area": "Offaly"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:21.850Z"
+          "retrieved_at": "2026-10-26T15:32:43.862Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Roscommon",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:43.872Z"
         },
         {
           "source": "cso",
@@ -986,7 +1274,18 @@
             "area": "Roscommon"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:21.853Z"
+          "retrieved_at": "2026-10-26T15:32:43.882Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Sligo",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:43.909Z"
         },
         {
           "source": "cso",
@@ -995,7 +1294,18 @@
             "area": "Sligo"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:21.855Z"
+          "retrieved_at": "2026-10-26T15:32:43.912Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Tipperary",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:43.915Z"
         },
         {
           "source": "cso",
@@ -1004,7 +1314,18 @@
             "area": "Tipperary"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:22.258Z"
+          "retrieved_at": "2026-10-26T15:32:44.160Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Waterford",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:44.171Z"
         },
         {
           "source": "cso",
@@ -1013,7 +1334,18 @@
             "area": "Waterford"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:22.352Z"
+          "retrieved_at": "2026-10-26T15:32:44.251Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Westmeath",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:44.259Z"
         },
         {
           "source": "cso",
@@ -1022,7 +1354,18 @@
             "area": "Westmeath"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:22.435Z"
+          "retrieved_at": "2026-10-26T15:32:44.339Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Wexford",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:44.345Z"
         },
         {
           "source": "cso",
@@ -1031,7 +1374,18 @@
             "area": "Wexford"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:22.506Z"
+          "retrieved_at": "2026-10-26T15:32:44.443Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Co.Wicklow",
+            "level": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:44.449Z"
         },
         {
           "source": "cso",
@@ -1040,7 +1394,7 @@
             "area": "Wicklow"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:22.611Z"
+          "retrieved_at": "2026-10-26T15:32:44.701Z"
         },
         {
           "source": "ppr",
@@ -1051,12 +1405,10 @@
             "to": "2024-12-31"
           },
           "url": "https://www.propertypriceregister.ie/website/npsra/ppr/npsra-ppr.nsf/Downloads/PPR-2024-Donegal.csv/$FILE/PPR-2024-Donegal.csv",
-          "retrieved_at": "2026-10-26T13:54:23.099Z"
+          "retrieved_at": "2026-10-26T15:32:45.252Z"
         }
       ],
-      "workarounds": [
-        "crosswalk:county-label-variants"
-      ]
+      "workarounds": []
     },
     "t2-real-deposit-rate-2025": {
       "tier": "T2",
@@ -1280,33 +1632,33 @@
             "limit": 500
           },
           "url": "https://data.cso.ie/table/NDA05",
-          "retrieved_at": "2026-10-26T13:54:25.050Z"
+          "retrieved_at": "2026-10-26T15:32:45.267Z"
         },
         {
-          "source": "geohive",
-          "operation": "geohive_locate",
+          "source": "cross",
+          "operation": "ireland_resolve_place",
           "args": {
-            "name": "Donaghmede",
-            "limit": 10
+            "limit": 500,
+            "place": "Dublin",
+            "level": "county",
+            "list": "lea"
           },
-          "url": "https://services-eu1.arcgis.com/FH5XCsx8rYXqnjF5/arcgis/rest/services/Centres_of_Population___OSi_National_Placenames_Gazetteer/FeatureServer/0/query?where=UPPER%28English_Na%29+%3D+%27DONAGHMEDE%27+OR+UPPER%28Irish_Name%29+%3D+%27DONAGHMEDE%27&outFields=English_Na%2CIrish_Name%2CCounty%2CClassifica&outSR=4326&returnGeometry=true&resultRecordCount=10&f=json",
-          "retrieved_at": "2026-10-26T13:54:27.979Z"
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:45.274Z"
         },
         {
-          "source": "geohive",
-          "operation": "geohive_boundaries_at_point",
+          "source": "cross",
+          "operation": "ireland_resolve_place",
           "args": {
-            "lat": 53.39864,
-            "lon": -6.16165
+            "limit": 500,
+            "place": "Donaghmede, Dublin City",
+            "level": "lea"
           },
-          "url": "https://www.geohive.ie/",
-          "retrieved_at": "2026-10-26T13:54:29.467Z"
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:45.300Z"
         }
       ],
-      "workarounds": [
-        "crosswalk:lea-to-county",
-        "crosswalk:lea-to-constituency"
-      ]
+      "workarounds": []
     },
     "t2-kohesio-west-per-capita": {
       "tier": "T2",
@@ -1396,13 +1748,25 @@
           "retrieved_at": "2026-10-07T23:20:32.414Z"
         },
         {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "IE042",
+            "level": "nuts3",
+            "list": "county"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:45.454Z"
+        },
+        {
           "source": "cso",
           "operation": "cso_area_profile",
           "args": {
             "area": "Galway"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:29.603Z"
+          "retrieved_at": "2026-10-26T15:32:45.457Z"
         },
         {
           "source": "cso",
@@ -1411,7 +1775,7 @@
             "area": "Mayo"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:29.604Z"
+          "retrieved_at": "2026-10-26T15:32:45.458Z"
         },
         {
           "source": "cso",
@@ -1420,12 +1784,11 @@
             "area": "Roscommon"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:29.606Z"
+          "retrieved_at": "2026-10-26T15:32:45.461Z"
         }
       ],
       "workarounds": [
-        "server-query:pagination",
-        "crosswalk:nuts3-to-county"
+        "server-query:pagination"
       ]
     },
     "t2-rent-law-rpz": {
@@ -1545,7 +1908,7 @@
             "max_categories": 500
           },
           "url": "https://data.cso.ie/table/NDA05",
-          "retrieved_at": "2026-10-26T13:55:42.712Z"
+          "retrieved_at": "2026-10-26T15:32:45.463Z"
         },
         {
           "source": "cso",
@@ -1563,7 +1926,18 @@
             "limit": 500
           },
           "url": "https://data.cso.ie/table/NDA05",
-          "retrieved_at": "2026-10-26T13:55:43.345Z"
+          "retrieved_at": "2026-10-26T15:32:45.693Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Clondalkin, South Dublin",
+            "level": "lea"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:45.695Z"
         },
         {
           "source": "cso",
@@ -1573,7 +1947,7 @@
             "max_categories": 500
           },
           "url": "https://data.cso.ie/table/UA05",
-          "retrieved_at": "2026-10-26T13:55:43.568Z"
+          "retrieved_at": "2026-10-26T15:32:45.720Z"
         },
         {
           "source": "cso",
@@ -1591,7 +1965,7 @@
             "limit": 500
           },
           "url": "https://data.cso.ie/table/UA05",
-          "retrieved_at": "2026-10-26T13:55:43.744Z"
+          "retrieved_at": "2026-10-26T15:32:45.798Z"
         },
         {
           "source": "ppr",
@@ -1602,12 +1976,11 @@
             "to": "2024-12-31"
           },
           "url": "https://www.propertypriceregister.ie/website/npsra/ppr/npsra-ppr.nsf/Downloads/PPR-2024-Dublin.csv/$FILE/PPR-2024-Dublin.csv",
-          "retrieved_at": "2026-10-26T13:55:47.202Z"
+          "retrieved_at": "2026-10-26T15:32:47.251Z"
         }
       ],
       "workarounds": [
-        "dataset-card:hardcoded-table-code",
-        "crosswalk:lea-to-county"
+        "dataset-card:hardcoded-table-code"
       ]
     },
     "t2-ed-deprivation-population": {
@@ -1629,7 +2002,7 @@
             "lon": -6.2603
           },
           "url": "https://services-eu1.arcgis.com/BuS9rtTsYEV5C0xh/arcgis/rest/services/CensusHub2022_T1_1_SA/FeatureServer/0/query?f=json&where=SA_GEOGID_2022%3D%27A268106016%27&outFields=SA_GEOGID_2022%2CT1_1AGETT%2CT1_1AGETM%2CT1_1AGETF%2CGEOGDESC%2CLOCAL_AUTHORITY%2CCOUNTY%2CNUTS3_NAME&resultRecordCount=1&resultOffset=0&returnGeometry=false",
-          "retrieved_at": "2026-10-26T13:54:32.760Z"
+          "retrieved_at": "2026-10-26T15:32:47.681Z"
         },
         {
           "source": "pobal",
@@ -1639,7 +2012,7 @@
             "limit": 5
           },
           "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=268106&limit=5",
-          "retrieved_at": "2026-10-26T13:54:32.934Z"
+          "retrieved_at": "2026-10-26T15:32:47.938Z"
         }
       ],
       "workarounds": []
@@ -1690,8 +2063,8 @@
       "tier": "T3",
       "drift": "slow",
       "retrieved": "2026-10-26",
-      "gap": "crosswalk:rtb-location-to-lea",
-      "evidence": "RTB locations for Galway City LEAs not found: Galway; Galway City; Athenry, Galway; Ballinasloe, Galway; Ballybane, Galway; Ballybrit, Galway; Barna, Galway; Bohermore, Galway; Claregalway, Galway; Clifden, Galway; Doughiska, Galway; Gort, Galway; Headford, Galway; Knocknacarra, Galway; Loughrea, Galway; Mervue, Galway; Monivea, Galway; Moycullen, Galway; Newcastle, Galway; Oranmore, Galway; Oughterard, Galway; Portumna, Galway; Rahoon, Galway; Renmore, Galway; Roscam, Galway; Salthill, Galway; Tuam, Galway; Wellpark, Galway; Woodquay, Galway"
+      "gap": "source:rtb-lea-rents",
+      "evidence": "RIA02 has 446 locations (counties, towns, neighbourhoods) and none is an LEA; Galway entries: Galway; Galway City; Athenry, Galway; Ballinasloe, Galway; Ballybane, Galway; Ballybrit, Galway; Barna, Galway; Bohermore, Galway; Claregalway, Galway; Clifden, Galway; Doughiska, Galway; Gort, Galway; Headford, Galway; Knocknacarra, Galway; Loughrea, Galway; Mervue, Galway; Monivea, Galway; Moycullen, Galway; Newcastle, Galway; Oranmore, Galway; Oughterard, Galway; Portumna, Galway; Rahoon, Galway; Renmore, Galway; Roscam, Galway; Salthill, Galway; Tuam, Galway; Wellpark, Galway; Woodquay, Galway"
     },
     "t3-ballymun-vs-tallaght": {
       "tier": "T3",
@@ -2051,7 +2424,7 @@
             "limit": 500
           },
           "url": "https://data.cso.ie/table/NDA05",
-          "retrieved_at": "2026-10-26T13:54:44.607Z"
+          "retrieved_at": "2026-10-26T15:32:48.345Z"
         },
         {
           "source": "ppr",
@@ -2062,7 +2435,7 @@
             "to": "2024-12-31"
           },
           "url": "https://www.propertypriceregister.ie/website/npsra/ppr/npsra-ppr.nsf/Downloads/PPR-2024-Cork.csv/$FILE/PPR-2024-Cork.csv",
-          "retrieved_at": "2026-10-26T13:54:45.147Z"
+          "retrieved_at": "2026-10-26T15:32:48.775Z"
         },
         {
           "source": "cso",
@@ -2071,7 +2444,19 @@
             "area": "Cork"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:45.149Z"
+          "retrieved_at": "2026-10-26T15:32:48.786Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Cork",
+            "level": "county",
+            "list": "lea"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:48.792Z"
         },
         {
           "source": "ppr",
@@ -2082,7 +2467,7 @@
             "to": "2024-12-31"
           },
           "url": "https://www.propertypriceregister.ie/website/npsra/ppr/npsra-ppr.nsf/Downloads/PPR-2024-Kerry.csv/$FILE/PPR-2024-Kerry.csv",
-          "retrieved_at": "2026-10-26T13:54:45.314Z"
+          "retrieved_at": "2026-10-26T15:32:48.944Z"
         },
         {
           "source": "cso",
@@ -2091,7 +2476,19 @@
             "area": "Kerry"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:45.318Z"
+          "retrieved_at": "2026-10-26T15:32:48.948Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Kerry",
+            "level": "county",
+            "list": "lea"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:48.953Z"
         },
         {
           "source": "ppr",
@@ -2102,7 +2499,7 @@
             "to": "2024-12-31"
           },
           "url": "https://www.propertypriceregister.ie/website/npsra/ppr/npsra-ppr.nsf/Downloads/PPR-2024-Limerick.csv/$FILE/PPR-2024-Limerick.csv",
-          "retrieved_at": "2026-10-26T13:54:45.426Z"
+          "retrieved_at": "2026-10-26T15:32:49.073Z"
         },
         {
           "source": "cso",
@@ -2111,19 +2508,283 @@
             "area": "Limerick"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T13:54:45.428Z"
+          "retrieved_at": "2026-10-26T15:32:49.081Z"
+        },
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Limerick",
+            "level": "county",
+            "list": "lea"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:49.085Z"
         }
       ],
-      "workarounds": [
-        "crosswalk:lea-to-county"
-      ]
+      "workarounds": []
     },
     "t3-lowest-deprivation-galway-city-td": {
       "tier": "T3",
       "drift": "slow",
       "retrieved": "2026-10-26",
-      "gap": "crosswalk:la-to-eds",
-      "evidence": "no tool lists the electoral divisions of a local authority; pobal_deprivation_search needs a name or id and has no council filter"
+      "expected": {
+        "electoral_division": "Newcastle",
+        "relative_score": -7.45,
+        "tds": [
+          "Connolly",
+          "Farrell",
+          "Grealish",
+          "Kyne",
+          "Naughton"
+        ]
+      },
+      "calls": [
+        {
+          "source": "cross",
+          "operation": "ireland_resolve_place",
+          "args": {
+            "limit": 500,
+            "place": "Galway City Council",
+            "level": "local_authority",
+            "list": "ed"
+          },
+          "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
+          "retrieved_at": "2026-10-26T15:32:49.094Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068001",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68001&limit=5",
+          "retrieved_at": "2026-10-26T15:32:49.169Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068002",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68002&limit=5",
+          "retrieved_at": "2026-10-26T15:32:49.247Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068003",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68003&limit=5",
+          "retrieved_at": "2026-10-26T15:32:49.361Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068004",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68004&limit=5",
+          "retrieved_at": "2026-10-26T15:32:49.430Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068005",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68005&limit=5",
+          "retrieved_at": "2026-10-26T15:32:49.502Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068006",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68006&limit=5",
+          "retrieved_at": "2026-10-26T15:32:49.575Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068007",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68007&limit=5",
+          "retrieved_at": "2026-10-26T15:32:49.640Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068008",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68008&limit=5",
+          "retrieved_at": "2026-10-26T15:32:49.699Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068009",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68009&limit=5",
+          "retrieved_at": "2026-10-26T15:32:49.996Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068010",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68010&limit=5",
+          "retrieved_at": "2026-10-26T15:32:50.071Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068011",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68011&limit=5",
+          "retrieved_at": "2026-10-26T15:32:50.134Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068012",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68012&limit=5",
+          "retrieved_at": "2026-10-26T15:32:50.203Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068013",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68013&limit=5",
+          "retrieved_at": "2026-10-26T15:32:50.260Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068014",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68014&limit=5",
+          "retrieved_at": "2026-10-26T15:32:50.318Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068015",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68015&limit=5",
+          "retrieved_at": "2026-10-26T15:32:50.462Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068016",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68016&limit=5",
+          "retrieved_at": "2026-10-26T15:32:50.529Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068017",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68017&limit=5",
+          "retrieved_at": "2026-10-26T15:32:50.589Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068018",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68018&limit=5",
+          "retrieved_at": "2026-10-26T15:32:50.663Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068019",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68019&limit=5",
+          "retrieved_at": "2026-10-26T15:32:50.729Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068020",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68020&limit=5",
+          "retrieved_at": "2026-10-26T15:32:50.790Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068021",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68021&limit=5",
+          "retrieved_at": "2026-10-26T15:32:50.934Z"
+        },
+        {
+          "source": "pobal",
+          "operation": "pobal_deprivation_search",
+          "args": {
+            "query": "068022",
+            "limit": 5
+          },
+          "url": "https://data.gov.ie/api/3/action/datastore_search?resource_id=0806f07b-b514-4769-bd3d-649da87ad205&q=68022&limit=5",
+          "retrieved_at": "2026-10-26T15:32:51.000Z"
+        },
+        {
+          "source": "oireachtas",
+          "operation": "oireachtas_search_members",
+          "args": {
+            "constituency": "Galway West",
+            "limit": 20
+          },
+          "url": "https://api.oireachtas.ie/v1/members?chamber=dail&house_no=34&limit=300",
+          "retrieved_at": "2026-10-26T15:32:51.147Z"
+        }
+      ],
+      "workarounds": []
     },
     "t3-energy-weather-now": {
       "tier": "T3",

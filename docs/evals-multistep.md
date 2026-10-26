@@ -83,6 +83,27 @@ Each run also checks the live catalogue for each pillar, looking for a crosswalk
 capability appears, any question it blocks changes status to `gap-capability-present`. That
 is the cue to write the missing reference.
 
+## Progress by pillar
+
+**Place crosswalk (October 2026).** `ireland_resolve_place` was the first pillar to ship. The
+references-only run before and after it gave these counts:
+
+| Crosswalk pillar | Before | After |
+| --- | ---: | ---: |
+| Blocked items | 2 | 0 |
+| References that needed a workaround | 8 | 1 |
+| Items that declare a crosswalk gap | 16 | 15 |
+
+- `t3-lowest-deprivation-galway-city-td` now has a reference. It lists the 22 EDs of Galway City
+  Council, scores each one with Pobal and takes the constituency from the crosswalk.
+- `t3-rent-growth-completions-tds` is still blocked, but now by a missing source
+  (`source:rtb-lea-rents`). CSO's RTB tables have no LEA rows. An LEA rent cannot be averaged from
+  neighbourhood rents without tenancy counts.
+- The only crosswalk workaround left is `t3-ballymun-vs-tallaght`. The question defines its area as
+  the EDs whose names start with a place name.
+- Each rewritten reference keeps the old hand-written mapping as a cross-check, and every value
+  matched its previous pin.
+
 ## Running it
 
 ```bash

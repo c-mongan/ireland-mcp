@@ -9,7 +9,7 @@ mkdirSync(kohesio, { recursive: true });
 copyFileSync(new URL("../src/sources/kohesio/snapshot.json", import.meta.url), new URL("snapshot.json", kohesio));
 
 // Published snapshots: the static site serves web/data and the MCP tools read the same files from dist/web/data.
-const PUBLISHED_DATA = ["cib/cis-annual.json", "cib/cis-query-categories.json", "cib/cips-annual.json", "civic-directory.json"];
+const PUBLISHED_DATA = ["cib/cis-annual.json", "cib/cis-query-categories.json", "cib/cips-annual.json", "civic-directory.json", "crosswalk/places-2022.json"];
 for (const file of PUBLISHED_DATA) {
   const target = new URL(`../dist/web/data/${file}`, import.meta.url);
   mkdirSync(new URL("./", target), { recursive: true });

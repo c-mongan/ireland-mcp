@@ -31,6 +31,8 @@ interface BoundaryLayer {
   key: string;
   label: string;
   service: string;
+  /** Feature layer id within the service; 0 when omitted. */
+  layerId?: number;
   fields: string[];
   pick: (a: Record<string, unknown>) => Record<string, unknown>;
 }
@@ -69,21 +71,28 @@ export const BOUNDARY_LAYERS: BoundaryLayer[] = [
   },
   {
     key: "local_electoral_area",
-    label: "Local electoral area",
-    service: "Local_Electoral_Areas_Boundaries_Generalised_20m",
-    fields: ["LE_ENGLISH", "COUNTY"],
+    label: "Local electoral area (2019 and 2024 local elections)",
+    service: "LocalElectoralArea_NationalStatutoryBoundaries_Ungeneralised_2024",
+    layerId: 1,
+    fields: ["ENG_NAME_VALUE", "GLE_NAME_VALUE", "BDY_ID"],
     pick: (a) => {
-      const name = str(a.LE_ENGLISH) ?? "";
-      const seats = name.match(/\((\d+)\)\s*$/)?.[1];
-      return { name: title(name.replace(/\s*\(\d+\)\s*$/, "")), seats: seats ? Number(seats) : null };
+      const name = str(a.ENG_NAME_VALUE) ?? "";
+      const seats = name.match(/\sLEA-(\d+)$/)?.[1];
+      return {
+        name: title(name.replace(/\s+LEA-\d+$/, "")),
+        irish: str(a.GLE_NAME_VALUE)?.replace(/\s+TA-\d+$/, "") ?? null,
+        seats: seats ? Number(seats) : null,
+        boundary_id: str(a.BDY_ID)
+      };
     }
   },
   {
     key: "electoral_division",
     label: "CSO electoral division",
     service: "CSO_Electoral_Divisions_Generalised_20m",
-    fields: ["ED_ENGLISH", "CSOED_3409", "CSOED_34_1"],
-    pick: (a) => ({ name: str(a.CSOED_34_1) ?? title(a.ED_ENGLISH), cso_code: str(a.CSOED_3409) })
+    fields: ["ED_ENGLISH", "ED_ID", "CSOED_3409", "CSOED_34_1"],
+    // ed_id is the 6-digit id used by Census 2022 small areas, Pobal and ireland_resolve_place; cso_code is CSO's older 3,409-ED code.
+    pick: (a) => ({ name: str(a.CSOED_34_1) ?? title(a.ED_ENGLISH), ed_id: str(a.ED_ID), cso_code: str(a.CSOED_3409) })
   },
   {
     key: "small_area",
@@ -137,7 +146,7 @@ export async function boundariesAt(ctx: ToolContext, lat: number, lon: number) {
   assertInIreland(lat, lon);
   const point = { geometry: `${lon},${lat}`, geometryType: "esriGeometryPoint", inSR: "4326", spatialRel: "esriSpatialRelIntersects" };
   const settled = await Promise.allSettled(
-    BOUNDARY_LAYERS.map((layer) => arcgisQuery(ctx, layer.service, { ...point, outFields: layer.fields.join(",") }))
+    BOUNDARY_LAYERS.map((layer) => arcgisQuery(ctx, layer.service, { ...point, outFields: layer.fields.join(",") }, layer.layerId ?? 0))
   );
   if (settled.every((s) => s.status === "rejected")) throw (settled[0] as PromiseRejectedResult).reason;
   const boundaries: Record<string, unknown> = {};
