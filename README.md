@@ -140,6 +140,16 @@ The civic-source additions and GeoHive layer selection are described in [civic s
 
 </details>
 
+## Beta: Irish law and your rights
+
+An optional add-on lets your assistant quote [Citizens Information](https://www.citizensinformation.ie) guidance and the [Irish Statute Book](https://www.irishstatutebook.ie), with a citation for every passage.
+
+- **Covers:** one topic so far: annual leave and working hours (Organisation of Working Time Act 1997).
+- **Not legal advice.** It quotes sources. It cannot confirm that a law is in force today, so check the linked publisher page.
+- **Off by default.** It is not on the public server. Run it yourself with the [pilot guide](packages/irish-legal-mcp/README.md), or set `LEGAL_ENABLED=true` on your own deployment.
+
+Read the [beta assessment](docs/legal-beta-assessment.md) for coverage, licences and known risks.
+
 ## Why it's lean
 
 Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **7 tools, 8,674 characters, about 2,169 tokens** (`toolsets=all` is 88 tools, about 25k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
