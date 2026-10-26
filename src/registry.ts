@@ -97,10 +97,10 @@ export function appModules(modules: SourceModule[] = sourceModules): { modules: 
   const raw = cross.filter((t) => t.raw);
   const crossModule: SourceModule = {
     info: crossInfo,
-    summary: "Combined lookups: what is at a point (nearby), a one-call place snapshot, and the source list.",
+    summary: "Combined lookups: resolve any place to all its geography codes (ireland_resolve_place), what is at a point (nearby), a one-call place snapshot, and the source list.",
     domain: "places/property",
     card: crossCard,
-    coverage: "Combines GeoHive boundaries, Met Éireann forecasts and warnings and CSO census population for any point or major place in Ireland.",
+    coverage: "Place crosswalk for every Census 2022 electoral division (county, local authority, LEA, Dáil constituency 2023, NUTS3), plus GeoHive boundaries, Met Éireann forecasts and warnings and CSO census population for any point or major place in Ireland.",
     tools: cross.filter((t) => !t.raw)
   };
   return { modules: [...modules, crossModule], extraTools: raw };

@@ -3,7 +3,7 @@
 [![CI](https://github.com/c-mongan/ireland-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/c-mongan/ireland-mcp/actions/workflows/ci.yml)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-34c08a.svg)](LICENSE)
 [![MCP](https://img.shields.io/badge/MCP-Streamable%20HTTP-6f42c1.svg)](https://modelcontextprotocol.io)
-[![Token budget](https://img.shields.io/badge/default%20surface-7%20tools%20%7C%20~2.1k%20tokens-0a7.svg)](#why-its-lean)
+[![Token budget](https://img.shields.io/badge/default%20surface-8%20tools%20%7C%20~2.7k%20tokens-0a7.svg)](#why-its-lean)
 
 **Ask ChatGPT, Claude or Copilot about Ireland, and get answers that cite official public sources.**
 
@@ -138,7 +138,7 @@ The default profile covers statistics (CSO, Eurostat, ECB, World Bank), the Oire
 <details>
 <summary><strong>All 39 sources, publishers and licences</strong></summary>
 
-The default profile registers 39 source modules in `src/registry.ts`. The default `nearby`, `search` and `fetch` shortcuts sit above these sources. The optional pilot rows require `LEGAL_ENABLED=true` and an ingested corpus; check `ireland_catalogue` for the modules available on an endpoint. See [new provider access and limits](docs/public-source-additions.md).
+The default profile registers 39 source modules in `src/registry.ts`. The default `nearby`, `ireland_resolve_place`, `search` and `fetch` shortcuts sit above these sources. `ireland_resolve_place` maps any place to its county, council, LEA, constituency, NUTS3 and ED codes; see the [place crosswalk](docs/crosswalk.md). The optional pilot rows require `LEGAL_ENABLED=true` and an ingested corpus; check `ireland_catalogue` for the modules available on an endpoint. See [new provider access and limits](docs/public-source-additions.md).
 
 Every source has a [dataset card](docs/dataset-cards.md): topics, geography levels, time coverage, update cadence, join keys and licence. Ask `ireland_catalogue` for, say, `{"geo_level": "lea", "topic": "housing"}` to list only the operations with that data, and `ireland_describe` with a source for its full card.
 
@@ -192,11 +192,11 @@ The civic-source additions and GeoHive layer selection are described in [civic s
 
 ## Why it's lean
 
-Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **7 tools, 8,985 characters, about 2,246 tokens** (`toolsets=all` is 98 tools, about 29k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
+Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **8 tools, 10,708 characters, about 2,677 tokens** (`toolsets=all` is 97 tools, about 28k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
 
 <p align="center">
   <a href="docs/architecture/ireland-mcp-lean-surface.drawio">
-    <img src="docs/architecture/ireland-mcp-lean-surface.png" alt="Token-cost comparison: 7 default tools versus all typed tools and one-server-per-source routing" width="800">
+    <img src="docs/architecture/ireland-mcp-lean-surface.png" alt="Token-cost comparison: 8 default tools versus all typed tools and one-server-per-source routing" width="800">
   </a>
 </p>
 
@@ -204,7 +204,7 @@ Need typed tools anyway?
 
 | Surface | Use |
 | --- | --- |
-| Default HTTP | `/mcp` lists only `ireland_catalogue`, `ireland_describe`, `ireland_call`, `ireland_about`, `search`, `fetch`, `nearby`. |
+| Default HTTP | `/mcp` lists only `ireland_catalogue`, `ireland_describe`, `ireland_call`, `ireland_about`, `search`, `fetch`, `nearby`, `ireland_resolve_place`. |
 | Source toolsets | `/mcp?toolsets=cso,irish-rail` lists selected typed tools too. |
 | One source path | `/mcp/x/{source}` lists that source's typed tools, for example `/mcp/x/met-eireann`. |
 | Everything | `/mcp?toolsets=all` lists all available tools and is useful for debugging, not routine chat. |

@@ -33,8 +33,10 @@ with the same `args`.
 
 1. **Agree the criteria.** Ask (once) which columns matter: price, rent, transport, deprivation,
    schools, river levels. Default to price, rent and transport. Cap the list at six places.
-2. **Locate each place.** Call `geohive/geohive_locate` with `{ "name": "Maynooth" }`. Keep `lat`, `lon`
-   and county. Then `census-areas/census_small_area_at` with that point for the ED code and local authority.
+2. **Locate each place.** Call `ireland_resolve_place` with `{ "place": "Maynooth" }`. Keep the county,
+   local authority, LEA, constituency and ED `code` from `codes`, and `match.lat`/`match.lon` when the
+   place resolved through the gazetteer. For a council or LEA instead of a town, use a gazetteer point
+   from `geohive/geohive_locate` for the transport step.
 3. **Prices.** Call `ppr/ppr_price_stats` with `{ "county", "address": "<town word>", "from": "<12 months ago>" }`.
    Use the same window for every place.
 4. **Rents.** Use `cso/cso_get_table_metadata` on RIQ02 to find each place's Location code, then

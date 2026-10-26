@@ -29,9 +29,10 @@ with the same `args`.
 
 ## Steps
 
-1. **Find the constituency.** From a town: `geohive/geohive_locate` then `geohive/geohive_boundaries_at_point`
-   with the `lat`/`lon`. Keep `dail_constituency.name`, `seats`, `local_electoral_area` and county.
-   From a constituency name, skip to step 2.
+1. **Find the constituency.** Call `ireland_resolve_place` with the town, LEA, council or `lat`/`lon`.
+   Keep `codes.constituency` (with `seats`), `codes.lea` and `codes.county`. An LEA or council can
+   overlap several constituencies; each comes with its share of residents, so name them all.
+   From a constituency name, pass `"list": "lea"` to get its LEAs, then go to step 2.
 2. **Sitting TDs.** Call `oireachtas/oireachtas_search_members` with `{ "constituency": "<name>" }`.
    List every member returned, in the API's order or alphabetically; never by party preference.
 3. **What each TD raised.** For each `member_code`, call `oireachtas/oireachtas_search_questions` with

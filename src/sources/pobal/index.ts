@@ -30,9 +30,17 @@ function n(v: unknown): number | null {
   if (typeof v === "string") { const out = Number(v.replace(/,/g, "")); return Number.isFinite(out) ? out : null; }
   return null;
 }
+// Pobal stores ED ids as numbers, so "068001" (Galway City) arrives as "68001". CSO, GeoHive and the
+// place crosswalk use the 6-digit form; pad on the way out and strip on the way in.
+const edId = (raw: unknown) => {
+  const id = String(raw ?? "").trim();
+  return /^\d{1,5}$/.test(id) ? id.padStart(6, "0") : id;
+};
+const pobalKey = (text: string) => (/^0\d{5}$/.test(text.trim()) ? String(Number(text.trim())) : text.trim());
+
 function compact(r: Record<string, unknown>) {
   return {
-    ed_id: String(r.ED_ID_STR ?? ""),
+    ed_id: edId(r.ED_ID_STR),
     electoral_division: String(r.ED_ENGLISH ?? ""),
     population_2022: n(r.TOTPOP22),
     relative_score_2022: n(r.Index22_ED_std_rel_wt),
@@ -53,11 +61,11 @@ const searchTool = defineTool({
   description: "Search 2022 Pobal HP Deprivation Index electoral-division scores by ED id or name.",
   example: { query: "Galvone", limit: 5 },
   inputSchema: {
-    query: z.string().min(2).max(120).describe("Electoral division name or ED id, e.g. 'Galvone' or '128020'."),
+    query: z.string().min(2).max(120).describe("Electoral division name or 6-digit ED id, e.g. 'Galvone' or '068001'."),
     limit: z.number().int().min(1).max(MAX_LIMIT).default(10)
   },
   handler: async ({ query: q, limit }, ctx) => {
-    const params = new URLSearchParams({ resource_id: RESOURCE_ID, q, limit: String(limit) });
+    const params = new URLSearchParams({ resource_id: RESOURCE_ID, q: pobalKey(q), limit: String(limit) });
     const result = await query(ctx, params);
     const records = (result.value.records ?? []).map(compact);
     const { items, truncated } = bound(records, limit);
@@ -79,7 +87,7 @@ export const pobalModule: SourceModule = {
     });
   },
   async fetchById(key: string, ctx: ToolContext): Promise<FetchedDocument> {
-    const result = await query(ctx, new URLSearchParams({ resource_id: RESOURCE_ID, filters: JSON.stringify({ ED_ID_STR: key }), limit: "1" }));
+    const result = await query(ctx, new URLSearchParams({ resource_id: RESOURCE_ID, filters: JSON.stringify({ ED_ID_STR: pobalKey(key) }), limit: "1" }));
     const record = result.value.records?.[0];
     if (!record) throw new ToolError("NOT_FOUND", "No Pobal electoral division matches this id.");
     const area = compact(record);

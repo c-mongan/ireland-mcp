@@ -13,7 +13,7 @@ import { GEO_LEVELS, JOIN_KEYS, TOPICS } from "./cards.js";
 import { buildServer, catalogueOf, type CatalogueArgs } from "./server.js";
 import { resolveToolsets, toolsetsFromArgs, toolsetsFromUrl, UnknownToolsetError } from "./toolsets.js";
 
-const META = ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about", "search", "fetch", "nearby"];
+const META = ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about", "search", "fetch", "nearby", "ireland_resolve_place"];
 const TOOLS_LIST_BUDGET_CHARS = 16_000;
 const ctx = createContext({ fetch: fakeFetch([]) });
 
@@ -61,6 +61,11 @@ describe("default lean surface", () => {
   it("keeps nearby cheap enough to stay top level (<350 tokens)", async () => {
     const nearby = (await listTools()).find((t) => t.name === "nearby");
     expect(JSON.stringify(nearby).length / 4).toBeLessThan(350);
+  });
+
+  it("keeps ireland_resolve_place cheap enough to stay top level (<450 tokens)", async () => {
+    const tool = (await listTools()).find((t) => t.name === "ireland_resolve_place");
+    expect(JSON.stringify(tool).length / 4).toBeLessThan(450);
   });
 
   it("lists the domains statically in the catalogue description and sets short instructions", async () => {

@@ -15,6 +15,13 @@ describe("pobal", () => {
     expect(result.body.data.areas[0]).toMatchObject({ ed_id: "128020", electoral_division: "GALVONE B", deprivation_label: "Extremely Disadvantaged" });
     expect(result.body.data.areas[0]?.population_2022).toBe(739);
   });
+
+  it("pads ED ids that Pobal stores without the leading zero, and accepts the 6-digit form", async () => {
+    const body = JSON.stringify({ success: true, result: { total: 1, records: [{ ED_ID_STR: "68001", ED_ENGLISH: "BALLYBAAN", TOTPOP22: "1,000", Index22_ED_std_rel_wt: 1.23, Index22_ED_rel_wt_lab: "Marginally Above Average" }] } });
+    const fetch = fakeFetch([{ match: /q=68001(&|$)/, body }]);
+    const result = await callTool<PobalBody>(pobalModule, "pobal_deprivation_search", { query: "068001", limit: 3 }, fetch);
+    expect(result.body.data.areas[0]).toMatchObject({ ed_id: "068001", electoral_division: "BALLYBAAN" });
+  });
 });
 
 it("does not cache unsuccessful CKAN envelopes as empty results", async () => {

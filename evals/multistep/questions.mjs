@@ -90,7 +90,30 @@ async function completionsByLea(ctx, year) {
   });
 }
 
-// Councils grouped into counties: a hand-written crosswalk the catalogue does not expose.
+// ---------- place crosswalk (cross/ireland_resolve_place) ----------
+
+async function resolvePlace(ctx, args) {
+  return ctx.call("cross", "ireland_resolve_place", { limit: 500, ...args });
+}
+
+/** Names of the areas of `list` level inside a place, via the crosswalk (mostly-inside only). */
+async function areasIn(ctx, place, level, list) {
+  const d = await resolvePlace(ctx, { place, level, list });
+  if (d.children.next_offset != null) throw new Error(`crosswalk list for ${place} is paged`);
+  return d.children.items.filter((r) => r.share_inside >= 0.5);
+}
+
+/** NDA05 rows for the LEAs inside a county, matched through the crosswalk ("<LEA>, <council>"). */
+async function leaRowsInCounty(ctx, leaRows, county) {
+  const leas = await areasIn(ctx, county, "county", "lea");
+  const rows = leaRows.filter((l) => leas.some((x) => norm(x.name) === norm(l.lea) && norm(x.local_authority).startsWith(norm(l.council))));
+  // Independent cross-check against the hand-written council map the crosswalk replaced.
+  const legacy = leaRows.filter((l) => councilToCounty(l.council) === county);
+  if (rows.length !== legacy.length || rows.length !== leas.length) throw new Error(`crosswalk LEAs for ${county}: ${rows.length} matched, ${legacy.length} by council name, ${leas.length} listed`);
+  return rows;
+}
+
+// Councils grouped into counties: the hand-written map the crosswalk replaced, kept only as a cross-check.
 const COUNCIL_COUNTY = {
   "Dublin City": "Dublin", "South Dublin": "Dublin", Fingal: "Dublin", "Dun Laoghaire-Rathdown": "Dublin", "Dún Laoghaire-Rathdown": "Dublin",
   "Cork City": "Cork", "Cork County": "Cork", "Galway City": "Galway", "Galway County": "Galway"
@@ -433,9 +456,12 @@ export const items = [
       const c = await ctx.call("geohive", "geohive_query_layer", { service: "Counties___OSi_National_Statutory_Boundaries", where: "PROVINCE='Munster'", out_fields: "ENGLISH,PROVINCE", limit: 20 });
       const counties = new Set(c.features.map((f) => norm(f.ENGLISH)));
       if (!counties.size) throw new Error("no Munster counties from GeoHive");
-      ctx.workaround("crosswalk:la-to-county");
-      const laInMunster = (la) => [...counties].some((cn) => norm(la).startsWith(cn.split(" ")[0]));
-      const isMunsterLa = (label) => /Council$/.test(label) && laInMunster(label);
+      const names = (await areasIn(ctx, "Munster", "province", "local_authority")).map((r) => r.name);
+      const las = new Set(names.map(norm));
+      const isMunsterLa = (label) => las.has(norm(label));
+      // Cross-check: the crosswalk's councils are exactly those named after a GeoHive Munster county.
+      const legacy = (label) => /Council$/.test(label) && [...counties].some((cn) => norm(label).startsWith(cn.split(" ")[0]));
+      if (names.some((la) => !legacy(la))) throw new Error(`crosswalk Munster councils disagree with GeoHive counties: ${names.join(", ")}`);
       const unemp = await cpni(ctx, "CPNI37", { laMatch: isMunsterLa });
       const top = unemp.sort((x, y) => y.value - x.value)[0];
       const la = top[LA_DIM];
@@ -494,8 +520,8 @@ export const items = [
     tier: "T2",
     drift: "slow",
     question: "Rank the counties of the province of Connacht by new dwelling completions in 2024 per 1,000 residents (Census 2022 population). Give the full ranking (highest first) and the top county's rate.",
-    required_sources: ["cso", "geohive"],
-    tool_path: ["geohive_query_layer(Counties, PROVINCE='Connacht')", "cso_search_tables(completions)", "cso_get_data(NDA05, 2024)", "aggregate LEAs to counties", "cso_area_profile per county"],
+    required_sources: ["cso", "cross"],
+    tool_path: ["ireland_resolve_place(Connacht, list county)", "cso_search_tables(completions)", "cso_get_data(NDA05, 2024)", "ireland_resolve_place(<county>, list lea) to aggregate LEAs", "cso_area_profile per county"],
     answer: {
       ranking: { type: "ordered_list", exact: true },
       top_rate_per_1000: { type: "number", tol_abs: 0.05 }
@@ -503,13 +529,11 @@ export const items = [
     gaps: ["crosswalk:lea-to-county", "server-query:aggregate"],
     async reference(ctx) {
       const leas = await completionsByLea(ctx, 2024);
-      ctx.workaround("crosswalk:lea-to-county");
-      const g = await ctx.call("geohive", "geohive_query_layer", { service: "Counties___OSi_National_Statutory_Boundaries", where: "PROVINCE='Connacht'", out_fields: "ENGLISH,PROVINCE", limit: 20 });
-      const counties = g.features.map((f) => f.ENGLISH.charAt(0) + f.ENGLISH.slice(1).toLowerCase());
+      const counties = (await areasIn(ctx, "Connacht", "province", "county")).map((r) => r.name);
       if (counties.length !== 5) throw new Error(`expected 5 Connacht counties, got ${counties.length}`);
       const rates = [];
       for (const c of counties) {
-        const total = leas.filter((l) => councilToCounty(l.council) === c).reduce((s, l) => s + l.value, 0);
+        const total = (await leaRowsInCounty(ctx, leas, c)).reduce((s, l) => s + l.value, 0);
         const { pop2022 } = await countyPop2022(ctx, c);
         rates.push({ c, rate: (total / pop2022) * 1000 });
       }
@@ -535,13 +559,15 @@ export const items = [
       const schemeDim = meta.dimensions.find((d) => /Scheme/i.test(d.label));
       const ja = schemeDim.categories.find((c) => /^Jobseekers Allowance$/i.test(c.label));
       const rows = await csoRows(ctx, "DSP24", { "TLIST(Q1)": ["2026Q2"], [schemeDim.code]: [ja.code] });
-      ctx.workaround("crosswalk:county-label-variants");
       const rates = [];
       for (const r of rows) {
         const m = /^Co\.?\s*(.+)$/.exec(r.County ?? "");
         if (!m || r.value == null) continue;
-        const { pop2022 } = await countyPop2022(ctx, m[1].trim());
-        rates.push({ c: m[1].trim(), rate: (r.value / pop2022) * 1000 });
+        // The crosswalk reads DSP's "Co.Donegal" labels; the regex above is the cross-check.
+        const county = (await resolvePlace(ctx, { place: r.County, level: "county" })).place.name;
+        if (norm(county) !== norm(m[1])) throw new Error(`crosswalk read ${r.County} as ${county}`);
+        const { pop2022 } = await countyPop2022(ctx, county);
+        rates.push({ c: county, rate: (r.value / pop2022) * 1000 });
       }
       if (rates.length < 20) throw new Error(`only ${rates.length} counties parsed`);
       rates.sort((x, y) => y.rate - x.rate);
@@ -615,8 +641,8 @@ export const items = [
     tier: "T2",
     drift: "slow",
     question: "Across the four Dublin local authorities, which three local electoral areas had the most new dwelling completions in 2024 (in order), what share of all Dublin completions did those three account for, and which Dáil constituency is the top LEA mainly in?",
-    required_sources: ["cso", "geohive"],
-    tool_path: ["cso_get_data(NDA05, 2024)", "filter Dublin councils", "geohive_locate(<top LEA>)", "geohive_boundaries_at_point"],
+    required_sources: ["cso", "cross"],
+    tool_path: ["cso_get_data(NDA05, 2024)", "ireland_resolve_place(Dublin, list lea)", "ireland_resolve_place(<top LEA>) -> constituency with largest share"],
     answer: {
       top3_leas: { type: "ordered_list", exact: true },
       top3_share_pct: { type: "number", tol_abs: 0.3 },
@@ -624,15 +650,13 @@ export const items = [
     },
     gaps: ["crosswalk:lea-to-constituency", "crosswalk:lea-to-county"],
     async reference(ctx) {
-      const leas = (await completionsByLea(ctx, 2024)).filter((l) => councilToCounty(l.council) === "Dublin");
-      ctx.workaround("crosswalk:lea-to-county");
+      const leas = await leaRowsInCounty(ctx, await completionsByLea(ctx, 2024), "Dublin");
       const total = leas.reduce((s, l) => s + l.value, 0);
       leas.sort((a, b) => b.value - a.value);
       const top = leas.slice(0, 3);
-      // No LEA→constituency mapping exists: locate the LEA's namesake place and take the constituency there.
-      ctx.workaround("crosswalk:lea-to-constituency");
-      const b = await boundaries(ctx, await locate(ctx, top[0].lea.split(/[- ]/)[0], "Dublin"));
-      return { top3_leas: top.map((l) => l.lea), top3_share_pct: round((top.reduce((s, l) => s + l.value, 0) / total) * 100, 1), top_lea_constituency: b.dail_constituency.name };
+      // "Mainly in": the constituency holding the largest share of the LEA's Census 2022 residents.
+      const r = await resolvePlace(ctx, { place: `${top[0].lea}, ${top[0].council}`, level: "lea" });
+      return { top3_leas: top.map((l) => l.lea), top3_share_pct: round((top.reduce((s, l) => s + l.value, 0) / total) * 100, 1), top_lea_constituency: r.codes.constituency[0].name };
     }
   },
   {
@@ -660,9 +684,10 @@ export const items = [
         offset = d.next_offset;
       }
       ctx.workaround("server-query:pagination");
-      ctx.workaround("crosswalk:nuts3-to-county");
+      const counties = (await areasIn(ctx, "IE042", "nuts3", "county")).map((r) => r.name).sort();
+      if (counties.join() !== "Galway,Mayo,Roscommon") throw new Error(`crosswalk IE042 counties: ${counties.join(", ")}`);
       let pop = 0;
-      for (const c of ["Galway", "Mayo", "Roscommon"]) pop += (await countyPop2022(ctx, c)).pop2022;
+      for (const c of counties) pop += (await countyPop2022(ctx, c)).pop2022;
       return { project_count: count, total_eu_budget_eur: Math.round(total), per_resident_eur: round(total / pop, 1) };
     }
   },
@@ -743,9 +768,12 @@ export const items = [
         rows.sort((a, b) => b.value - a.value);
         out[`${key}_table`] = code;
         out[`${key}_top_lea`] = rows[0][geo.label].split(",")[0].trim();
-        if (key === "completions") out._county = councilToCounty(rows[0][geo.label].split(",").at(-1).trim());
+        if (key === "completions") {
+          const r = await resolvePlace(ctx, { place: rows[0][geo.label], level: "lea" });
+          out._county = r.codes.county[0].name;
+          if (out._county !== councilToCounty(rows[0][geo.label].split(",").at(-1).trim())) throw new Error(`crosswalk county ${out._county} for ${rows[0][geo.label]}`);
+        }
       }
-      ctx.workaround("crosswalk:lea-to-county");
       out.completions_county_median_eur = (await pprYear(ctx, { county: out._county, from: "2024-01-01", to: "2024-12-31" })).median_eur;
       delete out._county;
       return out;
@@ -855,21 +883,24 @@ export const items = [
     tier: "T3",
     drift: "slow",
     question: "Among the three Galway City local electoral areas (Galway City Central, East and West), which had the fastest RTB average rent growth from 2019 to 2024 (all bedrooms, all property types)? For that LEA give the growth, its 2024 new dwelling completions, and the current TDs of the Dáil constituency that contains it.",
-    required_sources: ["cso", "geohive", "oireachtas"],
-    tool_path: ["cso_get_table_metadata(RIA02) find LEA locations", "cso_get_data(RIA02, 2019/2024)", "cso_get_data(NDA05, 2024)", "geohive (LEA -> constituency)", "oireachtas_search_members"],
+    required_sources: ["cso", "cross", "oireachtas"],
+    tool_path: ["cso_get_table_metadata(RIA02) find LEA locations", "cso_get_data(RIA02, 2019/2024)", "cso_get_data(NDA05, 2024)", "ireland_resolve_place(LEA) -> constituency", "oireachtas_search_members"],
     answer: {
       lea: { type: "text" },
       rent_growth_pct: { type: "number", tol_abs: 0.5 },
       completions_2024: { type: "number", tol_abs: 0 },
       tds: { type: "list" }
     },
-    gaps: ["crosswalk:rtb-location-to-lea", "crosswalk:lea-to-constituency", "server-query:large-table"],
+    // RTB publishes rents by LEA only in its own Rent Index reports (rtb.ie). CSO's RIA02 has towns and
+    // neighbourhoods; mapping them to LEAs cannot give an LEA average without tenancy counts, so this is a
+    // missing source, not a crosswalk gap. The crosswalk does answer the LEA -> constituency step.
+    gaps: ["source:rtb-lea-rents", "server-query:large-table"],
     async reference(ctx) {
       const meta = await ctx.call("cso", "cso_get_table_metadata", { table_code: "RIA02", max_categories: 500 });
       const loc = meta.dimensions.find((d) => d.label === "Location");
       const names = ["Galway City Central", "Galway City East", "Galway City West"];
       const cats = names.map((n) => loc.categories.find((c) => norm(c.label).startsWith(norm(n))));
-      if (cats.some((c) => !c)) throw new GapError("crosswalk:rtb-location-to-lea", `RTB locations for Galway City LEAs not found: ${loc.categories.filter((c) => /galway/i.test(c.label)).map((c) => c.label).join("; ")}`);
+      if (cats.some((c) => !c)) throw new GapError("source:rtb-lea-rents", `RIA02 has ${loc.categories.length} locations (counties, towns, neighbourhoods) and none is an LEA; Galway entries: ${loc.categories.filter((c) => /galway/i.test(c.label)).map((c) => c.label).join("; ")}`);
       const rows = await csoRows(ctx, "RIA02", { "TLIST(A1)": ["2019", "2024"], C02970V03592: ["-"], C02969V03591: ["-"], [loc.code]: cats.map((c) => c.code) });
       const growth = names.map((n, i) => {
         const r = rows.filter((x) => x.Location === cats[i].label);
@@ -877,9 +908,8 @@ export const items = [
       }).sort((a, b) => b.g - a.g);
       const top = growth[0];
       const comp = (await completionsByLea(ctx, 2024)).find((l) => norm(l.lea) === norm(top.n));
-      ctx.workaround("crosswalk:lea-to-constituency");
-      const b = await boundaries(ctx, await locate(ctx, "Galway", "Galway"));
-      return { lea: top.n, rent_growth_pct: top.g, completions_2024: comp.value, tds: await currentTds(ctx, b.dail_constituency.name) };
+      const r = await resolvePlace(ctx, { place: `${top.n}, Galway City`, level: "lea" });
+      return { lea: top.n, rent_growth_pct: top.g, completions_2024: comp.value, tds: await currentTds(ctx, r.codes.constituency[0].name) };
     }
   },
   {
@@ -1031,14 +1061,13 @@ export const items = [
     gaps: ["crosswalk:lea-to-county", "server-query:aggregate"],
     async reference(ctx) {
       const leas = await completionsByLea(ctx, 2024);
-      ctx.workaround("crosswalk:lea-to-county");
       const out = {};
       const rates = [];
       for (const c of ["Cork", "Kerry", "Limerick"]) {
         const k = c.toLowerCase();
         out[`${k}_median_eur`] = (await pprYear(ctx, { county: c, from: "2024-01-01", to: "2024-12-31" })).median_eur;
         const { pop2022, change_pct } = await countyPop2022(ctx, c);
-        const total = leas.filter((l) => councilToCounty(l.council).startsWith(c)).reduce((s, l) => s + l.value, 0);
+        const total = (await leaRowsInCounty(ctx, leas, c)).reduce((s, l) => s + l.value, 0);
         out[`${k}_completions_per_1000`] = round((total / pop2022) * 1000, 2);
         out[`${k}_pop_growth_pct`] = change_pct;
         rates.push([c, total / pop2022]);
@@ -1052,8 +1081,8 @@ export const items = [
     tier: "T3",
     drift: "slow",
     question: "Which electoral division in the Galway City Council area has the lowest (most deprived) 2022 Pobal HP relative deprivation score, what is the score, and who are the current TDs for the Dáil constituency it is in?",
-    required_sources: ["pobal", "geohive", "oireachtas"],
-    tool_path: ["list EDs in Galway City (crosswalk)", "pobal scores for each", "ED -> constituency", "oireachtas_search_members"],
+    required_sources: ["pobal", "cross", "oireachtas"],
+    tool_path: ["ireland_resolve_place(Galway City Council, list ed)", "pobal_deprivation_search(ED id) x22", "ED -> constituency (from the list)", "oireachtas_search_members"],
     answer: {
       electoral_division: { type: "text" },
       relative_score: { type: "number", tol_abs: 0.01 },
@@ -1064,7 +1093,19 @@ export const items = [
       if (!ctx.hasOperation("ireland_resolve_place") && !ctx.hasOperation("ireland_crosswalk")) {
         throw new GapError("crosswalk:la-to-eds", "no tool lists the electoral divisions of a local authority; pobal_deprivation_search needs a name or id and has no council filter");
       }
-      throw new Error("crosswalk tool now present: write this reference");
+      const eds = await areasIn(ctx, "Galway City Council", "local_authority", "ed");
+      if (eds.length < 20) throw new Error(`only ${eds.length} Galway City EDs from the crosswalk`);
+      const scored = [];
+      for (const ed of eds) {
+        const p = await ctx.call("pobal", "pobal_deprivation_search", { query: ed.code, limit: 5 }, { allowTruncated: true });
+        const hit = p.areas.find((a) => a.ed_id === ed.code);
+        if (!hit || typeof hit.relative_score_2022 !== "number") throw new Error(`Pobal has no score for ED ${ed.code} ${ed.name}`);
+        scored.push({ ed, score: hit.relative_score_2022 });
+      }
+      scored.sort((a, b) => a.score - b.score);
+      const low = scored[0];
+      if (low.ed.constituency.includes(";")) throw new Error(`ED ${low.ed.name} straddles constituencies: ${low.ed.constituency}`);
+      return { electoral_division: low.ed.name, relative_score: low.score, tds: await currentTds(ctx, low.ed.constituency) };
     }
   },
   {

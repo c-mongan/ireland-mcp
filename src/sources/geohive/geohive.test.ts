@@ -63,8 +63,8 @@ describe("GeoHive module", () => {
       county: { name: "Dublin", irish: "Baile Átha Cliath", province: "Leinster" },
       local_authority: { name: "Dublin City Council" },
       dail_constituency: { name: "Dublin Central", seats: 4 },
-      local_electoral_area: { name: "North Inner City", seats: 8 },
-      electoral_division: { name: "North City", cso_code: "02075" },
+      local_electoral_area: { name: "North Inner City", seats: 7, boundary_id: "13260426" },
+      electoral_division: { name: "North City", ed_id: "268106", cso_code: "02075" },
       small_area: { code: "268106016", nuts3: "Dublin" },
       settlement: { name: "Dublin city and suburbs" }
     });

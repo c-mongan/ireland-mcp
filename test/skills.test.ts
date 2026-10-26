@@ -9,13 +9,13 @@ const skillsDir = join(root, "skills");
 
 // Opt-in beta sources (LEGAL_ENABLED) are not on the hosted endpoint, so skills must not depend on them.
 const BETA_SOURCES = new Set(["irish-legal", "citizens-info"]);
-// ireland_call dispatches to these (source -> operation) pairs; "cross" holds nearby, ireland_snapshot, list_sources.
+// ireland_call dispatches to these (source -> operation) pairs; "cross" holds nearby, ireland_snapshot, list_sources, ireland_resolve_place.
 const ops = new Map<string, Set<string>>();
 for (const mod of appModules().modules) {
   if (!BETA_SOURCES.has(mod.info.id)) ops.set(mod.info.id, new Set(mod.tools.map((tool) => tool.name)));
 }
 const allOps = new Set([...ops.values()].flatMap((set) => [...set]));
-const META_TOOLS = ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about", "search", "fetch", "nearby"];
+const META_TOOLS = ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about", "search", "fetch", "nearby", "ireland_resolve_place"];
 
 function skillFolders(): string[] {
   if (!existsSync(skillsDir)) return [];

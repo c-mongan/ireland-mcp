@@ -139,6 +139,7 @@ export const operationContracts = {
   heritage_monuments_near: shape({ count: number, monuments: records }),
   list_sources: collection("sources"),
   ireland_snapshot: shape({ place: text, population: object, boundaries: object, forecast: (v) => records(v) || object(v), national_warnings: (v) => records(v) || object(v) }),
+  ireland_resolve_place: (data) => object(data.place) && object(data.codes) && object(data.match) && object(data.crosswalk),
   nearby: (data) => geographicPoint(data) && object(data.boundaries) && Object.hasOwn(data, "forecast") && Array.isArray(data.sources)
 };
 

@@ -1,0 +1,50 @@
+{
+ "objectIdFieldName": "OBJECTID",
+ "uniqueIdField": {
+  "name": "OBJECTID",
+  "isSystemMaintained": true
+ },
+ "globalIdFieldName": "",
+ "geometryType": "esriGeometryPolygon",
+ "spatialReference": {
+  "wkid": 2157,
+  "latestWkid": 2157
+ },
+ "fields": [
+  {
+   "name": "ENG_NAME_VALUE",
+   "type": "esriFieldTypeString",
+   "alias": "ENG_NAME_VALUE",
+   "sqlType": "sqlTypeOther",
+   "length": 750,
+   "domain": null,
+   "defaultValue": null
+  },
+  {
+   "name": "GLE_NAME_VALUE",
+   "type": "esriFieldTypeString",
+   "alias": "GLE_NAME_VALUE",
+   "sqlType": "sqlTypeOther",
+   "length": 750,
+   "domain": null,
+   "defaultValue": null
+  },
+  {
+   "name": "BDY_ID",
+   "type": "esriFieldTypeDouble",
+   "alias": "BDY_ID",
+   "sqlType": "sqlTypeOther",
+   "domain": null,
+   "defaultValue": null
+  }
+ ],
+ "features": [
+  {
+   "attributes": {
+    "ENG_NAME_VALUE": "NORTH INNER CITY LEA-7",
+    "GLE_NAME_VALUE": "Lár na Cathrach Thuaidh TA-7",
+    "BDY_ID": 13260426
+   }
+  }
+ ]
+}

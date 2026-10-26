@@ -23,22 +23,23 @@ tool name as the operation. On the default surface, run it with `ireland_call`, 
 ```
 
 If an argument shape is unclear, call `ireland_describe` with `{ "source", "operation" }` first;
-it returns the schema and an example. `search`, `fetch` and `nearby` are top-level tools. If the
+it returns the schema and an example. `search`, `fetch`, `nearby` and `ireland_resolve_place` are top-level tools. If the
 server was added with `?toolsets=<ids>` or `?toolsets=all`, the typed tool can be called directly
 with the same `args`.
 
 ## Steps
 
-1. **Pin both places to the same level.** Compare like with like: county with county, town with town,
-   electoral division (ED) with ED. For each place call `geohive/geohive_locate` with
-   `{ "name": "Tallaght" }`, then `census-areas/census_small_area_at` with the returned `lat`/`lon`.
-   Keep the county, local authority and the ED `code` (six digits, e.g. "268018").
-   If the levels differ, tell the user and pick the closest common level.
+1. **Pin both places to the same level.** Compare like with like: county with county, council with
+   council, LEA with LEA, electoral division (ED) with ED. Call `ireland_resolve_place` with
+   `{ "place": "Tallaght" }` for each place. It returns `place.level` and every code: county, local
+   authority, LEA, Dáil constituency, NUTS3 and the ED `code` (six digits, e.g. "268018"). For an area,
+   add `"list": "ed"` to get all of its EDs. A town name falls back to its gazetteer point, which is
+   flagged `approximate`. If the levels differ, tell the user and pick the closest common level.
 2. **Population.** Call `cso/cso_area_profile` with `{ "area": "<county or town>", "years": ["2016", "2022"] }`.
    Counties give change between censuses; towns give Census 2022 only.
 3. **Deprivation.** Call `pobal/pobal_deprivation_search` with `{ "query": "<ED code>" }` (the code from
-   step 1 matches Pobal's `ed_id`) or with an ED name. A name can match several EDs (Ballymun A–F);
-   list each or give the range, and say which.
+   step 1 matches Pobal's `ed_id`) for each ED from step 1. A name can match several EDs (Ballymun A–F);
+   list each or give a population-weighted average, and say which.
 4. **Sale prices.** Call `ppr/ppr_price_stats` for each place over the same 12 months, e.g.
    `{ "county": "Dublin", "address": "tallaght", "from": "<12 months ago>" }` or an Eircode routing key
    (`"eircode": "D24"`). Report median, count and quartiles.

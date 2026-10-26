@@ -58,6 +58,25 @@ export async function smallAreaAt(ctx: ToolContext, lat: number, lon: number) {
   };
 }
 
+/** Looks up a Census 2022 small area by its published code ("268098009") or GEOGID ("A268098009"). */
+export async function smallAreaByCode(ctx: ToolContext, code: string) {
+  const clean = code.trim().toUpperCase();
+  const field = clean.startsWith("A") ? "SA_GEOGID_2022" : "SA_PUB2022";
+  const result = await queryLayer(ctx, ARCGIS_LAYERS.censusSmallAreas, {
+    where: fieldEq(field, clean),
+    outFields: ["SA_PUB2022", "SA_GEOGID_2022", "ED_ID_STR", "ED_ENGLISH"],
+    resultRecordCount: 1,
+    returnGeometry: false
+  });
+  const attrs = result.features[0]?.attributes;
+  return {
+    result: attrs ? { code: str(attrs.SA_PUB2022), geogid: str(attrs.SA_GEOGID_2022), ed_id: str(attrs.ED_ID_STR), ed_name: str(attrs.ED_ENGLISH) } : null,
+    cached: result.cached,
+    stale: result.stale,
+    url: result.url
+  };
+}
+
 const tool = defineTool({
   name: "census_small_area_at",
   title: "Census small area at a location",

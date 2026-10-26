@@ -5,6 +5,7 @@ import { defineTool, type AnyTool, type SearchHit, type SourceModule, type ToolC
 import { boundariesAt, geohiveInfo, locatePlace } from "../sources/geohive/index.js";
 import { activeWarnings, forecastAt, metInfo, nearestStation } from "../sources/met-eireann/index.js";
 import { findPlace } from "./places.js";
+import { codesForEd, crosswalkInfo, resolvePlaceTool } from "./resolvePlace.js";
 
 export const crossInfo: SourceInfo = {
   id: "cross",
@@ -113,8 +114,10 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
   async function nearbyData(ctx: ToolContext, lat: number, lon: number, hours: number) {
     const station = nearestStation(lat, lon);
     const [bounds, forecast] = await Promise.allSettled([boundariesAt(ctx, lat, lon), forecastAt(ctx, lat, lon, hours)]);
+    const edId = bounds.status === "fulfilled" ? (bounds.value.boundaries.electoral_division as { ed_id?: string } | null)?.ed_id : undefined;
     return {
       boundaries: bounds.status === "fulfilled" ? bounds.value.boundaries : settledSection(bounds),
+      codes: codesForEd(edId) ?? null,
       nearest_met_station: station,
       forecast: forecast.status === "fulfilled" ? { model_run: forecast.value.model_run, hours: forecast.value.items } : settledSection(forecast),
       stale: [bounds, forecast].some((s) => s.status === "fulfilled" && s.value.stale),
@@ -150,7 +153,7 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
     pinned: true,
     title: "What is at this location",
     description:
-      "For a WGS84 point in Ireland: county, local authority, constituency, electoral division, small area and settlement (GeoHive), the nearest Met Éireann station and forecast, recorded monuments within 500 m (SMR) and NPWS protected sites at the point. Not live observations, river levels, buoys, bikes or populations: use ireland_call for those.",
+      "For a WGS84 point in Ireland: county, local authority, LEA, constituency, electoral division, small area and settlement (GeoHive) with crosswalk codes, the nearest Met Éireann station and forecast, recorded monuments within 500 m (SMR) and NPWS protected sites at the point. Not live observations, river levels, buoys, bikes or populations: use ireland_call for those.",
     inputSchema: {
       lat: z.number().min(-90).max(90).describe("Latitude, e.g. 53.3498."),
       lon: z.number().min(-180).max(180).describe("Longitude, e.g. -6.2603."),
@@ -163,11 +166,12 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
           lat,
           lon,
           boundaries: d.boundaries,
+          codes: d.codes,
           nearest_met_station: d.nearest_met_station,
           forecast: d.forecast,
           monuments: layers.monuments,
           protected_sites: layers.protected_sites,
-          sources: [cite(geohiveInfo, "https://www.geohive.ie/"), cite(metInfo, d.forecastUrl ?? metInfo.homepage), ...layers.sources]
+          sources: [cite(geohiveInfo, "https://www.geohive.ie/"), ...(d.codes ? [cite(crosswalkInfo, crosswalkInfo.homepage)] : []), cite(metInfo, d.forecastUrl ?? metInfo.homepage), ...layers.sources]
         },
         url: crossInfo.homepage,
         cached: d.cached && layers.cached,
@@ -229,6 +233,7 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
           lon: where.lon,
           population: pop ? pop.data : settledSection(population),
           boundaries: near.boundaries,
+          codes: near.codes,
           nearest_met_station: near.nearest_met_station,
           forecast: near.forecast,
           national_warnings:
@@ -238,6 +243,7 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
           sources: [
             ...(pop && byId.get("cso") ? [cite(byId.get("cso")!.info, pop.url)] : []),
             cite(geohiveInfo, "https://www.geohive.ie/"),
+            ...(near.codes ? [cite(crosswalkInfo, crosswalkInfo.homepage)] : []),
             cite(metInfo, near.forecastUrl ?? metInfo.homepage)
           ]
         },
@@ -248,5 +254,5 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
     }
   });
 
-  return [search, fetchTool, listSources, snapshot, nearby];
+  return [search, fetchTool, listSources, snapshot, nearby, resolvePlaceTool];
 }
