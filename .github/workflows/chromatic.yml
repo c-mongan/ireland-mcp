@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "web/**"
+      - "!web/data/**"
       - "storybook/**"
       - ".storybook/**"
       - ".github/workflows/chromatic.yml"
@@ -14,6 +15,7 @@ on:
   pull_request:
     paths:
       - "web/**"
+      - "!web/data/**"
       - "storybook/**"
       - ".storybook/**"
       - ".github/workflows/chromatic.yml"

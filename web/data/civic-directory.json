@@ -1,0 +1,1943 @@
+{
+  "schema": "https://irishopendata.ie/data/civic-directory.json#v1",
+  "title": "Éire Civic Tech Directory snapshot",
+  "description": "Irish civic-tech projects as listed in the Éire Civic Tech Directory, which powers CitizenData.ie.",
+  "publisher": "Éire Civic Tech Directory (CitizenData.ie)",
+  "maintainer": "William Kennedy",
+  "repository": "https://github.com/williamkennedy/eire_civic_tech_directory",
+  "commit": "7f0aeaf1a8655b25e55f76dae94a497943970629",
+  "commit_date": "2026-10-25T11:21:33Z",
+  "licence": "MIT",
+  "licence_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/LICENSE",
+  "licence_text": "MIT License\n\nCopyright (c) 2026 William Kennedy\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.",
+  "licence_sha256": "dd80751d917da2e1fc6e7b2c3b847b613719b2c4b9e977e6c6759bfbbd91994b",
+  "attribution": "Éire Civic Tech Directory by William Kennedy (MIT licence), the catalogue behind CitizenData.ie. Project names, descriptions and links belong to the listed owners.",
+  "listing_site": "https://citizendata.ie/",
+  "listing_note": "citizendata_listing_url (\"see listing on CitizenData.ie\") is derived from each entry's file name. Ireland MCP does not fetch or scrape citizendata.ie.",
+  "verification": "Status, owners and links are as listed, unverified. Ireland MCP has not checked whether projects are live or accurately described.",
+  "as_of": "2026-10-26",
+  "generated_by": "scripts/refresh-civic-directory.mjs (https://github.com/c-mongan/ireland-mcp)",
+  "projects": [
+    {
+      "slug": "actions-for-pollinators",
+      "title": "Actions for Pollinators",
+      "category": "Environment",
+      "owners": [
+        "National Biodiversity Data Centre"
+      ],
+      "description": "Online mapping system for registering and mapping pollinator-friendly actions across Ireland.",
+      "status_as_listed": "active",
+      "founding_year": 2017,
+      "link": "https://pollinators.biodiversityireland.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/actions-for-pollinators",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/actions-for-pollinators.md",
+      "sha256": "8173c8cbdd27889bab195d5f8418ff94dba7bba615e7b4d2f409ba7bdc09dc1c"
+    },
+    {
+      "slug": "active-travel-tracker",
+      "title": "Dublin City Council Active Travel Tracker",
+      "category": "Accountability",
+      "owners": [
+        "Cllr Feljin Jose"
+      ],
+      "description": "Every project in Dublin City Council’s Active Travel Network tracked through quarterly reports to councillors from 2022 to present.",
+      "status_as_listed": "active",
+      "founding_year": null,
+      "link": "https://feljin.ie/activetravel/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/active-travel-tracker",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/active-travel-tracker.md",
+      "sha256": "30b62272c3b58e9a2925e8ece50cc5752cf8639316b00ff7509e9205deabe5a9"
+    },
+    {
+      "slug": "aon-scor",
+      "title": "Aon Scór",
+      "category": "Sport",
+      "owners": [
+        "Rob Leonard",
+        "Rory McEvoy"
+      ],
+      "description": "Live scores, fixtures, results and championship brackets for all intercounty GAA codes.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://aon-scor.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/aon-scor",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/aon-scor.md",
+      "sha256": "733e904b2e7acf4a5f2727bf0b7f218f4f134ad038bb066591666c16ab71d348"
+    },
+    {
+      "slug": "baile-beo",
+      "title": "Baile Beo",
+      "category": "Equality",
+      "owners": [
+        "Dave McGinn"
+      ],
+      "description": "Place names as Gaeilge.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://www.bailebeo.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/baile-beo",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/baile-beo.md",
+      "sha256": "88f1c9e3df8075ba69850e735a1bda39883607a8d80fe9dce390b9f1a8364702"
+    },
+    {
+      "slug": "before-you-eat",
+      "title": "Before You Eat",
+      "category": "Food Safety",
+      "owners": [
+        "Gerald McAuley"
+      ],
+      "description": "Searchable archive of FSAI food safety enforcement orders across Ireland, with links to the official order documents.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://beforeyoueat.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/before-you-eat",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/before-you-eat.md",
+      "sha256": "919d91f2c8df27534800a1469a55f466ea75f70aa8fe356cb73ea08da4d19338"
+    },
+    {
+      "slug": "benefacts-legacy",
+      "title": "Benefacts Legacy",
+      "category": "Non-Profit Finance",
+      "owners": [
+        "Benefacts"
+      ],
+      "description": "Non-profit finance data from 2014 to 2022.",
+      "status_as_listed": "inactive",
+      "founding_year": 2014,
+      "link": "https://benefactslegacy.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/benefacts-legacy",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/benefacts-legacy.md",
+      "sha256": "842d1bf8b3b05cc40b5d17b5f6088e0a97382e5c288d38f855bb94a890bd0fa3"
+    },
+    {
+      "slug": "buildable",
+      "title": "Buildable",
+      "category": "Housing",
+      "owners": [
+        "John McEnroe"
+      ],
+      "description": "Find untapped development land in Dublin and Leinster before it hits the market.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://buildable.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/buildable",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/buildable.md",
+      "sha256": "cd84fe510f604e5a5916f65ddbac77e24e979c688a62d1c145f8b5470415aba1"
+    },
+    {
+      "slug": "bus-cancellations-dublin",
+      "title": "Bus Cancellations Dublin",
+      "category": "Transport",
+      "owners": [
+        "Unknown"
+      ],
+      "description": "Track and view Dublin bus cancellations by route and operator over a selected period.",
+      "status_as_listed": "active",
+      "founding_year": 2025,
+      "link": "https://buscancellationsdublin.eu/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/bus-cancellations-dublin",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/bus-cancellations-dublin.md",
+      "sha256": "996d6344928dc7c759001465f4b76aee5b4b98b3ac92bf28428e7296f2821d7c"
+    },
+    {
+      "slug": "bustimes-org",
+      "title": "Bustimes.org",
+      "category": "Transport",
+      "owners": [
+        "Joshua Goodwin"
+      ],
+      "description": "Live bus locations and timetables across Ireland and the UK.",
+      "status_as_listed": "active",
+      "founding_year": 2015,
+      "link": "https://bustimes.org/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/bustimes-org",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/bustimes-org.md",
+      "sha256": "555c993bf83371de9cc6137077a72c400bf9e01763ee7664bd0929a122b86387"
+    },
+    {
+      "slug": "bustracker",
+      "title": "Bustracker",
+      "category": "Transport",
+      "owners": [
+        "u/Expensive-Total-312 on Reddit"
+      ],
+      "description": "Live bus locations across the Republic of Ireland.",
+      "status_as_listed": "active",
+      "founding_year": 2025,
+      "link": "https://www.bustracker.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/bustracker",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/bustracker.md",
+      "sha256": "548686ad6c9853ac8ba52569f700a3ee6df523f94c543ee3e5e8d5b593253c90"
+    },
+    {
+      "slug": "cara",
+      "title": "Cara",
+      "category": "Housing",
+      "owners": [
+        "John McEnroe"
+      ],
+      "description": "Your personal agent for buying a home.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://usecara.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/cara",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/cara.md",
+      "sha256": "3e29c7d12e221c2f6a80b32c6b11bbf4d596ee36a30323dd188e1a6289be8ab3"
+    },
+    {
+      "slug": "carlow-weather",
+      "title": "Carlow Weather",
+      "category": "Environment",
+      "owners": [
+        "Alan O’Reilly"
+      ],
+      "description": "Weather updates and forecasts.",
+      "status_as_listed": "active",
+      "founding_year": 2008,
+      "link": "https://www.carlowweather.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/carlow-weather",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/carlow-weather.md",
+      "sha256": "28dd06e951d1fb0d02b0e230ecaf7804dd9ae1a07ed57a3d11353e522c082bab"
+    },
+    {
+      "slug": "citizendata",
+      "title": "Citizen Data",
+      "category": "Governance",
+      "owners": [
+        "William Kennedy"
+      ],
+      "description": "A curated directory of Irish civic tech projects, tools, and initiatives.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://citizendata.ie",
+      "repo": "https://github.com/williamkennedy/eire_civic_tech_directory",
+      "citizendata_listing_url": "https://citizendata.ie/project/citizendata",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/citizendata.md",
+      "sha256": "48ba158b9de0902495052c2348bfb19857a13ea3b7c3d097a9e3328a86afe976"
+    },
+    {
+      "slug": "civgraph",
+      "title": "Civgraph",
+      "category": "Geospatial",
+      "owners": [
+        "Scott Moore (@scottmoore0)"
+      ],
+      "description": "Maps, boundaries, census data and election results for the island of Ireland.",
+      "status_as_listed": "active",
+      "founding_year": 2025,
+      "link": "https://civgraph.net/",
+      "repo": "https://github.com/ScottMoore0/civgraph",
+      "citizendata_listing_url": "https://citizendata.ie/project/civgraph",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/civgraph.md",
+      "sha256": "7af7aa29b38ddd0c4ece78eaa8b7cac04ed52b4fa9b0010164d33ea447d0a8b2"
+    },
+    {
+      "slug": "civicq",
+      "title": "CivicQ",
+      "category": "Democracy",
+      "owners": [
+        "Dr Vanessa Liston",
+        "Mark Liston"
+      ],
+      "description": "Irish-based technology and research organisation specialising in online public engagement, civic participation, and public opinion insights.",
+      "status_as_listed": "active",
+      "founding_year": 2012,
+      "link": "https://www.civiq.eu/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/civicq",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/civicq.md",
+      "sha256": "f6ce91798e9da14c7316acc2a521da2ac7bec1f760f36bead826090483769537"
+    },
+    {
+      "slug": "coimisiun-na-mean-funding-register",
+      "title": "The Coimisiún na Meán Funding Register",
+      "category": "Accountability",
+      "owners": [
+        "Nick Delehanty"
+      ],
+      "description": "An independent register of Coimisiún na Meán funding awards compiled from public announcements.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://irishmediafunding.netlify.app/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/coimisiun-na-mean-funding-register",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/coimisiun-na-mean-funding-register.md",
+      "sha256": "0c08f67514cefba9b124b0064529ae940947d4d74c89f9e3fd7febde2609e87a"
+    },
+    {
+      "slug": "collision-tracker",
+      "title": "Collision Tracker",
+      "category": "Road Safety",
+      "owners": [
+        "Dublin Inquirer"
+      ],
+      "description": "Crowdsourced platform for reporting active travel collisions, hazards and near misses.",
+      "status_as_listed": "active",
+      "founding_year": 2024,
+      "link": "https://www.collisiontracker.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/collision-tracker",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/collision-tracker.md",
+      "sha256": "c67b11a873953bb07adbd7d8d52ad7e51b13aeb108ffd5c192daef0fb7f33d19"
+    },
+    {
+      "slug": "constituency-ie",
+      "title": "Constituency.ie",
+      "category": "Democracy",
+      "owners": [
+        "Private"
+      ],
+      "description": "Public consultation platform.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://constituency.ie",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/constituency-ie",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/constituency-ie.md",
+      "sha256": "742e83726bb0fbade666e1693d1015d8a9c1460824e27c612adf79a5dc105f05"
+    },
+    {
+      "slug": "constituent",
+      "title": "Constituent",
+      "category": "Governance",
+      "owners": [
+        "Owen Connor"
+      ],
+      "description": "Find your representatives and track the issues that shape Ireland and the EU.",
+      "status_as_listed": "active",
+      "founding_year": 2025,
+      "link": "https://constituent.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/constituent",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/constituent.md",
+      "sha256": "7049b2f91134a7bd3884b40a4045cd5af664d3d8b900d1d91440daf0f4caf90e"
+    },
+    {
+      "slug": "contact-your-local-td",
+      "title": "Contact Your Local TD",
+      "category": "Governance",
+      "owners": [
+        "Unknown"
+      ],
+      "description": "Contact details and voting records for your local TD.",
+      "status_as_listed": "active",
+      "founding_year": 2023,
+      "link": "https://www.contactyourtd.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/contact-your-local-td",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/contact-your-local-td.md",
+      "sha256": "311b7b84bd5d5a0dc88ad1df5cf04de3bd394e22dc06eb42d2c63db752357ba2"
+    },
+    {
+      "slug": "councilvotetracker",
+      "title": "CouncilVoteTracker",
+      "category": "Democracy",
+      "owners": [
+        "Dublin Inquirer"
+      ],
+      "description": "Tracks and publishes roll-call votes at monthly council meetings across Irish councils.",
+      "status_as_listed": "active",
+      "founding_year": 2018,
+      "link": "https://councilvotetracker.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/councilvotetracker",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/councilvotetracker.md",
+      "sha256": "a79231f8753daf44dc1a8499772f9db91bdfcd27acfa28312df9a323624e438a"
+    },
+    {
+      "slug": "crime-stats-ie",
+      "title": "Crime Stats IE",
+      "category": "Crime",
+      "owners": [
+        "Brian Fox"
+      ],
+      "description": "Basic crime statistics website.",
+      "status_as_listed": "active",
+      "founding_year": 2025,
+      "link": "https://www.crimestats.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/crime-stats-ie",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/crime-stats-ie.md",
+      "sha256": "e956f4c08a3b770f352b6e7eccbbd7ddc6e2063b816644fc13224fb3089b4b5a"
+    },
+    {
+      "slug": "dail-tracker",
+      "title": "Dáil Tracker",
+      "category": "Governance",
+      "owners": [
+        "peweet"
+      ],
+      "description": "A civic-data pipeline for Irish parliamentary transparency — tracking members, legislation, attendance, votes, payments, lobbying, and more.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://dailtracker.streamlit.app/member-overview",
+      "repo": "https://github.com/peweet/dail_tracker",
+      "citizendata_listing_url": "https://citizendata.ie/project/dail-tracker",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/dail-tracker.md",
+      "sha256": "2308a5c3618c1d602c0afc49d9eef419232d43cee3f43a3b050250f968c057eb"
+    },
+    {
+      "slug": "datacenter-map-ireland",
+      "title": "Data Center Map Ireland",
+      "category": "Geospatial",
+      "owners": [
+        "Data Center Map"
+      ],
+      "description": "Directory and map of 129 data center facilities across 13 markets in Ireland.",
+      "status_as_listed": "active",
+      "founding_year": 2007,
+      "link": "https://www.datacentermap.com/ireland/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/datacenter-map-ireland",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/datacenter-map-ireland.md",
+      "sha256": "580c55b44a54611319285db0d4077d5afa96893161a87fb6c4f8839603ccb946"
+    },
+    {
+      "slug": "derelict-ireland",
+      "title": "Derelict Ireland",
+      "category": "Housing",
+      "owners": [
+        "Alessio Coci"
+      ],
+      "description": "A map of derelict sites across Ireland, built from the registers councils are legally required to keep.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://acoci86.github.io/derelict-ireland/",
+      "repo": "https://github.com/ACoci86/derelict-ireland",
+      "citizendata_listing_url": "https://citizendata.ie/project/derelict-ireland",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/derelict-ireland.md",
+      "sha256": "53ae0f322fdf6dff6aba7a572c6a0ee140be86bae5fd873e764b6f7f8401aa7c"
+    },
+    {
+      "slug": "derelict-property-leads",
+      "title": "Derelict Property Leads",
+      "category": "Housing",
+      "owners": [
+        "Derelict Property Leads"
+      ],
+      "description": "A searchable database of vacant and derelict properties from Ireland's official council registers, with owner details, valuations, and grant eligibility up to €70,000.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://www.derelictproperties.ie",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/derelict-property-leads",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/derelict-property-leads.md",
+      "sha256": "d0260e5e96fc3e526239809e340d79afe42921acb4e3f7fec61a1868930889a6"
+    },
+    {
+      "slug": "derelict-sites",
+      "title": "Derelict Sites",
+      "category": "Housing",
+      "owners": [
+        "Rob Cross"
+      ],
+      "description": "Data-led project mapping derelict and long-term vacant properties across Irish local authorities.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://www.derelictsites.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/derelict-sites",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/derelict-sites.md",
+      "sha256": "bdae3647c8d231f61c185c6c4d34d3263966216073ba50a540b3c5038c4bd31f"
+    },
+    {
+      "slug": "details-ie",
+      "title": "Details.ie",
+      "category": "Web",
+      "owners": [
+        "u/hungry475 on Reddit"
+      ],
+      "description": "A profile for every Irish website.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://details.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/details-ie",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/details-ie.md",
+      "sha256": "fe897f52ed87aa79495084cc330e1944d1be36959395a38fac8cfe6cc6b2132c"
+    },
+    {
+      "slug": "discover-alone",
+      "title": "Discover Alone",
+      "category": "Geospatial",
+      "owners": [
+        "Rickie Doherty"
+      ],
+      "description": "Free map of historic places in Ireland and Britain, with nearby search, source-linked place records, and connected local stories.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://discoveralone.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/discover-alone",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/discover-alone.md",
+      "sha256": "7d57f8ccb628096da0cb04b16a9537c72bc7cc2133b2282b2aaea397c958fcc2"
+    },
+    {
+      "slug": "discoverable",
+      "title": "Discoverable",
+      "category": "Geospatial",
+      "owners": [
+        "Seán Lynch"
+      ],
+      "description": "Combination of multiple fragmented datasets incl mapped age of buildings.",
+      "status_as_listed": "active",
+      "founding_year": 2024,
+      "link": "https://discoverable.app",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/discoverable",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/discoverable.md",
+      "sha256": "a20a956250ba8c9ef739c630f55fbe48837ea8a53764c972d6264dcfa8a25940"
+    },
+    {
+      "slug": "down-the-road",
+      "title": "Down The Road",
+      "category": "Genealogy",
+      "owners": [
+        "Mark Duffy"
+      ],
+      "description": "Find ancestors across 12M+ records from 1821 to 1926.",
+      "status_as_listed": "active",
+      "founding_year": 2022,
+      "link": "https://downtheroad.dev/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/down-the-road",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/down-the-road.md",
+      "sha256": "72efd7268f8ad035710c5b8c4a39e084a0d3dc066204c60b9c53649003f87c5d"
+    },
+    {
+      "slug": "dublinhistoricmaps",
+      "title": "DublinHistoricMaps",
+      "category": "Geospatial",
+      "owners": [
+        "Brian Hollinshead"
+      ],
+      "description": "Dublin historic maps, boundaries & and OpenStreetMap miscellany.",
+      "status_as_listed": "active",
+      "founding_year": 2018,
+      "link": "https://www.dublinhistoricmaps.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/dublinhistoricmaps",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/dublinhistoricmaps.md",
+      "sha256": "1289c0504d9bf591c5e98ca1a82eaa8561214470a1c4c24ff6500cc7227ce804"
+    },
+    {
+      "slug": "easyoffer",
+      "title": "Easyoffer",
+      "category": "Housing",
+      "owners": [
+        "John McEnroe"
+      ],
+      "description": "Instant property valuation app.",
+      "status_as_listed": "active",
+      "founding_year": 2024,
+      "link": "https://www.easyoffer.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/easyoffer",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/easyoffer.md",
+      "sha256": "6dcd31019950fc2034bb76b9f0e363042ac6f6147a83c42ccfb8d01327ae3681"
+    },
+    {
+      "slug": "eireestate",
+      "title": "EireEstate",
+      "category": "Housing",
+      "owners": [
+        "Evegny Koltsov"
+      ],
+      "description": "Transparency in Ireland's new build developments.",
+      "status_as_listed": "active",
+      "founding_year": 2025,
+      "link": "https://www.eireestate.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/eireestate",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/eireestate.md",
+      "sha256": "df46bcc7119cb8bcfcc3e5c13b80f5d37c250389c8f6c72f67c8c7dc1f7a4466"
+    },
+    {
+      "slug": "electionsireland",
+      "title": "ElectionsIreland.org",
+      "category": "Democracy",
+      "owners": [
+        "Christopher Took",
+        "Seán Donnelly"
+      ],
+      "description": "Election results on the island of Ireland.",
+      "status_as_listed": "active",
+      "founding_year": 1998,
+      "link": "https://www.electionsireland.org/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/electionsireland",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/electionsireland.md",
+      "sha256": "656bbe4e9c2e4411c1638b1525607aec0b4b14cc9320cbdb2a3ffb5f47cb5e6f"
+    },
+    {
+      "slug": "everytownland",
+      "title": "Everytownland",
+      "category": "Geospatial",
+      "owners": [
+        "Florian Mousseau"
+      ],
+      "description": "Follow a name through the 1901, 1911 and 1926 censuses.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://everytownland.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/everytownland",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/everytownland.md",
+      "sha256": "c1337b30761fdea6024c15aaa72373d6c64bcfe40d764aa074f3f1a61d37cae6"
+    },
+    {
+      "slug": "explore-your-shore",
+      "title": "Explore Your Shore!",
+      "category": "Environment",
+      "owners": [
+        "National Biodiversity Data Centre"
+      ],
+      "description": "Ireland's marine biodiversity citizen science platform recording marine species around the Irish coast.",
+      "status_as_listed": "active",
+      "founding_year": 2019,
+      "link": "https://exploreyourshore.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/explore-your-shore",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/explore-your-shore.md",
+      "sha256": "2e77fd3754b62d5e0fcda710fbc24356b7fb864e2d50aba1a6d397473a07ee46"
+    },
+    {
+      "slug": "ez-commute-ie",
+      "title": "EZ Commute IE",
+      "category": "Transport",
+      "owners": [
+        "Rituraj Sambherao"
+      ],
+      "description": "Real-time intelligence for the Luas, Irish Rail and DART. Built for the realities of Irish transit — no bloat, no noise.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://ezcommute.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/ez-commute-ie",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/ez-commute-ie.md",
+      "sha256": "5e923b79bc33357d87ddb3d20f700f460bed86dd82f7ec28ab5a60ccfaeb1844"
+    },
+    {
+      "slug": "find-my-clan",
+      "title": "Find My Clan",
+      "category": "Genealogy",
+      "owners": [
+        "Unknown"
+      ],
+      "description": "Irish Heritage, from the 1901, 1911 & 1926 Censuses.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://findmyclan.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/find-my-clan",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/find-my-clan.md",
+      "sha256": "196fa55bcf28c9099fb9a33625cf39507e16b57964b14b9fdd53f7adc2d6947e"
+    },
+    {
+      "slug": "folio-record",
+      "title": "Folio Record",
+      "category": "Governance",
+      "owners": [
+        "Unknown"
+      ],
+      "description": "A public-interest reference layer for Irish public records.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://www.foliorecord.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/folio-record",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/folio-record.md",
+      "sha256": "f29bfa73d927ebed6abd1887e0342604acb2dc6f34d441bca6a2a179fb4450e7"
+    },
+    {
+      "slug": "ghost-buster",
+      "title": "Ghost Buster",
+      "category": "Transport",
+      "owners": [
+        "Oliver Moran"
+      ],
+      "description": "Real-time Cork bus tracker using NTA data to help fight ghost buses.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://realtime.prototype.website/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/ghost-buster",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/ghost-buster.md",
+      "sha256": "59b38307091d81c7534c527acb246fc2aa6ae41fb6ea189e66784c79b85e7661"
+    },
+    {
+      "slug": "government-mapped",
+      "title": "Government Mapped",
+      "category": "Accountability",
+      "owners": [
+        "James Spalding"
+      ],
+      "description": "Accountability and government mapping website.",
+      "status_as_listed": "active",
+      "founding_year": 2025,
+      "link": "https://governmentmapped.vercel.app/accountability/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/government-mapped",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/government-mapped.md",
+      "sha256": "24e876f49f7eb8ecb610fe77a3d075b3e333838a90ce6d97b69cbe1645b3c67b"
+    },
+    {
+      "slug": "green-collective",
+      "title": "Green Collective",
+      "category": "Energy",
+      "owners": [
+        "Johnston & Wang Green Collective KlG"
+      ],
+      "description": "Irish grid data and analysis platform tracking electricity generation, demand, and decarbonisation efforts.",
+      "status_as_listed": "active",
+      "founding_year": 2020,
+      "link": "https://www.greencollective.io/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/green-collective",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/green-collective.md",
+      "sha256": "bdefa5c21b98fbbf65b7e1e5eaa9126e0718c94e4ffd89479e950121de9227b7"
+    },
+    {
+      "slug": "gript-datahub",
+      "title": "Gript Datahub",
+      "category": "Governance",
+      "owners": [
+        "Gript"
+      ],
+      "description": "Tracks the cost of politics in Ireland — TD salaries, expenses, allowances, and state funding of political parties.",
+      "status_as_listed": "active",
+      "founding_year": 2025,
+      "link": "https://data.gript.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/gript-datahub",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/gript-datahub.md",
+      "sha256": "4e34ba95ce8f8fa2836fe087f6efdd2503c2de91de4518650ef7d34acb77d8e3"
+    },
+    {
+      "slug": "historic-stats",
+      "title": "Historic Stats",
+      "category": "Geospatial",
+      "owners": [
+        "Christopher O'Connor"
+      ],
+      "description": "A website for maps and statistical analysis of historical statistics in Ireland and Wales.",
+      "status_as_listed": "active",
+      "founding_year": 2023,
+      "link": "https://historicstats.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/historic-stats",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/historic-stats.md",
+      "sha256": "67ee4bea3be4e96542083b2a12c132eca3cb908a40ca48ca1d21f5b37fdcdc12"
+    },
+    {
+      "slug": "hometrue",
+      "title": "HomeTrue",
+      "category": "Housing",
+      "owners": [
+        "Unknown"
+      ],
+      "description": "Search any address in Ireland to see the commute, energy costs, schools, safety and more.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://hometrue.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/hometrue",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/hometrue.md",
+      "sha256": "7cad9bdeed35784dcaeb531399ef8bb443afc7103005f4a58d33d3daf7f66567"
+    },
+    {
+      "slug": "hometruth",
+      "title": "HomeTruth",
+      "category": "Housing",
+      "owners": [
+        "u/Extension-Street3016 on Reddit"
+      ],
+      "description": "The honest story behind Irish property prices.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://hometruth.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/hometruth",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/hometruth.md",
+      "sha256": "a29c55956fffdb4b9b061a35692dcb4eedb6815688542c46dc55c459d7475b92"
+    },
+    {
+      "slug": "house-price-ireland",
+      "title": "House Price Ireland",
+      "category": "Housing",
+      "owners": [
+        "Unknown"
+      ],
+      "description": "Track Irish home values, affordability, and market pressure county by county.",
+      "status_as_listed": "active",
+      "founding_year": 2024,
+      "link": "https://housepriceireland.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/house-price-ireland",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/house-price-ireland.md",
+      "sha256": "9830191d7e6c366d1bceb6c264de235ef4838d4cb471f39eba551744123f4777"
+    },
+    {
+      "slug": "houseprice-ie",
+      "title": "HousePrice.ie",
+      "category": "Housing",
+      "owners": [
+        "u/hungry475 on Reddit"
+      ],
+      "description": "Ireland's Property Price Register, made searchable.",
+      "status_as_listed": "active",
+      "founding_year": 2025,
+      "link": "https://houseprice.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/houseprice-ie",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/houseprice-ie.md",
+      "sha256": "52dca58434a01e9ea5ac8f2eb3c56a03c09a0137f0e74f8fe4e1c98ce2e7bd8d"
+    },
+    {
+      "slug": "houseval",
+      "title": "HouseVal",
+      "category": "Housing",
+      "owners": [
+        "Ryan O'Connor"
+      ],
+      "description": "Typical house prices for every area of Ireland.",
+      "status_as_listed": "active",
+      "founding_year": 2020,
+      "link": "https://housevalireland.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/houseval",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/houseval.md",
+      "sha256": "df5dc172e36eb12de0c4c0f5ece2aae18dabee78841a192c050f2cbdf929683e"
+    },
+    {
+      "slug": "how-ireland-votes",
+      "title": "How Ireland Votes",
+      "category": "Governance",
+      "owners": [
+        "Glen"
+      ],
+      "description": "Election results tracker.",
+      "status_as_listed": "active",
+      "founding_year": 2019,
+      "link": "https://www.irelandvotes.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/how-ireland-votes",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/how-ireland-votes.md",
+      "sha256": "78811182543b77aa2861454b7993412a56224ab684b79f554bc3848b72f8cadf"
+    },
+    {
+      "slug": "ihouse",
+      "title": "iHouse",
+      "category": "Housing",
+      "owners": [
+        "Dex Li"
+      ],
+      "description": "Property research tool for the Irish market.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://ihouse.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/ihouse",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/ihouse.md",
+      "sha256": "f56a599c83deab93ee58de55e44b4bab973b058851c9aafabaeb2bc4bfa05509"
+    },
+    {
+      "slug": "ireland-citizen-science-portal",
+      "title": "Ireland's Citizen Science Portal",
+      "category": "Environment",
+      "owners": [
+        "National Biodiversity Data Centre"
+      ],
+      "description": "Ireland's national citizen science portal for recording and exploring biodiversity records across all species groups.",
+      "status_as_listed": "active",
+      "founding_year": 2008,
+      "link": "https://records.biodiversityireland.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/ireland-citizen-science-portal",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/ireland-citizen-science-portal.md",
+      "sha256": "51c44e21f3bd5685f890e23fa6f0f4062dc320aba3d140745af04f3a2a2449ee"
+    },
+    {
+      "slug": "ireland-insights",
+      "title": "IrelandInsights",
+      "category": "Geospatial",
+      "owners": [
+        "IrelandInsights"
+      ],
+      "description": "Explore Ireland down to Electoral Division level — live-mapped census, housing and election data, plus a data-driven Canvass Planner built for campaign teams.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://irelandinsights.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/ireland-insights",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/ireland-insights.md",
+      "sha256": "2a574fc1218287e65b414664bf226b506cc244936c727d5ba12c4a7c90c69d1d"
+    },
+    {
+      "slug": "ireland-parish-project",
+      "title": "Ireland Parish Project",
+      "category": "Geospatial",
+      "owners": [
+        "Joe Cantwell"
+      ],
+      "description": "A comprehensive digital map of parishes in Ireland.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://sites.google.com/view/cantwell-gis/projects/ireland-parishes",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/ireland-parish-project",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/ireland-parish-project.md",
+      "sha256": "2abc35672f0cc5d9780aca85335abef7e528558b90b82149df520b8051de604f"
+    },
+    {
+      "slug": "ireland-road-deaths",
+      "title": "Ireland Road Deaths",
+      "category": "Road Safety",
+      "owners": [
+        "RSA"
+      ],
+      "description": "Interactive map showing fatal and injury road collisions in Ireland in recent years.",
+      "status_as_listed": "active",
+      "founding_year": 2018,
+      "link": "https://www.rsa.ie/road-safety/statistics/collisions",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/ireland-road-deaths",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/ireland-road-deaths.md",
+      "sha256": "9eb21fcccb71544cd2e1e8c2aa1c54512937751308d5de1cb073a4496c47e0ff"
+    },
+    {
+      "slug": "irelandelection",
+      "title": "IrelandElection.com",
+      "category": "Democracy",
+      "owners": [
+        "Gareth Deegan"
+      ],
+      "description": "Election results in the Republic of Ireland.",
+      "status_as_listed": "active",
+      "founding_year": 2010,
+      "link": "https://irelandelection.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/irelandelection",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/irelandelection.md",
+      "sha256": "f12c8b6643807f7c3afb6bbb7c4154174c6a347ef88bef0f48b57f13ac03ec7b"
+    },
+    {
+      "slug": "irish-ancestors",
+      "title": "Irish Ancestors",
+      "category": "Genealogy",
+      "owners": [
+        "John Grenham"
+      ],
+      "description": "A collection of Irish genealogy tools.",
+      "status_as_listed": "active",
+      "founding_year": 2013,
+      "link": "https://www.johngrenham.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/irish-ancestors",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/irish-ancestors.md",
+      "sha256": "ab81cee65678a375349d117ce0e81d06a55bc8ba4550dd98e3f791139c538e1a"
+    },
+    {
+      "slug": "irish-census",
+      "title": "Irish Census",
+      "category": "Genealogy",
+      "owners": [
+        "Unknown"
+      ],
+      "description": "Follow a name through the 1901, 1911 and 1926 censuses.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://facts.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/irish-census",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/irish-census.md",
+      "sha256": "e589228bb956a0e70ac817eba99f377b53cceb2192f9d11910d1f3e065215a5c"
+    },
+    {
+      "slug": "irish-demographic-polling-dataset",
+      "title": "Irish Demographic Polling Dataset",
+      "category": "Democracy",
+      "owners": [
+        "Stefan Müller",
+        "Thomas Pluck",
+        "Paula Montano",
+        "UCD"
+      ],
+      "description": "Polling data on Irish citizens’ vote intentions, satisfaction with the government, and approval of party leaders.",
+      "status_as_listed": "active",
+      "founding_year": 2024,
+      "link": "https://irishpoliticsdata.shinyapps.io/demographicpolling/",
+      "repo": "https://github.com/Irish-Dem-Polling/datasets",
+      "citizendata_listing_url": "https://citizendata.ie/project/irish-demographic-polling-dataset",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/irish-demographic-polling-dataset.md",
+      "sha256": "77c88462a6479a97aef101cfc295ad03a05b02dbed44d6843fa111ec14b2ee18"
+    },
+    {
+      "slug": "irish-election-projections-2021",
+      "title": "Irish Election Projections",
+      "category": "Democracy",
+      "owners": [
+        "Harry McEvansoneya"
+      ],
+      "description": "Seat projections for the next Irish general election.",
+      "status_as_listed": "active",
+      "founding_year": 2021,
+      "link": "https://irishelectionprojections.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/irish-election-projections-2021",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/irish-election-projections-2021.md",
+      "sha256": "093acd1b7b3976f4f27c2cfddddfaae8df6345c6ddfab9b3787166bf938118e6"
+    },
+    {
+      "slug": "irish-election-projections-2025",
+      "title": "Irish Election Projections",
+      "category": "Democracy",
+      "owners": [
+        "Dr Eoghan Kelly",
+        "Ayushi Gupta"
+      ],
+      "description": "The first customisable, constituency level projection for Irish Elections.",
+      "status_as_listed": "active",
+      "founding_year": 2025,
+      "link": "https://irishelections.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/irish-election-projections-2025",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/irish-election-projections-2025.md",
+      "sha256": "223c5136023d4669eb1409d4b4e08b92bd9eb9edac64f0ec8d5ee7417788471b"
+    },
+    {
+      "slug": "irish-langauge-map",
+      "title": "Irish Language Map",
+      "category": "Geospatial",
+      "owners": [
+        "Alessio Coci"
+      ],
+      "description": "Maps of Irish speaking ability by county since 1851.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://acoci86.github.io/irish-language-map/",
+      "repo": "https://github.com/ACoci86/irish-language-map",
+      "citizendata_listing_url": "https://citizendata.ie/project/irish-langauge-map",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/irish-langauge-map.md",
+      "sha256": "ad2de3a5ca6092f41b291488d0f893cd2cd4e48908fa87c5136e274a072bfb96"
+    },
+    {
+      "slug": "irish-league-archive",
+      "title": "Irish League Archive",
+      "category": "Sport",
+      "owners": [
+        "Haydn Milligan"
+      ],
+      "description": "A comprehensive archive of Irish soccer statistics.",
+      "status_as_listed": "active",
+      "founding_year": 2020,
+      "link": "https://www.irishleaguearchive.org/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/irish-league-archive",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/irish-league-archive.md",
+      "sha256": "0fd139cc58284436e326a3ba8abd31f4f4ab2018c6ed5416324066d5b6378244"
+    },
+    {
+      "slug": "irish-political-maps",
+      "title": "Irish Political Maps",
+      "category": "Geospatial",
+      "owners": [
+        "Jason Kelleher",
+        "NLI"
+      ],
+      "description": "Maps and information on Irish elections, referenda and political parties.",
+      "status_as_listed": "inactive",
+      "founding_year": 2011,
+      "link": "https://catalogue.nli.ie/Record/vtls000734917",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/irish-political-maps",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/irish-political-maps.md",
+      "sha256": "0a588b0335a9538302530aa204209801325be196e967d8365de73f855b6b6a22"
+    },
+    {
+      "slug": "irish-politics-data",
+      "title": "Irish Politics Data",
+      "category": "Democracy",
+      "owners": [
+        "Stefan Müller",
+        "Michele Crepaz"
+      ],
+      "description": "Links to datasets, text corpora, and dashboards on Irish politics.",
+      "status_as_listed": "active",
+      "founding_year": 2024,
+      "link": "https://irishpoliticsdata.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/irish-politics-data",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/irish-politics-data.md",
+      "sha256": "9301ed7ef039dd8cbc0d545430ced1e7b2d090b28f976a7c4a476f462128349a"
+    },
+    {
+      "slug": "irish-polling-indicator",
+      "title": "Irish Polling Indicator",
+      "category": "Democracy",
+      "owners": [
+        "Stefan Müller",
+        "UCD"
+      ],
+      "description": "Polling data aggregator for Dáil Éireann.",
+      "status_as_listed": "active",
+      "founding_year": 2014,
+      "link": "https://pollingindicator.com/",
+      "repo": "https://github.com/Irish-Polling-Indicator/ipi-data",
+      "citizendata_listing_url": "https://citizendata.ie/project/irish-polling-indicator",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/irish-polling-indicator.md",
+      "sha256": "d60d9c5709633e15b34a43dbd4c946d92e5628b32cc019bded248fc6436110eb"
+    },
+    {
+      "slug": "irish-roots",
+      "title": "Irish Roots",
+      "category": "Genealogy",
+      "owners": [
+        "Daenis Limited",
+        "Conor Maguire"
+      ],
+      "description": "Search over 60,000 townlands and millions of historical records.",
+      "status_as_listed": "active",
+      "founding_year": 2025,
+      "link": "https://irishroots.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/irish-roots",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/irish-roots.md",
+      "sha256": "62c22233e4e679638d1c7991640cc9696183c7c78a6cc1022a661734a56fe14f"
+    },
+    {
+      "slug": "irish-surname-atlas",
+      "title": "Irish Surname Atlas",
+      "category": "Genealogy",
+      "owners": [
+        "u/NanorH on Reddit"
+      ],
+      "description": "A map of surnames from historic Irish censuses.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://surname-atlas.surnames.workers.dev/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/irish-surname-atlas",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/irish-surname-atlas.md",
+      "sha256": "65dfb2d6d4203f23cbb2462fb3a1685d374d634baf7fcfe6d43a9983fdbbc042"
+    },
+    {
+      "slug": "irishpolitics-ie",
+      "title": "irishpolitics.ie",
+      "category": "Democracy",
+      "owners": [
+        "Unknown"
+      ],
+      "description": "Independent, non-partisan tracking of Irish opinion polls, seat projections and public sentiment.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://www.irishpolitics.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/irishpolitics-ie",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/irishpolitics-ie.md",
+      "sha256": "5332dbc0ceb16b06e26a2e943a56a0e5bd7db3bc8595b8512e153b2163c118c3"
+    },
+    {
+      "slug": "isad",
+      "title": "ISAD",
+      "category": "Governance",
+      "owners": [
+        "UCD"
+      ],
+      "description": "Irish State Administration Database.",
+      "status_as_listed": "active",
+      "founding_year": 2006,
+      "link": "https://isad.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/isad",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/isad.md",
+      "sha256": "055375bed4090f2eb157282f2215ec9e144ac92a74997bba44f71dcffbe1fd89"
+    },
+    {
+      "slug": "kildare-street",
+      "title": "Kildare Street",
+      "category": "Governance",
+      "owners": [
+        "John Handelaar"
+      ],
+      "description": "Searchable database of Oireachtas transcripts.",
+      "status_as_listed": "active",
+      "founding_year": 2009,
+      "link": "https://www.kildarestreet.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/kildare-street",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/kildare-street.md",
+      "sha256": "8f8d24de37830d7828e64e66a7296cad026924d86eb5e6243840fb7855080f6e"
+    },
+    {
+      "slug": "know-the-game",
+      "title": "Know the Game",
+      "category": "Sport",
+      "owners": [
+        "Eoin Keane",
+        "James Buckley"
+      ],
+      "description": "The most comprehensive database of GAA championship results 1887 - Present.",
+      "status_as_listed": "active",
+      "founding_year": 2022,
+      "link": "https://knowthegame.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/know-the-game",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/know-the-game.md",
+      "sha256": "6178bea28625152082f7787c1622d12bceb55eaa9ad71daab8ad79db336138c8"
+    },
+    {
+      "slug": "leggit",
+      "title": "Leggit",
+      "category": "Sport",
+      "owners": [
+        "Kieron Keenan"
+      ],
+      "description": "Every race in Ireland. One place.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://www.leggit.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/leggit",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/leggit.md",
+      "sha256": "d1a7fc2b53eaff099199451816d354af0f48fcf9857e9e32d2fcddd62e9d0794"
+    },
+    {
+      "slug": "live-dublin-trains",
+      "title": "Live Dublin Trains",
+      "category": "Transport",
+      "owners": [
+        "Jake McDermott"
+      ],
+      "description": "Every DART, commuter and intercity train around Dublin, on one map.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://www.jake.ie/trains",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/live-dublin-trains",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/live-dublin-trains.md",
+      "sha256": "07944b5501fbe10375b335b16623ca46618405b89efa286f3e73775fc6b4f9f3"
+    },
+    {
+      "slug": "lobbyieng",
+      "title": "Lobbyieng",
+      "category": "Accountability",
+      "owners": [
+        "Robert McElhinney"
+      ],
+      "description": "Interactive web app visualising Irish lobbying activities.",
+      "status_as_listed": "active",
+      "founding_year": 2025,
+      "link": "https://lobbyieng.com/",
+      "repo": "https://github.com/robmcelhinney/lobbyieng",
+      "citizendata_listing_url": "https://citizendata.ie/project/lobbyieng",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/lobbyieng.md",
+      "sha256": "e0206148883c39c07648a9b69120a886993af2aec27d930291dd447bd3858ce3"
+    },
+    {
+      "slug": "local-authority-finances",
+      "title": "Local Authority Finances",
+      "category": "Finance",
+      "owners": [
+        "Gerard Turley",
+        "Stephen McNena"
+      ],
+      "description": "Compare budget breakdowns across Irish local authorities, including county, city and city & county councils.",
+      "status_as_listed": "active",
+      "founding_year": 2014,
+      "link": "https://localauthorityfinances.com",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/local-authority-finances",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/local-authority-finances.md",
+      "sha256": "378f08521e35b490ed1ff427cdde18f5761db1a12a5b7de3dfb820a7bc62c856"
+    },
+    {
+      "slug": "longford-gaelic-stats",
+      "title": "Longford Gaelic Stats",
+      "category": "Sport",
+      "owners": [
+        "Paul Devaney",
+        "Colm Devaney",
+        "John Devaney"
+      ],
+      "description": "An independent archive of over 135 years of Longford Gaelic games, records and stats.",
+      "status_as_listed": "active",
+      "founding_year": 2022,
+      "link": "https://longfordgaelicstats.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/longford-gaelic-stats",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/longford-gaelic-stats.md",
+      "sha256": "2814a0cbd8a55735593a3fa8a72b9eaed3223afe8e44bc977f1b19579fd7dadd"
+    },
+    {
+      "slug": "map-collections-at-ucd-and-on-the-web",
+      "title": "Map Collections at UCD and on the Web",
+      "category": "Geospatial",
+      "owners": [
+        "UCD"
+      ],
+      "description": "A vast list of digitised, scanned and physical maps relating to Ireland.",
+      "status_as_listed": "active",
+      "founding_year": 2013,
+      "link": "https://libguides.ucd.ie/findingmaps",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/map-collections-at-ucd-and-on-the-web",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/map-collections-at-ucd-and-on-the-web.md",
+      "sha256": "c4a45bea1d0a93559429d1fd1c8bc52c44e0edc233eee6c438b4c0fccecf0e33"
+    },
+    {
+      "slug": "monumental-ireland",
+      "title": "Monumental Ireland",
+      "category": "Geospatial",
+      "owners": [
+        "Monumental Ireland"
+      ],
+      "description": "A digital guide to Ireland's prehistoric monuments, searchable by county or type, with SMR-verified entries, maps, and visitor information.",
+      "status_as_listed": "active",
+      "founding_year": 2016,
+      "link": "https://monumentalireland.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/monumental-ireland",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/monumental-ireland.md",
+      "sha256": "c09d5d1e4b3c66d3bd5521924534376c65688cf5535fc9529227a710af600075"
+    },
+    {
+      "slug": "mortgagelab-ireland",
+      "title": "MortgageLab Ireland",
+      "category": "Housing",
+      "owners": [
+        "Diego Barreiro Perez"
+      ],
+      "description": "Your complete mortgage toolkit for Ireland.",
+      "status_as_listed": "active",
+      "founding_year": 2025,
+      "link": "https://www.mortgagelab.ie/",
+      "repo": "https://github.com/barreeeiroo/MortgageLab-IE",
+      "citizendata_listing_url": "https://citizendata.ie/project/mortgagelab-ireland",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/mortgagelab-ireland.md",
+      "sha256": "6272bbde36875ef6b849536fc37b5412300286ccf18cbf075f9045645e88417a"
+    },
+    {
+      "slug": "myireland",
+      "title": "MyIreland.ie",
+      "category": "Geospatial",
+      "owners": [
+        "Diaz Xavier"
+      ],
+      "description": "Ten thousand years of Irish history, culture, and heritage on one interactive map — from ancient kingdoms and mythology to clans, counties, and diaspora trails.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://myireland.ie",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/myireland",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/myireland.md",
+      "sha256": "514adad5f905c3dbac557a3d47fe06afba73bcd03533eaeed65b733b166acdb7"
+    },
+    {
+      "slug": "myuplift",
+      "title": "MyUplift",
+      "category": "Petitions",
+      "owners": [
+        "Uplift"
+      ],
+      "description": "Petition platform.",
+      "status_as_listed": "active",
+      "founding_year": 2014,
+      "link": "https://my.uplift.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/myuplift",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/myuplift.md",
+      "sha256": "e91684ac319734462de57362ae8d9ef7746586f09f3b61620970461cf9fd4041"
+    },
+    {
+      "slug": "new-bus-routes-tracker",
+      "title": "New Bus Routes Tracker",
+      "category": "Accountability",
+      "owners": [
+        "Cllr Feljin Jose"
+      ],
+      "description": "Tracking every new or improved bus route in Ireland, from 2022 to 2027, against the 140 promised for next year.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://feljin.ie/newbusroutes/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/new-bus-routes-tracker",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/new-bus-routes-tracker.md",
+      "sha256": "e8fe2d45677ff1de4ac410eb066218a3fde8c6fd04b0b8f408fb4a7055a51c55"
+    },
+    {
+      "slug": "nobody-said-stop",
+      "title": "Nobody Said Stop",
+      "category": "Accountability",
+      "owners": [
+        "u/Beneficial-Celery-51 on Reddit"
+      ],
+      "description": "Documenting a decade of wasted Irish public money.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://nobody-said-stop.pages.dev/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/nobody-said-stop",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/nobody-said-stop.md",
+      "sha256": "ce98d0584faf9e8d78328d38f95b1080c4f68733e6d2eb790cbbb2e925b5d4be"
+    },
+    {
+      "slug": "noshowbus",
+      "title": "No-Show Bus Tracker",
+      "category": "Transport",
+      "owners": [
+        "Dublin Inquirer"
+      ],
+      "description": "Platform for reporting Dublin buses that never showed up — whether cancelled or ghost buses.",
+      "status_as_listed": "active",
+      "founding_year": 2024,
+      "link": "https://noshowbus.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/noshowbus",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/noshowbus.md",
+      "sha256": "f0d8ced95420f6d28998ae79c4603a660a7a4a48274d7a730d96963405736480"
+    },
+    {
+      "slug": "oireachtas-connect",
+      "title": "Oireachtas Connect",
+      "category": "Governance",
+      "owners": [
+        "Oireachtas Connect"
+      ],
+      "description": "Find and contact your local TD, track lobbying activity, and explore Ireland's key social, economic and lobbying metrics.",
+      "status_as_listed": "active",
+      "founding_year": 2025,
+      "link": "https://oireachtasconnect.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/oireachtas-connect",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/oireachtas-connect.md",
+      "sha256": "c1f87526ab59d78c11e4f461a297b14d23b2a631d21d0edbdb25bd80a6c32751"
+    },
+    {
+      "slug": "oireachtas-explorer",
+      "title": "Oireachtas Explorer",
+      "category": "Governance",
+      "owners": [
+        "David Ward"
+      ],
+      "description": "Search the entire workings of Ireland's parliament from 1919 to today in one place — every member, debate, bill, question, and vote, drawn live from the Oireachtas Open Data API in an easily naviable format.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://oireachtas-explorer.ie",
+      "repo": "https://github.com/oireachtas-explorer/oireachtas-explorer",
+      "citizendata_listing_url": "https://citizendata.ie/project/oireachtas-explorer",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/oireachtas-explorer.md",
+      "sha256": "888f4cf512fce3d9ae86fc517ebf7e5fdf5af1448b00fe4889021f6fff1680af"
+    },
+    {
+      "slug": "oireachtas-vote",
+      "title": "Oireachtas Vote",
+      "category": "Governance",
+      "owners": [
+        "Robert McElhinney"
+      ],
+      "description": "View Irish, Dáil Éireann, politicians voting records.",
+      "status_as_listed": "active",
+      "founding_year": 2019,
+      "link": "https://robmcelhinney.com/OireachtasVote/",
+      "repo": "https://github.com/robmcelhinney/OireachtasVote",
+      "citizendata_listing_url": "https://citizendata.ie/project/oireachtas-vote",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/oireachtas-vote.md",
+      "sha256": "d995ea876dfda2071daa933d02ae4b476893de17cfad40a6ccd3a438ad8f5c06"
+    },
+    {
+      "slug": "one-million-homes",
+      "title": "One Million Homes",
+      "category": "Housing",
+      "owners": [
+        "Rob Cass",
+        "Edward Dixon"
+      ],
+      "description": "Ireland's housing dashboard tracking housing delivery, wait times, and first-time buyer data by Local Electoral Area.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://onemillionhomes.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/one-million-homes",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/one-million-homes.md",
+      "sha256": "662b7465bd70a32ad4f3a81d015005bf447efafd50c7e3e3163dde61b4cc32b5"
+    },
+    {
+      "slug": "openlittermap",
+      "title": "OpenLitterMap",
+      "category": "Geospatial",
+      "owners": [
+        "Seán Lynch"
+      ],
+      "description": "Citizen science platform for mapping litter.",
+      "status_as_listed": "active",
+      "founding_year": 2008,
+      "link": "https://openlittermap.com/",
+      "repo": "https://github.com/OpenLitterMap/openlittermap-web",
+      "citizendata_listing_url": "https://citizendata.ie/project/openlittermap",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/openlittermap.md",
+      "sha256": "a73f2452dc8d849a6c9ce84c21d2ba0e24040c91ec6e6bca10d613f733643684"
+    },
+    {
+      "slug": "openpaye",
+      "title": "OpenPAYE",
+      "category": "Finance",
+      "owners": [
+        "Clarke Media"
+      ],
+      "description": "Ireland's salary after tax calculator.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://openpaye.ie/",
+      "repo": "https://github.com/clarkemedia/openpaye",
+      "citizendata_listing_url": "https://citizendata.ie/project/openpaye",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/openpaye.md",
+      "sha256": "12ab437a26eb6f3cc9d340a847fd7b1cd680473f853a2d364e15fcfc952dd982"
+    },
+    {
+      "slug": "openstreetmap-ireland",
+      "title": "OpenStreetMap Ireland",
+      "category": "Geospatial",
+      "owners": [
+        "OpenStreetMap Ireland"
+      ],
+      "description": "The home of the OpenStreetMap community in Ireland, providing free open map data, tutorials and mapping missions.",
+      "status_as_listed": "active",
+      "founding_year": 2015,
+      "link": "https://www.openstreetmap.ie",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/openstreetmap-ireland",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/openstreetmap-ireland.md",
+      "sha256": "725943fe34bd7ec63804878bbc82ba0fbe0243d14258087c26fb0fcfec6e01b8"
+    },
+    {
+      "slug": "overwatch-report",
+      "title": "Overwatch Report",
+      "category": "Accountability",
+      "owners": [
+        "xbard"
+      ],
+      "description": "Accountability tools and commentary.",
+      "status_as_listed": "inactive",
+      "founding_year": null,
+      "link": "https://overwatch.report/about/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/overwatch-report",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/overwatch-report.md",
+      "sha256": "590439498a64c7771c7d0be630a5c2eb742e932d5c690806d7f1e1e9599c4b59"
+    },
+    {
+      "slug": "passing-places",
+      "title": "Passing Places",
+      "category": "Geospatial",
+      "owners": [
+        "Mark Finlay"
+      ],
+      "description": "A companion for journeys through Ireland, built by one person, from the public record.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://passingplaces.app/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/passing-places",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/passing-places.md",
+      "sha256": "5935d52d60d4df28b600766d61f9570953f5d014f89b2dc61a7418f4970ba9c5"
+    },
+    {
+      "slug": "paygap-ie",
+      "title": "PayGap.ie",
+      "category": "Equality",
+      "owners": [
+        "Jennifer Keane"
+      ],
+      "description": "Searchable database of Irish gender pay gap reports, aggregating company disclosures required under the Gender Pay Gap Information Act 2021.",
+      "status_as_listed": "active",
+      "founding_year": 2024,
+      "link": "https://paygap.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/paygap-ie",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/paygap-ie.md",
+      "sha256": "2c840d65f2d456ae01cbfdaaf387ba4fde14f31aa1f232056c06aef80520193c"
+    },
+    {
+      "slug": "planningregister-ie",
+      "title": "PlanningRegister.ie",
+      "category": "Housing",
+      "owners": [
+        "John McEnroe"
+      ],
+      "description": "Search every planning application near any Irish address.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://planningregister.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/planningregister-ie",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/planningregister-ie.md",
+      "sha256": "d7fa6349433c89340d0102b05959bc076a7bdddd90f8694821b2e5fab9a71898"
+    },
+    {
+      "slug": "property-data-ireland",
+      "title": "Property Data Ireland",
+      "category": "Housing",
+      "owners": [
+        "Alan Davis"
+      ],
+      "description": "Property price data and insights for Ireland. Helping first-time buyers and investors make informed decisions.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://propertydata.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/property-data-ireland",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/property-data-ireland.md",
+      "sha256": "1da2395a12636fb233a5aed9ea9dd3286d5ce7038391daad95acea461ed175c9"
+    },
+    {
+      "slug": "property-price-ireland",
+      "title": "Ireland Property Price Atlas",
+      "category": "Housing",
+      "owners": [
+        "Ireland Property Price Atlas"
+      ],
+      "description": "Explore registered residential sales by county and locality, with rolling three-month prices, market distributions, geographic patterns and individual transaction detail.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://propertypriceireland.com",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/property-price-ireland",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/property-price-ireland.md",
+      "sha256": "a36b57059b816286735e78ddcee502862584a8f81167326cabc70b72508546af"
+    },
+    {
+      "slug": "property-price-register-api",
+      "title": "Property Price Register API",
+      "category": "Housing",
+      "owners": [
+        "CivicTech.ie"
+      ],
+      "description": "Property Price Register API.",
+      "status_as_listed": "active",
+      "founding_year": 2023,
+      "link": "https://priceregister.civictech.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/property-price-register-api",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/property-price-register-api.md",
+      "sha256": "5134f22d863547ff33916d452a4ef1f72fc1854586df771d99e1cd5d00c37017"
+    },
+    {
+      "slug": "propertylab",
+      "title": "PropertyLab",
+      "category": "Housing",
+      "owners": [
+        "u/dylgarr on Reddit"
+      ],
+      "description": "Search real sale prices from the Property Price Register — free, instant, no sign-up.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://propertylab.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/propertylab",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/propertylab.md",
+      "sha256": "835fa423106ca9f1a812825a1eac2f3a526bc7d78f9ff8dec5fbafce6e89aad7"
+    },
+    {
+      "slug": "public-data-unpacked",
+      "title": "Public Data Unpacked",
+      "category": "Accountability",
+      "owners": [
+        "Public Data Unpacked"
+      ],
+      "description": "Irish public-sector datasets turned into clear, interactive dashboards.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://www.publicdataunpacked.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/public-data-unpacked",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/public-data-unpacked.md",
+      "sha256": "fd1f68567c0f4a479fc8081919e840c55829f0993f755d266a298a7216807c1a"
+    },
+    {
+      "slug": "public-information",
+      "title": "Public Information",
+      "category": "Governance",
+      "owners": [
+        "Dave Anderson"
+      ],
+      "description": "Canonical list of public bodies and related datasets including Freedom of Information",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://www.publicinformation.ie",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/public-information",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/public-information.md",
+      "sha256": "348f887ac573a1abea5572b16e79e30fb06d87158d4fe53f54654e630ac850cc"
+    },
+    {
+      "slug": "publicpurse-ie",
+      "title": "PublicPurse.ie",
+      "category": "Finance",
+      "owners": [
+        "William Kennedy"
+      ],
+      "description": "Indexing every line item of Irish government expenditure.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://publicpurse.ie",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/publicpurse-ie",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/publicpurse-ie.md",
+      "sha256": "365607da398165b2ef33d6f7e0c7db1ed0717b909fbd4fb3f574d08019f4c0cd"
+    },
+    {
+      "slug": "railmaponline",
+      "title": "RailMapOnline",
+      "category": "Transport",
+      "owners": [
+        "Unknown"
+      ],
+      "description": "Past and present railways in Ireland, the UK and the US.",
+      "status_as_listed": "active",
+      "founding_year": 2013,
+      "link": "https://www.railmaponline.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/railmaponline",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/railmaponline.md",
+      "sha256": "0404eba8889dbf3c9a256329d58b5abcd7564eeba3f6433a513ef053cb5dfc41"
+    },
+    {
+      "slug": "rainy-ie",
+      "title": "Rainy.ie",
+      "category": "Environment",
+      "owners": [
+        "Shane O'Sullivan"
+      ],
+      "description": "Live rain radar for Ireland.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://rainy.ie/",
+      "repo": "https://github.com/shaneosullivan/rainy/",
+      "citizendata_listing_url": "https://citizendata.ie/project/rainy-ie",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/rainy-ie.md",
+      "sha256": "9431c7e79a24c2c3a6f23f6c773a8574ef88ce91df90b5b753effdda0d453f24"
+    },
+    {
+      "slug": "rule-ie",
+      "title": "Rule.ie",
+      "category": "Governance",
+      "owners": [
+        "Unknown"
+      ],
+      "description": "AI-written summaries of Oireachtas bills.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://rule.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/rule-ie",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/rule-ie.md",
+      "sha256": "4dd66df60532f0e000684b55fb627cd86a713e9f6056ecc511e483d5d196aabc"
+    },
+    {
+      "slug": "safescoot",
+      "title": "Safescoot.ie",
+      "category": "Transport",
+      "owners": [
+        "Warren Brandt"
+      ],
+      "description": "Find out if your e-scooter is road-legal in Ireland — before the Gardaí do.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://safescoot.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/safescoot",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/safescoot.md",
+      "sha256": "3cd6711f7977df2a3385c6e0bb010d8f3e0726fa5156be702134775a7311e4b3"
+    },
+    {
+      "slug": "smart-grid-dashboard",
+      "title": "Smart Grid Dashboard",
+      "category": "Energy",
+      "owners": [
+        "EirGrid Group plc"
+      ],
+      "description": "Real-time dashboard exploring energy demand and generation across the island of Ireland.",
+      "status_as_listed": "active",
+      "founding_year": 2011,
+      "link": "https://www.smartgriddashboard.com/all/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/smart-grid-dashboard",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/smart-grid-dashboard.md",
+      "sha256": "6e8f13324bd5eadab5fde9546fa70a4650838689d73a79ac7996356327bab015"
+    },
+    {
+      "slug": "soldright-ie",
+      "title": "SoldRight.ie",
+      "category": "Housing",
+      "owners": [
+        "u/Wise_Dot_9828 on Reddit"
+      ],
+      "description": "Compare estate agents before you pick one.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://soldright.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/soldright-ie",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/soldright-ie.md",
+      "sha256": "4e081c0548f0bcf52c9ad4871af47d6dbd96f7315b700901af8074f5cc2a7341"
+    },
+    {
+      "slug": "sport-on-tv-ireland",
+      "title": "Sport on TV Ireland",
+      "category": "Sport",
+      "owners": [
+        "u/Euphoric-Map7197 on Reddit"
+      ],
+      "description": "Your complete guide to live sport on TV in Ireland",
+      "status_as_listed": "active",
+      "founding_year": 2025,
+      "link": "https://sportontvireland.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/sport-on-tv-ireland",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/sport-on-tv-ireland.md",
+      "sha256": "3dc8ef20cce8fb296c605259defb420500dde35f48beb4b359cf4ec4161bebbf"
+    },
+    {
+      "slug": "statespend",
+      "title": "StateSpend.ie",
+      "category": "Finance",
+      "owners": [
+        "Albert Dolan TD",
+        "Matthew Fenlon (TPSA)"
+      ],
+      "description": "~€103bn of published Irish public-body purchase orders and payments, searchable.",
+      "status_as_listed": "active",
+      "founding_year": 2025,
+      "link": "https://statespend.ie",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/statespend",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/statespend.md",
+      "sha256": "6304a10d3c54c8c9dc9476e73593651401a98f2ffa8f1d37ffa46e31c343aeb1"
+    },
+    {
+      "slug": "tipperary-hurling",
+      "title": "Tipperary Hurling",
+      "category": "Sport",
+      "owners": [
+        "Brian McDonnell"
+      ],
+      "description": "Tipperary inter-county championship hurling database.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://tipphurling.com/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/tipperary-hurling",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/tipperary-hurling.md",
+      "sha256": "dd6a4b4a8e4a9fafec377b2e98b4bcab99f212595a0054e16cebd6b6567d229a"
+    },
+    {
+      "slug": "tobar-na-heigse",
+      "title": "Tobar na hÉigse",
+      "category": "Education",
+      "owners": [
+        "Draoi"
+      ],
+      "description": "A directory for Irish language learning resources.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://draoi.github.io/tobar-na-heigse/",
+      "repo": "https://github.com/Draoi/tobar-na-heigse",
+      "citizendata_listing_url": "https://citizendata.ie/project/tobar-na-heigse",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/tobar-na-heigse.md",
+      "sha256": "4eb10e2d08b085be9b1c58130080e86db6be9501dd6b8ad542fdcf7113e1cfb8"
+    },
+    {
+      "slug": "townlands",
+      "title": "Townlands.ie",
+      "category": "Geospatial",
+      "owners": [
+        "OpenStreetMap Ireland"
+      ],
+      "description": "Searchable index of Irish townlands, civil parishes, baronies and counties based on OpenStreetMap data.",
+      "status_as_listed": "active",
+      "founding_year": 2014,
+      "link": "https://www.townlands.ie",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/townlands",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/townlands.md",
+      "sha256": "98b198948165e816f7500026cc5f0038d6aa8d07f2b43a56427643d51c1f19a1"
+    },
+    {
+      "slug": "uk-parliamentary-constituencies",
+      "title": "UK Parliamentary Constituencies",
+      "category": "Geospatial",
+      "owners": [
+        "Unknown"
+      ],
+      "description": "UK parliamentary constituencies (including Northern Ireland and pre-partition Ireland) since 1885.",
+      "status_as_listed": "active",
+      "founding_year": 2021,
+      "link": "https://parlconst.org/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/uk-parliamentary-constituencies",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/uk-parliamentary-constituencies.md",
+      "sha256": "0b93b6fd83dbb1a3b769f77c07de6ca58c77026a1fabe5b9aa65104767d094cf"
+    },
+    {
+      "slug": "untangle-ie",
+      "title": "Untangle.ie",
+      "category": "Housing",
+      "owners": [
+        "u/Plashgar on Reddit"
+      ],
+      "description": "Checks what Irish renovation grants you’re actually entitled to.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://www.untangle.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/untangle-ie",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/untangle-ie.md",
+      "sha256": "88ca7314f4c39a292168db226f9c1a056cc509745e0670c16180cd03c5256069"
+    },
+    {
+      "slug": "vote-td",
+      "title": "Vote TD",
+      "category": "Governance",
+      "owners": [
+        "Frank Conway"
+      ],
+      "description": "Tracks how TDs and Senators vote on legislation.",
+      "status_as_listed": "active",
+      "founding_year": 2026,
+      "link": "https://votetd.ie/",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/vote-td",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/vote-td.md",
+      "sha256": "344b78b8768ab157122f126b62084cf3d1be9084370cacc7fa8458578fd790c4"
+    },
+    {
+      "slug": "where-your-money-goes",
+      "title": "Where Your Money Goes",
+      "category": "Finance",
+      "owners": [
+        "Government"
+      ],
+      "description": "Government spending website.",
+      "status_as_listed": "active",
+      "founding_year": 2017,
+      "link": "https://whereyourmoneygoes.gov.ie",
+      "repo": null,
+      "citizendata_listing_url": "https://citizendata.ie/project/where-your-money-goes",
+      "source_url": "https://github.com/williamkennedy/eire_civic_tech_directory/blob/7f0aeaf1a8655b25e55f76dae94a497943970629/src/content/projects/where-your-money-goes.md",
+      "sha256": "ada898bdad5b11c4435112e891ab3925078f82478016a5e5b9b7633d419004de"
+    }
+  ]
+}

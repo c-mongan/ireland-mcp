@@ -40,6 +40,8 @@ import { failteIreland } from "./sources/failte-ireland/index.js";
 import { tfiStaticModule } from "./sources/tfi-static/index.js";
 import { gsiModule } from "./sources/gsi/index.js";
 import { logainmModule } from "./sources/logainm/index.js";
+import { cibModule } from "./sources/cib/index.js";
+import { civicDirectoryModule } from "./sources/civic-directory/index.js";
 
 export const sourceModules: SourceModule[] = [
   csoModule,
@@ -78,6 +80,8 @@ export const sourceModules: SourceModule[] = [
   tfiStaticModule,
   gsiModule,
   logainmModule,
+  cibModule,
+  civicDirectoryModule,
   ...(process.env.LEGAL_ENABLED === "true" ? createLegalModules() : [])
 ];
 

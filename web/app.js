@@ -16,7 +16,8 @@ const SOURCE_FALLBACK = [
     { id: "pobal", name: "Pobal HP Deprivation Index", summary: "Small-area deprivation scores and lookup for Irish places.", operations: ["pobal_deprivation_search"] },
     { id: "data-gov-ie", name: "data.gov.ie", summary: "National open-data catalogue from Irish public bodies.", operations: ["datagov_search_datasets", "datagov_get_dataset", "datagov_query_datastore"] },
     { id: "smart-dublin", name: "Smart Dublin", summary: "Dublin city and county datasets: counters, parking, footfall, planning and environment.", operations: ["smartdublin_search_datasets", "smartdublin_get_dataset", "smartdublin_query_datastore"] },
-    { id: "census-areas", name: "CSO Census 2022 small areas", summary: "Small-area boundary lookup for census geography.", operations: ["census_small_area_at"] }
+    { id: "census-areas", name: "CSO Census 2022 small areas", summary: "Small-area boundary lookup for census geography.", operations: ["census_small_area_at"] },
+    { id: "cib", name: "Citizens Information Board Data Hub", summary: "National Citizens Information Services and Phone Service callers, queries and categories, 2021–2025; pinned reports, not live.", operations: ["cib_cis_annual_summary", "cib_cis_query_categories", "cib_cips_summary"] }
   ] },
   { domain: "economy", sources: [
     { id: "paygap", name: "PayGap.ie employer reports", summary: "Employer pay-gap reports with original report links and data-quality annotations.", operations: ["paygap_search_reports"] },
@@ -46,6 +47,7 @@ const SOURCE_FALLBACK = [
   { domain: "law/politics", sources: [
     { id: "lobbying", name: "SIPO Register of Lobbying", summary: "Published lobbying returns with bounded date windows and paged search.", operations: ["lobbying_search_returns"] },
     { id: "oireachtas", name: "Houses of the Oireachtas Open Data API", summary: "Members, bills, debates, parliamentary questions and votes.", operations: ["oireachtas_search_members", "oireachtas_search_bills", "oireachtas_get_debates", "oireachtas_search_questions", "oireachtas_get_votes"] },
+    { id: "civic-directory", name: "Éire Civic Tech Directory (CitizenData.ie)", summary: "Irish civic-tech projects with links to each project and its CitizenData.ie listing; as listed, unverified.", operations: ["civic_directory_search"] },
     { id: "legislation", name: "Irish Statute Book via ELI", summary: "Acts of the Oireachtas by year, contents and section text.", operations: ["legislation_list_acts", "legislation_get_act", "legislation_get_section", "legislation_get_act_effects", "legislation_list_sis", "legislation_get_si", "legislation_get_constitution_article"] },
     { id: "irish-legal", name: "Irish legal evidence corpus", optional: true, summary: "Optional pilot of indexed source versions and Act sections, seeded with annual leave and working time. Current law is unverified; Revised Acts indexing requires explicit publisher reuse permission.", operations: ["irish_legal_catalogue", "irish_legal_search", "irish_legal_fetch", "irish_legal_get_provision", "irish_legal_get_changes", "irish_legal_research"] },
     { id: "citizens-info", name: "Citizens Information", optional: true, summary: "Optional pilot of indexed explanatory guidance, limited to ingested pages; verify the underlying legal provisions and source versions.", operations: ["citizens_info_search", "citizens_info_get_article"] }
@@ -80,6 +82,8 @@ const SOURCE_DETAILS = {
   "census-areas": { licence: "CC BY 4.0", example: "Which census small area contains 53.35,-6.26?" },
   cro: { licence: "CC BY 4.0", example: "Find CRO datasets about companies." },
   kohesio: { licence: "European Commission reuse policy", example: "Find EU-funded projects in Galway." },
+  cib: { licence: "CC BY 4.0", example: "How many housing queries did Citizens Information Services handle in 2025?" },
+  "civic-directory": { licence: "MIT (catalogue)", example: "Find civic-tech projects about housing and their CitizenData.ie listings." },
   ted: { licence: "EU reuse policy", example: "Find recent Irish tenders about schools." },
   nta: { licence: "CC BY 4.0", example: "Summarise current GTFS-R service disruption." },
   "irish-rail": { licence: "Irish Rail realtime API terms", example: "When are the next trains from Dublin Connolly?" },

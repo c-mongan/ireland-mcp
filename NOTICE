@@ -81,6 +81,21 @@ Kohesio — https://kohesio.ec.europa.eu/
   Snapshot provenance and source URLs: src/sources/kohesio/snapshot.json
   and docs/kohesio-exports.md.
 
+Citizens Information Board Data Hub — https://www.citizensinformationboard.ie/en/data-hub/
+  Licence: CC BY 4.0 (https://www.citizensinformationboard.ie/en/notices/psi.html)
+  Attribution: Contains Irish Public Sector Data licensed under a Creative
+  Commons Attribution 4.0 International (CC BY 4.0) licence. Source: Citizens
+  Information Board, Data Hub statistical reports.
+  Pinned annual figures with per-file SHA-256: web/data/cib/*.json and
+  docs/cib-and-civic-directory.md.
+
+Éire Civic Tech Directory — https://github.com/williamkennedy/eire_civic_tech_directory
+  Licence: MIT. Copyright (c) 2026 William Kennedy. The full licence text is
+  included in web/data/civic-directory.json (licence_text).
+  The catalogue behind CitizenData.ie (https://citizendata.ie/). Project names,
+  descriptions and links belong to the listed owners and are reproduced as
+  listed, unverified. citizendata.ie itself is not fetched or scraped.
+
 Smart Dublin (CKAN) — https://data.smartdublin.ie
   Licence: per dataset, mostly CC BY 4.0. Check each dataset's licence field.
   Data from the four Dublin local authorities.

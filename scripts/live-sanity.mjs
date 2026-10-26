@@ -31,6 +31,8 @@ const CASES = [
   ["data-gov-ie", "datagov_search_datasets", { query: "population", limit: 3 }, (d) => d.total > 0],
   ["cro", "cro_search_datasets", { query: "company", limit: 2 }, (d) => d.datasets?.some((x) => x.id === "companies")],
   ["kohesio", "kohesio_search_projects", { query: "Galway", limit: 3 }, (d) => d.total > 0 && Array.isArray(d.projects)],
+  ["cib", "cib_cis_annual_summary", { year: 2024 }, (d) => d.record?.callers === 395017 && d.record?.sources?.every((s) => /^[0-9a-f]{64}$/.test(s.sha256))],
+  ["civic-directory", "civic_directory_search", { category: "Housing", limit: 3 }, (d) => d.total > 0 && d.projects?.every((p) => p.citizendata_listing?.url?.startsWith("https://citizendata.ie/project/"))],
   ["smart-dublin", "smartdublin_search_datasets", { query: "bike", limit: 3 }, (d) => d.total > 0],
   ["met-eireann", "met_get_forecast", { lat: 53.3498, lon: -6.2603, hours: 3 }, (d) => d.forecast?.length === 3],
   ["met-eireann", "met_get_warnings", {}, (d) => Array.isArray(d.warnings)],

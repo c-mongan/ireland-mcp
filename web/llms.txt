@@ -6,7 +6,7 @@ Endpoint: [Ireland MCP Streamable HTTP endpoint](https://mcp.irishopendata.ie/mc
 Docs: [Ireland MCP documentation and playground](https://irishopendata.ie/)
 Transport: Streamable HTTP JSON-RPC over POST
 Auth: none
-Default tool surface: 7 tools, 8,407 characters, about 2.1k tokens
+Default tool surface: 7 tools, 8,832 characters, about 2.2k tokens
 Full surface: use ?toolsets=all only when a client needs all typed tools listed
 
 Install:
@@ -35,6 +35,15 @@ Toolsets:
 - One source: /mcp/x/{source-id} or ?toolsets={source-id}.
 
 Source domains: stats, law/politics, places/property, environment, transport, energy and economy. Data remains under each publisher licence; responses include source and licence metadata where available.
+
+## Static data files
+
+Plain JSON, no MCP client needed. Each file carries source URLs, SHA-256 checksums, an `as_of` date, licence and attribution. The MCP tools read these same files. Schema: [CIB and civic directory data](https://github.com/c-mongan/ireland-mcp/blob/main/docs/cib-and-civic-directory.md).
+
+- [CIS callers and queries by year](https://irishopendata.ie/data/cib/cis-annual.json): Citizens Information Services, 2021–2025. CC BY 4.0, Citizens Information Board.
+- [CIS queries by category](https://irishopendata.ie/data/cib/cis-query-categories.json): top-level query categories, 2021–2025. CC BY 4.0, Citizens Information Board.
+- [CIPS contacts and call categories](https://irishopendata.ie/data/cib/cips-annual.json): Citizens Information Phone Service, 2021–2025. CC BY 4.0, Citizens Information Board.
+- [Irish civic-tech directory](https://irishopendata.ie/data/civic-directory.json): projects listed in the Éire Civic Tech Directory behind CitizenData.ie, with each project's link and its CitizenData.ie listing. MIT, William Kennedy; status and links as listed, unverified.
 
 ## Documentation
 
