@@ -1,20 +1,20 @@
 #!/usr/bin/env node
 // Live all-operations proof. Uses a real MCP client transport against stdio dist/src/cli.js
 // or a deployed Streamable HTTP endpoint (--url https://.../mcp), and calls every catalogue operation via ireland_call.
-import { dirname, resolve } from "node:path";
+import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { mkdir, writeFile } from "node:fs/promises";
 import { setTimeout as sleep } from "node:timers/promises";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+import { parseArgs, reportPathFor } from "./live-all-args.mjs";
 import { assessResult } from "./live-result.mjs";
 import { appModules } from "../dist/src/registry.js";
 
 // First-party checks are tagged so usage metrics count only real clients.
 const SYNTHETIC = { requestInit: { headers: { "x-ireland-mcp-synthetic": "1" } } };
 
-const DEPLOYED_URL = "https://func-ireland-mcp-aofsjpwgy4hva.azurewebsites.net/mcp";
 const DEFAULT_TOOLS = ["search", "fetch", "nearby", "ireland_catalogue", "ireland_describe", "ireland_about", "ireland_call"];
 const TODAY = new Date().toISOString().slice(0, 10);
 const REPORT_PATH = new URL("../docs/live-all-ops.md", import.meta.url);
@@ -89,25 +89,6 @@ function localExamples() {
     }
   }
   return { examples };
-}
-
-function parseArgs() {
-  const out = { url: null, json: false, delayMs: null, report: null };
-  for (let i = 2; i < process.argv.length; i += 1) {
-    const arg = process.argv[i];
-    if (arg === "--json") out.json = true;
-    else if (arg === "--report") {
-      out.report = process.argv[++i];
-      if (!out.report || out.report.startsWith("--")) throw new Error("--report requires a path");
-    }
-    else if (arg === "--deployed") out.url = DEPLOYED_URL;
-    else if (arg === "--url") out.url = process.argv[++i] ?? DEPLOYED_URL;
-    else if (arg.startsWith("--url=")) out.url = arg.slice("--url=".length) || DEPLOYED_URL;
-    else if (arg === "--delay-ms") out.delayMs = Number(process.argv[++i] ?? "0");
-    else if (arg.startsWith("--delay-ms=")) out.delayMs = Number(arg.slice("--delay-ms=".length));
-    else throw new Error(`Unknown argument: ${arg}`);
-  }
-  return out;
 }
 
 async function connect(url) {
@@ -352,9 +333,12 @@ async function main() {
     ...mdRows,
     ""
   ].join("\n");
-  const reportPath = args.report ? resolve(args.report) : fileURLToPath(REPORT_PATH);
-  await mkdir(dirname(reportPath), { recursive: true });
-  await writeFile(reportPath, report);
+  // Only a hosted run may replace the checked-in receipt that `npm run counts` reads.
+  const reportPath = reportPathFor(args, fileURLToPath(REPORT_PATH));
+  if (reportPath) {
+    await mkdir(dirname(reportPath), { recursive: true });
+    await writeFile(reportPath, report);
+  }
 
   const summary = { target, default: defaultRows, errors, operations: opRows, counts: { pass, notConfigured, hostedBlocked, degraded, fail }, report: reportPath };
   if (args.json) console.log(JSON.stringify(summary, null, 2));
@@ -363,7 +347,8 @@ async function main() {
     console.log(`Operations: ${pass} PASS, ${notConfigured} NOT_CONFIGURED, ${hostedBlocked} HOSTED_BLOCKED, ${degraded} DEGRADED, ${fail} FAIL.`);
     console.log(`Default tools: ${defaultRows.filter((r) => r.status === "PASS").length}/${defaultRows.length} PASS.`);
     console.log(`Error paths: ${errors.filter((r) => r.status === "PASS").length}/${errors.length} PASS.`);
-    console.log(`Report: ${reportPath}`);
+    if (reportPath) console.log(`Report: ${reportPath}`);
+    else console.log(`\n${report}\nReport not written: docs/live-all-ops.md is the hosted receipt. Pass --report <path> to save this run.`);
   }
   if (fail || degraded || defaultRows.some((r) => r.status !== "PASS") || errors.some((r) => r.status !== "PASS")) process.exit(1);
 }

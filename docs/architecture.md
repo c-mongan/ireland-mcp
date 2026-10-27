@@ -118,6 +118,4 @@ These come from the 2026-10-26 architecture audit.
 
 | Gap | Issue |
 | --- | --- |
-| `live:all` can overwrite the hosted receipt from a local run. | [#117](https://github.com/c-mongan/ireland-mcp/issues/117) |
 | Packaged skills have no evals. | [#119](https://github.com/c-mongan/ireland-mcp/issues/119) |
-| The deploy smoke test does not verify the deployed revision. | [#121](https://github.com/c-mongan/ireland-mcp/issues/121) |

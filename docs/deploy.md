@@ -39,7 +39,9 @@ Cost controls:
    Don't use `azd up` or `azd deploy` for the code: they request a remote Oryx build on Flex Consumption,
    which fails for this project. `scripts/deploy-zip.sh` builds locally, ships `dist/` with production
    dependencies, and turns the remote build off.
-7. Check it: `curl "$(azd env get-value MCP_ENDPOINT | sed 's#/mcp$##')/healthz"`
+7. Check it: `curl "$(azd env get-value MCP_ENDPOINT | sed 's#/mcp$##')/healthz"`. `release` is the
+   Git revision that `deploy:zip` stamped, or `null` for a dirty or unstamped build. The deploy
+   workflow's smoke step waits until it equals the workflow's commit.
 8. Build the first PPR index. Either wait for the 03:15 UTC timer, or run `npm run build && AzureWebJobsStorage__accountName=<storage> npm run ppr:build`
    locally after `az login` (needs Storage Blob Data Contributor for your user).
    Until then, `ppr_*` tools use the live per-county CSV fallback.

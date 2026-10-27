@@ -1,4 +1,5 @@
 import { app, type HttpResponseInit } from "@azure/functions";
+import { PACKAGED_RELEASE } from "../gateway/release.js";
 import { SERVER_NAME, SERVER_VERSION } from "../gateway/server.js";
 import { SECURITY_HEADERS } from "../gateway/securityHeaders.js";
 import { reportHandlerError } from "../gateway/telemetry.js";
@@ -41,6 +42,8 @@ async function healthResponse(request?: HealthRequest): Promise<HttpResponseInit
       status: "ok",
       name: SERVER_NAME,
       version: SERVER_VERSION,
+      // Git revision stamped by scripts/deploy-zip.sh; null for unstamped or dirty builds.
+      release: PACKAGED_RELEASE ?? null,
       sources: sourceModules.map((module) => module.info.id),
       time: new Date().toISOString()
     }
