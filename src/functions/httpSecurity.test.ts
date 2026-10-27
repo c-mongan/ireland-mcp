@@ -187,7 +187,7 @@ describe("Function health responses", () => {
     const headers = expectSecurity(response);
     expect(headers.get("cache-control")).toBe("no-store");
     expect(headers.get("access-control-allow-origin")).toBeNull();
-    expect(response.jsonBody).toMatchObject({ status: "ok", sources: ["demo"] });
+    expect(response.jsonBody).toMatchObject({ status: "ok", sources: ["demo"], release: null });
     expect(mocks.check).not.toHaveBeenCalled();
   });
 
