@@ -194,7 +194,7 @@ The civic-source additions and GeoHive layer selection are described in [civic s
 
 ## Why it's lean
 
-Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **9 tools, 14,509 characters, about 3,627 tokens** (`toolsets=all` is 101 tools, about 30k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
+Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **9 tools, 14,784 characters, about 3,696 tokens** (`toolsets=all` is 101 tools, about 30k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
 
 <p align="center">
   <a href="docs/architecture/ireland-mcp-lean-surface.drawio">
