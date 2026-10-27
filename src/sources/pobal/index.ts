@@ -91,6 +91,6 @@ export const pobalModule: SourceModule = {
     const record = result.value.records?.[0];
     if (!record) throw new ToolError("NOT_FOUND", "No Pobal electoral division matches this id.");
     const area = compact(record);
-    return { id: `${pobalInfo.id}:${key}`, title: `${area.electoral_division || key} deprivation score`, text: JSON.stringify(area, null, 2), url: result.url, metadata: { source: pobalInfo.id } };
+    return { id: `${pobalInfo.id}:${key}`, title: `${area.electoral_division || key} deprivation score`, text: JSON.stringify(area, null, 2), url: result.url, metadata: { source: pobalInfo.id, licence: pobalInfo.licence, attribution: pobalInfo.attribution } };
   }
 };

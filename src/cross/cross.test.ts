@@ -6,7 +6,11 @@ import { ToolError } from "../gateway/errors.js";
 import type { SourceModule, ToolContext } from "../gateway/module.js";
 import { runTool } from "../gateway/server.js";
 import { sourceModules } from "../registry.js";
+import { epaModule } from "../sources/epa/index.js";
 import { BOUNDARY_LAYERS } from "../sources/geohive/index.js";
+import { pobalModule } from "../sources/pobal/index.js";
+import { tedModule } from "../sources/ted/index.js";
+import { worldBankModule } from "../sources/world-bank/index.js";
 import { SEARCH_TIMEOUT_MS, crossSourceTools, interleave } from "./index.js";
 import { findPlace } from "./places.js";
 
@@ -119,7 +123,7 @@ describe("cross-source tools", () => {
   it("fetch routes by the source prefix and rejects unknown ids", async () => {
     const tools = crossSourceTools([fakeModule("a", 1), fakeModule("b", 1)]);
     const { body } = await call(tools, "fetch", { id: "b:doc:with:colons" }, ctx);
-    expect(body).toEqual({ id: "b:doc:with:colons", title: "doc:with:colons", text: "text of doc:with:colons", url: "https://b.example/doc:with:colons", metadata: {} });
+    expect(body).toEqual({ id: "b:doc:with:colons", title: "doc:with:colons", text: "text of doc:with:colons", url: "https://b.example/doc:with:colons", metadata: { licence: "CC BY 4.0", attribution: "b" } });
     expect((await call(tools, "fetch", { id: "zzz:1" }, ctx)).body.error.code).toBe("NOT_FOUND");
   });
 
@@ -133,6 +137,34 @@ describe("cross-source tools", () => {
     const unknown = (await call(tools, "fetch", { id: "nope:1" }, ctx)).body;
     expect(unknown.error.code).toBe("NOT_FOUND");
     expect(unknown.error.hint).toContain("Fetchable sources: a.");
+  });
+
+  it.each([
+    { mod: epaModule, key: "wfd:IE_SE_16B020080", route: { match: /\/api\/waterbody\/IE_SE_16B020080$/, file: fx("epa", "waterbody-blackwater.json") } },
+    { mod: pobalModule, key: "128020", route: { match: /datastore_search/, file: fx("pobal", "deprivation-galvone.json") } },
+    { mod: tedModule, key: "646747-2026", route: { match: /api\.ted\.europa\.eu\/v3\/notices\/search/, file: fx("ted", "search-bicycle.json") } },
+    { mod: worldBankModule, key: "SP.POP.TOTL", route: { match: /WB_WDI_SP_POP_TOTL/, file: fx("world-bank", "population-irl.json") } }
+  ])("$mod.info.id fetchById documents carry licence and attribution", async ({ mod, key, route }) => {
+    const doc = await mod.fetchById!(key, createContext({ fetch: fakeFetch([route]) }));
+    expect(doc.metadata).toMatchObject({ licence: mod.info.licence, attribution: mod.info.attribution });
+  });
+
+  it("fetch fills a missing licence or attribution from the source, keeping document-level values and explicit nulls", async () => {
+    const withMeta = (metadata: Record<string, unknown> | undefined): SourceModule => ({
+      ...fakeModule("a", 1),
+      fetchById: async (key) => ({ id: `a:${key}`, title: key, text: key, url: "https://a.example", metadata: metadata as Record<string, unknown> })
+    });
+    const cases: Array<[Record<string, unknown> | undefined, Record<string, unknown>]> = [
+      [undefined, { licence: "CC BY 4.0", attribution: "a" }],
+      [{}, { licence: "CC BY 4.0", attribution: "a" }],
+      [{ licence: null }, { licence: null, attribution: "a" }],
+      [{ licence: "OGL", code: 1 }, { licence: "OGL", attribution: "a", code: 1 }],
+      [{ attribution: "Dataset publisher" }, { licence: "CC BY 4.0", attribution: "Dataset publisher" }]
+    ];
+    for (const [metadata, expected] of cases) {
+      const { body } = await call(crossSourceTools([withMeta(metadata)]), "fetch", { id: "a:1" }, ctx);
+      expect(body.metadata).toEqual(expected);
+    }
   });
 
   it("every registered searchable source can fetch the ids its search returns", () => {

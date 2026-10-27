@@ -181,6 +181,6 @@ export const tedModule: SourceModule = {
   },
   fetchById: async (key, ctx): Promise<FetchedDocument> => {
     const r = await getTool.handler({ id: key }, ctx) as { data: { notice: ReturnType<typeof normalise> }; url: string };
-    return { id: `ted:${key}`, title: r.data.notice.title ?? key, text: JSON.stringify(r.data.notice), url: r.url, metadata: { source: "ted" } };
+    return { id: `ted:${key}`, title: r.data.notice.title ?? key, text: JSON.stringify(r.data.notice), url: r.url, metadata: { source: tedInfo.id, licence: tedInfo.licence, attribution: tedInfo.attribution } };
   }
 };
