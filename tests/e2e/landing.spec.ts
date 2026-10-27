@@ -380,6 +380,28 @@ test("playground retries an interrupted response body with a fresh cold-start de
   await expect(page.locator("html")).toHaveAttribute("data-fresh-deadline", "true");
 });
 
+for (const { label, status, contentType, body, expected } of [
+  { label: "an HTML 502 page", status: 502, contentType: "text/html", body: "<html><body>Bad Gateway</body></html>", expected: "HTTP 502" },
+  { label: "an empty 503", status: 503, contentType: "text/plain", body: "", expected: "HTTP 503" },
+  { label: "a malformed SSE frame", status: 200, contentType: "text/event-stream", body: "data: {not json\n\n", expected: "unreadable response" },
+  { label: "an HTML 200 page", status: 200, contentType: "text/html", body: "<html>Maintenance</html>", expected: "unreadable response" }
+]) {
+  test(`playground reports ${label} without a JSON parse error`, async ({ page }) => {
+    await page.route(endpointPattern, async (route) => {
+      const request = route.request().postDataJSON();
+      if (request.params?.name !== "ireland_call") return route.fallback();
+      await route.fulfill({ status, contentType, body });
+    });
+    await page.goto("/#playground");
+    await page.getByRole("button", { name: /Run live query/i }).click();
+    await expect(page.locator("#pg-output")).toContainText(expected);
+    await expect(page.locator("#pg-output")).not.toContainText("Unexpected token");
+    await expect(page.locator("#pg-output")).not.toContainText("JSON");
+    await expect(page.locator("#pg-output")).toHaveClass(/error/);
+    await expect(page.locator("#pg-status")).toContainText("Query failed");
+  });
+}
+
 test("playground accepts SSE data frames after a keepalive and marks tool errors", async ({ page }) => {
   await page.route(endpointPattern, async (route) => {
     const body = route.request().postDataJSON();

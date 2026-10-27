@@ -13,7 +13,13 @@ describe("Static Web App security configuration", () => {
       "permissions-policy": "camera=(), microphone=(), geolocation=()"
     });
     expect(config.globalHeaders["content-security-policy"]).toContain("frame-ancestors 'none'");
-    expect(config.globalHeaders["content-security-policy"]).toContain("https://mcp.irishopendata.com");
+  });
+
+  it("lets the site connect only to origins that its pages use", () => {
+    const csp: string = config.globalHeaders["content-security-policy"];
+    const connect = csp.split(";").map((d) => d.trim()).find((d) => d.startsWith("connect-src "))?.split(/\s+/).slice(1);
+    expect(connect).toEqual(["'self'", "https://eu.i.posthog.com", "https://us.i.posthog.com", "https://mcp.irishopendata.ie", "https://raw.githubusercontent.com"]);
+    expect(csp).not.toMatch(/localhost|127\.0\.0\.1|azurewebsites|irishopendata\.com/);
   });
 
   it("keeps missing resources as real 404 responses", () => {
