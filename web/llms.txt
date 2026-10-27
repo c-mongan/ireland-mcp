@@ -6,7 +6,7 @@ Endpoint: [Ireland MCP Streamable HTTP endpoint](https://mcp.irishopendata.ie/mc
 Docs: [Ireland MCP documentation and playground](https://irishopendata.ie/)
 Transport: Streamable HTTP JSON-RPC over POST
 Auth: none
-Default tool surface: 8 tools, 11,924 characters, about 3.0k tokens
+Default tool surface: 9 tools, 14,509 characters, about 3.6k tokens
 Full surface: use ?toolsets=all only when a client needs all typed tools listed
 
 Install:
@@ -24,10 +24,12 @@ Default tools:
 - ireland_catalogue: compact domain/source/operation catalogue.
 - ireland_describe: arguments and metadata for one source/operation.
 - ireland_call: execute an operation by source and operation name; cite returned source/licence metadata.
+- ireland_query: filter, join, aggregate and rank whole tables on the server (table_id from ireland_call); returns only the answer rows with provenance.
 - ireland_about: server, policy and citation guidance.
 - search: cross-source search.
 - fetch: fetch an ireland:// resource or search hit.
 - nearby: place-aware shortcut.
+- ireland_resolve_place: every geography code for a place (county, council, LEA, ED, constituency, NUTS3).
 
 Toolsets:
 - Default is lean.

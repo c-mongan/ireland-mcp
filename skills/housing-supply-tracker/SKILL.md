@@ -52,10 +52,26 @@ with the same `args`.
    area's Location code, for the same years.
 6. **Prices.** `ppr/ppr_price_stats` for each year (`from`/`to`), once with `"property": "new"` and once with
    `"property": "second-hand"`. Each result also reports `new_count` and `second_hand_count`.
-7. **Pipeline (optional).** `planning/planning_search` with `{ "council", "text": "houses", "from" }` to list
-   recent large residential applications; counts here are applications, not permissions or homes.
-8. **Ranking across LEAs (optional).** Fetch NDA05 for all LEAs in one council, sort by completions and
-   show the full list, not just the top or bottom. To roll LEAs up to a county, list the county's LEAs
+7. **Pipeline (optional).** `planning/planning_stats` with `{ "council", "from", "to", "min_units": 1 }` gives the
+   exact number of applications proposing homes and the units they propose, computed by the planning
+   service. `units_recorded` shows how many applications filled in the unit count. Some councils leave it
+   blank or enter 0 for every application, so report a total of 0 units as unknown. `planning/planning_search` lists individual applications.
+   These are applications, not permissions or homes.
+8. **Ranking across LEAs (optional).** Let `ireland_query` do the ranking on the server instead of pulling
+   every row. For example, completions per 1,000 residents for each LEA in a council:
+
+   ```json
+   { "tables": [
+       { "alias": "leas", "source": "cross", "operation": "ireland_resolve_place", "args": { "place": "Galway County Council", "list": "lea" } },
+       { "alias": "done", "source": "cso", "operation": "cso_get_data", "args": { "table_code": "NDA05", "filters": { "TLIST(A1)": ["2024"] } },
+         "steps": [{ "filter": ["Local Electoral Area", "contains", ", Galway County"] },
+                   { "derive": { "lea": "trim(split_part([Local Electoral Area], ',', 1))" } }] } ],
+     "steps": [{ "join": "done", "on": ["name", "lea"], "normalize": true },
+               { "derive": { "per_1000": "round(value / population_2022 * 1000, 2)" } },
+               { "select": ["name", "value", "population_2022", "per_1000"] }, { "sort": "-per_1000" }] }
+   ```
+
+   Show the full list, not just the top or bottom. To roll LEAs up to a county, list the county's LEAs
    with `ireland_resolve_place` (`"list": "lea"`) rather than guessing from council names.
 9. **Rents by LEA are not available.** RTB rents in CSO (RIQ02/RIA02) are by county, town and
    neighbourhood, not LEA. Report the town or county rent and say it is not an LEA figure.

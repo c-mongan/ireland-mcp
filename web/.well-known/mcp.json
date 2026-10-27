@@ -29,7 +29,7 @@
     "sampling": false
   },
   "toolsets": {
-    "default": "Lean cross-source surface of 8 tools, about 3.0k tokens.",
+    "default": "Lean cross-source surface of 9 tools, about 3.6k tokens.",
     "all": "Append ?toolsets=all to list every typed source tool.",
     "source": "Use /mcp/x/{source-id} or ?toolsets={source-id} for one source."
   },

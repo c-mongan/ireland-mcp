@@ -49,7 +49,16 @@ export interface QueryLayerOptions {
   resultRecordCount?: number;
   returnGeometry?: false | "centroid";
   orderByFields?: string;
+  /** First feature to read (ArcGIS resultOffset). Pair with a unique orderByFields for stable pages. */
+  offset?: number;
+  /** Raises the per-call cap above the default 100 for layers that allow it (at most 2000). */
+  maxRecords?: number;
+  /** Features per upstream request (default 50). */
+  pageSize?: number;
 }
+
+/** ArcGIS's own per-request ceiling for the allowlisted hosted layers. */
+export const ARCGIS_MAX_RECORDS = 2000;
 
 function assertArcGisOk(body: ArcGisResponse): void {
   if (!body.error) return;
@@ -123,15 +132,17 @@ function paramsForGeometry(geometry: QueryLayerOptions["geometry"]): Record<stri
 
 export async function queryLayer(ctx: ToolContext, layerUrl: string, options: QueryLayerOptions) {
   const base = normalizeLayerUrl(layerUrl);
-  const cap = Math.min(Math.max(options.resultRecordCount ?? DEFAULT_CAP, 1), HARD_CAP);
-  const pageSize = Math.min(cap, DEFAULT_CAP);
+  const hardCap = Math.min(Math.max(options.maxRecords ?? HARD_CAP, 1), ARCGIS_MAX_RECORDS);
+  const cap = Math.min(Math.max(options.resultRecordCount ?? DEFAULT_CAP, 1), hardCap);
+  const pageSize = Math.min(cap, Math.max(1, options.pageSize ?? DEFAULT_CAP), ARCGIS_MAX_RECORDS);
+  const start = Math.max(0, Math.floor(options.offset ?? 0));
   const features: ArcGisFeature[] = [];
   let exceeded = false;
   let cached = true;
   let stale = false;
   let lastUrl = "";
 
-  for (let offset = 0; features.length < cap; offset += pageSize) {
+  for (let offset = start; features.length < cap; offset += pageSize) {
     const query = new URLSearchParams({
       f: "json",
       where: options.where ?? "1=1",
@@ -156,3 +167,76 @@ export async function queryLayer(ctx: ToolContext, layerUrl: string, options: Qu
   return { url: lastUrl, features, exceeded: exceeded || features.length >= cap, cached, stale };
 }
 
+
+interface ArcGisCountResponse {
+  count?: number;
+  error?: ArcGisResponse["error"];
+}
+
+/** Exact number of features matching a filter (ArcGIS returnCountOnly), through the cache. */
+export async function countLayer(ctx: ToolContext, layerUrl: string, options: Pick<QueryLayerOptions, "where" | "geometry">) {
+  const base = normalizeLayerUrl(layerUrl);
+  const query = new URLSearchParams({ f: "json", where: options.where ?? "1=1", returnCountOnly: "true", ...paramsForGeometry(options.geometry) });
+  const url = `${base}/query?${query.toString()}`;
+  const result = await ctx.cachedJson<ArcGisCountResponse>(url, TTL, {
+    label: "ArcGIS",
+    validate: (body) => {
+      assertArcGisOk(body);
+      if (typeof body.count !== "number" || !Number.isInteger(body.count) || body.count < 0) {
+        throw new ToolError("UPSTREAM_DOWN", "ArcGIS returned no feature count.");
+      }
+    }
+  });
+  return { url, count: result.value.count as number, cached: result.cached, stale: result.stale };
+}
+
+export interface LayerStatistic {
+  type: "count" | "sum" | "avg" | "min" | "max";
+  field: string;
+  as: string;
+}
+
+/** Server-side ArcGIS statistics (outStatistics), optionally grouped by allowlisted fields. */
+export async function statsLayer(
+  ctx: ToolContext,
+  layerUrl: string,
+  options: Pick<QueryLayerOptions, "where" | "geometry"> & { statistics: LayerStatistic[]; groupBy?: string[]; maxGroups?: number }
+) {
+  const base = normalizeLayerUrl(layerUrl);
+  for (const s of options.statistics) {
+    assertField(s.field);
+    assertField(s.as);
+  }
+  for (const g of options.groupBy ?? []) assertField(g);
+  const outStatistics = options.statistics.map((s) => ({ statisticType: s.type, onStatisticField: s.field, outStatisticFieldName: s.as }));
+  const query = new URLSearchParams({
+    f: "json",
+    where: options.where ?? "1=1",
+    outStatistics: JSON.stringify(outStatistics),
+    returnGeometry: "false",
+    // ArcGIS rejects resultRecordCount on an ungrouped statistics query, which returns one row anyway.
+    ...(options.groupBy?.length
+      ? {
+          groupByFieldsForStatistics: options.groupBy.join(","),
+          orderByFields: options.groupBy.join(","),
+          resultRecordCount: String(Math.min(Math.max(options.maxGroups ?? 500, 1), ARCGIS_MAX_RECORDS))
+        }
+      : {}),
+    ...paramsForGeometry(options.geometry)
+  });
+  const url = `${base}/query?${query.toString()}`;
+  const result = await ctx.cachedJson<ArcGisResponse>(url, TTL, {
+    label: "ArcGIS",
+    validate: (body) => {
+      assertArcGisOk(body);
+      if (!Array.isArray(body.features)) throw new ToolError("UPSTREAM_DOWN", "ArcGIS returned no statistics.");
+    }
+  });
+  return {
+    url,
+    groups: (result.value.features ?? []).map((f) => f.attributes),
+    exceeded: Boolean(result.value.exceededTransferLimit),
+    cached: result.cached,
+    stale: result.stale
+  };
+}

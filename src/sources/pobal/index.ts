@@ -58,18 +58,22 @@ async function query(ctx: ToolContext, params: URLSearchParams) {
 const searchTool = defineTool({
   name: "pobal_deprivation_search",
   title: "Search Pobal deprivation scores",
-  description: "Search 2022 Pobal HP Deprivation Index electoral-division scores by ED id or name.",
+  description: "Search 2022 Pobal HP Deprivation Index electoral-division scores by ED id or name. Omit query to page through all 3,417 EDs (or load them all as a table with ireland_query and join on ed_id).",
   example: { query: "Galvone", limit: 5 },
   inputSchema: {
-    query: z.string().min(2).max(120).describe("Electoral division name or 6-digit ED id, e.g. 'Galvone' or '068001'."),
-    limit: z.number().int().min(1).max(MAX_LIMIT).default(10)
+    query: z.string().min(2).max(120).optional().describe("Electoral division name or 6-digit ED id, e.g. 'Galvone' or '068001'. Omit for every ED."),
+    limit: z.number().int().min(1).max(MAX_LIMIT).default(10),
+    offset: z.number().int().min(0).max(10_000).default(0).describe("Records to skip.")
   },
-  handler: async ({ query: q, limit }, ctx) => {
-    const params = new URLSearchParams({ resource_id: RESOURCE_ID, q: pobalKey(q), limit: String(limit) });
+  table: { rows: "areas", total: "total" },
+  handler: async ({ query: q, limit, offset }, ctx) => {
+    // Text search keeps CKAN's relevance order; the full list is sorted by _id so offset pages stay consistent.
+    const params = new URLSearchParams({ resource_id: RESOURCE_ID, ...(q ? { q: pobalKey(q) } : { sort: "_id" }), limit: String(limit), ...(offset ? { offset: String(offset) } : {}) });
     const result = await query(ctx, params);
     const records = (result.value.records ?? []).map(compact);
     const { items, truncated } = bound(records, limit);
-    return envelope(pobalInfo, { data: { total: result.value.total ?? records.length, areas: items }, url: result.url, cached: result.cached, stale: result.stale, truncated: truncated || (result.value.total ?? 0) > items.length });
+    const total = result.value.total ?? records.length;
+    return envelope(pobalInfo, { data: { total, offset, areas: items, next_offset: offset + items.length < total ? offset + items.length : null }, url: result.url, cached: result.cached, stale: result.stale, truncated: truncated || total > offset + items.length });
   }
 });
 

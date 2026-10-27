@@ -49,6 +49,9 @@ residents inside the place. Some examples:
 - the counties in a NUTS3 region: `{ "place": "IE042", "list": "county" }`;
 - the LEAs in a constituency: `{ "place": "Dublin Bay North", "list": "lea" }`.
 
+A `list` result is a table handle. [`ireland_query`](query.md) can join it to other sources on
+the server, for example the EDs of a council to Pobal scores by `ed_id`, then roll them up to LEAs.
+
 `nearby` and `ireland_snapshot` also return a short `codes` block from the same table: ED, LEA,
 constituency, council, county and NUTS3.
 

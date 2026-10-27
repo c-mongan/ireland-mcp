@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { DAY, HOUR } from "../../gateway/context.js";
-import { bound, DEFAULT_LIMIT, envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js";
+import { DEFAULT_LIMIT, envelope, MAX_LIMIT, type SourceInfo } from "../../gateway/envelope.js";
 import { ToolError } from "../../gateway/errors.js";
 import { defineTool, type SourceModule, type ToolContext } from "../../gateway/module.js";
 import { pprIndexStoreFromEnv, type PprIndex, type PprIndexStore } from "./indexStore.js";
@@ -138,6 +138,7 @@ export function createPprModule(options: PprModuleOptions = {}): SourceModule {
 
   const searchSales = defineTool({
     name: "ppr_search_sales",
+    table: { rows: "sales", total: "total" },
     example: { county: "Galway", address: "oranmore", limit: 5 },
     title: "Search residential property sales",
     description:
@@ -145,19 +146,21 @@ export function createPprModule(options: PprModuleOptions = {}): SourceModule {
     inputSchema: {
       ...filterShape,
       sort: z.enum(["date_desc", "price_desc", "price_asc"]).default("date_desc"),
-      limit: z.number().int().min(1).max(MAX_LIMIT).default(DEFAULT_LIMIT)
+      limit: z.number().int().min(1).max(MAX_LIMIT).default(DEFAULT_LIMIT),
+      offset: z.number().int().min(0).max(100_000).default(0).describe("Matching sales to skip.")
     },
-    handler: async ({ sort, limit, ...f }, ctx) => {
+    handler: async ({ sort, limit, offset, ...f }, ctx) => {
       const r = await load(ctx, f);
       const matches = applyFilters(r.rows, f);
       if (sort !== "date_desc") matches.sort((a, b) => (sort === "price_desc" ? b[4] - a[4] : a[4] - b[4]));
-      const page = bound(matches, limit);
+      const items = matches.slice(offset, offset + limit);
+      const more = offset + items.length < matches.length;
       return envelope(pprInfo, {
-        data: { total: matches.length, source: r.source, sales: page.items.map(toSale) },
+        data: { total: matches.length, source: r.source, offset, next_offset: more ? offset + items.length : null, sales: items.map(toSale) },
         url: r.url,
         cached: r.cached,
         stale: r.stale,
-        truncated: page.truncated
+        truncated: more
       });
     }
   });

@@ -20,7 +20,7 @@ for (const mod of appModules().modules) {
   toolsBySource.set(mod.info.id, new Map(mod.tools.map((tool) => [tool.name, tool])));
 }
 const allOps = new Set([...ops.values()].flatMap((set) => [...set]));
-const META_TOOLS = ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about", "search", "fetch", "nearby", "ireland_resolve_place"];
+const META_TOOLS = ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_query", "ireland_about", "search", "fetch", "nearby", "ireland_resolve_place"];
 
 function skillFolders(): string[] {
   if (!existsSync(skillsDir)) return [];

@@ -124,9 +124,9 @@ Portable Copilot / MCP JSON:
 | --- | ---: | --- |
 | Data sources | 39 | Upstream public-data sources, one module each. The `cross` combiner is not a source. |
 | Available without an operator key | 37 of 39 | NTA realtime needs an operator key. Logainm needs a Gaois operator account and API key. |
-| Catalogue operations | 93 | 89 source operations plus 4 cross-source ones (`list_sources`, `nearby`, `ireland_snapshot`, `ireland_resolve_place`), all callable through `ireland_call`. |
-| Default tools | 8 | What `tools/list` returns: 4 meta tools plus `search`, `fetch`, `nearby` and `ireland_resolve_place`. |
-| Tools with `?toolsets=all` | 99 | Every operation as a typed tool, plus the 4 meta tools, `search` and `fetch`. |
+| Catalogue operations | 94 | 90 source operations plus 4 cross-source ones (`list_sources`, `nearby`, `ireland_snapshot`, `ireland_resolve_place`), all callable through `ireland_call`. |
+| Default tools | 9 | What `tools/list` returns: 5 meta tools plus `search`, `fetch`, `nearby` and `ireland_resolve_place`. |
+| Tools with `?toolsets=all` | 101 | Every operation as a typed tool, plus the 5 meta tools, `search` and `fetch`. |
 | Prompts | 3 | `area_profile`, `commute_check`, `compare_counties`. |
 | Dataset cards | 39 of 39 | Sources with a card (topics, geography levels, time coverage, join keys) that `ireland_catalogue` filters on. See [dataset cards](docs/dataset-cards.md). |
 <!-- counts:end -->
@@ -139,6 +139,8 @@ The default profile covers statistics (CSO, Eurostat, ECB, World Bank), the Oire
 <summary><strong>All 39 sources, publishers and licences</strong></summary>
 
 The default profile registers 39 source modules in `src/registry.ts`. The default `nearby`, `ireland_resolve_place`, `search` and `fetch` shortcuts sit above these sources. `ireland_resolve_place` maps any place to its county, council, LEA, constituency, NUTS3 and ED codes; see the [place crosswalk](docs/crosswalk.md). The optional pilot rows require `LEGAL_ENABLED=true` and an ingested corpus; check `ireland_catalogue` for the modules available on an endpoint. See [new provider access and limits](docs/public-source-additions.md).
+
+For counts, sums, joins and rankings over many rows, `ireland_query` loads whole tables on the server (CSO tables, planning applications, Pobal scores, crosswalk lists, property sales, pay-gap reports, EU projects and council budgets) and returns only the answer rows, with each input's provenance. `planning_search` returns exact totals and pages with `offset`; `planning_stats` counts applications and proposed homes nationally. See [server-side queries](docs/query.md).
 
 Every source has a [dataset card](docs/dataset-cards.md): topics, geography levels, time coverage, update cadence, join keys and licence. Ask `ireland_catalogue` for, say, `{"geo_level": "lea", "topic": "housing"}` to list only the operations with that data, and `ireland_describe` with a source for its full card.
 
@@ -192,11 +194,11 @@ The civic-source additions and GeoHive layer selection are described in [civic s
 
 ## Why it's lean
 
-Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **8 tools, 11,924 characters, about 2,981 tokens** (`toolsets=all` is 99 tools, about 29k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
+Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **9 tools, 14,509 characters, about 3,627 tokens** (`toolsets=all` is 101 tools, about 30k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
 
 <p align="center">
   <a href="docs/architecture/ireland-mcp-lean-surface.drawio">
-    <img src="docs/architecture/ireland-mcp-lean-surface.png" alt="Token-cost comparison: 8 default tools versus all typed tools and one-server-per-source routing" width="800">
+    <img src="docs/architecture/ireland-mcp-lean-surface.png" alt="Token-cost comparison: the default tools versus all typed tools and one-server-per-source routing" width="800">
   </a>
 </p>
 
@@ -204,7 +206,7 @@ Need typed tools anyway?
 
 | Surface | Use |
 | --- | --- |
-| Default HTTP | `/mcp` lists only `ireland_catalogue`, `ireland_describe`, `ireland_call`, `ireland_about`, `search`, `fetch`, `nearby`, `ireland_resolve_place`. |
+| Default HTTP | `/mcp` lists only `ireland_catalogue`, `ireland_describe`, `ireland_call`, `ireland_query`, `ireland_about`, `search`, `fetch`, `nearby`, `ireland_resolve_place`. |
 | Source toolsets | `/mcp?toolsets=cso,irish-rail` lists selected typed tools too. |
 | One source path | `/mcp/x/{source}` lists that source's typed tools, for example `/mcp/x/met-eireann`. |
 | Everything | `/mcp?toolsets=all` lists all available tools and is useful for debugging, not routine chat. |

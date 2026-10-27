@@ -90,6 +90,7 @@ const matchesIndustry = (report: PayGapReport, query: string) => {
 
 const searchTool = defineTool({
   name: "paygap_search_reports",
+  table: { rows: "reports", total: "total_reports" },
   title: "Search Irish gender pay gap reports",
   description: "Search the combined PayGap.ie employer report dataset by company name, report year and/or NACE industry. Returns submitted report figures, source report links and source annotations when available. If the primary export refuses access, the latest publisher CSV commit is rechecked after a one-hour cache expires and downloaded by its immutable revision, with explicit snapshot dates and annotation limits. Coverage and completeness are as published by PayGap.ie; the data is not a census of all employers and does not prove discrimination or equal pay.",
   example: { company: "AIB", year: 2025, limit: 10 },

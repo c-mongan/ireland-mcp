@@ -7,7 +7,7 @@ test("the compact catalogue exposes tourism, static stops and groundwater withou
   const connected = await connectClient(createAppServer(createContext({ fetch: async () => { throw new Error("Catalogue must not download datasets"); } })));
   try {
     const listed = await connected.listTools();
-    expect(listed.tools).toHaveLength(8);
+    expect(listed.tools).toHaveLength(9);
     const result = await connected.callTool({ name: "ireland_catalogue", arguments: {} });
     expect(JSON.stringify(result)).toContain('"failte-ireland"');
     expect(JSON.stringify(result)).toContain('"tfi-static"');

@@ -135,6 +135,7 @@ export const operationContracts = {
   ppr_search_sales: shape({ total: number, sales: records }),
   ppr_price_stats: (data) => shape({ count: number })(data) && (data.count === 0 ? data.median_eur === null : data.count > 0 && positive(data.median_eur)),
   planning_search: shape({ count: number, applications: records }),
+  planning_stats: shape({ applications: number, residential_units: number, groups: records }),
   planning_get: shape({ count: number, applications: records }),
   heritage_monuments_near: shape({ count: number, monuments: records }),
   list_sources: collection("sources"),

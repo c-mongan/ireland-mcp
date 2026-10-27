@@ -69,6 +69,9 @@ describe("PPR module", () => {
     const { body } = await callTool(mod, "ppr_search_sales", { include_non_market: true, sort: "price_asc", limit: 2 }, ctx);
     expect(body.data.sales.map((s: { price_eur: number }) => s.price_eur)).toEqual([95000, 200000]);
     expect(body.truncated).toBe(true);
+    expect(body.data).toMatchObject({ offset: 0, next_offset: 2 });
+    const next = await callTool(mod, "ppr_search_sales", { include_non_market: true, sort: "price_asc", limit: 2, offset: 1 }, ctx);
+    expect(next.body.data.sales[0].price_eur).toBe(200000);
     const fresh = await callTool(mod, "ppr_search_sales", { property: "new" }, ctx);
     expect(fresh.body.data.sales[0]).toMatchObject({ vat_exclusive: true, size: "less than 38 sq metres" });
   });

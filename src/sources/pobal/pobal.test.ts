@@ -22,6 +22,20 @@ describe("pobal", () => {
     const result = await callTool<PobalBody>(pobalModule, "pobal_deprivation_search", { query: "068001", limit: 3 }, fetch);
     expect(result.body.data.areas[0]).toMatchObject({ ed_id: "068001", electoral_division: "BALLYBAAN" });
   });
+
+  it("lists every ED in _id order with offset paging when the query is omitted", async () => {
+    const page = (offset: number) => JSON.stringify({ success: true, result: { total: 3, records: [{ ED_ID_STR: String(68001 + offset), ED_ENGLISH: `ED ${offset}` }] } });
+    const fetch = fakeFetch([
+      { match: /sort=_id&limit=1$/, body: page(0) },
+      { match: /sort=_id&limit=1&offset=2$/, body: page(2) }
+    ]);
+    const first = await callTool<PobalBody & { data: { next_offset: number | null } }>(pobalModule, "pobal_deprivation_search", { limit: 1 }, fetch);
+    expect(first.body.data).toMatchObject({ next_offset: 1 });
+    const last = await callTool<PobalBody & { data: { next_offset: number | null } }>(pobalModule, "pobal_deprivation_search", { limit: 1, offset: 2 }, fetch);
+    expect(last.body.data.areas[0]).toMatchObject({ ed_id: "068003" });
+    expect(last.body.data.next_offset).toBeNull();
+    expect(fetch.calls.every((c) => !c.url.includes("q="))).toBe(true);
+  });
 });
 
 it("does not cache unsuccessful CKAN envelopes as empty results", async () => {

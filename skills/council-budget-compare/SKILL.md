@@ -35,7 +35,17 @@ with the same `args`.
    "Limerick City and County Council"); a NOT_FOUND error lists the valid names.
    Page with `offset` = `next_offset` until it is null. Omit `division` to get every division.
 3. **Total per division.** Sum `amount` for `measure: "Expenditure"` per division. Keep Income separate;
-   never add income to expenditure. Show the number of lines summed.
+   never add income to expenditure. Show the number of lines summed. `ireland_query` does this on the
+   server without paging, for one or several councils:
+
+   ```json
+   { "tables": [
+       { "alias": "a", "source": "council-budgets", "operation": "council_budgets_get", "args": { "year": 2025, "authority": "Galway City Council" } },
+       { "alias": "b", "source": "council-budgets", "operation": "council_budgets_get", "args": { "year": 2025, "authority": "Galway County Council" } } ],
+     "steps": [{ "union": "b" }, { "filter": ["measure", "=", "Expenditure"] },
+               { "aggregate": { "eur": "sum:amount", "lines": "count" }, "group_by": ["source_authority", "division"] },
+               { "sort": ["division", "-eur"] }] }
+   ```
 4. **Per resident (optional).** Call `cso/cso_get_table_metadata` with `{ "table_code": "URLIA02" }` to find the
    Local Authority Area code, then `cso/cso_get_data` with filters `"STATISTIC": ["URLIA02C01"]`,
    `"C02199V02655": ["-"]` (both sexes) and the area code. The table has no urban/rural total, so sum

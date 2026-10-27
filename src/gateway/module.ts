@@ -43,7 +43,35 @@ export interface ToolDefinition<Shape extends z.ZodRawShape = z.ZodRawShape> {
   pinned?: boolean;
   /** Example arguments shown by ireland_describe. Derived from the schema when omitted. */
   example?: Record<string, unknown>;
+  /** Marks the result as a table that ireland_query can load in full by reference (a table handle). */
+  table?: TableSpec;
   handler(args: z.infer<z.ZodObject<Shape>>, ctx: ToolContext): Promise<Envelope | unknown>;
+}
+
+/** One fully loaded table: every row plus the evidence of where it came from. */
+export interface TableLoad {
+  rows: unknown[];
+  /** Provenance of the load (source, licence, attribution, retrieval time, cache state). */
+  envelope: Envelope;
+  /** Every upstream URL read; the envelope url is the first. */
+  urls: string[];
+  /** Upstream pages read. */
+  pages: number;
+}
+
+/**
+ * How ireland_query reads a table-capable operation in full. By default the handler is paged with
+ * `limit: pageSize` and, when the schema has one, `offset` until the envelope is no longer truncated.
+ */
+export interface TableSpec {
+  /** Dotted path inside `data` to the array of row objects, e.g. "rows" or "children.items". */
+  rows: string;
+  /** Dotted path inside `data` to the total row count, checked before paging further. */
+  total?: string;
+  /** Rows per handler call (default 500, the shared MAX_LIMIT). */
+  pageSize?: number;
+  /** Loads every row directly instead of paging the handler (CSO JSON-stat, ArcGIS layers). */
+  load?(args: Record<string, unknown>, ctx: ToolContext, maxRows: number): Promise<TableLoad>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
