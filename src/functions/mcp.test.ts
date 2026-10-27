@@ -32,7 +32,7 @@ describe("Azure MCP request boundary", () => {
     expect(response.status).toBe(200);
     const body = JSON.parse(String(response.body));
     expect(body.result.tools.map((tool: { name: string }) => tool.name).sort()).toEqual([
-      "fetch", "ireland_about", "ireland_call", "ireland_catalogue", "ireland_describe", "ireland_resolve_place", "nearby", "search"
+      "fetch", "ireland_about", "ireland_call", "ireland_catalogue", "ireland_describe", "ireland_query", "ireland_resolve_place", "nearby", "search"
     ]);
   });
 });

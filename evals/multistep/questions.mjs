@@ -604,7 +604,7 @@ export const items = [
     drift: "slow",
     question: "In the 2025 PayGap.ie reports, what mean hourly gender pay gap did AIB report, what is the median mean-hourly gap across all 2025 reports in the Financial and Insurance Activities sector, and what is Eurostat's latest unadjusted gender pay gap for Ireland (whole economy excluding public administration)?",
     required_sources: ["paygap", "eurostat"],
-    tool_path: ["paygap_search_reports(AIB, 2025)", "paygap_search_reports(industry=Financial, 2025, paged)", "eurostat_get_data(earn_gr_gpgr2)"],
+    tool_path: ["paygap_search_reports(AIB, 2025)", "ireland_query(paygap_search_reports(industry=Financial, 2025): median mean_hourly_gap)", "eurostat_get_data(earn_gr_gpgr2)"],
     answer: {
       aib_mean_gap_pct: { type: "number", tol_abs: 0.05 },
       sector_median_pct: { type: "number", tol_abs: 0.3 },
@@ -615,22 +615,29 @@ export const items = [
     async reference(ctx) {
       const aib = await ctx.call("paygap", "paygap_search_reports", { company: "AIB", year: 2025, limit: 5 });
       const a = aib.reports.find((r) => r.company_name === "AIB");
-      const gaps = [];
-      // Follow next_offset: the server trims each page to its token budget.
-      let seen = 0;
-      let total = null;
-      for (let offset = 0, guard = 0; offset != null && guard < 100; guard++) {
-        const page = await ctx.call("paygap", "paygap_search_reports", { industry: "Financial and Insurance", year: 2025, limit: 20, offset }, { allowTruncated: true });
-        total = page.total_reports;
-        seen += page.reports.length;
-        for (const r of page.reports) if (typeof r.metrics?.mean_hourly_gap === "number") gaps.push(r.metrics.mean_hourly_gap);
-        offset = page.next_offset;
+      const sector = { industry: "Financial and Insurance", year: 2025 };
+      let median;
+      if (ctx.hasOperation("ireland_query")) {
+        const q = await ctx.query({ tables: [{ alias: "r", source: "paygap", operation: "paygap_search_reports", args: sector }], steps: [{ aggregate: { reports: "count", median: "median:metrics.mean_hourly_gap" } }] });
+        median = q.rows[0].median;
+      } else {
+        const gaps = [];
+        // Follow next_offset: the server trims each page to its token budget.
+        let seen = 0;
+        let total = null;
+        for (let offset = 0, guard = 0; offset != null && guard < 100; guard++) {
+          const page = await ctx.call("paygap", "paygap_search_reports", { ...sector, limit: 20, offset }, { allowTruncated: true });
+          total = page.total_reports;
+          seen += page.reports.length;
+          for (const r of page.reports) if (typeof r.metrics?.mean_hourly_gap === "number") gaps.push(r.metrics.mean_hourly_gap);
+          offset = page.next_offset;
+        }
+        ctx.workaround("server-query:pagination");
+        if (seen !== total) throw new Error(`paged ${seen} of ${total} sector reports`);
+        gaps.sort((x, y) => x - y);
+        const mid = gaps.length / 2;
+        median = gaps.length % 2 ? gaps[Math.floor(mid)] : (gaps[mid - 1] + gaps[mid]) / 2;
       }
-      ctx.workaround("server-query:pagination");
-      if (seen !== total) throw new Error(`paged ${seen} of ${total} sector reports`);
-      gaps.sort((x, y) => x - y);
-      const mid = gaps.length / 2;
-      const median = gaps.length % 2 ? gaps[Math.floor(mid)] : (gaps[mid - 1] + gaps[mid]) / 2;
       const e = await ctx.call("eurostat", "eurostat_get_data", { dataset: "earn_gr_gpgr2", filters: { nace_r2: ["B-S_X_O"], unit: ["PC"] }, since: "2018" });
       const last = e.rows.filter((r) => r.value != null).at(-1);
       return { aib_mean_gap_pct: a.metrics.mean_hourly_gap, sector_median_pct: round(median, 2), eurostat_ie_pct: last.value, eurostat_year: last.Time };
@@ -665,7 +672,7 @@ export const items = [
     drift: "stable",
     question: "In the packaged Kohesio snapshot, what is the total EU budget of EU-funded projects in the West region (NUTS3 IE042: Galway, Mayo, Roscommon), and how much is that per resident of those three counties (Census 2022)?",
     required_sources: ["kohesio", "cso"],
-    tool_path: ["kohesio_search_projects(region=IE042, paged)", "sum eu_budget", "cso_area_profile x3"],
+    tool_path: ["ireland_query(kohesio_search_projects(region=IE042): count, sum eu_budget)", "cso_area_profile x3"],
     answer: {
       project_count: { type: "number", tol_abs: 0 },
       total_eu_budget_eur: { type: "number", tol_rel: 0.01 },
@@ -675,15 +682,21 @@ export const items = [
     async reference(ctx) {
       let total = 0;
       let count = 0;
-      let offset = 0;
-      for (let page = 0; page < 40; page++) {
-        const d = await ctx.call("kohesio", "kohesio_search_projects", { region: "IE042", limit: 50, offset }, { allowTruncated: true });
-        for (const p of d.projects) total += p.eu_budget ?? 0;
-        count += d.projects.length;
-        if (d.next_offset == null || d.next_offset >= d.total) break;
-        offset = d.next_offset;
+      if (ctx.hasOperation("ireland_query")) {
+        const q = await ctx.query({ tables: [{ alias: "k", source: "kohesio", operation: "kohesio_search_projects", args: { region: "IE042" } }], steps: [{ aggregate: { projects: "count", eu_budget: "sum:eu_budget" } }] });
+        count = q.rows[0].projects;
+        total = q.rows[0].eu_budget ?? 0;
+      } else {
+        let offset = 0;
+        for (let page = 0; page < 40; page++) {
+          const d = await ctx.call("kohesio", "kohesio_search_projects", { region: "IE042", limit: 50, offset }, { allowTruncated: true });
+          for (const p of d.projects) total += p.eu_budget ?? 0;
+          count += d.projects.length;
+          if (d.next_offset == null || d.next_offset >= d.total) break;
+          offset = d.next_offset;
+        }
+        ctx.workaround("server-query:pagination");
       }
-      ctx.workaround("server-query:pagination");
       const counties = (await areasIn(ctx, "IE042", "nuts3", "county")).map((r) => r.name).sort();
       if (counties.join() !== "Galway,Mayo,Roscommon") throw new Error(`crosswalk IE042 counties: ${counties.join(", ")}`);
       let pop = 0;
@@ -843,7 +856,7 @@ export const items = [
     drift: "slow",
     question: "How many planning applications received in calendar 2024 lie within 500 m of the Broombridge Luas stop, and how many residential units do they propose in total?",
     required_sources: ["luas", "planning"],
-    tool_path: ["luas_list_stops(Green)", "planning_search(lat, lon, 500, 2024)"],
+    tool_path: ["luas_list_stops(Green)", "planning_stats(lat, lon, 500, 2024)"],
     answer: {
       applications: { type: "number", tol_abs: 1 },
       residential_units: { type: "number", tol_rel: 0.05, tol_abs: 2 }
@@ -852,9 +865,14 @@ export const items = [
     async reference(ctx) {
       const l = await ctx.call("luas", "luas_list_stops", { line: "Green" });
       const s = l.stops.find((x) => /Broombridge/i.test(x.name));
-      const p = await ctx.call("planning", "planning_search", { lat: s.lat, lon: s.lon, radius_m: 500, from: "2024-01-01", to: "2024-12-31", limit: 100 }, { allowTruncated: true });
-      if (p.count >= 100) throw new GapError("server-query:count", "planning_search caps at 100 rows with no total; count unknowable");
-      return { applications: p.count, residential_units: p.applications.reduce((t, a) => t + (a.residential_units ?? 0), 0) };
+      const args = { lat: s.lat, lon: s.lon, radius_m: 500, from: "2024-01-01", to: "2024-12-31" };
+      if (!ctx.hasOperation("ireland_query")) {
+        const p = await ctx.call("planning", "planning_search", { ...args, limit: 100 }, { allowTruncated: true });
+        if (p.count >= 100) throw new GapError("server-query:count", "planning_search caps at 100 rows with no total; count unknowable");
+        return { applications: p.count, residential_units: p.applications.reduce((t, a) => t + (a.residential_units ?? 0), 0) };
+      }
+      const st = await ctx.call("planning", "planning_stats", args);
+      return { applications: st.applications, residential_units: st.residential_units };
     }
   },
   {
@@ -863,17 +881,24 @@ export const items = [
     drift: "slow",
     question: "How many planning applications did Galway City Council receive in calendar 2024, and what was the council's 2025 adopted Division D (Development Management) expenditure per application?",
     required_sources: ["planning", "council-budgets"],
-    tool_path: ["planning_search(council=Galway City Council, 2024) -> total count", "council_budgets_get(2025, Galway City Council, D)"],
+    tool_path: ["planning_stats(council=Galway City Council, 2024) -> applications", "council_budgets_get(2025, Galway City Council, D)"],
     answer: {
       applications_2024: { type: "number", tol_rel: 0.02 },
       division_d_per_application_eur: { type: "number", tol_rel: 0.03 }
     },
     gaps: ["server-query:count"],
     async reference(ctx) {
-      const p = await ctx.call("planning", "planning_search", { council: "Galway City Council", from: "2024-01-01", to: "2024-12-31", limit: 100 }, { allowTruncated: true });
-      if (p.count >= 100 && p.total == null) throw new GapError("server-query:count", "planning_search returns at most 100 rows and no total; a council-year count needs server-side aggregation");
+      const args = { council: "Galway City Council", from: "2024-01-01", to: "2024-12-31" };
+      if (!ctx.hasOperation("ireland_query")) {
+        const p = await ctx.call("planning", "planning_search", { ...args, limit: 100 }, { allowTruncated: true });
+        if (p.count >= 100 && p.total == null) throw new GapError("server-query:count", "planning_search returns at most 100 rows and no total; a council-year count needs server-side aggregation");
+      }
+      // The ArcGIS service counts; planning_search's exact total must agree.
+      const s = await ctx.call("planning", "planning_stats", args);
+      const p = await ctx.call("planning", "planning_search", { ...args, limit: 1 }, { allowTruncated: true });
+      if (p.total !== s.applications) throw new Error(`planning_stats ${s.applications} vs planning_search total ${p.total}`);
       const d = await divisionTotal(ctx, "Galway City Council", 2025, "D");
-      return { applications_2024: p.total ?? p.count, division_d_per_application_eur: Math.round(d / (p.total ?? p.count)) };
+      return { applications_2024: s.applications, division_d_per_application_eur: Math.round(d / s.applications) };
     }
   },
 
@@ -1137,7 +1162,7 @@ export const items = [
     drift: "slow",
     question: "For Galway City Council: how many planning applications proposing residential units were received in 2024, what is the total number of units proposed, what is the council's 2025 adopted Division A (Housing and Building) expenditure, and under which 2024 Act will new planning applications be decided once commenced (title and number)?",
     required_sources: ["planning", "council-budgets", "legislation"],
-    tool_path: ["planning_search(council, 2024) -> filter residential_units > 0", "council_budgets_get(2025, A)", "legislation_list_acts(2024, planning)"],
+    tool_path: ["ireland_query(planning_search(council, 2024): filter residential_units > 0, count + sum)", "council_budgets_get(2025, A)", "legislation_list_acts(2024, planning)"],
     answer: {
       residential_applications: { type: "number", tol_rel: 0.03 },
       residential_units: { type: "number", tol_rel: 0.03 },
@@ -1147,12 +1172,22 @@ export const items = [
     },
     gaps: ["server-query:count", "knowledge:law-search"],
     async reference(ctx) {
-      const p = await ctx.call("planning", "planning_search", { council: "Galway City Council", from: "2024-01-01", to: "2024-12-31", limit: 100 }, { allowTruncated: true });
-      if (p.count >= 100 && p.total == null) throw new GapError("server-query:count", "planning_search caps at 100 rows and has no total; a council-year filter + sum needs server-side aggregation");
-      const res = p.applications.filter((a) => (a.residential_units ?? 0) > 0);
+      const args = { council: "Galway City Council", from: "2024-01-01", to: "2024-12-31" };
+      if (!ctx.hasOperation("ireland_query")) {
+        const p = await ctx.call("planning", "planning_search", { ...args, limit: 100 }, { allowTruncated: true });
+        if (p.count >= 100 && p.total == null) throw new GapError("server-query:count", "planning_search caps at 100 rows and has no total; a council-year filter + sum needs server-side aggregation");
+      }
+      const q = await ctx.query({
+        tables: [{ alias: "p", source: "planning", operation: "planning_search", args }],
+        steps: [{ filter: ["residential_units", ">", 0] }, { aggregate: { applications: "count", units: "sum:residential_units" } }]
+      });
+      const res = q.rows[0];
+      // Cross-check against the ArcGIS service's own statistics.
+      const s = await ctx.call("planning", "planning_stats", { ...args, min_units: 1 });
+      if (s.applications !== res.applications || s.residential_units !== res.units) throw new Error(`ireland_query ${res.applications}/${res.units} vs planning_stats ${s.applications}/${s.residential_units}`);
       const l = await ctx.call("legislation", "legislation_list_acts", { year: 2024, query: "Planning and Development" });
       const act = l.acts.find((a) => a.title === "Planning and Development Act 2024");
-      return { residential_applications: res.length, residential_units: res.reduce((t, a) => t + a.residential_units, 0), division_a_expenditure_eur: Math.round(await divisionTotal(ctx, "Galway City Council", 2025, "A")), act: act.title, act_number: act.number };
+      return { residential_applications: res.applications, residential_units: res.units, division_a_expenditure_eur: Math.round(await divisionTotal(ctx, "Galway City Council", 2025, "A")), act: act.title, act_number: act.number };
     }
   },
   {

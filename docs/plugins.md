@@ -86,7 +86,7 @@ affiliation or endorsement is implied either way. Each skill names its related p
 All skills share the attribution rules in [`skills/_shared/citations.md`](../skills/_shared/citations.md).
 Skills reference only sources on the default hosted server; the opt-in legal beta is never required.
 The server's default surface lists only the meta tools (`ireland_catalogue`, `ireland_describe`,
-`ireland_call`, `ireland_about`, `search`, `fetch`, `nearby`). Skills name each step as a source and
+`ireland_call`, `ireland_query`, `ireland_about`, `search`, `fetch`, `nearby`, `ireland_resolve_place`). Skills name each step as a source and
 operation (e.g. `ppr/ppr_price_stats`) and run it with
 `ireland_call { "source": "ppr", "operation": "ppr_price_stats", "args": { ... } }`, calling
 `ireland_describe { "source", "operation" }` first when the argument shape is unclear.

@@ -37,6 +37,9 @@ with the same `args`.
 3. **Planning.** Call `planning/planning_search` with `{ "lat", "lon", "radius_m": 500, "from": "<2 years ago>" }`.
    Report reference, council, received date, decision (if present) and a one-line description.
    For one application, call `planning/planning_get` with `{ "application_ref", "council" }`.
+   Each result has the exact `total`; page with `offset`. For "how many, and how many homes", call
+   `planning/planning_stats` with the same filters (add `"group_by": "decision"` for a breakdown) instead of
+   counting rows by hand.
 4. **Monuments.** Call `heritage/heritage_monuments_near` with `{ "lat", "lon", "radius_m": 1000 }`. Report
    SMR number, class, townland and distance. Recorded monuments have legal protection; say so.
 5. **Protected sites.** Call `environment-sites/protected_sites_near` with `{ "lat", "lon", "radius_m": 2000 }`

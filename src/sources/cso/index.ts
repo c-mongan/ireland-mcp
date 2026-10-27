@@ -149,7 +149,21 @@ const dataTool = defineTool({
       .describe('Map of dimension code to category codes, e.g. {"TLIST(A1)":["2022"],"C02779V03348":["02"]}.'),
     limit
   },
-  handler: async ({ table_code, filters, limit: max }, ctx) => {
+  table: {
+    rows: "rows",
+    // JSON-stat arrives whole, so the table decodes every cell from one cached read instead of paging.
+    load: async (args, ctx, maxRows) => {
+      const env = await getData(args as { table_code: string; filters: Record<string, string[]> }, ctx, maxRows);
+      if (env.data.total_rows > maxRows) {
+        throw new ToolError("BAD_ARGS", `That selection has ${env.data.total_rows} cells; a table holds at most ${maxRows}.`, { hint: "Filter the largest dimensions (time, geography)." });
+      }
+      return { rows: env.data.rows, envelope: env, urls: [env.url], pages: 1 };
+    }
+  },
+  handler: async ({ table_code, filters, limit: max }, ctx) => getData({ table_code, filters }, ctx, max)
+});
+
+async function getData({ table_code, filters }: { table_code: string; filters: Record<string, string[]> }, ctx: ToolContext, max: number) {
     const code = normaliseTableCode(table_code);
     const meta = await readMetadata(ctx, code);
     const dims = dimensions(meta.value);
@@ -192,8 +206,7 @@ const dataTool = defineTool({
       stale: data.stale,
       truncated: decoded.total > decoded.rows.length
     });
-  }
-});
+}
 
 const F1001 = { table: "F1001", year: "TLIST(A1)", county: "C02779V03348", sex: "C02199V02655" } as const;
 const F1015 = { table: "F1015", year: "TLIST(A1)", town: "C04160V04929", sex: "C02199V02655" } as const;

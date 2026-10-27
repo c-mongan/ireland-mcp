@@ -13,7 +13,7 @@ import { GEO_LEVELS, JOIN_KEYS, TOPICS } from "./cards.js";
 import { buildServer, catalogueOf, type CatalogueArgs } from "./server.js";
 import { resolveToolsets, toolsetsFromArgs, toolsetsFromUrl, UnknownToolsetError } from "./toolsets.js";
 
-const META = ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about", "search", "fetch", "nearby", "ireland_resolve_place"];
+const META = ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_query", "ireland_about", "search", "fetch", "nearby", "ireland_resolve_place"];
 const TOOLS_LIST_BUDGET_CHARS = 16_000;
 const ctx = createContext({ fetch: fakeFetch([]) });
 

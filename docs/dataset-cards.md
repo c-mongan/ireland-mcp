@@ -15,6 +15,7 @@ any of it:
 | `auth` | Whether the operator needs a key (otherwise `NOT_CONFIGURED`) | none |
 | `examples` | Questions the source answers | median sale price in County Dublin in 2024 |
 | `licence` | The source's reuse licence | PSI General Licence / CC BY 4.0 |
+| `table_handle` | `true` when `ireland_query` can load the operation's result as a whole table (operation cards only) | `true` for `ppr_search_sales` |
 
 A field that nobody has verified says `unknown`, and the card's `unknowns` explains why. Cards are
 written by hand from the code and the publisher's documentation. They describe the source; they do not
@@ -57,8 +58,10 @@ question ──► 1 find datasets ──► 2 read cards ──► 3 check the 
 4. **Fetch small.** Call `ireland_describe { "source", "operation" }` for the argument schema, then
    `ireland_call` with filters for just the places and periods you need. Large unfiltered tables are
    truncated.
-5. **Compute and cite.** Do the arithmetic yourself, then cite each source's `url`, `licence` and
-   retrieval time. Say so if a result is `stale`.
+5. **Compute and cite.** For counts, sums, joins and rankings over more than a handful of rows, use
+   [`ireland_query`](query.md) on operations whose card has `table_handle: true`. It computes on the
+   server and returns each input's provenance. For a few rows, do the arithmetic yourself. Either way,
+   cite each source's `url`, `licence` and retrieval time. Say so if a result is `stale`.
 
 ## Finding CSO tables at a geography level
 

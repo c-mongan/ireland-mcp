@@ -11,7 +11,7 @@ async function mockNetwork(page: Page) {
   await page.route(endpointPattern, async (route) => {
     const body = route.request().postDataJSON() as { method: string; params?: { name?: string } };
     if (body.method === "tools/list") {
-      await route.fulfill({ contentType: "application/json", body: JSON.stringify({ jsonrpc: "2.0", id: 1, result: { tools: ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about", "search", "fetch", "nearby", "ireland_resolve_place"].map((name) => ({ name, description: `${name} description` })) } }) });
+      await route.fulfill({ contentType: "application/json", body: JSON.stringify({ jsonrpc: "2.0", id: 1, result: { tools: ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_query", "ireland_about", "search", "fetch", "nearby", "ireland_resolve_place"].map((name) => ({ name, description: `${name} description` })) } }) });
       return;
     }
     if (body.params?.name === "ireland_catalogue") {

@@ -59,7 +59,7 @@ const SOURCE_FALLBACK = [
     { id: "geohive", name: "Tailte Éireann GeoHive boundaries", summary: "County, constituency, electoral division, small-area and layer queries.", operations: ["geohive_boundaries_at_point", "geohive_locate", "geohive_list_layers", "geohive_query_layer"] },
     { id: "wikidata", name: "Wikidata Query Service", summary: "Irish place and entity facts from Wikidata.", operations: ["wikidata_place", "wikidata_entity"] },
     { id: "ppr", name: "Residential Property Price Register", summary: "Residential sale prices and median prices by area.", operations: ["ppr_search_sales", "ppr_price_stats"] },
-    { id: "planning", name: "National Planning Application Database", summary: "Planning application search and detail from NPAD.", operations: ["planning_search", "planning_get"] },
+    { id: "planning", name: "National Planning Application Database", summary: "Planning application search, exact counts and detail from NPAD.", operations: ["planning_search", "planning_stats", "planning_get"] },
     { id: "heritage", name: "National Monuments Service SMR", summary: "Recorded monuments near a coordinate.", operations: ["heritage_monuments_near"] },
     { id: "cross", name: "Ireland MCP combined sources", summary: "Cross-source source list, nearby, one-call place snapshot and the place crosswalk.", operations: ["list_sources", "ireland_snapshot", "nearby", "ireland_resolve_place"] }
   ] }
@@ -534,7 +534,7 @@ async function initLiveStats() {
     // `cross` combines other sources; it is not a data source (see docs/counts.json).
     const sourceCount = domains.reduce((sum, group) => sum + (group.sources || []).filter((s) => s.id !== "cross").length, 0);
     $("stat-sources").textContent = new Intl.NumberFormat("en-IE").format(sourceCount);
-    $("stat-ops").textContent = new Intl.NumberFormat("en-IE").format(tools.tools?.length || 8);
+    $("stat-ops").textContent = new Intl.NumberFormat("en-IE").format(tools.tools?.length || 9);
     $("live-label").textContent = "Live Server Online";
     renderSources(domains);
   } catch {

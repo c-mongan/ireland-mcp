@@ -6,8 +6,8 @@ export const HOSTED_LIMITS: Record<string, string> = {
   logainm: "Logainm needs a Gaois operator account and API key."
 };
 
-/** ireland_catalogue, ireland_describe, ireland_call, ireland_about. */
-export const META_TOOLS = 4;
+/** ireland_catalogue, ireland_describe, ireland_call, ireland_query, ireland_about. */
+export const META_TOOLS = 5;
 export const PROMPTS = ["area_profile", "commute_check", "compare_counties"] as const;
 
 export interface Counts {

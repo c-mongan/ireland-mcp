@@ -434,7 +434,7 @@ describe("handleMcpHttp", () => {
       createServer
     });
     const tools = (await list.json()).result.tools as Array<{ name: string; annotations: Record<string, boolean> }>;
-    expect(tools.map((t) => t.name)).toEqual(["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about", "demo_echo", "demo_fail"]);
+    expect(tools.map((t) => t.name)).toEqual(["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_query", "ireland_about", "demo_echo", "demo_fail"]);
     expect(tools.every((t) => t.annotations.readOnlyHint && t.annotations.openWorldHint)).toBe(true);
 
     const call = await handleMcpHttp(

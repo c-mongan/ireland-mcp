@@ -40,6 +40,88 @@ describe("allowlisted ArcGIS sources", () => {
     expect(decodeURIComponent(fetch.calls[0]!.url).replace(/\+/g, " ")).toContain("ReceivedDate >= DATE '2024-01-01'");
   });
 
+  it("pages planning search with an exact total and a stable order", async () => {
+    const fetch = fakeFetch([
+      { match: (url) => url.includes("IrishPlanningApplications") && url.includes("returnCountOnly=true"), body: JSON.stringify({ count: 325 }) },
+      {
+        match: (url) => url.includes("IrishPlanningApplications") && url.includes("resultOffset=300"),
+        body: features([{ PlanningAuthority: "Galway City Council", ApplicationNumber: "24/1", NumResidentialUnits: 2, ReceivedDate: Date.UTC(2024, 0, 5) }])
+      }
+    ]);
+    const { body } = await callTool(planningModule, "planning_search", { council: "Galway City Council", from: "2024-01-01", to: "2024-12-31", limit: 1, offset: 300 }, fetch);
+    expect(body.data).toMatchObject({ total: 325, offset: 300, count: 1, next_offset: 301 });
+    expect(body.truncated).toBe(true);
+    const page = decodeURIComponent(fetch.calls.find((c) => c.url.includes("resultOffset"))!.url);
+    expect(page).toContain("orderByFields=ReceivedDate+DESC,OBJECTID+DESC");
+  });
+
+  it("never points next_offset at an empty page, and trusts ArcGIS's more-rows flag over an older count", async () => {
+    const fetch = fakeFetch([
+      { match: (url) => url.includes("returnCountOnly=true"), body: JSON.stringify({ count: 130 }) },
+      { match: (url) => url.includes("resultOffset=100"), body: features([]) },
+      { match: (url) => url.includes("resultOffset=0"), body: JSON.stringify({ features: [{ attributes: { ApplicationNumber: "1" } }], exceededTransferLimit: true }) }
+    ]);
+    const empty = await callTool(planningModule, "planning_search", { council: "Galway City Council", limit: 30, offset: 100 }, fetch);
+    expect(empty.body.data).toMatchObject({ count: 0, next_offset: null });
+    expect(empty.body.truncated).toBe(false);
+    const stale = await callTool(planningModule, "planning_search", { council: "Galway City Council", limit: 1 }, fakeFetch([
+      { match: (url) => url.includes("returnCountOnly=true"), body: JSON.stringify({ count: 1 }) },
+      { match: (url) => url.includes("resultOffset=0"), body: JSON.stringify({ features: [{ attributes: { ApplicationNumber: "1" } }], exceededTransferLimit: true }) }
+    ]));
+    expect(stale.body.data.next_offset).toBe(1);
+  });
+
+  it("flags an unknown total instead of failing when the count request fails", async () => {
+    const fetch = fakeFetch([
+      { match: (url) => url.includes("returnCountOnly=true"), body: JSON.stringify({ error: { code: 500, message: "boom" } }) },
+      { match: (url) => url.includes("IrishPlanningApplications"), body: features([{ PlanningAuthority: "Carlow County Council", ApplicationNumber: "1" }]) }
+    ]);
+    const { body } = await callTool(planningModule, "planning_search", { council: "Carlow County Council", limit: 5 }, fetch);
+    expect(body.data.total).toBeNull();
+    expect(body.data.total_note).toMatch(/Total unknown/);
+    expect(body.truncated).toBe(false);
+  });
+
+  it("counts applications and units server-side with planning_stats", async () => {
+    const fetch = fakeFetch([
+      {
+        match: (url) => url.includes("outStatistics") && url.includes("groupByFieldsForStatistics=PlanningAuthority"),
+        body: JSON.stringify({ features: [{ attributes: { PlanningAuthority: "Cork City Council", applications: 692, residential_units: 0, units_recorded: 0 } }, { attributes: { PlanningAuthority: "Galway City Council", applications: 325, residential_units: 417, units_recorded: 300 } }] })
+      },
+      { match: (url) => url.includes("outStatistics"), body: JSON.stringify({ features: [{ attributes: { applications: 222, residential_units: 417, units_recorded: 222 } }] }) }
+    ]);
+    const grouped = await callTool(planningModule, "planning_stats", { from: "2024-01-01", to: "2024-12-31", group_by: "council" }, fetch);
+    expect(grouped.body.data).toMatchObject({ applications: 1017, residential_units: 417, units_recorded: 300, group_by: "council" });
+    expect(grouped.body.data.groups[1]).toEqual({ council: "Galway City Council", applications: 325, residential_units: 417, units_recorded: 300 });
+    const total = await callTool(planningModule, "planning_stats", { council: "Galway City Council", min_units: 1 }, fetch);
+    expect(total.body.data).toMatchObject({ applications: 222, residential_units: 417 });
+    const url = decodeURIComponent(fetch.calls.at(-1)!.url).replace(/\+/g, " ");
+    expect(url).toContain("(NumResidentialUnits >= 1)");
+    expect(url).not.toContain("resultRecordCount");
+  });
+
+  it("loads a whole planning table for ireland_query, checked against the exact count", async () => {
+    const { loadTable } = await import("../../gateway/table.js");
+    const rows = [1, 2, 3].map((id) => ({ OBJECTID: id, PlanningAuthority: "Galway City Council", ApplicationNumber: `A${id}`, NumResidentialUnits: id - 1 }));
+    const ok = fakeFetch([
+      { match: (url) => url.includes("returnCountOnly=true"), body: JSON.stringify({ count: 3 }) },
+      { match: (url) => url.includes("orderByFields=OBJECTID+ASC") && url.includes("resultOffset=0"), body: features(rows) }
+    ]);
+    const table = await loadTable([planningModule], { source: "planning", operation: "planning_search", args: { council: "Galway City Council" } }, createContext({ fetch: ok }));
+    expect(table.rows.map((r) => r.application_ref)).toEqual(["A1", "A2", "A3"]);
+    expect(table.provenance).toMatchObject({ pages: 2, licence: "CC BY 4.0" });
+
+    const changed = fakeFetch([
+      { match: (url) => url.includes("returnCountOnly=true"), body: JSON.stringify({ count: 4 }) },
+      { match: (url) => url.includes("resultOffset=0"), body: features(rows) }
+    ]);
+    await expect(loadTable([planningModule], { source: "planning", operation: "planning_search", args: { council: "Galway City Council" } }, createContext({ fetch: changed }))).rejects.toThrow(/may have changed/);
+
+    const huge = fakeFetch([{ match: (url) => url.includes("returnCountOnly=true"), body: JSON.stringify({ count: 38_018 }) }]);
+    await expect(loadTable([planningModule], { source: "planning", operation: "planning_search", args: { from: "2024-01-01" } }, createContext({ fetch: huge }))).rejects.toThrow(/38018 planning applications match/);
+    expect(huge.calls).toHaveLength(1);
+  });
+
   it("gets a planning application by reference through ireland_call", async () => {
     const fetch = fakeFetch([
       {

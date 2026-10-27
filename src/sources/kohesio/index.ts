@@ -58,6 +58,7 @@ const evidence = () => ({ url: DATA_PAGE, cached: true, retrievedAt: new Date(lo
 
 const searchTool = defineTool({
   name: "kohesio_search_projects", title: "Search EU-funded Irish projects",
+  table: { rows: "projects", total: "total" },
   description: "Search a dated snapshot of the official Kohesio Ireland CSV exports by keyword, region name/code or minimum EU budget. Not live data; excludes separate Interreg exports.",
   example: { query: "Galway", limit: 5 },
   inputSchema: {

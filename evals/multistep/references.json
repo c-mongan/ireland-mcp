@@ -1,7 +1,7 @@
 {
-  "as_of": "2026-10-26",
+  "as_of": "2026-10-27",
   "server": "stdio dist/src/cli.js",
-  "git_sha": "51887c2",
+  "git_sha": "0c9ff15",
   "items": {
     "t1-galway-pop-tds": {
       "tier": "T1",
@@ -1455,7 +1455,7 @@
     "t2-gender-pay-gap-finance": {
       "tier": "T2",
       "drift": "slow",
-      "retrieved": "2026-10-26",
+      "retrieved": "2026-10-27",
       "expected": {
         "aib_mean_gap_pct": 17.5,
         "sector_median_pct": 19.06,
@@ -1472,115 +1472,34 @@
             "limit": 5
           },
           "url": "https://paygap.ie/downloads/annotated",
-          "retrieved_at": "2026-10-26T14:09:29.951Z"
+          "retrieved_at": "2026-10-27T15:32:10.469Z"
         },
         {
-          "source": "paygap",
-          "operation": "paygap_search_reports",
+          "source": "query",
+          "operation": "ireland_query",
           "args": {
-            "industry": "Financial and Insurance",
-            "year": 2025,
-            "limit": 20,
-            "offset": 0
+            "tables": [
+              {
+                "alias": "r",
+                "source": "paygap",
+                "operation": "paygap_search_reports",
+                "args": {
+                  "industry": "Financial and Insurance",
+                  "year": 2025
+                }
+              }
+            ],
+            "steps": [
+              {
+                "aggregate": {
+                  "reports": "count",
+                  "median": "median:metrics.mean_hourly_gap"
+                }
+              }
+            ]
           },
-          "url": "https://paygap.ie/downloads/annotated",
-          "retrieved_at": "2026-10-26T14:09:29.995Z"
-        },
-        {
-          "source": "paygap",
-          "operation": "paygap_search_reports",
-          "args": {
-            "industry": "Financial and Insurance",
-            "year": 2025,
-            "limit": 20,
-            "offset": 20
-          },
-          "url": "https://paygap.ie/downloads/annotated",
-          "retrieved_at": "2026-10-26T14:09:30.003Z"
-        },
-        {
-          "source": "paygap",
-          "operation": "paygap_search_reports",
-          "args": {
-            "industry": "Financial and Insurance",
-            "year": 2025,
-            "limit": 20,
-            "offset": 40
-          },
-          "url": "https://paygap.ie/downloads/annotated",
-          "retrieved_at": "2026-10-26T14:09:30.050Z"
-        },
-        {
-          "source": "paygap",
-          "operation": "paygap_search_reports",
-          "args": {
-            "industry": "Financial and Insurance",
-            "year": 2025,
-            "limit": 20,
-            "offset": 60
-          },
-          "url": "https://paygap.ie/downloads/annotated",
-          "retrieved_at": "2026-10-26T14:09:30.061Z"
-        },
-        {
-          "source": "paygap",
-          "operation": "paygap_search_reports",
-          "args": {
-            "industry": "Financial and Insurance",
-            "year": 2025,
-            "limit": 20,
-            "offset": 80
-          },
-          "url": "https://paygap.ie/downloads/annotated",
-          "retrieved_at": "2026-10-26T14:09:30.076Z"
-        },
-        {
-          "source": "paygap",
-          "operation": "paygap_search_reports",
-          "args": {
-            "industry": "Financial and Insurance",
-            "year": 2025,
-            "limit": 20,
-            "offset": 100
-          },
-          "url": "https://paygap.ie/downloads/annotated",
-          "retrieved_at": "2026-10-26T14:09:30.094Z"
-        },
-        {
-          "source": "paygap",
-          "operation": "paygap_search_reports",
-          "args": {
-            "industry": "Financial and Insurance",
-            "year": 2025,
-            "limit": 20,
-            "offset": 120
-          },
-          "url": "https://paygap.ie/downloads/annotated",
-          "retrieved_at": "2026-10-26T14:09:30.108Z"
-        },
-        {
-          "source": "paygap",
-          "operation": "paygap_search_reports",
-          "args": {
-            "industry": "Financial and Insurance",
-            "year": 2025,
-            "limit": 20,
-            "offset": 140
-          },
-          "url": "https://paygap.ie/downloads/annotated",
-          "retrieved_at": "2026-10-26T14:09:30.118Z"
-        },
-        {
-          "source": "paygap",
-          "operation": "paygap_search_reports",
-          "args": {
-            "industry": "Financial and Insurance",
-            "year": 2025,
-            "limit": 20,
-            "offset": 160
-          },
-          "url": "https://paygap.ie/downloads/annotated",
-          "retrieved_at": "2026-10-26T14:09:30.125Z"
+          "url": null,
+          "retrieved_at": "2026-10-27T15:32:10.475Z"
         },
         {
           "source": "eurostat",
@@ -1598,12 +1517,10 @@
             "since": "2018"
           },
           "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/earn_gr_gpgr2?format=JSON&lang=EN&geo=IE&nace_r2=B-S_X_O&unit=PC&sinceTimePeriod=2018",
-          "retrieved_at": "2026-10-26T14:09:30.442Z"
+          "retrieved_at": "2026-10-27T15:32:10.687Z"
         }
       ],
-      "workarounds": [
-        "server-query:pagination"
-      ]
+      "workarounds": []
     },
     "t2-dublin-top-lea-completions": {
       "tier": "T2",
@@ -1663,7 +1580,7 @@
     "t2-kohesio-west-per-capita": {
       "tier": "T2",
       "drift": "stable",
-      "retrieved": "2026-10-26",
+      "retrieved": "2026-10-27",
       "expected": {
         "project_count": 194,
         "total_eu_budget_eur": 902123538,
@@ -1671,81 +1588,30 @@
       },
       "calls": [
         {
-          "source": "kohesio",
-          "operation": "kohesio_search_projects",
+          "source": "query",
+          "operation": "ireland_query",
           "args": {
-            "region": "IE042",
-            "limit": 50,
-            "offset": 0
+            "tables": [
+              {
+                "alias": "k",
+                "source": "kohesio",
+                "operation": "kohesio_search_projects",
+                "args": {
+                  "region": "IE042"
+                }
+              }
+            ],
+            "steps": [
+              {
+                "aggregate": {
+                  "projects": "count",
+                  "eu_budget": "sum:eu_budget"
+                }
+              }
+            ]
           },
-          "url": "https://kohesio.ec.europa.eu/en/data",
-          "retrieved_at": "2026-10-07T23:20:32.414Z"
-        },
-        {
-          "source": "kohesio",
-          "operation": "kohesio_search_projects",
-          "args": {
-            "region": "IE042",
-            "limit": 50,
-            "offset": 42
-          },
-          "url": "https://kohesio.ec.europa.eu/en/data",
-          "retrieved_at": "2026-10-07T23:20:32.414Z"
-        },
-        {
-          "source": "kohesio",
-          "operation": "kohesio_search_projects",
-          "args": {
-            "region": "IE042",
-            "limit": 50,
-            "offset": 85
-          },
-          "url": "https://kohesio.ec.europa.eu/en/data",
-          "retrieved_at": "2026-10-07T23:20:32.414Z"
-        },
-        {
-          "source": "kohesio",
-          "operation": "kohesio_search_projects",
-          "args": {
-            "region": "IE042",
-            "limit": 50,
-            "offset": 127
-          },
-          "url": "https://kohesio.ec.europa.eu/en/data",
-          "retrieved_at": "2026-10-07T23:20:32.414Z"
-        },
-        {
-          "source": "kohesio",
-          "operation": "kohesio_search_projects",
-          "args": {
-            "region": "IE042",
-            "limit": 50,
-            "offset": 152
-          },
-          "url": "https://kohesio.ec.europa.eu/en/data",
-          "retrieved_at": "2026-10-07T23:20:32.414Z"
-        },
-        {
-          "source": "kohesio",
-          "operation": "kohesio_search_projects",
-          "args": {
-            "region": "IE042",
-            "limit": 50,
-            "offset": 169
-          },
-          "url": "https://kohesio.ec.europa.eu/en/data",
-          "retrieved_at": "2026-10-07T23:20:32.414Z"
-        },
-        {
-          "source": "kohesio",
-          "operation": "kohesio_search_projects",
-          "args": {
-            "region": "IE042",
-            "limit": 50,
-            "offset": 190
-          },
-          "url": "https://kohesio.ec.europa.eu/en/data",
-          "retrieved_at": "2026-10-07T23:20:32.414Z"
+          "url": null,
+          "retrieved_at": "2026-10-27T15:32:10.692Z"
         },
         {
           "source": "cross",
@@ -1757,7 +1623,7 @@
             "list": "county"
           },
           "url": "https://irishopendata.ie/data/crosswalk/places-2022.json",
-          "retrieved_at": "2026-10-26T15:32:45.454Z"
+          "retrieved_at": "2026-10-27T15:32:10.706Z"
         },
         {
           "source": "cso",
@@ -1766,7 +1632,7 @@
             "area": "Galway"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T15:32:45.457Z"
+          "retrieved_at": "2026-10-27T15:32:10.970Z"
         },
         {
           "source": "cso",
@@ -1775,7 +1641,7 @@
             "area": "Mayo"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T15:32:45.458Z"
+          "retrieved_at": "2026-10-27T15:32:11.090Z"
         },
         {
           "source": "cso",
@@ -1784,12 +1650,10 @@
             "area": "Roscommon"
           },
           "url": "https://data.cso.ie/table/F1001",
-          "retrieved_at": "2026-10-26T15:32:45.461Z"
+          "retrieved_at": "2026-10-27T15:32:11.159Z"
         }
       ],
-      "workarounds": [
-        "server-query:pagination"
-      ]
+      "workarounds": []
     },
     "t2-rent-law-rpz": {
       "tier": "T2",
@@ -2020,7 +1884,7 @@
     "t2-planning-near-luas-broombridge": {
       "tier": "T2",
       "drift": "slow",
-      "retrieved": "2026-10-26",
+      "retrieved": "2026-10-27",
       "expected": {
         "applications": 13,
         "residential_units": 20
@@ -2033,21 +1897,20 @@
             "line": "Green"
           },
           "url": "https://luasforecasts.rpa.ie/xml/get.ashx?action=stops&encrypt=false",
-          "retrieved_at": "2026-10-26T13:54:32.939Z"
+          "retrieved_at": "2026-10-27T15:32:11.209Z"
         },
         {
           "source": "planning",
-          "operation": "planning_search",
+          "operation": "planning_stats",
           "args": {
             "lat": 53.37223956,
             "lon": -6.29768465,
             "radius_m": 500,
             "from": "2024-01-01",
-            "to": "2024-12-31",
-            "limit": 100
+            "to": "2024-12-31"
           },
-          "url": "https://services.arcgis.com/NzlPQPKn5QF9v2US/arcgis/rest/services/IrishPlanningApplications/FeatureServer/0/query?f=json&where=%28ReceivedDate+%3E%3D+DATE+%272024-01-01%27%29+AND+%28ReceivedDate+%3C%3D+DATE+%272024-12-31%27%29&outFields=PlanningAuthority%2CApplicationNumber%2CDevelopmentDescription%2CDevelopmentAddress%2CApplicationStatus%2CApplicationType%2CDecision%2CReceivedDate%2CDecisionDate%2CGrantDate%2CExpiryDate%2CNumResidentialUnits%2CLinkAppDetails&resultRecordCount=50&resultOffset=0&returnGeometry=false&geometry=-6.29768465%2C53.37223956&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&distance=500&units=esriSRUnit_Meter&orderByFields=ReceivedDate+DESC",
-          "retrieved_at": "2026-10-26T13:54:33.219Z"
+          "url": "https://services.arcgis.com/NzlPQPKn5QF9v2US/arcgis/rest/services/IrishPlanningApplications/FeatureServer/0/query?f=json&where=%28ReceivedDate+%3E%3D+DATE+%272024-01-01%27%29+AND+%28ReceivedDate+%3C%3D+DATE+%272024-12-31%27%29&outStatistics=%5B%7B%22statisticType%22%3A%22count%22%2C%22onStatisticField%22%3A%22OBJECTID%22%2C%22outStatisticFieldName%22%3A%22applications%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22NumResidentialUnits%22%2C%22outStatisticFieldName%22%3A%22residential_units%22%7D%2C%7B%22statisticType%22%3A%22count%22%2C%22onStatisticField%22%3A%22NumResidentialUnits%22%2C%22outStatisticFieldName%22%3A%22units_recorded%22%7D%5D&returnGeometry=false&geometry=-6.29768465%2C53.37223956&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&distance=500&units=esriSRUnit_Meter",
+          "retrieved_at": "2026-10-27T15:32:11.765Z"
         }
       ],
       "workarounds": []
@@ -2055,9 +1918,49 @@
     "t2-galway-city-planning-volume": {
       "tier": "T2",
       "drift": "slow",
-      "retrieved": "2026-10-26",
-      "gap": "server-query:count",
-      "evidence": "planning_search returns at most 100 rows and no total; a council-year count needs server-side aggregation"
+      "retrieved": "2026-10-27",
+      "expected": {
+        "applications_2024": 325,
+        "division_d_per_application_eur": 46936
+      },
+      "calls": [
+        {
+          "source": "planning",
+          "operation": "planning_stats",
+          "args": {
+            "council": "Galway City Council",
+            "from": "2024-01-01",
+            "to": "2024-12-31"
+          },
+          "url": "https://services.arcgis.com/NzlPQPKn5QF9v2US/arcgis/rest/services/IrishPlanningApplications/FeatureServer/0/query?f=json&where=%28PlanningAuthority%3D%27Galway+City+Council%27%29+AND+%28ReceivedDate+%3E%3D+DATE+%272024-01-01%27%29+AND+%28ReceivedDate+%3C%3D+DATE+%272024-12-31%27%29&outStatistics=%5B%7B%22statisticType%22%3A%22count%22%2C%22onStatisticField%22%3A%22OBJECTID%22%2C%22outStatisticFieldName%22%3A%22applications%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22NumResidentialUnits%22%2C%22outStatisticFieldName%22%3A%22residential_units%22%7D%2C%7B%22statisticType%22%3A%22count%22%2C%22onStatisticField%22%3A%22NumResidentialUnits%22%2C%22outStatisticFieldName%22%3A%22units_recorded%22%7D%5D&returnGeometry=false",
+          "retrieved_at": "2026-10-27T15:32:11.927Z"
+        },
+        {
+          "source": "planning",
+          "operation": "planning_search",
+          "args": {
+            "council": "Galway City Council",
+            "from": "2024-01-01",
+            "to": "2024-12-31",
+            "limit": 1
+          },
+          "url": "https://services.arcgis.com/NzlPQPKn5QF9v2US/arcgis/rest/services/IrishPlanningApplications/FeatureServer/0/query?f=json&where=%28PlanningAuthority%3D%27Galway+City+Council%27%29+AND+%28ReceivedDate+%3E%3D+DATE+%272024-01-01%27%29+AND+%28ReceivedDate+%3C%3D+DATE+%272024-12-31%27%29&outFields=PlanningAuthority%2CApplicationNumber%2CDevelopmentDescription%2CDevelopmentAddress%2CApplicationStatus%2CApplicationType%2CDecision%2CReceivedDate%2CDecisionDate%2CGrantDate%2CExpiryDate%2CNumResidentialUnits%2CLinkAppDetails&resultRecordCount=1&resultOffset=0&returnGeometry=false&orderByFields=ReceivedDate+DESC%2COBJECTID+DESC",
+          "retrieved_at": "2026-10-27T15:32:11.991Z"
+        },
+        {
+          "source": "council-budgets",
+          "operation": "council_budgets_get",
+          "args": {
+            "year": 2025,
+            "authority": "Galway City Council",
+            "division": "D",
+            "limit": 500
+          },
+          "url": "https://opendata.housing.gov.ie/dataset/e55a1d32-c225-48e0-bb6f-43c86071841b/resource/69cb7558-f0d8-45f7-a08f-f1ab3b564d80/download/budget-publication-document-2025.xlsx",
+          "retrieved_at": "2026-10-27T15:32:12.919Z"
+        }
+      ],
+      "workarounds": []
     },
     "t3-rent-growth-completions-tds": {
       "tier": "T3",
@@ -2827,9 +2730,86 @@
     "t3-galway-planning-act-budget": {
       "tier": "T3",
       "drift": "slow",
-      "retrieved": "2026-10-26",
-      "gap": "server-query:count",
-      "evidence": "planning_search caps at 100 rows and has no total; a council-year filter + sum needs server-side aggregation"
+      "retrieved": "2026-10-27",
+      "expected": {
+        "residential_applications": 222,
+        "residential_units": 417,
+        "division_a_expenditure_eur": 65384217,
+        "act": "Planning and Development Act 2024",
+        "act_number": 34
+      },
+      "calls": [
+        {
+          "source": "query",
+          "operation": "ireland_query",
+          "args": {
+            "tables": [
+              {
+                "alias": "p",
+                "source": "planning",
+                "operation": "planning_search",
+                "args": {
+                  "council": "Galway City Council",
+                  "from": "2024-01-01",
+                  "to": "2024-12-31"
+                }
+              }
+            ],
+            "steps": [
+              {
+                "filter": [
+                  "residential_units",
+                  ">",
+                  0
+                ]
+              },
+              {
+                "aggregate": {
+                  "applications": "count",
+                  "units": "sum:residential_units"
+                }
+              }
+            ]
+          },
+          "url": null,
+          "retrieved_at": "2026-10-27T15:32:12.979Z"
+        },
+        {
+          "source": "planning",
+          "operation": "planning_stats",
+          "args": {
+            "council": "Galway City Council",
+            "from": "2024-01-01",
+            "to": "2024-12-31",
+            "min_units": 1
+          },
+          "url": "https://services.arcgis.com/NzlPQPKn5QF9v2US/arcgis/rest/services/IrishPlanningApplications/FeatureServer/0/query?f=json&where=%28PlanningAuthority%3D%27Galway+City+Council%27%29+AND+%28ReceivedDate+%3E%3D+DATE+%272024-01-01%27%29+AND+%28ReceivedDate+%3C%3D+DATE+%272024-12-31%27%29+AND+%28NumResidentialUnits+%3E%3D+1%29&outStatistics=%5B%7B%22statisticType%22%3A%22count%22%2C%22onStatisticField%22%3A%22OBJECTID%22%2C%22outStatisticFieldName%22%3A%22applications%22%7D%2C%7B%22statisticType%22%3A%22sum%22%2C%22onStatisticField%22%3A%22NumResidentialUnits%22%2C%22outStatisticFieldName%22%3A%22residential_units%22%7D%2C%7B%22statisticType%22%3A%22count%22%2C%22onStatisticField%22%3A%22NumResidentialUnits%22%2C%22outStatisticFieldName%22%3A%22units_recorded%22%7D%5D&returnGeometry=false",
+          "retrieved_at": "2026-10-27T15:32:12.998Z"
+        },
+        {
+          "source": "legislation",
+          "operation": "legislation_list_acts",
+          "args": {
+            "year": 2024,
+            "query": "Planning and Development"
+          },
+          "url": "https://www.irishstatutebook.ie/eli/2024/act/",
+          "retrieved_at": "2026-10-27T15:32:13.066Z"
+        },
+        {
+          "source": "council-budgets",
+          "operation": "council_budgets_get",
+          "args": {
+            "year": 2025,
+            "authority": "Galway City Council",
+            "division": "A",
+            "limit": 500
+          },
+          "url": "https://opendata.housing.gov.ie/dataset/e55a1d32-c225-48e0-bb6f-43c86071841b/resource/69cb7558-f0d8-45f7-a08f-f1ab3b564d80/download/budget-publication-document-2025.xlsx",
+          "retrieved_at": "2026-10-27T15:32:13.068Z"
+        }
+      ],
+      "workarounds": []
     },
     "t3-cso-geography-mismatch": {
       "tier": "T3",

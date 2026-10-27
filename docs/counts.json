@@ -5,11 +5,11 @@
     "nta",
     "logainm"
   ],
-  "operations": 93,
-  "source_operations": 89,
+  "operations": 94,
+  "source_operations": 90,
   "cross_operations": 4,
-  "default_tools": 8,
-  "all_tools": 99,
+  "default_tools": 9,
+  "all_tools": 101,
   "prompts": 3,
   "dataset_cards": 39
 }

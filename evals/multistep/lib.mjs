@@ -97,8 +97,31 @@ export function makeContext(client, { delayMs = 0, catalogue } = {}) {
       return env.data;
     }
   }
+  /** Runs ireland_query (server-side join/aggregate) and records it like a call; truncation is fatal. */
+  async function query(input) {
+    if (delayMs) await sleep(delayMs);
+    let result;
+    for (let attempt = 0; ; attempt++) {
+      result = await client.callTool({ name: "ireland_query", arguments: { max_tokens: 8000, ...input } });
+      const env = envelopeOf(result);
+      const code = env?.error?.code;
+      if (result.isError && ((code === "RATE_LIMITED" && attempt < 3) || (code === "UPSTREAM_DOWN" && attempt < 1))) {
+        await sleep(3000 * 2 ** attempt);
+        continue;
+      }
+      calls.push({ source: "query", operation: "ireland_query", args: input, url: null, retrieved_at: env?.retrieved_at ?? null, truncated: Boolean(env?.truncated), inputs: (env?.inputs ?? []).map((i) => ({ table_id: i.table_id, rows: i.rows, url: i.url, retrieved_at: i.retrieved_at })) });
+      if (result.isError) {
+        const message = `ireland_query: ${code ?? "ERROR"} ${env?.error?.message ?? JSON.stringify(env).slice(0, 200)}`;
+        if (UPSTREAM_CODES.has(code)) throw new UpstreamError(message, code);
+        throw new Error(message);
+      }
+      if (env?.truncated) throw new Error("ireland_query returned truncated:true; aggregate further or lower limit");
+      return env.data;
+    }
+  }
   return {
     call,
+    query,
     calls,
     workarounds,
     /** Marks that the reference needed a client-side workaround that a pillar would remove. */

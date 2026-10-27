@@ -18,6 +18,8 @@ import { exampleArgs, listOperations, operationSchema, shortDescription, type Op
 import { applyBudget, DEFAULT_MAX_TOKENS, MAX_MAX_TOKENS } from "./envelope.js";
 import { ToolError, toToolError } from "./errors.js";
 import { DOMAINS, type AnyTool, type SourceModule, type ToolContext } from "./module.js";
+import { QUERY_LIMITS, queryInputShape, runQuery } from "./query.js";
+import { tableId } from "./table.js";
 import { noopSink, type TelemetrySink } from "./telemetry.js";
 import { ALL_TOOLSETS, resolveToolsets } from "./toolsets.js";
 
@@ -28,14 +30,15 @@ export const REPO_URL = "https://github.com/c-mongan/ireland-mcp";
 
 export const INSTRUCTIONS = [
   "Read-only Irish public data (CSO, Oireachtas, Met Éireann, transport, property, energy and more).",
-  "Workflow: ireland_call's description indexes every source and operation; when one fits, call ireland_call with {source, operation, args} directly (bad args return the schema and an example).",
-  "Otherwise use ireland_catalogue to find datasets (filter by topic, geo_level, join_key, has_time_series or text; each result has a compact dataset card), and ireland_describe for the full card and an operation's argument schema.",
+  "Workflow: ireland_call's description indexes every source and operation; when one fits, call ireland_call with {source, operation, args} directly (bad args return the schema).",
+  "Otherwise ireland_catalogue finds datasets (filter by topic, geo_level, join_key, has_time_series or text; results carry dataset cards); ireland_describe gives the full card and an operation's schema.",
   "search/fetch is keyword discovery (CSO tables, bills, acts, datasets, tenders). nearby covers boundaries, small area code, forecast, monuments and protected sites at a lat/lon only.",
+  "Counts, sums, joins or rankings over many rows: ireland_query (computed on the server from table_ids).",
   "Use ireland_call for live readings (weather observations, river levels, buoys, bikes), populations (cso_area_profile, census_small_area_at) and place names (geohive_locate).",
   "Cite `source`, `url`, `licence` and `attribution` from each result.",
   "If `stale` is true the cached copy was served; say so.",
-  "If `truncated` is true, narrow the request or pass max_tokens (up to 8000).",
-  "Typed tools per source can be enabled with ?toolsets=<id>,… (HTTP) or --toolsets (stdio)."
+  "If `truncated` is true, narrow the request or raise max_tokens (≤8000).",
+  "Typed tools per source: ?toolsets=<id>,… (HTTP) or --toolsets (stdio)."
 ].join(" ");
 
 const ANNOTATIONS = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true } as const;
@@ -90,16 +93,15 @@ function operationIndex(operations: readonly Operation[]): string {
 }
 
 /** Names the dispatched operation in an ireland_call result, so transcripts and evals can attribute the call. */
-function tagOperation(result: ToolResult, source: string, operation: string): ToolResult {
+function tagOperation(result: ToolResult, source: string, operation: string, table?: string): ToolResult {
+  const prefix = `"operation":${JSON.stringify(operation)},${table ? `"table_id":${JSON.stringify(table)},` : ""}`;
   const content = result.content.map((part, i) =>
-    i === 0 && part.text.startsWith("{") && part.text !== "{}"
-      ? { ...part, text: `{"operation":${JSON.stringify(operation)},${part.text.slice(1)}` }
-      : part
+    i === 0 && part.text.startsWith("{") && part.text !== "{}" ? { ...part, text: `{${prefix}${part.text.slice(1)}` } : part
   );
   return {
     ...result,
     content,
-    ...(result.structuredContent ? { structuredContent: { operation, ...result.structuredContent } } : {}),
+    ...(result.structuredContent ? { structuredContent: { operation, ...(table ? { table_id: table } : {}), ...result.structuredContent } } : {}),
     _meta: { ...result._meta, "ireland/source": source, "ireland/operation": operation }
   };
 }
@@ -116,7 +118,7 @@ export function buildServer(options: BuildServerOptions): McpServer {
     )
   );
 
-  const seen = new Set<string>(["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about"]);
+  const seen = new Set<string>(["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about", "ireland_query"]);
   for (const { tool } of allTools(modules, extraTools)) {
     if (seen.has(tool.name)) throw new Error(`Duplicate tool name: ${tool.name}`);
     seen.add(tool.name);
@@ -277,7 +279,7 @@ function describeOperation(module: SourceModule, { tool, source }: Operation) {
     input_schema: operationSchema(tool),
     example: exampleArgs(tool),
     call: { tool: "ireland_call", arguments: { source, operation: tool.name, args: exampleArgs(tool) } },
-    ...(module.card ? { card: { ...operationCard(module.card, tool.name), licence: module.info.licence } } : {})
+    ...(module.card ? { card: { ...operationCard(module.card, tool.name), ...(tool.table ? { table_handle: true } : {}), licence: module.info.licence } } : {})
   };
 }
 
@@ -308,6 +310,7 @@ function describeSource(module: SourceModule) {
       name: t.name,
       title: t.title,
       description: shortDescription(t.description),
+      ...(t.table ? { table_handle: true } : {}),
       ...(overrides?.[t.name] ? { card_differences: overrides[t.name] } : {})
     })),
     next: "ireland_describe(source, operation) for an operation's arguments, then ireland_call."
@@ -414,7 +417,42 @@ function registerMetaTools(
         return tagOperation(failure, op.source, op.tool.name);
       }
       const result = await runTool(op.tool, op.source, { ...(args ?? {}), ...(max_tokens ? { max_tokens } : {}) }, context, sink);
-      return tagOperation(result, op.source, op.tool.name);
+      // Table-capable results carry a handle that ireland_query can load in full.
+      const table = op.tool.table && !result.isError ? tableId(op.source, op.tool.name, args ?? {}) : undefined;
+      return tagOperation(result, op.source, op.tool.name, table && table.length <= 1000 ? table : undefined);
+    }
+  );
+
+  server.registerTool(
+    "ireland_query",
+    {
+      title: "Query tables on the server",
+      description: [
+        "Filter, join, aggregate, rank and sort whole tables on the server; returns only the answer rows, each input's provenance and the query echo.",
+        "tables: {alias, table_id} (from an ireland_call result) or {alias, source, operation, args}, each with optional own steps (no joins); put source filters (council, dates, codes) in args.",
+        "No steps: columns, row count and preview per table. Steps run in order:",
+        '{"filter": ["col", ">", 0]} (= != > >= < <= in not_in contains starts_with is_null not_null; {"and"|"or": [..]}, {"not": ..});',
+        '{"join": "alias", "on": "col"|["l","r"], "type": "left", "normalize": true};',
+        '{"union": "alias"}; {"derive": {"rate": "a / [Col B] * 1000"}} (round abs min max coalesce if lower norm concat substr split_part replace number year pct_change …);',
+        '{"aggregate": {"n": "count", "u": "sum:units", "d": "weighted_avg:score:pop"}, "group_by": ["county"]} (count count_distinct sum avg min max median weighted_avg first);',
+        '{"select": [..]|{"new": "old"}}; {"sort": "-n"}; {"limit": 10}; {"rank": {"by": "n"}}; {"pct_of_total": {"col": "n"}}; {"distinct": [..]}.',
+        `Limits: ${QUERY_LIMITS.maxTables} tables, 10,000 rows each, ${QUERY_LIMITS.maxRows.toLocaleString("en-IE")} rows after a join, ${QUERY_LIMITS.maxSteps} steps. Partial tables are an error, never computed.`
+      ].join(" "),
+      inputSchema: queryInputShape,
+      outputSchema: OUTPUT_SCHEMA,
+      annotations: { title: "Query tables on the server", ...ANNOTATIONS }
+    },
+    async (args) => {
+      const started = Date.now();
+      try {
+        const result = await runQuery(modules, args, context);
+        sink({ tool: "ireland_query", source: "query", durationMs: Date.now() - started, outcome: "ok", cached: result.cached === true });
+        return ok(result);
+      } catch (error) {
+        const toolError = toToolError(error);
+        sink({ tool: "ireland_query", source: "query", durationMs: Date.now() - started, outcome: "error", errorCode: toolError.code });
+        return fail(toolError.toJSON());
+      }
     }
   );
 
@@ -435,7 +473,7 @@ function registerMetaTools(
         repository: REPO_URL,
         status_url: `${HOSTED_URL}/healthz`,
         toolsets: {
-          default: "Meta tools only (ireland_catalogue, ireland_describe, ireland_call, ireland_about, search, fetch, nearby).",
+          default: "Meta tools only (ireland_catalogue, ireland_describe, ireland_call, ireland_query, ireland_about, search, fetch, nearby, ireland_resolve_place).",
           http_query: `${HOSTED_URL}/mcp?toolsets=cso,irish-rail`,
           http_path: `${HOSTED_URL}/mcp/x/{source}`,
           all: `${HOSTED_URL}/mcp?toolsets=${ALL_TOOLSETS}`,

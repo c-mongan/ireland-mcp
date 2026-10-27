@@ -11,7 +11,7 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 // First-party checks are tagged so usage metrics count only real clients.
 const SYNTHETIC = { requestInit: { headers: { "x-ireland-mcp-synthetic": "1" } } };
 
-const META = ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about"];
+const META = ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_query", "ireland_about"];
 const sorted = (values) => [...values].sort();
 const bodyOf = (result, error = false) => {
   assert.equal(result.isError === true, error, "Unexpected tool result status");

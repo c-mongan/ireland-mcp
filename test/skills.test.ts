@@ -20,7 +20,7 @@ for (const mod of appModules().modules) {
   toolsBySource.set(mod.info.id, new Map(mod.tools.map((tool) => [tool.name, tool])));
 }
 const allOps = new Set([...ops.values()].flatMap((set) => [...set]));
-const META_TOOLS = ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about", "search", "fetch", "nearby", "ireland_resolve_place"];
+const META_TOOLS = ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_query", "ireland_about", "search", "fetch", "nearby", "ireland_resolve_place"];
 
 function skillFolders(): string[] {
   if (!existsSync(skillsDir)) return [];
@@ -163,7 +163,7 @@ describe("skills pack", () => {
     const text = readFileSync(join(skillsDir, name, "SKILL.md"), "utf8");
     const examples = [...text.matchAll(/```json[ \t]*\r?\n([\s\S]*?)```/g)]
       .map((m) => m[1]?.trim() ?? "")
-      .filter((block) => /"operation"\s*:/.test(block))
+      .filter((block) => /"operation"\s*:/.test(block) && !/"tables"\s*:/.test(block))
       .map((block) => JSON.parse(block) as { source: string; operation: string; args?: Record<string, unknown> });
     expect(examples, `${name}: expected exactly one ireland_call JSON example`).toHaveLength(1);
     const { source, operation, args = {} } = examples[0]!;
@@ -172,6 +172,23 @@ describe("skills pack", () => {
     // strict(): a renamed or removed argument fails here instead of being silently dropped at call time.
     const parsed = z.object(tool!.inputSchema).strict().safeParse(args);
     expect(parsed.success, `${name}: ${source}/${operation} rejects ${JSON.stringify(args)}: ${parsed.error?.message ?? ""}`).toBe(true);
+  });
+
+  it.each(folders.map((name) => [name]))("%s ireland_query examples load table-capable operations with valid args", (name) => {
+    const text = readFileSync(join(skillsDir, name, "SKILL.md"), "utf8");
+    const queries = [...text.matchAll(/```json[ \t]*\r?\n([\s\S]*?)```/g)]
+      .map((m) => m[1]?.trim() ?? "")
+      .filter((block) => /"tables"\s*:/.test(block))
+      .map((block) => JSON.parse(block) as { tables: Array<{ alias: string; source: string; operation: string; args?: Record<string, unknown> }>; steps?: unknown[] });
+    for (const q of queries) {
+      expect(q.tables.length).toBeGreaterThan(0);
+      for (const t of q.tables) {
+        const tool = toolsBySource.get(t.source)?.get(t.operation);
+        expect(tool?.table, `${name}: ${t.source}/${t.operation} is not table-capable`).toBeDefined();
+        const parsed = z.object(tool!.inputSchema).strict().safeParse(t.args ?? {});
+        expect(parsed.success, `${name}: ${t.source}/${t.operation} rejects ${JSON.stringify(t.args)}: ${parsed.error?.message ?? ""}`).toBe(true);
+      }
+    }
   });
 
   it.each(folders.map((name) => [name]))("%s step examples only use argument names the operation accepts", (name) => {

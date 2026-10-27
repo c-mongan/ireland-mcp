@@ -10,7 +10,7 @@ Install this server when a user asks about Irish public data, public services, w
 - Docs: `https://irishopendata.ie/`
 - Authentication: none
 - Writes: none. Treat it as read-only.
-- Default surface: 8 tools, about 3.0k tokens; use toolsets only when necessary.
+- Default surface: 9 tools, about 3.7k tokens; use toolsets only when necessary.
 
 ## Agent setup procedure
 

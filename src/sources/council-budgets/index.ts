@@ -72,6 +72,7 @@ const listYearsTool = defineTool({
 
 const getTool = defineTool({
   name: "council_budgets_get",
+  table: { rows: "rows", total: "total_rows" },
   title: "Get council budget rows",
   description: "Read adopted budget estimates by council, service division (A–H), budget line and expenditure or income. Amounts are in EUR. This is budget data, not actual spend.",
   example: { year: 2026, authority: "Dublin City Council", division: "A", limit: 20 },

@@ -65,6 +65,7 @@ export const resolvePlaceTool = defineTool({
   title: "Resolve an Irish place to every geography code",
   description:
     "All geography codes for an Irish place: county, province, council, LEA, Dáil constituency, NUTS3, electoral division (ED) and, for lat/lon, small area, with population shares where areas straddle. Takes a name (English or Irish, 'Co. Mayo', 'Dublin 8', 'Tallaght Central, South Dublin'), an ED/small-area/NUTS3 code, or lat/lon. list returns the EDs, LEAs, constituencies or councils inside.",
+  table: { rows: "children.items", total: "children.total" },
   inputSchema: {
     place: z.string().min(1).max(120).optional().describe("Name or code, e.g. 'Ballymun', 'Galway West', 'IE042', '268015'."),
     lat: z.number().min(-90).max(90).optional(),
