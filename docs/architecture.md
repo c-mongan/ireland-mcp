@@ -123,4 +123,3 @@ These come from the 2026-10-26 architecture audit.
 | Packaged skills have no evals. | [#119](https://github.com/c-mongan/ireland-mcp/issues/119) |
 | The production CSP allows `localhost`. | [#120](https://github.com/c-mongan/ireland-mcp/issues/120) |
 | The deploy smoke test does not verify the deployed revision. | [#121](https://github.com/c-mongan/ireland-mcp/issues/121) |
-| `fetch` documents from EPA, Pobal, TED and World Bank omit licence and attribution. | [#127](https://github.com/c-mongan/ireland-mcp/issues/127) |

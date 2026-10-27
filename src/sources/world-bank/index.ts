@@ -100,6 +100,6 @@ export const worldBankModule: SourceModule = {
   async fetchById(key: string, ctx: ToolContext): Promise<FetchedDocument> {
     const result = await indicator(ctx, "IRL", key, { top: "200" });
     const observations = rows(result.value, 10).map(compact);
-    return { id: `${worldBankInfo.id}:${key}`, title: `${key} for Ireland`, text: JSON.stringify(observations, null, 2), url: result.url, metadata: { source: worldBankInfo.id, indicator: key } };
+    return { id: `${worldBankInfo.id}:${key}`, title: `${key} for Ireland`, text: JSON.stringify(observations, null, 2), url: result.url, metadata: { source: worldBankInfo.id, indicator: key, licence: worldBankInfo.licence, attribution: worldBankInfo.attribution } };
   }
 };

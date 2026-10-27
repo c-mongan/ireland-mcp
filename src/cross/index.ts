@@ -99,7 +99,14 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
       }
       const key = id.slice(at + 1);
       if (!key.trim()) throw new ToolError("BAD_ARGS", `"${id}" has no key after the source prefix.`, { hint: "Ids look like '<source>:<key>', e.g. 'cso:F1001'." });
-      return module.fetchById(key, ctx);
+      const doc = await module.fetchById(key, ctx);
+      const metadata = doc.metadata ?? {};
+      // Every fetched document must be citable. A document-level value wins, including an explicit null
+      // (e.g. a CKAN dataset with no stated licence), so the source-wide default never overstates it.
+      return {
+        ...doc,
+        metadata: { licence: module.info.licence, attribution: module.info.attribution, ...metadata }
+      };
     }
   });
 

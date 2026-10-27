@@ -126,6 +126,6 @@ export const epaModule: SourceModule = {
     const code = key.replace(/^wfd:/, "");
     const result = await getJson<WfdWaterbody>(ctx, `${WFD_BASE}/waterbody/${encodeURIComponent(code)}`);
     const body = compactWaterbody(result.value);
-    return { id: `${epaInfo.id}:wfd:${code}`, title: `${body.name ?? code} WFD waterbody`, text: JSON.stringify(body, null, 2), url: result.url, metadata: { source: epaInfo.id, code } };
+    return { id: `${epaInfo.id}:wfd:${code}`, title: `${body.name ?? code} WFD waterbody`, text: JSON.stringify(body, null, 2), url: result.url, metadata: { source: epaInfo.id, code, licence: epaInfo.licence, attribution: epaInfo.attribution } };
   }
 };
