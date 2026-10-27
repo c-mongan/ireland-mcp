@@ -1,25 +1,24 @@
 {
   "status": "degraded",
-  "checked_at": "2026-10-26T20:27:24.134Z",
+  "checked_at": "2026-10-27T00:03:23.209Z",
   "cached": false,
   "sources": [
     {
       "source": "failte-ireland",
-      "status": "down",
-      "latencyMs": 48,
-      "httpStatus": 403,
-      "error": "HTTP 403"
+      "status": "up",
+      "latencyMs": 129,
+      "httpStatus": 200
     },
     {
       "source": "tfi-static",
-      "status": "up",
-      "latencyMs": 103,
-      "httpStatus": 200
+      "status": "down",
+      "latencyMs": 5001,
+      "error": "timeout"
     },
     {
       "source": "gsi",
       "status": "up",
-      "latencyMs": 75,
+      "latencyMs": 129,
       "httpStatus": 200
     },
     {
@@ -31,85 +30,85 @@
     {
       "source": "lobbying",
       "status": "up",
-      "latencyMs": 147,
+      "latencyMs": 1236,
       "httpStatus": 200
     },
     {
       "source": "paygap",
       "status": "up",
-      "latencyMs": 423,
+      "latencyMs": 395,
       "httpStatus": 200
     },
     {
       "source": "council-budgets",
       "status": "up",
-      "latencyMs": 316,
+      "latencyMs": 396,
       "httpStatus": 200
     },
     {
       "source": "cso",
       "status": "up",
-      "latencyMs": 527,
+      "latencyMs": 1224,
       "httpStatus": 200
     },
     {
       "source": "world-bank",
       "status": "up",
-      "latencyMs": 282,
+      "latencyMs": 427,
       "httpStatus": 200
     },
     {
       "source": "eurostat",
       "status": "up",
-      "latencyMs": 276,
+      "latencyMs": 410,
       "httpStatus": 200
     },
     {
       "source": "ecb",
       "status": "up",
-      "latencyMs": 276,
+      "latencyMs": 384,
       "httpStatus": 200
     },
     {
       "source": "pobal",
       "status": "up",
-      "latencyMs": 276,
+      "latencyMs": 598,
       "httpStatus": 200
     },
     {
       "source": "oireachtas",
       "status": "up",
-      "latencyMs": 200,
+      "latencyMs": 388,
       "httpStatus": 200
     },
     {
       "source": "geohive",
       "status": "up",
-      "latencyMs": 1002,
+      "latencyMs": 1426,
       "httpStatus": 200
     },
     {
       "source": "wikidata",
       "status": "up",
-      "latencyMs": 654,
+      "latencyMs": 676,
       "httpStatus": 200
     },
     {
       "source": "data-gov-ie",
       "status": "up",
-      "latencyMs": 301,
+      "latencyMs": 515,
       "httpStatus": 200
     },
     {
       "source": "ncse",
       "status": "up",
-      "latencyMs": 369,
+      "latencyMs": 711,
       "httpStatus": 200
     },
     {
       "source": "cro",
       "status": "up",
-      "latencyMs": 353,
+      "latencyMs": 633,
       "httpStatus": 200
     },
     {
@@ -121,13 +120,13 @@
     {
       "source": "smart-dublin",
       "status": "up",
-      "latencyMs": 347,
+      "latencyMs": 635,
       "httpStatus": 200
     },
     {
       "source": "met-eireann",
       "status": "up",
-      "latencyMs": 401,
+      "latencyMs": 661,
       "httpStatus": 200
     },
     {
@@ -139,133 +138,90 @@
     {
       "source": "legislation",
       "status": "up",
-      "latencyMs": 327,
+      "latencyMs": 607,
       "httpStatus": 200
     },
     {
       "source": "ppr",
       "status": "up",
-      "latencyMs": 365,
+      "latencyMs": 619,
       "httpStatus": 200
     },
     {
       "source": "irish-rail",
       "status": "up",
-      "latencyMs": 351,
+      "latencyMs": 640,
       "httpStatus": 200
     },
     {
       "source": "luas",
       "status": "up",
-      "latencyMs": 391,
+      "latencyMs": 629,
       "httpStatus": 200
     },
     {
       "source": "eirgrid",
       "status": "up",
-      "latencyMs": 1720,
+      "latencyMs": 34,
       "httpStatus": 200
     },
     {
       "source": "marine",
       "status": "up",
-      "latencyMs": 431,
+      "latencyMs": 663,
       "httpStatus": 200
     },
     {
       "source": "opw-water",
       "status": "up",
-      "latencyMs": 780,
+      "latencyMs": 1024,
       "httpStatus": 200
     },
     {
       "source": "planning",
       "status": "up",
-      "latencyMs": 381,
+      "latencyMs": 637,
       "httpStatus": 200
     },
     {
       "source": "census-areas",
       "status": "up",
-      "latencyMs": 430,
+      "latencyMs": 655,
       "httpStatus": 200
     },
     {
       "source": "epa",
-      "status": "up",
-      "latencyMs": 418,
-      "httpStatus": 200
+      "status": "down",
+      "latencyMs": 5000,
+      "error": "timeout"
     },
     {
       "source": "heritage",
       "status": "up",
-      "latencyMs": 430,
+      "latencyMs": 674,
       "httpStatus": 200
     },
     {
       "source": "environment-sites",
       "status": "up",
-      "latencyMs": 383,
+      "latencyMs": 607,
       "httpStatus": 200
     },
     {
       "source": "ted",
       "status": "up",
-      "latencyMs": 450,
+      "latencyMs": 695,
       "httpStatus": 200
     },
     {
       "source": "bikes",
       "status": "up",
-      "latencyMs": 522,
+      "latencyMs": 730,
       "httpStatus": 200
     }
   ],
   "name": "ireland-mcp",
   "version": "1.2.0",
-  "breakers": {
-    "lobbying": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    },
-    "paygap": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    },
-    "api.github.com": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    },
-    "raw.githubusercontent.com": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    },
-    "council-budgets": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    },
-    "cso": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    },
-    "services.arcgis.com": {
-      "state": "closed",
-      "consecutiveFailures": 0,
-      "active": 0,
-      "queued": 0
-    }
-  },
-  "fetched_at": "2026-10-26T20:27:22.047Z"
+  "breakers": {},
+  "fetched_at": "2026-10-27T00:03:12.599Z"
 }
