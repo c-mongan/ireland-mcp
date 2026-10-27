@@ -71,8 +71,12 @@ const buoysTool = defineTool({
   handler: async ({ buoy }, ctx) => {
     const since = new Date(Date.now() - 6 * 60 * MINUTE).toISOString().slice(0, 13) + ":00:00Z";
     const url = `${ERDDAP_BASE}?${FIELDS.join("%2C")}&time%3E=${since}`;
-    const r = await ctx.cachedText(url, 10 * MINUTE, { label: "Marine Institute buoys" });
-    if (!r.value.startsWith("station_id")) throw new ToolError("UPSTREAM_DOWN", "The Marine Institute ERDDAP returned an unexpected format.");
+    const r = await ctx.cachedText(url, 10 * MINUTE, {
+      label: "Marine Institute buoys",
+      validate: (body) => {
+        if (!body.startsWith("station_id")) throw new ToolError("UPSTREAM_DOWN", "The Marine Institute ERDDAP returned an unexpected format.");
+      }
+    });
     let rows = latestPerBuoy(r.value);
     if (buoy) {
       rows = rows.filter((row) => row.station_id?.toUpperCase() === buoy.toUpperCase());

@@ -22,7 +22,9 @@ strings or keys are stored in app settings.
 
 Cost controls:
 - `MAX_INSTANCE_COUNT` (default 10) caps Flex scale-out.
-- Per-IP rate limiting (60 requests a minute) runs in the app.
+- The app rate-limits each client IP to 60 requests a minute per Functions instance. The
+  counter is in memory, so it is not shared between instances: one client can reach about
+  60 × `MAX_INSTANCE_COUNT` requests a minute in total (600 at the default cap).
 - Log Analytics has a 1 GB daily cap.
 - Optional budget alert (`MONTHLY_BUDGET`, default 20).
 

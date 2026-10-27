@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { DEFAULT_LIMIT, envelope, type SourceInfo } from "../gateway/envelope.js";
 import { ToolError, toToolError } from "../gateway/errors.js";
+import { reportSearchOutcomes, type SearchOutcome } from "../gateway/telemetry.js";
 import { defineTool, type AnyTool, type SearchHit, type SourceModule, type ToolContext } from "../gateway/module.js";
 import { boundariesAt, geohiveInfo, locatePlace } from "../sources/geohive/index.js";
 import { activeWarnings, forecastAt, metInfo, nearestStation } from "../sources/met-eireann/index.js";
@@ -18,8 +19,20 @@ export const crossInfo: SourceInfo = {
 /** One slow source must not hold up the combined search; its result still warms the cache for next time. */
 export const SEARCH_TIMEOUT_MS = 5_000;
 
-const withTimeout = <T>(p: Promise<T>, ms: number, label: string) =>
-  Promise.race([p, new Promise<never>((_, reject) => setTimeout(() => reject(new ToolError("UPSTREAM_DOWN", `${label} timed out.`)), ms).unref?.())]);
+/** Marks the combined search's own deadline, so it is not confused with an upstream timeout. */
+class SearchDeadline extends ToolError {}
+
+function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new SearchDeadline("UPSTREAM_DOWN", `${label} timed out.`)), ms);
+    timer.unref?.();
+  });
+  return Promise.race([p, deadline]).finally(() => clearTimeout(timer));
+}
+
+const outcomeOf = (r: PromiseSettledResult<unknown>): SearchOutcome =>
+  r.status === "fulfilled" ? "ok" : r.reason instanceof SearchDeadline ? "timeout" : "failed";
 
 /** Round-robin merge so every source gets a fair share of the top results. */
 export function interleave<T>(lists: T[][], limit: number): T[] {
@@ -51,12 +64,21 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
     raw: true,
     inputSchema: { query: z.string().min(1).max(200).describe("What to look for, e.g. 'population by county' or 'housing bill 2024'.") },
     handler: async ({ query }, ctx) => {
+      if (!searchable.length) {
+        throw new ToolError("NOT_FOUND", "No searchable sources are enabled on this server.", { hint: "Call list_sources to see which sources are available." });
+      }
       const settled = await Promise.allSettled(
         searchable.map((m) => withTimeout(m.search!(query, DEFAULT_LIMIT / 5, ctx), SEARCH_TIMEOUT_MS, m.info.name))
       );
+      const outcomes = Object.fromEntries(searchable.map((m, i) => [m.info.id, outcomeOf(settled[i]!)]));
+      reportSearchOutcomes(outcomes);
+      if (settled.every((s) => s.status === "rejected")) {
+        throw new ToolError("UPSTREAM_DOWN", `Every search source failed or timed out: ${searchable.map((m) => m.info.name).join(", ")}.`, {
+          hint: "Try again in a minute, or use ireland_catalogue to call one source's own search operation."
+        });
+      }
       const lists = settled.map((s) => (s.status === "fulfilled" ? s.value : ([] as SearchHit[])));
-      if (settled.every((s) => s.status === "rejected")) throw toToolError((settled[0] as PromiseRejectedResult).reason);
-      // ChatGPT's search contract is exactly { results }; slow or failed sources are simply omitted.
+      // ChatGPT's search contract is exactly { results }; slow or failed sources are omitted here and reported in telemetry.
       return { results: interleave(lists, 20) };
     }
   });

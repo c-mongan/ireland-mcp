@@ -44,8 +44,12 @@ export function parseStations(xml: string): RailStation[] {
 
 async function loadStations(ctx: ToolContext) {
   const url = `${RAIL_BASE}/getAllStationsXML`;
-  const r = await ctx.cachedText(url, DAY, { label: "Irish Rail stations" });
-  if (!r.value.includes("<ArrayOfObjStation")) throw new ToolError("UPSTREAM_DOWN", "Irish Rail returned an unexpected station list.");
+  const r = await ctx.cachedText(url, DAY, {
+    label: "Irish Rail stations",
+    validate: (body) => {
+      if (!body.includes("<ArrayOfObjStation")) throw new ToolError("UPSTREAM_DOWN", "Irish Rail returned an unexpected station list.");
+    }
+  });
   return { url, stations: parseStations(r.value), cached: r.cached, stale: r.stale };
 }
 
@@ -97,8 +101,10 @@ const departuresTool = defineTool({
     const codes = [...new Set(stations.filter((s) => s.name === found.name).map((s) => s.code))];
     const urlFor = (code: string) => `${RAIL_BASE}/getStationDataByCodeXML_WithNumMins?StationCode=${encodeURIComponent(code)}&NumMins=${minutes}`;
     const url = urlFor(found.code);
-    const feeds = await Promise.all(codes.map((code) => ctx.cachedText(urlFor(code), MINUTE, { label: "Irish Rail departures" })));
-    if (feeds.some((r) => !r.value.includes("<ArrayOfObjStationData"))) throw new ToolError("UPSTREAM_DOWN", "Irish Rail returned an unexpected departures format.");
+    const validate = (body: string) => {
+      if (!body.includes("<ArrayOfObjStationData")) throw new ToolError("UPSTREAM_DOWN", "Irish Rail returned an unexpected departures format.");
+    };
+    const feeds = await Promise.all(codes.map((code) => ctx.cachedText(urlFor(code), MINUTE, { label: "Irish Rail departures", validate })));
     const seen = new Set<string>();
     const departures = feeds
       .flatMap((r) => blocks(r.value, "objStationData"))

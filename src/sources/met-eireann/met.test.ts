@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fakeFetch, type Route } from "../../../test/helpers/fakeFetch.js";
+import { fakeFetch, softErrorOnce, type Route } from "../../../test/helpers/fakeFetch.js";
 import { callTool, fixturePath } from "../../../test/helpers/callTool.js";
 import { createContext } from "../../gateway/context.js";
 import { findStation, metModule as mod, nearestStation } from "./index.js";
@@ -183,5 +183,16 @@ describe("Met Éireann module", () => {
     expect(findStation("Roches Point")?.slug).toBe("Roches-Point");
     expect(findStation("Cork Airport")?.name).toBe("Cork");
     expect(nearestStation(51.9, -8.47).name).toBe("Cork");
+  });
+
+  it("does not cache a malformed forecast body", async () => {
+    const fetch = softErrorOnce(routes, /locationforecast/);
+    const ctx = createContext({ fetch });
+    const args = { lat: 53.3498, lon: -6.2603, hours: 3 };
+    const first = await callTool(mod, "met_get_forecast", args, ctx);
+    expect(first.ok).toBe(false);
+    expect(first.body.error.code).toBe("UPSTREAM_DOWN");
+    expect((await callTool(mod, "met_get_forecast", args, ctx)).ok).toBe(true);
+    expect(fetch.calls.filter((c) => c.url.includes("locationforecast"))).toHaveLength(2);
   });
 });

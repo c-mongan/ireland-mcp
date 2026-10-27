@@ -39,3 +39,14 @@ export function reportHandlerError(handler: "healthResponse" | "mcpHandler" | "h
   if (error instanceof RangeError) errorType = "RangeError";
   console.error(JSON.stringify({ type: "handler_error", handler, errorType }));
 }
+
+export type SearchOutcome = "ok" | "failed" | "timeout";
+
+/** One line when the combined search returns partial results. Source ids only; never the query. */
+export function reportSearchOutcomes(outcomes: Record<string, SearchOutcome>): void {
+  if (process.env.IRELAND_MCP_TELEMETRY === "off") return;
+  const values = Object.values(outcomes);
+  const count = (o: SearchOutcome) => values.filter((v) => v === o).length;
+  if (count("ok") === values.length) return;
+  console.error(JSON.stringify({ type: "search_sources", ok: count("ok"), failed: count("failed"), timeout: count("timeout"), outcomes }));
+}

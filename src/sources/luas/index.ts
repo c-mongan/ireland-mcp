@@ -51,8 +51,12 @@ export function parseStops(xml: string): LuasStop[] {
 
 async function loadStops(ctx: ToolContext) {
   const url = `${LUAS_BASE}?action=stops&encrypt=false`;
-  const r = await ctx.cachedText(url, DAY, { label: "Luas stops" });
-  if (!r.value.includes("<stops")) throw new ToolError("UPSTREAM_DOWN", "Luas returned an unexpected stop list.");
+  const r = await ctx.cachedText(url, DAY, {
+    label: "Luas stops",
+    validate: (body) => {
+      if (!body.includes("<stops")) throw new ToolError("UPSTREAM_DOWN", "Luas returned an unexpected stop list.");
+    }
+  });
   return { url, stops: parseStops(r.value), cached: r.cached, stale: r.stale };
 }
 
@@ -86,8 +90,12 @@ const forecastTool = defineTool({
     const found = findStop(stops, stop);
     if (!found) throw new ToolError("NOT_FOUND", `No Luas stop matches '${stop}'.`, { hint: "Use luas_list_stops to see stop names and codes." });
     const url = `${LUAS_BASE}?action=forecast&stop=${encodeURIComponent(found.code)}&encrypt=false`;
-    const r = await ctx.cachedText(url, MINUTE / 2, { label: "Luas forecast" });
-    if (!r.value.includes("<stopInfo")) throw new ToolError("UPSTREAM_DOWN", "Luas returned an unexpected forecast format.");
+    const r = await ctx.cachedText(url, MINUTE / 2, {
+      label: "Luas forecast",
+      validate: (body) => {
+        if (!body.includes("<stopInfo")) throw new ToolError("UPSTREAM_DOWN", "Luas returned an unexpected forecast format.");
+      }
+    });
     const direction = (name: string) => trams(r.value.match(new RegExp(`<direction name="${name}">([\\s\\S]*?)</direction>`))?.[1] ?? "");
     const message = r.value.match(/<message>([\s\S]*?)<\/message>/)?.[1]?.trim();
     return envelope(luasInfo, {

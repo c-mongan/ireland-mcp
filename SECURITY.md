@@ -22,7 +22,8 @@ reports include:
 - server-side request forgery, or any way to make the server fetch a host
   outside its fixed upstream list
 - leaking the operator's NTA API key or any Azure credential
-- bypassing the per-IP rate limit, response size bounds or request body limit
+- bypassing the per-instance, per-IP rate limit (it is not shared across instances; see
+  `docs/deploy.md`), response size bounds or request body limit
 - cache poisoning across users, or stale data shown without the `stale` flag
 - script injection in the `web/` landing page
 - denial of service that costs the operator money beyond the instance cap
