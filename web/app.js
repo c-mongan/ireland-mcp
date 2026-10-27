@@ -215,11 +215,19 @@ async function rpc(method, params = {}) {
     }
   }
   const isStream = response.headers.get("content-type")?.includes("text/event-stream") || /^(event:|data:|:)/m.test(text);
-  const body = isStream
-    ? text.split(/\r?\n\r?\n/).map((event) => event.split(/\r?\n/)
-      .filter((line) => line.startsWith("data:")).map((line) => line.slice(5).trimStart()).join("\n"))
-      .filter(Boolean).map((data) => JSON.parse(data)).find((message) => message.id === id)
-    : JSON.parse(text || "{}");
+  let body;
+  try {
+    body = isStream
+      ? text.split(/\r?\n\r?\n/).map((event) => event.split(/\r?\n/)
+        .filter((line) => line.startsWith("data:")).map((line) => line.slice(5).trimStart()).join("\n"))
+        .filter(Boolean).map((data) => JSON.parse(data)).find((message) => message.id === id)
+      : JSON.parse(text || "{}");
+  } catch (error) {
+    // Platform error pages (an HTML 502 during a cold start, for example) are not JSON.
+    throw new Error(response.ok
+      ? "The server returned an unreadable response. Please try again."
+      : `HTTP ${response.status}: the server is unavailable or waking up. Please try again.`, { cause: error });
+  }
   if (!body) throw new Error("The server did not return a query response.");
   if (body.error) throw new Error(body.error.message || `HTTP ${response.status}`);
   if (!response.ok) throw new Error(`HTTP ${response.status}`);

@@ -118,8 +118,6 @@ These come from the 2026-10-26 architecture audit.
 
 | Gap | Issue |
 | --- | --- |
-| The playground parses the response body before checking the HTTP status. | [#116](https://github.com/c-mongan/ireland-mcp/issues/116) |
 | `live:all` can overwrite the hosted receipt from a local run. | [#117](https://github.com/c-mongan/ireland-mcp/issues/117) |
 | Packaged skills have no evals. | [#119](https://github.com/c-mongan/ireland-mcp/issues/119) |
-| The production CSP allows `localhost`. | [#120](https://github.com/c-mongan/ireland-mcp/issues/120) |
 | The deploy smoke test does not verify the deployed revision. | [#121](https://github.com/c-mongan/ireland-mcp/issues/121) |
