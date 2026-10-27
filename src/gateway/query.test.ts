@@ -297,7 +297,9 @@ describe("ireland_query limits", () => {
   it("charges a deterministic work budget", async () => {
     const heavy = "(" + Array.from({ length: 60 }, () => "k").join(" + ") + ")";
     const steps = Array.from({ length: 6 }, (_, i) => ({ derive: { [`h${i}`]: heavy } }));
-    await fails({ tables: [t("a", "demo_big", { n: 10_000 })], steps }, /work units/);
+    // A frozen clock isolates the deterministic budget from the wall-clock backstop (slow under coverage).
+    const error = await runQuery(modules, { tables: [t("a", "demo_big", { n: 10_000 })], steps }, ctx, { clock: () => 0 }).catch((e: unknown) => e);
+    expect((error as ToolError).message).toMatch(/work units/);
   });
 
   it("stops computation at the wall-clock backstop", async () => {
