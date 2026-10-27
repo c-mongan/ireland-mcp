@@ -118,11 +118,8 @@ These come from the 2026-10-26 architecture audit.
 
 | Gap | Issue |
 | --- | --- |
-| `cachedText` has no `validate` hook, so a malformed 200 body (for example the Luas stop list) is cached before it is checked. | [#114](https://github.com/c-mongan/ireland-mcp/issues/114) |
-| `search` drops failed sources silently and gives no per-source signal. | [#115](https://github.com/c-mongan/ireland-mcp/issues/115) |
 | The playground parses the response body before checking the HTTP status. | [#116](https://github.com/c-mongan/ireland-mcp/issues/116) |
 | `live:all` can overwrite the hosted receipt from a local run. | [#117](https://github.com/c-mongan/ireland-mcp/issues/117) |
-| The rate limit is per instance, not global. | [#118](https://github.com/c-mongan/ireland-mcp/issues/118) |
 | Packaged skills have no evals. | [#119](https://github.com/c-mongan/ireland-mcp/issues/119) |
 | The production CSP allows `localhost`. | [#120](https://github.com/c-mongan/ireland-mcp/issues/120) |
 | The deploy smoke test does not verify the deployed revision. | [#121](https://github.com/c-mongan/ireland-mcp/issues/121) |

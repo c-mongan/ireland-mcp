@@ -131,8 +131,12 @@ export function parseForecast(xml: string): ForecastHour[] {
 export async function forecastAt(ctx: ToolContext, lat: number, lon: number, hours: number) {
   assertInIreland(lat, lon);
   const url = `${FORECAST_BASE}?lat=${lat.toFixed(4)};long=${lon.toFixed(4)}`;
-  const result = await ctx.cachedText(url, TTL, { label: "Met Éireann forecast" });
-  if (!result.value.includes("<weatherdata")) throw new ToolError("UPSTREAM_DOWN", "Met Éireann returned an unexpected forecast format.");
+  const result = await ctx.cachedText(url, TTL, {
+    label: "Met Éireann forecast",
+    validate: (body) => {
+      if (!body.includes("<weatherdata")) throw new ToolError("UPSTREAM_DOWN", "Met Éireann returned an unexpected forecast format.");
+    }
+  });
   const all = parseForecast(result.value);
   return { url, ...bound(all, hours), cached: result.cached, stale: result.stale, model_run: attr(result.value, "model", "runended") ?? null };
 }

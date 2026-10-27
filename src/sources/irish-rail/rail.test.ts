@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { fakeFetch, type Route } from "../../../test/helpers/fakeFetch.js";
+import { fakeFetch, softErrorOnce, type Route } from "../../../test/helpers/fakeFetch.js";
+import { createContext } from "../../gateway/context.js";
 import { callTool, fixturePath } from "../../../test/helpers/callTool.js";
 import { irishRailModule as mod } from "./index.js";
 
@@ -63,5 +64,19 @@ describe("Irish Rail module", () => {
     expect(ok).toBe(false);
     expect(body.error.code).toBe("NOT_FOUND");
     expect(body.error.hint).toContain("rail_find_station");
+  });
+
+  it.each([
+    ["station list", /getAllStationsXML$/],
+    ["departures", /StationCode=PERSE&/]
+  ])("does not cache a malformed %s body", async (_, match) => {
+    const fetch = softErrorOnce(routes, match);
+    const ctx = createContext({ fetch });
+    const first = await callTool(mod, "rail_get_departures", { station: "Dublin Pearse", minutes: 60 }, ctx);
+    expect(first.ok).toBe(false);
+    expect(first.body.error.code).toBe("UPSTREAM_DOWN");
+    const second = await callTool(mod, "rail_get_departures", { station: "Dublin Pearse", minutes: 60 }, ctx);
+    expect(second.ok).toBe(true);
+    expect(fetch.calls.filter((c) => match.test(c.url))).toHaveLength(2);
   });
 });

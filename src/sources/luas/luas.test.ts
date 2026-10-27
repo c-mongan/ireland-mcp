@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { fakeFetch, type Route } from "../../../test/helpers/fakeFetch.js";
+import { fakeFetch, softErrorOnce, type Route } from "../../../test/helpers/fakeFetch.js";
+import { createContext } from "../../gateway/context.js";
 import { callTool, fixturePath } from "../../../test/helpers/callTool.js";
 import { luasModule as mod } from "./index.js";
 
@@ -38,5 +39,19 @@ describe("Luas module", () => {
     const { ok, body } = await callTool(mod, "luas_get_forecast", { stop: "Atlantis" }, fakeFetch(routes));
     expect(ok).toBe(false);
     expect(body.error.hint).toContain("luas_list_stops");
+  });
+
+  it.each([
+    ["stop list", /action=stops&/],
+    ["forecast", /action=forecast&stop=STS&/]
+  ])("does not cache a malformed %s body", async (_, match) => {
+    const fetch = softErrorOnce(routes, match);
+    const ctx = createContext({ fetch });
+    const first = await callTool(mod, "luas_get_forecast", { stop: "STS" }, ctx);
+    expect(first.ok).toBe(false);
+    expect(first.body.error.code).toBe("UPSTREAM_DOWN");
+    const second = await callTool(mod, "luas_get_forecast", { stop: "STS" }, ctx);
+    expect(second.ok).toBe(true);
+    expect(fetch.calls.filter((c) => match.test(c.url))).toHaveLength(2);
   });
 });

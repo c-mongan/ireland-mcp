@@ -70,6 +70,52 @@ describe("cross-source tools", () => {
     expect(body.error.code).toBe("UPSTREAM_DOWN");
   });
 
+  it("search with no searchable sources fails cleanly instead of crashing", async () => {
+    const searchless: SourceModule = { ...fakeModule("x", 1), search: undefined };
+    for (const modules of [[], [searchless]]) {
+      const { ok, body } = await call(crossSourceTools(modules), "search", { query: "x" }, ctx);
+      expect(ok).toBe(false);
+      expect(body.error.code).toBe("NOT_FOUND");
+      expect(body.error.message).toContain("No searchable sources");
+    }
+  });
+
+  it("search names every failed source when all of them fail", async () => {
+    const { ok, body } = await call(crossSourceTools([fakeModule("c", 1, true), fakeModule("d", 1, true)]), "search", { query: "x" }, ctx);
+    expect(ok).toBe(false);
+    expect(body.error.code).toBe("UPSTREAM_DOWN");
+    expect(body.error.message).toContain("C, D");
+  });
+
+  it("search logs per-source outcomes when results are partial, without the query", async () => {
+    const lines: string[] = [];
+    const spy = vi.spyOn(console, "error").mockImplementation((line: unknown) => void lines.push(String(line)));
+    vi.useFakeTimers();
+    try {
+      const hanging: SourceModule = { ...fakeModule("slow", 1), search: () => new Promise(() => {}) };
+      const upstreamTimeout: SourceModule = { ...fakeModule("u", 1), search: async () => { throw new ToolError("UPSTREAM_DOWN", "u timed out."); } };
+      const tools = crossSourceTools([fakeModule("a", 1), fakeModule("c", 1, true), hanging, upstreamTimeout]);
+      const pending = call(tools, "search", { query: "secret query" }, ctx);
+      await vi.advanceTimersByTimeAsync(SEARCH_TIMEOUT_MS + 10);
+      const { ok, body } = await pending;
+      expect(ok).toBe(true);
+      expect(Object.keys(body)).toEqual(["results"]);
+      const events = lines.map((l) => JSON.parse(l)).filter((e) => e.type === "search_sources");
+      expect(events).toEqual([{ type: "search_sources", ok: 1, failed: 2, timeout: 1, outcomes: { a: "ok", c: "failed", slow: "timeout", u: "failed" } }]);
+      expect(lines.join("\n")).not.toContain("secret query");
+
+      lines.length = 0;
+      await call(crossSourceTools([fakeModule("a", 1)]), "search", { query: "x" }, ctx);
+      process.env.IRELAND_MCP_TELEMETRY = "off";
+      await call(crossSourceTools([fakeModule("c", 1, true), fakeModule("a", 1)]), "search", { query: "x" }, ctx);
+      expect(lines.filter((l) => l.includes("search_sources"))).toEqual([]);
+    } finally {
+      delete process.env.IRELAND_MCP_TELEMETRY;
+      vi.useRealTimers();
+      spy.mockRestore();
+    }
+  });
+
   it("fetch routes by the source prefix and rejects unknown ids", async () => {
     const tools = crossSourceTools([fakeModule("a", 1), fakeModule("b", 1)]);
     const { body } = await call(tools, "fetch", { id: "b:doc:with:colons" }, ctx);

@@ -21,6 +21,8 @@ Configure the Azure Function with:
 | `IRELAND_MCP_POSTHOG_HOST` | `https://eu.i.posthog.com` or `https://us.i.posthog.com`, matching the project region. |
 | `IRELAND_MCP_TELEMETRY` | `off` disables structured tool logs and PostHog capture. |
 
+When the combined `search` tool returns partial results, it writes one `search_sources` log line with each source's outcome (`ok`, `failed` or `timeout`) by source id. The query is not logged. `IRELAND_MCP_TELEMETRY=off` also disables this line.
+
 PostHog stays off if any required setting is absent or invalid. The CLI does not configure this integration; the Azure MCP entry point supplies the known source and operation labels from its registry.
 
 ZIP deployment preserves existing Function settings. If you provision the environment again, pass these settings through the secure `additionalAppSettings` parameter in `infra/main.bicep`. Its empty default does not preserve settings added through the Azure CLI. Keep the ingestion token in the existing private deployment configuration, outside Git.

@@ -50,7 +50,8 @@ unless `IRELAND_MCP_POSTHOG_*` and `web/analytics-config.json` are configured.
 
 ## Rate limiting
 
-The per-client rate limit (60 requests a minute by default) needs a key per caller. The key
+The per-client rate limit (60 requests a minute by default, counted separately on each
+Functions instance) needs a key per caller. The key
 is an HMAC-SHA256 of the caller's IP address with a random 32-byte salt, truncated to 22
 characters. The salt lives only in memory, and a new one is generated each UTC day and
 on every restart, so keys cannot be linked across days or reversed to an IP. The key and

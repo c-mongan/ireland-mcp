@@ -27,6 +27,23 @@ export function fakeFetch(routes: Route[]): FakeFetch {
   return impl;
 }
 
+/** Serves an HTML soft-error page (HTTP 200) for the first request matching `match`, then defers to `routes`. */
+export function softErrorOnce(routes: Route[], match: RegExp): FakeFetch {
+  let served = false;
+  return fakeFetch([
+    {
+      match: (url) => {
+        if (served || !match.test(url)) return false;
+        served = true;
+        return true;
+      },
+      body: "<!DOCTYPE html><html><body>Service temporarily unavailable</body></html>",
+      headers: { "content-type": "text/html" }
+    },
+    ...routes
+  ]);
+}
+
 export function fixture(dir: string, name: string): string {
   return new URL(`${name}`, `file://${dir.endsWith("/") ? dir : `${dir}/`}`).pathname;
 }

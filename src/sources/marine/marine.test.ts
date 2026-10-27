@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { fakeFetch, type Route } from "../../../test/helpers/fakeFetch.js";
+import { fakeFetch, softErrorOnce, type Route } from "../../../test/helpers/fakeFetch.js";
+import { createContext } from "../../gateway/context.js";
 import { callTool, fixturePath } from "../../../test/helpers/callTool.js";
 import { marineModule as mod } from "./index.js";
 
@@ -41,5 +42,15 @@ describe("Marine Institute weather buoys module", () => {
     const { ok, body } = await callTool(mod, "marine_get_buoys", { buoy: "M4" }, fakeFetch(routes));
     expect(ok).toBe(false);
     expect(body.error.code).toBe("NOT_FOUND");
+  });
+
+  it("does not cache a malformed buoy body", async () => {
+    const fetch = softErrorOnce(routes, /IWBNetwork\.csv/);
+    const ctx = createContext({ fetch });
+    const first = await callTool(mod, "marine_get_buoys", {}, ctx);
+    expect(first.ok).toBe(false);
+    expect(first.body.error.code).toBe("UPSTREAM_DOWN");
+    expect((await callTool(mod, "marine_get_buoys", {}, ctx)).ok).toBe(true);
+    expect(fetch.calls).toHaveLength(2);
   });
 });
