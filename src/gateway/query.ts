@@ -8,7 +8,7 @@ import { MAX_MAX_TOKENS } from "./envelope.js";
 import { ToolError } from "./errors.js";
 import { cellsEqual, compareCells, evaluate, exprSize, normText, orderCells, parseExpr, toNum, type Expr } from "./expr.js";
 import type { SourceModule, ToolContext } from "./module.js";
-import { columnTypes, loadTable, parseTableId, type Cell, type LoadedTable, type Row, type TableRef } from "./table.js";
+import { columnTypes, loadTable, parseTableId, resolveTool, type Cell, type LoadedTable, type Row, type TableRef } from "./table.js";
 
 export const QUERY_LIMITS = {
   /** Tables per query. */
@@ -479,19 +479,21 @@ function aggregate(a: AggSpec, members: Row[], cells: Cell[], numbers: () => num
 /** Rounds float noise (0.1 + 0.2, sums of cents) to 12 significant digits. */
 const round = (x: number): number | null => (Number.isFinite(x) ? Number(x.toPrecision(12)) : null);
 
-function selectStep(state: State, spec: unknown): State {
+function selectStep(state: State, spec: unknown, budget: Budget): State {
   const resolve = resolver(state.columns);
-  let pairs: Array<[string, string]>;
-  if (Array.isArray(spec)) pairs = spec.map((c) => [resolve(c), resolve(c)]);
-  else if (isPlainObject(spec)) pairs = Object.entries(spec).map(([to, from]) => [checkName(to, "column"), resolve(from)]);
-  else throw bad('select takes ["col", ...] or {"new_name": "col", ...}.');
-  if (pairs.length === 0) throw bad("select needs at least one column.");
+  const size = Array.isArray(spec) ? spec.length : isPlainObject(spec) ? Object.keys(spec).length : -1;
+  if (size < 1 || size > QUERY_LIMITS.maxColumns) throw bad(`select takes 1–${QUERY_LIMITS.maxColumns} columns as ["col", ...] or {"new_name": "col", ...}.`);
+  const named = new Map<string, string>();
+  if (Array.isArray(spec)) for (const c of spec) named.set(resolve(c), resolve(c));
+  else for (const [to, from] of Object.entries(spec as Record<string, unknown>)) named.set(checkName(to, "column"), resolve(from));
+  const pairs = [...named];
+  budget.charge(state.rows.length * pairs.length);
   const rows = state.rows.map((r) => {
     const out = Object.create(null) as Row;
     for (const [to, from] of pairs) out[to] = Object.hasOwn(r, from) ? r[from]! : null;
     return out;
   });
-  return { rows, columns: [...new Set(pairs.map(([to]) => to))] };
+  return { rows, columns: pairs.map(([to]) => to) };
 }
 
 function sortKeys(spec: unknown, resolve: (n: unknown) => string): Array<{ col: string; desc: boolean }> {
@@ -589,7 +591,9 @@ function pctStep(state: State, spec: unknown, budget: Budget): State {
 
 function distinctStep(state: State, spec: unknown, budget: Budget): State {
   const resolve = resolver(state.columns);
-  const cols = (Array.isArray(spec) ? spec : [spec]).map(resolve);
+  const list = Array.isArray(spec) ? spec : [spec];
+  if (list.length < 1 || list.length > QUERY_LIMITS.maxColumns) throw bad(`distinct takes 1–${QUERY_LIMITS.maxColumns} columns.`);
+  const cols = [...new Set(list.map(resolve))];
   const seen = new Set<string>();
   const rows: Row[] = [];
   for (const r of state.rows) {
@@ -627,7 +631,7 @@ function runSteps(initial: State, steps: Array<Record<string, unknown>>, tables:
           state = aggregateStep(state, step, budget, warnings);
           break;
         case "select":
-          state = selectStep(state, step.select);
+          state = selectStep(state, step.select, budget);
           break;
         case "sort":
           state = sortStep(state, step.sort, budget);
@@ -724,6 +728,8 @@ async function execute(modules: SourceModule[], input: QueryInput, ctx: ToolCont
     aliases.add(t.alias);
   }
   const refs = input.tables.map((t) => ({ alias: t.alias, ref: refOf(t) }));
+  // Validate every table before any upstream read starts, so a bad table cannot leave others loading.
+  for (const { ref } of refs) resolveTool(modules, ref);
   // Identical calls (a self-join) load once.
   const unique = new Map<string, Promise<LoadedTable>>();
   const loadAll = Promise.all(
@@ -733,7 +739,8 @@ async function execute(modules: SourceModule[], input: QueryInput, ctx: ToolCont
       return unique.get(k)!;
     })
   );
-  loads.pending = loadAll;
+  // The slot is held until every load settles, even after the first failure or the timeout.
+  loads.pending = Promise.allSettled(unique.values());
   const loaded = await withTimeout(loadAll, options.loadMs ?? QUERY_LIMITS.loadMs);
   const totalRows = [...new Set(loaded)].reduce((t, l) => t + l.rows.length, 0);
   if (totalRows > QUERY_LIMITS.maxInputRows) {

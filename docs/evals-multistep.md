@@ -104,6 +104,29 @@ references-only run before and after it gave these counts:
 - Each rewritten reference keeps the old hand-written mapping as a cross-check, and every value
   matched its previous pin.
 
+**Server-side queries (October 2026).** `ireland_query`, table handles, `planning_stats` and exact
+planning totals shipped next. The references-only run before and after gave these counts:
+
+| Server-query pillar | Before | After |
+| --- | ---: | ---: |
+| Blocked items | 2 | 0 |
+| References that needed a workaround | 2 | 0 |
+| References computed (`ok`) | 37 of 41 | 39 of 41 |
+| Items that declare a server-query gap | 10 | 10 |
+
+- `t2-galway-city-planning-volume` now has a reference: Galway City Council received 325 planning
+  applications in 2024. `planning_stats` gives the count. `planning_search`'s exact `total` must agree with it.
+- `t3-galway-planning-act-budget` now has a reference: 222 applications proposed 417 homes. It is
+  computed with `ireland_query` over the full table of 325 applications, and checked against
+  `planning_stats`.
+- `t2-gender-pay-gap-finance` and `t2-kohesio-west-per-capita` no longer page by hand. A single
+  `ireland_query` gives the sector median and the regional total. `t2-planning-near-luas-broombridge`
+  uses `planning_stats`. All three reproduced their earlier pinned values exactly.
+- Each rewritten reference keeps the old path for servers without `ireland_query`, so older
+  deployments still report the original gap.
+- The two remaining unanswerable items need a new source (RTB rents by LEA) and a Citizens
+  Information index.
+
 ## Running it
 
 ```bash

@@ -55,6 +55,22 @@ describe("allowlisted ArcGIS sources", () => {
     expect(page).toContain("orderByFields=ReceivedDate+DESC,OBJECTID+DESC");
   });
 
+  it("never points next_offset at an empty page, and trusts ArcGIS's more-rows flag over an older count", async () => {
+    const fetch = fakeFetch([
+      { match: (url) => url.includes("returnCountOnly=true"), body: JSON.stringify({ count: 130 }) },
+      { match: (url) => url.includes("resultOffset=100"), body: features([]) },
+      { match: (url) => url.includes("resultOffset=0"), body: JSON.stringify({ features: [{ attributes: { ApplicationNumber: "1" } }], exceededTransferLimit: true }) }
+    ]);
+    const empty = await callTool(planningModule, "planning_search", { council: "Galway City Council", limit: 30, offset: 100 }, fetch);
+    expect(empty.body.data).toMatchObject({ count: 0, next_offset: null });
+    expect(empty.body.truncated).toBe(false);
+    const stale = await callTool(planningModule, "planning_search", { council: "Galway City Council", limit: 1 }, fakeFetch([
+      { match: (url) => url.includes("returnCountOnly=true"), body: JSON.stringify({ count: 1 }) },
+      { match: (url) => url.includes("resultOffset=0"), body: JSON.stringify({ features: [{ attributes: { ApplicationNumber: "1" } }], exceededTransferLimit: true }) }
+    ]));
+    expect(stale.body.data.next_offset).toBe(1);
+  });
+
   it("flags an unknown total instead of failing when the count request fails", async () => {
     const fetch = fakeFetch([
       { match: (url) => url.includes("returnCountOnly=true"), body: JSON.stringify({ error: { code: 500, message: "boom" } }) },

@@ -54,6 +54,11 @@ const dateRange = (from?: string, to?: string) => [from ? dateClause("ReceivedDa
 
 /** Rows planning_search returns per call; one ArcGIS request. */
 const PAGE_MAX = 500;
+/**
+ * Whole-table loads keep their own short-lived copies of the count and pages, read together, so a count cached
+ * earlier by planning_search cannot disagree with fresh pages for the rest of the day.
+ */
+const TABLE_CACHE = { ttlMs: 15 * 60_000, cachePrefix: "planning-table" } as const;
 /** ReceivedDate is not unique; OBJECTID breaks ties so offset pages neither repeat nor skip rows. */
 const STABLE_ORDER = "ReceivedDate DESC,OBJECTID DESC";
 
@@ -133,7 +138,9 @@ const searchTool = defineTool({
       totalOf(ctx, q)
     ]);
     const applications = result.features.slice(0, limit).map((f) => row(f.attributes));
-    const more = total ? offset + applications.length < total.count : result.exceeded;
+    // The count and the page are cached separately, so trust either signal of more rows, but never point
+    // next_offset at an empty page (a client following it would loop).
+    const more = applications.length > 0 && ((total !== null && offset + applications.length < total.count) || result.transferLimit);
     return envelope(planningInfo, {
       data: {
         total: total?.count ?? null,
@@ -154,7 +161,7 @@ const searchTool = defineTool({
 /** Reads every matching application for a table handle, in OBJECTID order, checked against the exact count. */
 async function loadAll(filters: Filters, ctx: ToolContext, maxRows: number) {
   const q = planningQuery(filters);
-  const total = await countLayer(ctx, ARCGIS_LAYERS.planningPoints, q);
+  const total = await countLayer(ctx, ARCGIS_LAYERS.planningPoints, { ...q, ...TABLE_CACHE });
   if (total.count > maxRows) {
     throw new ToolError("BAD_ARGS", `${total.count} planning applications match; a table holds at most ${maxRows}.`, {
       hint: "Narrow by council, dates or location, or use planning_stats for counts and unit totals at any scale."
@@ -173,7 +180,8 @@ async function loadAll(filters: Filters, ctx: ToolContext, maxRows: number) {
       pageSize: ARCGIS_MAX_RECORDS,
       offset,
       returnGeometry: false,
-      orderByFields: "OBJECTID ASC"
+      orderByFields: "OBJECTID ASC",
+      ...TABLE_CACHE
     });
     urls.push(page.url);
     cached &&= page.cached;
@@ -183,7 +191,7 @@ async function loadAll(filters: Filters, ctx: ToolContext, maxRows: number) {
   }
   if (seen.size !== total.count) {
     throw new ToolError("UPSTREAM_DOWN", `The planning layer returned ${seen.size} applications but counted ${total.count}; it may have changed while being read.`, {
-      hint: "Try again shortly. ireland_query never computes over a partial table."
+      hint: "Try again in about 15 minutes, when the cached copy refreshes. ireland_query never computes over a partial table."
     });
   }
   const env: Envelope = envelope(planningInfo, { data: null, url: urls[1] ?? total.url, cached, stale, retrievedAt: ctx.now() });

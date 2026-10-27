@@ -55,6 +55,9 @@ export interface QueryLayerOptions {
   maxRecords?: number;
   /** Features per upstream request (default 50). */
   pageSize?: number;
+  /** Cache lifetime (default one day) and a cache-key prefix, so a caller can keep its own, fresher copy. */
+  ttlMs?: number;
+  cachePrefix?: string;
 }
 
 /** ArcGIS's own per-request ceiling for the allowlisted hosted layers. */
@@ -138,6 +141,7 @@ export async function queryLayer(ctx: ToolContext, layerUrl: string, options: Qu
   const start = Math.max(0, Math.floor(options.offset ?? 0));
   const features: ArcGisFeature[] = [];
   let exceeded = false;
+  let transferLimit = false;
   let cached = true;
   let stale = false;
   let lastUrl = "";
@@ -155,16 +159,22 @@ export async function queryLayer(ctx: ToolContext, layerUrl: string, options: Qu
       ...(options.orderByFields ? { orderByFields: options.orderByFields } : {})
     });
     lastUrl = `${base}/query?${query.toString()}`;
-    const result = await ctx.cachedJson<ArcGisResponse>(lastUrl, TTL, { label: "ArcGIS", validate: assertArcGisOk });
+    const result = await ctx.cachedJson<ArcGisResponse>(lastUrl, options.ttlMs ?? TTL, {
+      label: "ArcGIS",
+      validate: assertArcGisOk,
+      ...(options.cachePrefix ? { cacheKey: `${options.cachePrefix} ${lastUrl}` } : {})
+    });
     cached &&= result.cached;
     stale ||= result.stale;
     const page = result.value.features ?? [];
     features.push(...page);
     exceeded ||= Boolean(result.value.exceededTransferLimit);
+    transferLimit = Boolean(result.value.exceededTransferLimit);
     if (!result.value.exceededTransferLimit || page.length === 0) break;
   }
 
-  return { url: lastUrl, features, exceeded: exceeded || features.length >= cap, cached, stale };
+  /** transferLimit: ArcGIS's own flag on the last page, true when more features follow it. */
+  return { url: lastUrl, features, exceeded: exceeded || features.length >= cap, transferLimit, cached, stale };
 }
 
 
@@ -174,12 +184,13 @@ interface ArcGisCountResponse {
 }
 
 /** Exact number of features matching a filter (ArcGIS returnCountOnly), through the cache. */
-export async function countLayer(ctx: ToolContext, layerUrl: string, options: Pick<QueryLayerOptions, "where" | "geometry">) {
+export async function countLayer(ctx: ToolContext, layerUrl: string, options: Pick<QueryLayerOptions, "where" | "geometry" | "ttlMs" | "cachePrefix">) {
   const base = normalizeLayerUrl(layerUrl);
   const query = new URLSearchParams({ f: "json", where: options.where ?? "1=1", returnCountOnly: "true", ...paramsForGeometry(options.geometry) });
   const url = `${base}/query?${query.toString()}`;
-  const result = await ctx.cachedJson<ArcGisCountResponse>(url, TTL, {
+  const result = await ctx.cachedJson<ArcGisCountResponse>(url, options.ttlMs ?? TTL, {
     label: "ArcGIS",
+    ...(options.cachePrefix ? { cacheKey: `${options.cachePrefix} ${url}` } : {}),
     validate: (body) => {
       assertArcGisOk(body);
       if (typeof body.count !== "number" || !Number.isInteger(body.count) || body.count < 0) {

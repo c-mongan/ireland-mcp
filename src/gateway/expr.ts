@@ -309,8 +309,7 @@ function callFn(name: FnName, args: Expr[], row: Record<string, Cell>): Cell {
       const x = n(0);
       const dp = args.length > 1 ? Math.min(Math.max(Math.trunc(n(1) ?? 0), 0), 10) : 0;
       if (x === null) return null;
-      const f = 10 ** dp;
-      return Math.round(x * f) / f;
+      return roundHalfAway(x, dp);
     }
     case "abs": {
       const x = n(0);
@@ -398,6 +397,16 @@ function callFn(name: FnName, args: Expr[], row: Record<string, Cell>): Cell {
       return finite(((to - from) / Math.abs(from)) * 100);
     }
   }
+}
+
+/** Rounds half away from zero via decimal exponents, so 1.005 → 1.01 and -2.5 → -3 (plain x * 10^dp misrounds both). */
+export function roundHalfAway(x: number, dp: number): number | null {
+  const abs = Math.abs(x);
+  const shifted = Number(`${abs}e${dp}`);
+  const scaled = Math.round(Number.isFinite(shifted) ? shifted : abs * 10 ** dp);
+  const back = Number(`${scaled}e-${dp}`);
+  const r = Number.isFinite(back) ? back : scaled / 10 ** dp;
+  return finite(x < 0 ? -r : r);
 }
 
 /** Number of AST nodes, used to charge work per row. */

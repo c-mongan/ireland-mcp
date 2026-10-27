@@ -322,6 +322,29 @@ describe("ireland_query limits", () => {
     expect(runningQueries()).toBe(0);
   });
 
+  it("caps select and distinct lists and charges them to the budget", async () => {
+    await fails({ tables: [t("p", "demo_people")], steps: [{ select: Array.from({ length: 65 }, () => "name") }] }, /1–64 columns/);
+    await fails({ tables: [t("p", "demo_people")], steps: [{ distinct: Array.from({ length: 65 }, () => "name") }] }, /1–64 columns/);
+    const r = await q({ tables: [t("p", "demo_people")], steps: [{ select: ["name", "name", "NAME"] }] });
+    expect(r.data.columns).toEqual(["name"]);
+  });
+
+  it("validates every table before loading any, so a bad table starts no upstream work", async () => {
+    const before = releases.length;
+    await fails({ tables: [{ alias: "bad", source: "demo", operation: "nope" }, { alias: "s", source: "demo", operation: "demo_slow" }] }, /No operation/);
+    expect(releases.length).toBe(before);
+    expect(runningQueries()).toBe(0);
+  });
+
+  it("holds the slot until every load settles when one table fails mid-load", async () => {
+    const pending = runQuery(modules, { tables: [{ alias: "n", source: "demo", operation: "demo_nooffset" }, { alias: "s", source: "demo", operation: "demo_slow" }] }, ctx).catch((e: unknown) => e);
+    expect(((await pending) as ToolError).message).toMatch(/cannot page/);
+    expect(runningQueries()).toBe(1);
+    for (const r of releases.splice(0)) r();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(runningQueries()).toBe(0);
+  });
+
   it("fits the result budget with whole rows and says so", async () => {
     const r = await runQuery(modules, { tables: [t("a", "demo_big", { n: 500 })], steps: [{ derive: { pad: "concat('x', 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')" } }], limit: 500, max_tokens: 1000 }, ctx);
     const data = r.data as { rows: Item[]; returned: number; row_count: number };
@@ -357,6 +380,7 @@ describe("expressions", () => {
     expect(run("replace('Galway County Council', ' Council', '')")).toBe("Galway County");
     expect(run("coalesce(null, x, 3)", { x: null })).toBe(3);
     expect(run("1 / 0")).toBeNull();
+    expect([run("round(-2.5)"), run("round(2.5)"), run("round(-3.85, 1)"), run("round(1.005, 2)")]).toEqual([-3, 3, -3.9, 1.01]);
     expect(run("norm('Co. Dún Laoghaire–Rathdown')")).toBe("dun laoghaire rathdown");
   });
 

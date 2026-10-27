@@ -182,7 +182,7 @@ These limits keep one public query from tying up the server. Each one is tested.
 | Rows across all tables | 20,000 |
 | Rows at any step, checked before a join is built | 50,000 |
 | Cells (rows × columns) at any step | 1,000,000 |
-| Columns | 64 |
+| Columns, and entries in a `select` or `distinct` list | 64 |
 | Steps | 20 main, 30 including the tables' own steps |
 | Condition size | 100 parts, 8 levels deep, 500 values in an `in` list |
 | Expression size | 500 characters, 200 parts, 24 levels deep; built text up to 1,000 characters |
@@ -207,5 +207,9 @@ were left out. It never cuts a value in half.
 - **No shared state.** Results are computed for each request and are not written to the cache. Only the
   source's own upstream reads are cached, as with `ireland_call`.
 - **Bounded work.** The limits above stop large joins and runaway expressions before they use much
-  memory. A join's size is worked out before it is built. Column names such as `__proto__` are
-  rejected, and rows are plain records with no prototype.
+  memory. A join's size is worked out before it is built. Every step, including `select`, is charged to
+  the work budget. Column names such as `__proto__` are rejected, and rows are plain records with no
+  prototype.
+- **No background pile-up.** Every table is checked before any is loaded. A query that fails or times
+  out keeps its slot until its upstream reads have finished, so failed queries cannot start unlimited
+  background work.
