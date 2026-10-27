@@ -85,7 +85,7 @@ ireland-mcp
 | Hosting | `src/functions/mcp.ts`, `infra/service.bicep` | Flex Consumption app with system identity. Storage uses managed identity and has shared keys off. The optional NTA key is a Key Vault reference; the optional Logainm key is an app setting. Without them those sources return NOT_CONFIGURED. |
 | Legal corpus | `packages/irish-legal-mcp/src/` | Policy-gated ingestion, then a file or blob store, then search/fetch with currentness warnings. `current_law_verified` is always `false`. |
 | Website | `web/app.js`, `web/staticwebapp.config.json` | Static site. The playground calls `/mcp` anonymously with JSON-RPC. CSP restricts `connect-src`. |
-| Skills and evals | `skills/*/SKILL.md`, `evals/` | Skills call operations through `ireland_call`. Evals check tool selection. |
+| Skills and evals | `skills/*/SKILL.md`, `evals/` | Skills call operations through `ireland_call`. Evals check tool selection. `test/skills.test.ts` checks each skill's `ireland_call` example and step arguments against the operation's input schema. |
 | CI and ops | `.github/workflows/`, `scripts/` | CI: lint, typecheck, tests, build, Inspector conformance, Playwright. Separate workflows run Chromatic, nightly live smoke, status, and a manual production deploy. |
 
 ## Deploy path
@@ -114,8 +114,4 @@ There are no deployment slots, so a deploy goes straight to production. The stat
 
 ## Known gaps
 
-These come from the 2026-10-26 architecture audit.
-
-| Gap | Issue |
-| --- | --- |
-| Packaged skills have no evals. | [#119](https://github.com/c-mongan/ireland-mcp/issues/119) |
+The gaps found in the 2026-10-26 architecture audit (#114 to #121 and #127) are closed. The rate limit is still counted per instance; that is now documented above and in [deploy.md](deploy.md) (#118). Track new gaps as GitHub issues.
