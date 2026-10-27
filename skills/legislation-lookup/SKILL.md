@@ -17,7 +17,7 @@ Steps name each operation as source/operation (e.g. `ppr/ppr_price_stats`), usin
 default surface, run it with `ireland_call`, for example:
 
 ```json
-{ "source": "legislation", "operation": "legislation_list_acts", "args": { "query": "data protection" } }
+{ "source": "legislation", "operation": "legislation_list_acts", "args": { "year": 2018, "query": "data protection" } }
 ```
 
 If an argument shape is unclear, call `ireland_describe` with `{ "source", "operation" }` first;

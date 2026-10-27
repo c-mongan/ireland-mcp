@@ -2,6 +2,8 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { z } from "zod";
+import type { AnyTool } from "../src/gateway/module.js";
 import { appModules } from "../src/registry.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -11,8 +13,11 @@ const skillsDir = join(root, "skills");
 const BETA_SOURCES = new Set(["irish-legal", "citizens-info"]);
 // ireland_call dispatches to these (source -> operation) pairs; "cross" holds nearby, ireland_snapshot, list_sources, ireland_resolve_place.
 const ops = new Map<string, Set<string>>();
+const toolsBySource = new Map<string, Map<string, AnyTool>>();
 for (const mod of appModules().modules) {
-  if (!BETA_SOURCES.has(mod.info.id)) ops.set(mod.info.id, new Set(mod.tools.map((tool) => tool.name)));
+  if (BETA_SOURCES.has(mod.info.id)) continue;
+  ops.set(mod.info.id, new Set(mod.tools.map((tool) => tool.name)));
+  toolsBySource.set(mod.info.id, new Map(mod.tools.map((tool) => [tool.name, tool])));
 }
 const allOps = new Set([...ops.values()].flatMap((set) => [...set]));
 const META_TOOLS = ["ireland_catalogue", "ireland_describe", "ireland_call", "ireland_about", "search", "fetch", "nearby", "ireland_resolve_place"];
@@ -85,6 +90,21 @@ function legacyRefs(text: string): string[] {
   return [...dotted, ...opKey];
 }
 
+interface StepExample { source: string; operation: string; raw: string; args: Record<string, unknown> }
+
+/** "Call `source/operation` with `{...}`" step examples. Prose placeholders such as { "source", "operation" } are skipped. */
+function stepExamples(markdown: string): StepExample[] {
+  const text = markdown.replace(/\s*\r?\n\s*/g, " ");
+  return [...text.matchAll(/`([a-z][a-z-]*)\/([a-z][a-z0-9_]*)` with `(\{[^`]*\})`/g)].flatMap(([, source = "", operation = "", raw = ""]) => {
+    try {
+      const args = JSON.parse(raw) as unknown;
+      return args && typeof args === "object" && !Array.isArray(args) ? [{ source, operation, raw, args: args as Record<string, unknown> }] : [];
+    } catch {
+      return [];
+    }
+  });
+}
+
 function checkRef(ref: OpRef): void {
   expect(ops.has(ref.source), `${ref.file}: unknown source "${ref.source}" (op ${ref.op})`).toBe(true);
   expect(ops.get(ref.source)?.has(ref.op), `${ref.file}: source "${ref.source}" has no operation "${ref.op}"`).toBe(true);
@@ -137,6 +157,44 @@ describe("skills pack", () => {
     expect(text).toContain("ireland_describe");
     expect(/"source":\s*"[a-z-]+",\s*"operation":/.test(text), "needs a full ireland_call argument example").toBe(true);
     expect(legacyRefs(text), "legacy source.op / op: references").toEqual([]);
+  });
+
+  it.each(folders.map((name) => [name]))("%s ireland_call example is accepted by the operation's input schema", (name) => {
+    const text = readFileSync(join(skillsDir, name, "SKILL.md"), "utf8");
+    const examples = [...text.matchAll(/```json[ \t]*\r?\n([\s\S]*?)```/g)]
+      .map((m) => m[1]?.trim() ?? "")
+      .filter((block) => /"operation"\s*:/.test(block))
+      .map((block) => JSON.parse(block) as { source: string; operation: string; args?: Record<string, unknown> });
+    expect(examples, `${name}: expected exactly one ireland_call JSON example`).toHaveLength(1);
+    const { source, operation, args = {} } = examples[0]!;
+    const tool = toolsBySource.get(source)?.get(operation);
+    expect(tool, `${name}: ${source}/${operation} does not exist`).toBeDefined();
+    // strict(): a renamed or removed argument fails here instead of being silently dropped at call time.
+    const parsed = z.object(tool!.inputSchema).strict().safeParse(args);
+    expect(parsed.success, `${name}: ${source}/${operation} rejects ${JSON.stringify(args)}: ${parsed.error?.message ?? ""}`).toBe(true);
+  });
+
+  it.each(folders.map((name) => [name]))("%s step examples only use argument names the operation accepts", (name) => {
+    for (const { source, operation, raw, args } of stepExamples(readFileSync(join(skillsDir, name, "SKILL.md"), "utf8"))) {
+      const tool = toolsBySource.get(source)?.get(operation);
+      expect(tool, `${name}: ${source}/${operation} does not exist`).toBeDefined();
+      // Steps may leave out values from an earlier step or write "<placeholder>": check names, and types of concrete values.
+      const entries = Object.entries(args);
+      for (const [key] of entries) expect(Object.keys(tool!.inputSchema), `${name}: ${source}/${operation} has no argument "${key}"`).toContain(key);
+      const concrete = Object.fromEntries(entries.filter(([, value]) => !(typeof value === "string" && /^<[^>]*>$/.test(value))));
+      const parsed = z.object(tool!.inputSchema).partial().strict().safeParse(concrete);
+      expect(parsed.success, `${name}: ${source}/${operation} rejects ${raw}: ${parsed.error?.message ?? ""}`).toBe(true);
+    }
+  });
+
+  it("finds step examples to check", () => {
+    const total = folders.reduce((n, name) => n + stepExamples(readFileSync(join(skillsDir, name, "SKILL.md"), "utf8")).length, 0);
+    expect(total).toBeGreaterThanOrEqual(20);
+  });
+
+  it("the example check rejects stale argument names", () => {
+    const tool = toolsBySource.get("ppr")?.get("ppr_price_stats");
+    expect(z.object(tool!.inputSchema).strict().safeParse({ county: "Galway", town: "oranmore" }).success).toBe(false);
   });
 
   it.each(folders.map((name) => [name]))("%s only uses top-level tools that the default surface lists", (name) => {

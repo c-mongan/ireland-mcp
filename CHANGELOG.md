@@ -24,6 +24,7 @@ All notable changes to this project are documented here. The format follows
 ### Changed
 - `live:all` fails when `--url` has no valid value, `--deployed` targets `https://mcp.irishopendata.ie/mcp`, and only a run against that endpoint writes `docs/live-all-ops.md`. Other runs print the report or save it with `--report` (#117).
 - `/healthz` returns `release`, the Git revision stamped by `deploy:zip` (`null` when unstamped). The deploy workflow's smoke step waits, bounded, until it matches the deployed commit (#121).
+- `test/skills.test.ts` validates each skill's `ireland_call` example against the operation's input schema (unknown arguments fail), and checks the argument names in every "call `source/operation` with `{...}`" step. This found a `legislation-lookup` example without the required `year`, now fixed (#119).
 - Luas, Irish Rail, Marine Institute buoy and Met Éireann forecast reads now check the response format inside the cache loader, so an HTML error page returned with HTTP 200 is not cached for the full TTL (#114).
 - Combined `search` logs a `search_sources` line with each source's outcome when results are partial. It fails with a clear error when no searchable source is enabled, and names the failed sources when every source fails (#115).
 - The deploy, security and privacy docs now say that the rate limit is per client IP on each Functions instance, so the total is bounded by `MAX_INSTANCE_COUNT` (#118).
