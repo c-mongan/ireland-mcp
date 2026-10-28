@@ -184,6 +184,50 @@ describe("ireland_query pipeline", () => {
     expect(clash.data.columns).toContain("c.region");
   });
 
+  it.each([
+    {
+      collision: "an existing left column",
+      left: [{ key: 1, name: "left", "r.name": "preserve me" }],
+      right: [{ key: 1, name: "right" }]
+    },
+    {
+      collision: "another right output column",
+      left: [{ key: 1, name: "left" }],
+      right: [{ key: 1, name: "right", "r.name": "preserve this too" }]
+    }
+  ].flatMap((fixture) => ["inner", "left"].map((type) => ({ ...fixture, type }))))(
+    "rejects $type joins when a prefixed name collides with $collision",
+    async ({ left, right, type }) => {
+      const fixture: SourceModule = {
+        ...demo,
+        tools: [pagedTool("demo_left", () => left), pagedTool("demo_right", () => right)]
+      };
+      await expect(runQuery([fixture], {
+        tables: [t("l", "demo_left"), t("r", "demo_right")],
+        steps: [{ join: "r", on: "key", type }]
+      }, ctx)).rejects.toMatchObject({
+        code: "BAD_ARGS",
+        message: expect.stringMatching(/column.*r\.name/i),
+        hint: expect.stringMatching(/select.*rename|rename.*select/i)
+      });
+    }
+  );
+
+  it("keeps dotted and prefixed right columns when their output names are unique", async () => {
+    const fixture: SourceModule = {
+      ...demo,
+      tools: [
+        pagedTool("demo_left", () => [{ key: 1, name: "left" }]),
+        pagedTool("demo_right", () => [{ key: 1, name: "right", "r.score": 10 }])
+      ]
+    };
+    const result = await runQuery([fixture], {
+      tables: [t("l", "demo_left"), t("r", "demo_right")],
+      steps: [{ join: "r", on: "key" }]
+    }, ctx);
+    expect(result.data).toMatchObject({ rows: [{ key: 1, name: "left", "r.name": "right", "r.score": 10 }] });
+  });
+
   it("rejects a join that would explode before building it", async () => {
     const e = await fails({ tables: [t("a", "demo_big", { n: 300 }), t("b", "demo_big", { n: 300, kind: "b" })], steps: [{ join: "b", on: "g" }] }, /90000 rows/);
     expect(e.hint).toMatch(/specific key/);

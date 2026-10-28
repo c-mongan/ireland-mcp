@@ -236,13 +236,35 @@ export async function statsLayer(
     ...paramsForGeometry(options.geometry)
   });
   const url = `${base}/query?${query.toString()}`;
+  const validate = (body: ArcGisResponse) => {
+    const invalid = () => {
+      throw new ToolError("UPSTREAM_DOWN", "ArcGIS returned invalid statistics.", {
+        hint: "Try again later; the source did not return a valid aggregate response."
+      });
+    };
+    if (!body || typeof body !== "object" || Array.isArray(body)) invalid();
+    assertArcGisOk(body);
+    if (!Array.isArray(body.features) || (!options.groupBy?.length && body.features.length !== 1)) invalid();
+    for (const feature of body.features!) {
+      const attributes = feature?.attributes;
+      if (!attributes || typeof attributes !== "object" || Array.isArray(attributes)) invalid();
+      for (const statistic of options.statistics) {
+        const value = attributes[statistic.as];
+        const count = options.statistics.find((s) => s.type === "count" && s.field === statistic.field);
+        const empty = value === null && (!count || attributes[count.as] === 0);
+        const valid = statistic.type === "count"
+          ? typeof value === "number" && Number.isFinite(value) && Number.isInteger(value) && value >= 0
+          : empty || (typeof value === "number" && Number.isFinite(value));
+        if (!valid) invalid();
+      }
+    }
+  };
   const result = await ctx.cachedJson<ArcGisResponse>(url, TTL, {
     label: "ArcGIS",
-    validate: (body) => {
-      assertArcGisOk(body);
-      if (!Array.isArray(body.features)) throw new ToolError("UPSTREAM_DOWN", "ArcGIS returned no statistics.");
-    }
+    validate
   });
+  // Older cache entries predate aggregate validation and must not bypass it.
+  validate(result.value);
   return {
     url,
     groups: (result.value.features ?? []).map((f) => f.attributes),

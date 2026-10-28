@@ -223,11 +223,12 @@ const statsTool = defineTool({
       ...(field ? { groupBy: [field] } : {}),
       maxGroups: 1000
     });
+    // statsLayer validates the counts; only an explicit null sum means no recorded unit values.
     const groups = result.groups.map((g) => ({
       ...(field ? { [group_by!]: str(g[field]) } : {}),
-      applications: typeof g.applications === "number" ? g.applications : 0,
-      residential_units: typeof g.residential_units === "number" ? g.residential_units : 0,
-      units_recorded: typeof g.units_recorded === "number" ? g.units_recorded : 0
+      applications: g.applications as number,
+      residential_units: g.residential_units === null ? 0 : g.residential_units as number,
+      units_recorded: g.units_recorded as number
     }));
     const totals = groups.reduce(
       (t, g) => ({ applications: t.applications + g.applications, residential_units: t.residential_units + g.residential_units, units_recorded: t.units_recorded + g.units_recorded }),

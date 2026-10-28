@@ -279,6 +279,20 @@ function joinStep(state: State, step: Record<string, unknown>, tables: Map<strin
     }
     return parts.join("\u0001");
   };
+  // Right columns that would clash take the alias as a prefix; a right key with the same name as its left key is dropped.
+  const dropRight = new Set(pairs.filter(([a, b]) => a === b).map(([, b]) => b));
+  const rename = new Map<string, string>();
+  const outputNames = new Set(state.columns);
+  for (const c of rightCols) {
+    if (dropRight.has(c)) continue;
+    const name = state.columns.includes(c) ? `${alias}.${c}` : c;
+    if (outputNames.has(name)) {
+      throw bad(`join output column "${name}" conflicts with an existing column.`, "Rename or remove the conflicting column with a table select step before joining.");
+    }
+    outputNames.add(name);
+    rename.set(c, name);
+  }
+  const columns = [...state.columns, ...rename.values()];
   const buckets = new Map<string, Row[]>();
   for (const r of rightRows) {
     budget.charge(1);
@@ -288,14 +302,6 @@ function joinStep(state: State, step: Record<string, unknown>, tables: Map<strin
     if (b) b.push(r);
     else buckets.set(k, [r]);
   }
-  // Right columns that would clash take the alias as a prefix; a right key with the same name as its left key is dropped.
-  const dropRight = new Set(pairs.filter(([a, b]) => a === b).map(([, b]) => b));
-  const rename = new Map<string, string>();
-  for (const c of rightCols) {
-    if (dropRight.has(c)) continue;
-    rename.set(c, state.columns.includes(c) ? `${alias}.${c}` : c);
-  }
-  const columns = [...state.columns, ...[...rename.values()].filter((c) => !state.columns.includes(c))];
   // Size the result before building it, so a many-to-many join cannot exhaust memory.
   const keys: Array<string | null> = [];
   let estimate = 0;
