@@ -7,7 +7,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createContext } from "../dist/src/gateway/context.js";
 import { createAppServer } from "../dist/src/registry.js";
-import { assessSmokeResult, exitCode, ntaSummarySample, optionalLegalCases, publicSourceCases } from "./live-sanity-policy.mjs";
+import { assessSmokeResult, exitCode, ntaSummarySample, optionalLegalCases, publicSourceCases, smokeDiagnosticsMarkdown } from "./live-sanity-policy.mjs";
 import { assessResult } from "./live-result.mjs";
 
 const year = new Date().getUTCFullYear();
@@ -111,6 +111,8 @@ else {
   console.log(`Surface: ${toolsets ? `toolsets=${toolsets}` : "default (meta tools)"}, ${listed.size} tools listed.\n`);
   console.log(`| Source | Tool | Result | ms | Note |\n|---|---|---|---|---|`);
   for (const r of results) console.log(`| ${r.source} | ${r.tool} | ${r.status} | ${r.ms} | ${r.note.replace(/\|/g, "/").slice(0, 160)} |`);
+  const diagnostics = smokeDiagnosticsMarkdown(results);
+  if (diagnostics) console.log(diagnostics);
   const warned = results.filter((r) => r.status === "WARN");
   if (warned.length) console.log(`\nWARN: ${warned.length} known-flaky upstream failure(s) reported but not failing the run.`);
   const degraded = results.filter((r) => r.status === "DEGRADED");

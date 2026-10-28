@@ -18,14 +18,39 @@ export const ntaSummarySample = (data) => typeof data.feed_timestamp === "string
   && [data.trips, data.cancelled, data.added].every((count) => Number.isInteger(count) && count >= 0)
   && data.cancelled + data.added <= data.trips;
 
+// Keep the evidence behind an EirGrid acceptance failure. The adapter can legitimately return
+// partial data after empty-chart retries/fallbacks; that still must not pass the demand probe.
+function gridDiagnostics(body) {
+  const pick = (value, keys) => Object.fromEntries(keys.filter((key) => Object.hasOwn(value, key)).map((key) => {
+    const field = value[key];
+    return [key, typeof field === "string" ? field.slice(0, 600)
+      : field === null || typeof field === "number" || typeof field === "boolean" ? field : "[non-scalar]"];
+  }));
+  return {
+    ...pick(body, ["retrieved_at", "cached", "stale"]),
+    data: pick(body.data, ["region", "demand_mw", "demand_time", "wind_mw", "wind_time", "wind_share_pct", "wind_share_time", "co2_g_per_kwh", "co2_time", "note"])
+  };
+}
+
+/** Outside the shortened table cells, so sanity.md and the existing tracking issue keep the evidence. */
+export function smokeDiagnosticsMarkdown(results) {
+  const failures = results.filter((result) => result.diagnostics).map(({ source, tool, diagnostics }) => ({ source, tool, diagnostics }));
+  if (!failures.length) return "";
+  const json = JSON.stringify(failures, null, 2).replace(/`/g, "\\u0060");
+  return `\nEirGrid response diagnostics (validation still fails):\n\n\`\`\`json\n${json}\n\`\`\`\n`;
+}
+
 /** Shared response validation precedes the source-specific sample check on both MCP surfaces. */
 export function assessSmokeResult(result, { source, tool, check, raw = false, typed = false, ms = 0 }) {
   const assessed = assessResult(result, raw ? tool : `${source}/${tool}`, { requireOperationTag: !typed });
   const body = assessed.body;
   const base = { source, tool, ms };
+  const details = source === "eirgrid" && tool === "grid_get_status"
+    && body?.data !== null && typeof body?.data === "object" && !Array.isArray(body.data)
+    ? { diagnostics: gridDiagnostics(body) } : {};
   if (assessed.status !== "PASS") {
     const errorNote = result?.isError && body?.error ? `${body.error.code}: ${body.error.message}` : undefined;
-    const failure = { ...base, status: "FAIL", note: assessed.reason ?? errorNote ?? `Result status: ${assessed.status}.` };
+    const failure = { ...base, ...details, status: "FAIL", note: assessed.reason ?? errorNote ?? `Result status: ${assessed.status}.` };
     // Only structured transport evidence from a correctly routed error is degradation.
     // It is still a failing live check after the HTTP client's bounded retry is exhausted.
     const transport = body?.error?.upstream_failure;
@@ -49,9 +74,9 @@ export function assessSmokeResult(result, { source, tool, check, raw = false, ty
   try {
     return check(raw ? body : body.data)
       ? { ...base, status: "PASS", note: "" }
-      : { ...base, status: "FAIL", note: "Source sample failed its expected-value check." };
+      : { ...base, ...details, status: "FAIL", note: "Source sample failed its expected-value check." };
   } catch {
-    return { ...base, status: "FAIL", note: "Source sample could not be checked." };
+    return { ...base, ...details, status: "FAIL", note: "Source sample could not be checked." };
   }
 }
 
