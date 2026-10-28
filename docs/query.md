@@ -90,6 +90,9 @@ column names. Write a name with spaces in brackets, such as `[Local Electoral Ar
 as text, so the ED id `"068001"` keeps its leading zero. Column names match without regard to case. An
 unknown column gives an error that lists the real ones.
 
+When a joined column name already exists, the output uses `alias.column`. If that name also exists,
+the query returns `BAD_ARGS`. Rename or remove the conflicting column with a table-level `select` step.
+
 ## Worked example: Galway's local electoral areas
 
 **Question.** Rank Galway County Council's local electoral areas by new homes completed in 2024 per
@@ -164,6 +167,9 @@ in one request:
 ```json
 { "source": "planning", "operation": "planning_stats", "args": { "from": "2024-01-01", "to": "2024-12-31", "group_by": "council" } }
 ```
+
+If the planning service omits or corrupts aggregate fields, the tool returns an upstream error instead
+of reporting zero applications.
 
 `min_units: 1` keeps only applications that propose homes. Not every council records the unit count.
 `units_recorded` shows how many applications filled it in. For 2024, Cork County and Dún

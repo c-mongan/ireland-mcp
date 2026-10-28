@@ -100,6 +100,116 @@ describe("allowlisted ArcGIS sources", () => {
     expect(url).not.toContain("resultRecordCount");
   });
 
+  it.each([
+    ["missing aggregate fields", {}],
+    ["missing application count", { residential_units: 7, units_recorded: 2 }],
+    ["missing recorded-unit count", { applications: 3, residential_units: 7 }],
+    ["missing unit sum", { applications: 3, units_recorded: 2 }],
+    ["text application count", { applications: "3", residential_units: 7, units_recorded: 2 }],
+    ["negative application count", { applications: -3, residential_units: 7, units_recorded: 2 }],
+    ["fractional recorded-unit count", { applications: 3, residential_units: 7, units_recorded: 1.5 }],
+    ["null recorded-unit count", { applications: 3, residential_units: 7, units_recorded: null }],
+    ["null unit sum with recorded units", { applications: 3, residential_units: null, units_recorded: 2 }],
+    ["text unit sum", { applications: 3, residential_units: "7", units_recorded: 2 }],
+    ["null attributes", null],
+    ["array attributes", []]
+  ])("rejects malformed planning statistics: %s", async (_label, attributes) => {
+    const fetch = fakeFetch([{ match: /outStatistics/, body: JSON.stringify({ features: [{ attributes }] }) }]);
+    const result = await callTool(planningModule, "planning_stats", { council: "Galway City Council" }, fetch);
+    expect(result.ok).toBe(false);
+    expect(result.body.error).toMatchObject({ code: "UPSTREAM_DOWN", hint: expect.any(String) });
+  });
+
+  it.each([
+    { label: "null", body: "null" },
+    { label: "array", body: "[]" },
+    { label: "text", body: '"unavailable"' },
+    { label: "boolean", body: "true" }
+  ])("rejects a non-object statistics root: $label", async ({ body }) => {
+    const fetch = fakeFetch([{ match: /outStatistics/, body }]);
+    const result = await callTool(planningModule, "planning_stats", { council: "Galway City Council" }, fetch);
+    expect(result.ok).toBe(false);
+    expect(result.body.error).toMatchObject({
+      code: "UPSTREAM_DOWN",
+      message: "ArcGIS returned invalid statistics.",
+      hint: "Try again later; the source did not return a valid aggregate response."
+    });
+  });
+
+  it("rejects a non-finite planning statistic", async () => {
+    const fetch = fakeFetch([{ match: /outStatistics/, body: '{"features":[{"attributes":{"applications":3,"residential_units":1e309,"units_recorded":2}}]}' }]);
+    const result = await callTool(planningModule, "planning_stats", { council: "Galway City Council" }, fetch);
+    expect(result.ok).toBe(false);
+    expect(result.body.error.code).toBe("UPSTREAM_DOWN");
+  });
+
+  it.each([
+    { label: "no rows", rows: [] },
+    { label: "two rows", rows: [{ applications: 1, residential_units: 2, units_recorded: 1 }, { applications: 1, residential_units: 2, units_recorded: 1 }] }
+  ])(
+    "rejects an ungrouped statistics response without one aggregate row: $label", async ({ rows }) => {
+      const fetch = fakeFetch([{ match: /outStatistics/, body: features(rows) }]);
+      const result = await callTool(planningModule, "planning_stats", { council: "Galway City Council" }, fetch);
+      expect(result.ok).toBe(false);
+      expect(result.body.error.code).toBe("UPSTREAM_DOWN");
+    }
+  );
+
+  it("does not cache malformed planning statistics before a valid retry", async () => {
+    let first = true;
+    const fetch = fakeFetch([
+      { match: (url) => {
+        if (!url.includes("outStatistics") || !first) return false;
+        first = false;
+        return true;
+      }, body: features([{}]) },
+      { match: /outStatistics/, body: features([{ applications: 3, residential_units: 7, units_recorded: 2 }]) }
+    ]);
+    const ctx = createContext({ fetch });
+    const bad = await callTool(planningModule, "planning_stats", { council: "Galway City Council" }, ctx);
+    expect(bad.ok).toBe(false);
+    expect(bad.body.error.code).toBe("UPSTREAM_DOWN");
+    const recovered = await callTool(planningModule, "planning_stats", { council: "Galway City Council" }, ctx);
+    expect(recovered.ok).toBe(true);
+    expect(recovered.body.data).toMatchObject({ applications: 3, residential_units: 7, units_recorded: 2 });
+    expect(recovered.body.cached).toBe(false);
+    const cached = await callTool(planningModule, "planning_stats", { council: "Galway City Council" }, ctx);
+    expect(cached.ok).toBe(true);
+    expect(cached.body.cached).toBe(true);
+    expect(fetch.calls).toHaveLength(2);
+  });
+
+  it("rejects malformed planning statistics from an existing cache entry", async () => {
+    const fetch = fakeFetch([]);
+    const ctx = createContext({ fetch, store: {
+      get: async () => ({ value: { features: [{ attributes: {} }] }, expiresAt: Date.now() + 60_000, storedAt: Date.now() }),
+      set: async () => undefined
+    } });
+    const result = await callTool(planningModule, "planning_stats", { council: "Galway City Council" }, ctx);
+    expect(result.ok).toBe(false);
+    expect(result.body.error.code).toBe("UPSTREAM_DOWN");
+    expect(fetch.calls).toHaveLength(0);
+  });
+
+  it.each([
+    { label: "no applications", rows: [{ applications: 0, residential_units: null, units_recorded: 0 }] },
+    { label: "units not recorded", rows: [{ applications: 3, residential_units: null, units_recorded: 0 }] },
+    { label: "recorded zero units", rows: [{ applications: 3, residential_units: 0, units_recorded: 3 }] }
+  ])("preserves legitimate zero or null unit totals: $label", async ({ rows }) => {
+    const fetch = fakeFetch([{ match: /outStatistics/, body: features(rows) }]);
+    const result = await callTool(planningModule, "planning_stats", { council: "Galway City Council" }, fetch);
+    expect(result.ok).toBe(true);
+    expect(result.body.data.residential_units).toBe(0);
+    expect(result.body.data.note).toContain("a total of 0 can mean unknown");
+  });
+
+  it("preserves zero totals when no groups match", async () => {
+    const fetch = fakeFetch([{ match: /outStatistics/, body: features([]) }]);
+    const result = await callTool(planningModule, "planning_stats", { council: "Galway City Council", group_by: "council" }, fetch);
+    expect(result.ok).toBe(true);
+    expect(result.body.data).toMatchObject({ applications: 0, residential_units: 0, units_recorded: 0, groups: [] });
+  });
+
   it("loads a whole planning table for ireland_query, checked against the exact count", async () => {
     const { loadTable } = await import("../../gateway/table.js");
     const rows = [1, 2, 3].map((id) => ({ OBJECTID: id, PlanningAuthority: "Galway City Council", ApplicationNumber: `A${id}`, NumResidentialUnits: id - 1 }));
