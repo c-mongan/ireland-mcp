@@ -35,6 +35,15 @@ check. A stale response or an unavailable section in a combined response fails
 the smoke run. Typed tools can omit the operation tag. A conflicting tag fails
 on either surface.
 
+EirGrid requires finite positive demand; partial wind/CO₂ data does not pass.
+If `grid_get_status` fails validation, the JSON and Markdown receipts retain a
+bounded selection of its readings, observation times, cache flags and fallback
+note. The Markdown details sit outside the shortened table cells, so the
+existing workflow also retains them in its artifact and tracking issue. These
+are the adapter's observations, not proof of the cause of an upstream outage.
+Empty-chart retries and the previous-day fallback remain bounded in the adapter;
+the smoke check does not add retries or tolerate missing demand.
+
 NTA checks the real summary fields: `feed_timestamp`, `trips`, `cancelled`,
 `added`, and `routes`. A valid feed with no updates can pass. A missing
 `NTA_API_KEY` is SKIP. An invalid HTTP-200 feed is a typed `UPSTREAM_DOWN` error
