@@ -8,7 +8,8 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 
 // With no argument, start and stop an owned loopback-only Storybook server.
 // A supplied URL checks an already running local or published MCP endpoint.
-const endpoint = new URL(process.argv[2] ?? "http://localhost:6007/mcp");
+const port = process.env.STORYBOOK_MCP_PORT ?? (process.argv[2] ? new URL(process.argv[2]).port : "6008");
+const endpoint = new URL(process.argv[2] ?? `http://localhost:${port}/mcp`);
 const client = new Client({ name: "ireland-storybook-mcp-check", version: "1.0.0" });
 let server;
 let serverError;
@@ -23,7 +24,7 @@ try {
   if (!process.argv[2]) {
     server = spawn(process.execPath, [
       fileURLToPath(new URL("../node_modules/storybook/dist/bin/dispatcher.js", import.meta.url)),
-      "dev", "--host", "127.0.0.1", "--port", "6007", "--exact-port", "--ci", "--no-open", "--disable-telemetry"
+      "dev", "--host", "127.0.0.1", "--port", String(port), "--exact-port", "--ci", "--no-open", "--disable-telemetry"
     ], { cwd: fileURLToPath(new URL("../", import.meta.url)), stdio: ["ignore", "pipe", "pipe"] });
     server.on("error", (error) => { serverError = error; });
     for (const stream of [server.stdout, server.stderr]) {
