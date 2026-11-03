@@ -138,7 +138,7 @@ describe("Production infrastructure replay contracts", () => {
     expect(certificates).not.toContain("dependsOn: [bindings]");
   });
 
-  it("creates only site and initialize probes and reuses the original health-test identity", () => {
+  it("creates only site and initialize probes and does not depend on the optional /healthz test", () => {
     expect([...availability.matchAll(/url: '([^']+)'/g)].map((match) => match[1])).toEqual([
       "https://irishopendata.com",
       "https://mcp.irishopendata.com/mcp"

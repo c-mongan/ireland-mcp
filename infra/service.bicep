@@ -284,5 +284,4 @@ output appName string = app.name
 output defaultHostName string = app.properties.defaultHostName
 output customDomainVerificationId string = app.properties.customDomainVerificationId
 output insightsName string = insights.name
-output healthTestName string = enableAvailabilityTest ? healthTest!.name : ''
 output endpoint string = 'https://${app.properties.defaultHostName}/mcp'
