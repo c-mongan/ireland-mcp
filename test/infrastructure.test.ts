@@ -151,7 +151,9 @@ describe("Production infrastructure replay contracts", () => {
     expect(service).toContain("RequestUrl: empty(healthCheckUrl) ? 'https://${app.properties.defaultHostName}/healthz' : healthCheckUrl");
     expect(main).toContain("healthCheckUrl: enableProductionDomains ? 'https://mcp.irishopendata.com/healthz' : ''");
     expect(main).toContain("healthTestName: service.outputs.healthTestName");
-    expect(availability).toContain("{ name: healthTestName, displayName: 'mcp.irishopendata.com /healthz' }");
+    // The /mcp initialize probe covers the server, so the optional /healthz test is off by default and not alerted on.
+    expect(service).toContain("param enableAvailabilityTest bool = false");
+    expect(availability).toContain("var monitoredTests = tests");
     expect(availability).toContain("for test in monitoredTests");
     expect(availability).toContain("webTestId: resourceId('Microsoft.Insights/webtests', test.name)");
     const body = availability.match(/body: base64\('([^']+)'\)/)?.[1] ?? "";
@@ -171,11 +173,12 @@ describe("Production infrastructure replay contracts", () => {
     expect(availability).toContain("SSLCertRemainingLifetimeCheck: 7");
   });
 
-  it("adds two-location alerts and accepts the budget recipient only at deployment time", () => {
+  it("adds single-location alerts and accepts the budget recipient only at deployment time", () => {
     expect(main).toContain("param availabilityAlertEmail string = ''");
     expect(availability).toContain("param alertEmail string = ''");
     expect(availability).toContain("emailAddress: alertEmail");
-    expect(availability).toContain("failedLocationCount: 2");
+    expect(availability).toContain("failedLocationCount: 1");
+    expect(availability).toContain("{ Id: 'emea-gb-db3-azr' }");
     expect(availability).toContain("windowSize: 'PT15M'");
     expect(availability).toContain("actionGroupId: id");
     expect(azd.availabilityAlertEmail.value).toBe("${AVAILABILITY_CONTACT_EMAIL=}");
