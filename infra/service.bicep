@@ -43,8 +43,8 @@ var effectiveOrigins = empty(rawOrigins) ? defaultAllowedOrigins : extendOrigins
 var concreteBrowserOrigins = filter(effectiveOrigins, entry => !empty(entry) && !contains(entry, '*'))
 var platformOrigins = contains(effectiveOrigins, '*') ? ['*'] : union(concreteBrowserOrigins, [])
 
-@description('Create an App Insights standard availability test against /healthz.')
-param enableAvailabilityTest bool = true
+@description('Create an App Insights standard availability test against /healthz. Off by default: the production /mcp initialize test covers the server.')
+param enableAvailabilityTest bool = false
 
 @description('Optional URL for the existing health-test identity. Empty uses the Function default hostname.')
 param healthCheckUrl string = ''

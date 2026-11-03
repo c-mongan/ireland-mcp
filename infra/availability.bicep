@@ -61,10 +61,9 @@ resource webtests 'Microsoft.Insights/webtests@2022-06-15' = [for test in tests:
     Frequency: 900
     Timeout: 30
     RetryEnabled: true
+    // One location keeps runs (and cost) low; RetryEnabled re-tests a failure before it counts.
     Locations: [
-      { Id: 'emea-nl-ams-azr' }
       { Id: 'emea-gb-db3-azr' }
-      { Id: 'emea-fr-pra-edge' }
     ]
     Request: union({
       RequestUrl: test.url
@@ -87,16 +86,15 @@ resource webtests 'Microsoft.Insights/webtests@2022-06-15' = [for test in tests:
 }]
 
 var effectiveActionGroupIds = union(actionGroupIds, empty(alertEmail) ? [] : [emailGroup!.id])
-var monitoredTests = concat(tests, [
-  { name: healthTestName, displayName: 'mcp.irishopendata.com /healthz' }
-])
+// The /mcp initialize test already covers the server, so the separate /healthz test is not alerted on.
+var monitoredTests = tests
 
 resource alerts 'Microsoft.Insights/metricAlerts@2018-03-01' = [for test in monitoredTests: {
   name: '${test.name}-availability'
   location: 'global'
   tags: tags
   properties: {
-    description: '${test.displayName}: fails from at least two of three locations, or TLS expires within seven days.'
+    description: '${test.displayName}: fails (after a retry), or TLS expires within seven days.'
     severity: 1
     enabled: true
     autoMitigate: true
@@ -107,7 +105,7 @@ resource alerts 'Microsoft.Insights/metricAlerts@2018-03-01' = [for test in moni
       'odata.type': 'Microsoft.Azure.Monitor.WebtestLocationAvailabilityCriteria'
       webTestId: resourceId('Microsoft.Insights/webtests', test.name)
       componentId: insights.id
-      failedLocationCount: 2
+      failedLocationCount: 1
     }
     actions: [for id in effectiveActionGroupIds: { actionGroupId: id }]
   }
