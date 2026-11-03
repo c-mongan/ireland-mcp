@@ -99,7 +99,6 @@ module availability 'availability.bicep' = if (enableProductionDomains) {
     location: location
     tags: tags
     insightsName: service.outputs.insightsName
-    healthTestName: service.outputs.healthTestName
     actionGroupIds: availabilityActionGroupIds
     alertEmail: availabilityAlertEmail
   }

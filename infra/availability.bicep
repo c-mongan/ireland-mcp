@@ -1,9 +1,6 @@
 param location string
 param tags object = {}
 param insightsName string
-@minLength(1)
-@description('The service-owned existing health test. This module creates only site and initialize tests.')
-param healthTestName string
 param actionGroupIds array = []
 param alertEmail string = ''
 
