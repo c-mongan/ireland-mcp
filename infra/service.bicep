@@ -244,7 +244,7 @@ resource vaultRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (ha
   }
 }
 
-// Standard availability test: GET /healthz every 15 minutes from three regions, expects 200 and "ok".
+// Standard availability test: GET /healthz every 15 minutes from one region (opt-in, not alerted on), expects 200 and "ok".
 resource healthTest 'Microsoft.Insights/webtests@2022-06-15' = if (enableAvailabilityTest) {
   name: 'healthz-${token}'
   location: location
@@ -259,9 +259,7 @@ resource healthTest 'Microsoft.Insights/webtests@2022-06-15' = if (enableAvailab
     Timeout: 30
     RetryEnabled: true
     Locations: [
-      { Id: 'emea-nl-ams-azr' }
       { Id: 'emea-gb-db3-azr' }
-      { Id: 'emea-fr-pra-edge' }
     ]
     Request: {
       RequestUrl: empty(healthCheckUrl) ? 'https://${app.properties.defaultHostName}/healthz' : healthCheckUrl
@@ -286,5 +284,4 @@ output appName string = app.name
 output defaultHostName string = app.properties.defaultHostName
 output customDomainVerificationId string = app.properties.customDomainVerificationId
 output insightsName string = insights.name
-output healthTestName string = enableAvailabilityTest ? healthTest!.name : ''
 output endpoint string = 'https://${app.properties.defaultHostName}/mcp'

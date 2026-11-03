@@ -138,7 +138,7 @@ describe("Production infrastructure replay contracts", () => {
     expect(certificates).not.toContain("dependsOn: [bindings]");
   });
 
-  it("creates only site and initialize probes and reuses the original health-test identity", () => {
+  it("creates only site and initialize probes and does not depend on the optional /healthz test", () => {
     expect([...availability.matchAll(/url: '([^']+)'/g)].map((match) => match[1])).toEqual([
       "https://irishopendata.com",
       "https://mcp.irishopendata.com/mcp"
@@ -150,7 +150,9 @@ describe("Production infrastructure replay contracts", () => {
     expect(service).toContain("name: 'healthz-${token}'");
     expect(service).toContain("RequestUrl: empty(healthCheckUrl) ? 'https://${app.properties.defaultHostName}/healthz' : healthCheckUrl");
     expect(main).toContain("healthCheckUrl: enableProductionDomains ? 'https://mcp.irishopendata.com/healthz' : ''");
-    expect(main).toContain("healthTestName: service.outputs.healthTestName");
+    // The optional /healthz test is off by default, so availability must not require its name.
+    expect(main).not.toContain("healthTestName:");
+    expect(availability).not.toContain("param healthTestName");
     // The /mcp initialize probe covers the server, so the optional /healthz test is off by default and not alerted on.
     expect(service).toContain("param enableAvailabilityTest bool = false");
     expect(availability).toContain("var monitoredTests = tests");

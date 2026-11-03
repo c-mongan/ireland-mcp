@@ -100,7 +100,7 @@ manual (or a change to its own workflow) → deploy-legal.yml (legal:check, then
 v* tag → publish-registry.yml → npm + MCP Registry
 ```
 
-There are no deployment slots, so a deploy goes straight to production. The status workflow and the Application Insights availability test watch `/healthz` afterwards.
+There are no deployment slots, so a deploy goes straight to production. The status workflow watches `/healthz` afterwards, and the Application Insights availability tests (site and MCP initialize) watch production.
 
 ## Operations
 

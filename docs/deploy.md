@@ -11,7 +11,7 @@ The service runs on Azure Functions Flex Consumption (FC1) in North Europe.
 | Function app (Flex FC1, Node 22, system identity) | `/mcp` (plus `/mcp/x/{source}` for one typed toolset), `/healthz` and the nightly PPR index timer |
 | Storage account (no shared keys, no public blobs) | Deployment package, `ppr` index container, `mcpcache` table |
 | Application Insights + Log Analytics (1 GB/day cap) | OpenTelemetry traces and metrics, Entra auth only |
-| Standard availability test (`enableAvailabilityTest`, default on) | GET `/healthz` every 15 minutes from three EU regions; production custom domains also monitor the site and MCP initialize |
+| Standard availability tests | Production custom domains monitor the site and MCP initialize every 15 minutes from one EU region, with a retry; alerts notify the configured email or action groups. An optional `/healthz` test (`enableAvailabilityTest`, default off) is not alerted on |
 | Key Vault (only when `NTA_API_KEY` is set) | Holds the NTA key; the app reads it by Key Vault reference |
 | Budget (only when `BUDGET_CONTACT_EMAIL` is set) | Emails at 80% actual and 100% forecast spend |
 
@@ -162,13 +162,14 @@ in EUR for North Europe, before tax, discounts, or subscription credits:
 |---|---|---|
 | Existing public DNS zones (`.com` and `.ie`) | EUR 0.44/zone/month | EUR 0.88; no new zones |
 | Public DNS queries | EUR 0.352/million queries (first billion) | Usage-dependent |
-| Standard availability tests | EUR 0.0005/execution | EUR 4.32/test for 30 days at three locations every 15 minutes |
-| Three tests: site, MCP health, MCP initialize | 25,920 executions/30 days | EUR 12.96 total; EUR 8.64 above the existing single test |
+| Standard availability tests | EUR 0.0005/execution | EUR 1.44/test for 30 days at one location every 15 minutes |
+| Two tests: site, MCP initialize | 5,760 executions/30 days, plus retries | About EUR 2.88 total |
 | Metric alerts | First ten monitored metrics free, then EUR 0.088/metric/month | Depends on subscription-wide usage |
 | SWA Free, managed certificates, email action group | No fixed charge for these changes | EUR 0 added |
 
-The existing health test is retargeted to the MCP custom domain rather than
-duplicated. A 31-day month adds about EUR 8.93 instead of EUR 8.64. Retry
+One location keeps cost low; a regional probe blip can raise a false alert, which the
+retry reduces but cannot rule out. Alerts only notify someone when
+`availabilityAlertEmail` or action group IDs are set. Retry
 executions, Function invocations, and telemetry ingestion can add usage charges;
 the existing EUR 20 budget is an alert, not a spending cap. Keep the Function
 scale cap, application rate limit, cache policy, and Log Analytics daily cap.
