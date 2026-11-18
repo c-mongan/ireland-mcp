@@ -73,6 +73,14 @@ fail it. Baselines are not automatically accepted.
 
 ## Add a source
 
+Start with one citizen question. Check `ireland_catalogue` before adding code:
+the [Sandyford recycling example](docs/public-source-additions.md#worked-example-glass-recycling-in-sandyford)
+needs a better example, not another connector. For a proposed integration,
+name the maintainer, official endpoint, licence and attribution, geographic
+limits, update signal, failure behaviour, fixture and bounded live check.
+If reuse is unclear, propose a publisher link instead. A reachable page or
+permissive robots.txt is not permission to copy its contents.
+
 1. Check the publisher's licence allows reuse, and note its attribution text.
 2. Create `src/sources/<id>/index.ts`:
 

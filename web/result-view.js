@@ -1,5 +1,8 @@
 const MAX_ROWS = 5;
 const MAX_TEXT = 300;
+export const BRING_BANKS_RESOURCE = "46f3a338-cbc9-4c1a-acc5-0d2271763ecd";
+export const isBringBanksQuery = (source, operation, args) => source === "smart-dublin" &&
+  operation === "smartdublin_query_datastore" && args?.resource_id === BRING_BANKS_RESOURCE;
 const record = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
 const text = (value) => typeof value === "string" && value.trim() ? value.slice(0, MAX_TEXT) : "Not reported";
 const number = (value, unit = "") => typeof value === "number" && Number.isFinite(value)
@@ -27,7 +30,7 @@ function retrievalTime(value) {
 }
 
 /** A deterministic preview of documented source fields. It does not generate an answer. */
-export function buildResultView(payload, { source, operation, isError = false } = {}) {
+export function buildResultView(payload, { source, operation, args, dataset, isError = false } = {}) {
   const envelope = record(payload) ? payload : {};
   const data = envelope.data;
   const model = {
@@ -41,11 +44,19 @@ export function buildResultView(payload, { source, operation, isError = false } 
   if (envelope.stale === true) model.notices.push("Stale response. Check the publisher before using this data.");
   if (envelope.truncated === true || (record(data) && data.truncated === true)) model.notices.push("Truncated response. Some data was omitted. Narrow the query or inspect the raw response.");
   if (envelope.partial === true || (record(data) && data.partial === true)) model.notices.push("Partial response. Some requested data is missing.");
-  if (isError) return model;
   if (typeof envelope.operation === "string" && envelope.operation !== operation) {
     model.notices.push("The response names a different operation. Inspect the raw response before using it.");
     return model;
   }
+  const bringBanks = isBringBanksQuery(source, operation, args);
+  if (bringBanks) {
+    Object.assign(model.provenance, {
+      publisher: "Dún Laoghaire-Rathdown County Council", licence: "CC BY 4.0", url: "https://data.gov.ie/dataset/bring-banks-dlr",
+      linkLabel: "Open the council’s Bring Banks DLR dataset"
+    });
+    if (isError) model.description = "No recycling data was available from this request. Check the council dataset below.";
+  }
+  if (isError) return model;
 
   function table(title, columns, items, row, fields) {
     if (!Array.isArray(items)) return false;
@@ -58,7 +69,26 @@ export function buildResultView(payload, { source, operation, isError = false } 
   }
 
   const key = `${source}/${operation}`;
-  if (key === "cso/cso_get_data" && record(data) && data.code === "RIQ02" && table("Published figures", ["Location", "Period", "Figure", "Context"], data.rows, (item) => [
+  if (bringBanks) {
+    const resource = dataset?.data?.id === "bring-banks-dlr" && Array.isArray(dataset.data.resources)
+      ? dataset.data.resources.find((entry) => entry?.id === BRING_BANKS_RESOURCE) : undefined;
+    model.notices.push(`CSV last modified: ${text(resource?.last_modified)}. Retrieval time is separate.`);
+    if (dataset?.stale === true) model.notices.push("The dataset metadata is stale; check the publisher for the latest CSV date.");
+    if (record(data) && Array.isArray(data.records)) {
+      const count = data.records.length;
+      const total = Number.isSafeInteger(data.total) && data.total >= 0 ? data.total : undefined;
+      const offset = args.offset ?? 0;
+      const completeEmpty = !count && total === 0 && !offset && !envelope.truncated && !envelope.partial && !data.truncated && !data.partial;
+      if (completeEmpty || (count && table("Bring bank listings", ["Site", "Location", "Area", "Glass accepted"], data.records,
+        (item) => [text(item.centre), text(item.sitelocati), text(item.area), text(item.glass)], ["centre", "sitelocati"]))) {
+        model.title = completeEmpty ? "No matching rows in the council dataset" : "Bring banks in Dún Laoghaire-Rathdown";
+        model.description = "These council listings cover Dún Laoghaire-Rathdown only. They do not confirm opening hours or availability.";
+      } else if (!count) {
+        model.description = "No listings were included on this page. Check the council dataset before drawing conclusions.";
+      }
+      model.notices.push(`${count} ${count === 1 ? "row" : "rows"} returned at offset ${offset}; ${total === undefined ? "matching total not reported" : `${total} matching in the dataset`}.`);
+    }
+  } else if (key === "cso/cso_get_data" && record(data) && data.code === "RIQ02" && table("Published figures", ["Location", "Period", "Figure", "Context"], data.rows, (item) => [
     text(item.Location), text(item.Quarter), data.code === "RIQ02" && item.value === 0 ? "Insufficient published data" : typeof item.value === "number" && Number.isFinite(item.value) ? `${number(item.value)} ${text(item.unit)}` : "Not reported",
     [item["Number of Bedrooms"], item["Property Type"]].filter((value) => typeof value === "string").map(text).join(" · ") || "Inspect raw response"
   ], ["value", "Quarter", "Location"])) {
@@ -156,7 +186,7 @@ export function renderResultView(container, model) {
   }
   container.append(provenance);
   if (model.provenance.url) {
-    const link = element("a", model.provenance.url); link.href = model.provenance.url; link.rel = "noreferrer"; link.dataset.resultAction = "open_source"; link.setAttribute("aria-label", `${model.provenance.url} (open the source response)`); container.append(link);
+    const link = element("a", model.provenance.linkLabel ?? model.provenance.url); link.href = model.provenance.url; link.rel = "noreferrer"; link.dataset.resultAction = "open_source"; link.setAttribute("aria-label", model.provenance.linkLabel ?? `${model.provenance.url} (open the source response)`); container.append(link);
   } else { container.append(element("p", "No safe source URL was supplied.", "result-description")); }
   if (model.provenance.attribution) container.append(element("p", model.provenance.attribution, "result-attribution"));
 }

@@ -3,7 +3,7 @@
 [![CI](https://github.com/c-mongan/ireland-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/c-mongan/ireland-mcp/actions/workflows/ci.yml)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-34c08a.svg)](LICENSE)
 [![MCP](https://img.shields.io/badge/MCP-Streamable%20HTTP-6f42c1.svg)](https://modelcontextprotocol.io)
-[![Token budget](https://img.shields.io/badge/default%20surface-8%20tools%20%7C%20~3.0k%20tokens-0a7.svg)](#why-its-lean)
+[![Default tool surface](https://img.shields.io/badge/default%20surface-9%20tools-0a7.svg)](#why-its-lean)
 
 **Ask ChatGPT, Claude or Copilot about Ireland, and get answers that cite official public sources.**
 
@@ -67,6 +67,8 @@ An optional pilot finds Irish employment-law evidence and quotes it with links. 
 - **AI summaries can be wrong.** Every answer quotes its sources. Read them.
 
 Without the beta, the default `legislation` source quotes Irish law as enacted, live from the Irish Statute Book. In this revision that covers Acts, statutory instruments and the Constitution; check `ireland_describe` for what a given server offers. The beta adds Citizens Information guidance and stored, versioned evidence.
+
+**Looking for the wording in force?** A recent retrieval does not make an enacted Act current. Check the [Irish Statute Book](https://www.irishstatutebook.ie/) for amendments and commencement and, where available, the [Law Reform Commission's Revised Acts](https://revisedacts.lawreform.ie/) for consolidated wording and its revision date. If the date or coverage is unclear, treat the current wording as unverified. Ireland MCP does not forward your question to a separate specialist law service.
 
 Try it on your own machine:
 
@@ -194,7 +196,7 @@ The civic-source additions and GeoHive layer selection are described in [civic s
 
 ## Why it's lean
 
-Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **9 tools, 14,784 characters, about 3,696 tokens** (`toolsets=all` is 101 tools, about 30k tokens) (`npm run measure:tools`). CI fails if that list grows past 16,000 characters.
+Most data MCPs expose every typed tool up front. Ireland MCP keeps the default `tools/list` to **9 tools, about 3.7k tokens** (`toolsets=all` is 101 tools, about 30k tokens). Run `npm run measure:tools` for the exact size. CI fails if the default list grows past 16,000 characters.
 
 <p align="center">
   <a href="docs/architecture/ireland-mcp-lean-surface.drawio">

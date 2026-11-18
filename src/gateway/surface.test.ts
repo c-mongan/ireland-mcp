@@ -147,6 +147,31 @@ describe("typed toolsets", () => {
 });
 
 describe("meta tools", () => {
+  it.each([
+    ["Has a food product been recalled?", "Food Safety Authority of Ireland", "https://www.fsai.ie/news-and-alerts/food-alerts", "recall status"],
+    ["Is there a water outage near me?", "Uisce Éireann", "https://www.water.ie/help/supply", "supply status"]
+  ])("returns an official handoff offline for %s", async (query, publisher, url, limit) => {
+    let requests = 0;
+    const client = await connectClient(createAppServer(createContext({ fetch: async () => { requests++; throw Error("offline"); } })));
+    try {
+      const call = async (name: string, args: Record<string, string>) => text(await client.callTool({ name, arguments: args }));
+      const catalogue = await call("ireland_catalogue", { text: query });
+      expect(catalogue.service_links).toEqual([expect.objectContaining({ publisher, url, access_mode: "link-only" })]);
+      const { results } = await call("search", { query });
+      expect(results).toEqual([{ id: catalogue.service_links[0].id, url, title: expect.stringContaining("link only") }]);
+      const doc = await call("fetch", { id: results[0].id });
+      expect(doc).toMatchObject({ url, metadata: { access_mode: "link-only", publisher, coverage: expect.any(String), last_link_check: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/) } });
+      expect(doc.text).toContain(limit);
+      expect(requests).toBe(0);
+    } finally { await client.close(); }
+  });
+
+  it("does not confuse enforcement orders or electricity outages with service handoffs", () => {
+    for (const text of ["FSAI enforcement orders", "electricity outage", "car recall"]) {
+      expect(catalogueOf(appModules().modules, { text })).not.toHaveProperty("service_links");
+    }
+  });
+
   it("catalogue groups every source by domain with its operations", async () => {
     const client = await connectClient(createAppServer(ctx));
     const all = text(await client.callTool({ name: "ireland_catalogue", arguments: {} }));

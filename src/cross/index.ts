@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { DEFAULT_LIMIT, envelope, type SourceInfo } from "../gateway/envelope.js";
 import { ToolError, toToolError } from "../gateway/errors.js";
+import { fetchServiceLink, serviceLinksFor } from "../gateway/serviceLinks.js";
 import { reportSearchOutcomes, type SearchOutcome } from "../gateway/telemetry.js";
 import { defineTool, type AnyTool, type SearchHit, type SourceModule, type ToolContext } from "../gateway/module.js";
 import { boundariesAt, geohiveInfo, locatePlace } from "../sources/geohive/index.js";
@@ -60,10 +61,13 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
   const search = defineTool({
     name: "search",
     title: "Search Irish public data",
-    description: `Search across ${searchable.map((m) => m.info.name).join(", ")}. Returns ids like 'cso:F1001' to pass to fetch.`,
+    description: `Search across ${searchable.map((m) => m.info.name).join(", ")}. Food alerts and water outages return official links only. Pass result ids to fetch.`,
     raw: true,
     inputSchema: { query: z.string().min(1).max(200).describe("What to look for, e.g. 'population by county' or 'housing bill 2024'.") },
     handler: async ({ query }, ctx) => {
+      // Do not forward location or product details to unrelated search providers.
+      const links = serviceLinksFor(query);
+      if (links.length) return { results: links.map(({ id, task, url }) => ({ id, title: `${task} (link only)`, url })) };
       if (!searchable.length) {
         throw new ToolError("NOT_FOUND", "No searchable sources are enabled on this server.", { hint: "Call list_sources to see which sources are available." });
       }
@@ -86,10 +90,11 @@ export function crossSourceTools(modules: SourceModule[]): AnyTool[] {
   const fetchTool = defineTool({
     name: "fetch",
     title: "Fetch a document by id",
-    description: "Fetch the full text of a search result by its id, e.g. 'cso:F1001', 'oireachtas:bill/2024/12', 'legislation:2018/7/s2' or 'data-gov-ie:moby-bikes'.",
+    description: "Fetch a search result by id, e.g. 'cso:F1001' or 'legislation:2018/7/s2'. Official service links return handoff guidance, not publisher content.",
     raw: true,
     inputSchema: { id: z.string().min(3).max(200).describe("Id from search, '<source>:<key>'.") },
     handler: async ({ id }, ctx) => {
+      if (id.startsWith("official-service:")) return fetchServiceLink(id);
       const at = id.indexOf(":");
       const module = at > 0 ? byId.get(id.slice(0, at)) : undefined;
       if (!module?.fetchById) {
