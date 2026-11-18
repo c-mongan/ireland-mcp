@@ -7,7 +7,7 @@ export const legislationCard: SourceCard = {
   cadence: "daily",
   dimensions: ["Act or SI year and number", "title", "enactment or made date", "sections and text", "amendments, repeals and commencements", "EU acts transposed", "Constitution articles"],
   join_keys: ["eli", "act_year_number", "si_year_number", "year"],
-  freshness: "Irish Statute Book (eISB); new Acts appear after publication. Text is as enacted; check legislation_get_act_effects before relying on it. Cached for a day.",
+  freshness: "Irish Statute Book (eISB); Acts are as enacted, not current consolidations. Cached for a day. Check legislation_get_act_effects for amendments and commencement. For revised wording check https://revisedacts.lawreform.ie/ and its revision date; otherwise report current wording as unverified.",
   auth: { required: false },
   examples: ["Which Acts with 'Residential Tenancies' in the title were enacted in 2021?", "Text of section 2 of Act 7 of 2018", "Has section 34 of the Planning and Development Act 2000 been amended?"],
   operations: {

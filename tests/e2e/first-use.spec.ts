@@ -33,6 +33,44 @@ test("the first trial precedes installation and shows data, flags, provenance an
   await expect(page.getByRole("link", { name: "Tell us what you could not find" })).toHaveAttribute("href", "https://github.com/c-mongan/ireland-mcp/issues/new");
 });
 
+test("the recycling journey queries a bounded Sandyford page and keeps the citation on failure", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockPage(page);
+  const resource = "46f3a338-cbc9-4c1a-acc5-0d2271763ecd";
+  let unavailable = false;
+  await page.route(endpoint, async (route) => {
+    const request = route.request().postDataJSON();
+    if (request.params?.name !== "ireland_call") return route.fallback();
+    const { source, operation, args } = request.params.arguments;
+    expect(source).toBe("smart-dublin");
+    let data;
+    if (operation === "smartdublin_get_dataset") {
+      expect(args).toEqual({ id: "bring-banks-dlr" });
+      data = { id: args.id, resources: [{ id: resource, last_modified: "2024-06-07T08:09:10" }] };
+    } else {
+      expect(operation).toBe("smartdublin_query_datastore");
+      expect(args).toEqual({ resource_id: resource, filters: { area: "Sandyford", glass: "Yes" }, limit: 2 });
+      if (unavailable) return route.fulfill({ status: 503, body: "Offline" });
+      data = { records: [{ centre: "Example road", area: "Sandyford", glass: "Yes" }], total: 1 };
+    }
+    return route.fulfill({ json: { jsonrpc: "2.0", id: request.id, result: { structuredContent: { operation, data } } } });
+  });
+  await page.goto("/#playground");
+  await page.locator("#example-select").selectOption({ label: "Where can I recycle glass in Sandyford?" });
+  const run = page.getByRole("button", { name: "Run live query" });
+  const result = page.locator("#pg-result");
+  await run.focus();
+  await page.keyboard.press("Enter");
+  await expect(result).toContainText("Example road");
+  await expect(result).toContainText("2024-06-07");
+  unavailable = true;
+  await run.click();
+  await expect(result).toHaveAttribute("data-state", "error");
+  await expect(result.getByRole("link")).toHaveAttribute("href", "https://data.gov.ie/dataset/bring-banks-dlr");
+  await expect(result.locator("table")).toHaveCount(0);
+  await expect(result).not.toContainText("No matching rows");
+});
+
 test("upstream strings cannot create elements or executable source links", async ({ page }) => {
   const malicious = { ...envelope, source: '<img src=x onerror="alert(1)">', licence: "<script>window.pwned=true</script>", url: "javascript:alert(1)", data: [{ code: "<svg onload=alert(1)>", title: '<img src=x onerror="alert(1)">', released: null }] };
   await mockPage(page, { structuredContent: malicious });

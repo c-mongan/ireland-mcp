@@ -126,3 +126,37 @@ describe("deterministic result previews", () => {
     expect(result.title).toContain("error");
   });
 });
+
+describe("DLR bring bank preview", () => {
+  const resource = "46f3a338-cbc9-4c1a-acc5-0d2271763ecd";
+  const request = { source: "smart-dublin", operation: "smartdublin_query_datastore", args: { resource_id: resource } };
+  const dataset = { data: { id: "bring-banks-dlr", modified: "2099-12-30", resources: [{ id: "other", last_modified: "2098-01-01" }, { id: resource, last_modified: "2024-06-07T08:09:10" }] } };
+  const row = { centre: "Example road", sitelocati: "Example road, Sandyford", area: "Sandyford", glass: "Yes" };
+  it("uses only the selected CSV's modification date, displays paging and limits rows", () => {
+    const result = buildResultView({ ...metadata, truncated: true, data: { records: Array(7).fill(row), total: 14 } }, { ...request, dataset });
+    expect(result.tables[0].rows).toHaveLength(5);
+    expect(result.tables[0].rows[0]).toContain("Example road, Sandyford");
+    expect(result.notices.join(" ")).toMatch(/7 rows returned.*14 matching/i);
+    expect(result.notices.join(" ")).toContain("2024-06-07");
+    expect(result.notices.join(" ")).not.toMatch(/209[89]/);
+    expect(result.provenance).toMatchObject({ publisher: "Dún Laoghaire-Rathdown County Council", licence: "CC BY 4.0", url: "https://data.gov.ie/dataset/bring-banks-dlr" });
+    expect(result.provenance.retrieved).toContain("UTC");
+    expect(result.description).toMatch(/opening hours/i);
+  });
+  it("distinguishes a reported zero from an incomplete page or failed query", () => {
+    const empty = { records: [], total: 0 };
+    const result = buildResultView({ data: empty }, { ...request, dataset: { data: { id: "bring-banks-dlr", modified: "2099-12-30", resources: [{ id: resource, last_modified: null }] } } });
+    expect(result.title).toMatch(/no matching rows/i);
+    expect(result.notices.join(" ")).toContain("CSV last modified: Not reported");
+    for (const payload of [{ data: { records: [], total: 4 } }, { data: empty, truncated: true }, { data: {} }, { data: { records: [], total: null } }]) {
+      expect(buildResultView(payload, request).title).not.toMatch(/no matching/i);
+    }
+    const failed = buildResultView({ data: empty }, { ...request, isError: true });
+    expect(failed.title).toContain("error");
+    expect(failed.tables).toHaveLength(0);
+    expect(failed.provenance.url).toContain("bring-banks-dlr");
+    const other = buildResultView({ data: { records: [row] } }, { ...request, args: { resource_id: "another" } });
+    expect(other.tables).toHaveLength(0);
+    expect(other.provenance.url).toBeUndefined();
+  });
+});

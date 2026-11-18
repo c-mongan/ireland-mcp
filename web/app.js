@@ -1,7 +1,7 @@
 import { initIrelandCube } from "./ireland-cube.js?v=20261013-redesign-v2";
 import { initDemoPlayer } from "./demo-player.js?v=20261013-preview";
 import { createAnalytics } from "./analytics.js?v=20261026-page-views";
-import { buildResultView, decodeToolPayload, renderResultView } from "./result-view.js?v=20261026-nowrap-dates";
+import { BRING_BANKS_RESOURCE, buildResultView, decodeToolPayload, isBringBanksQuery, renderResultView } from "./result-view.js?v=20261118-bring-banks";
 
 const MCP_URL = "https://mcp.irishopendata.ie/mcp";
 const STATUS_URL = "https://raw.githubusercontent.com/c-mongan/ireland-mcp/status/status/status.json";
@@ -122,7 +122,8 @@ const EXAMPLES = [
   { question: "Historical registered rents: Galway City two-bed apartments, 2025Q4", source: "cso", operation: "cso_get_data", args: { table_code: "RIQ02", filters: { STATISTIC: ["RIQ02"], "TLIST(Q1)": ["20254"], C02970V03592: ["02"], C02969V03591: ["04"], C03004V03625: ["141600"] }, limit: 5 } },
   { question: "Tourism attractions in Galway", source: "failte-ireland", operation: "failte_search", args: { dataset: "attractions", county: "Galway", limit: 5 } },
   { question: "Static transport stops named Heuston", source: "tfi-static", operation: "tfi_static_search_stops", args: { name: "Heuston", limit: 5 } },
-  { question: "Groundwater vulnerability at a Dublin point", source: "gsi", operation: "groundwater_vulnerability_at", args: { lat: 53.3498, lon: -6.2603 } }
+  { question: "Groundwater vulnerability at a Dublin point", source: "gsi", operation: "groundwater_vulnerability_at", args: { lat: 53.3498, lon: -6.2603 } },
+  { question: "Where can I recycle glass in Sandyford?", source: "smart-dublin", operation: "smartdublin_query_datastore", args: { resource_id: BRING_BANKS_RESOURCE, filters: { area: "Sandyford", glass: "Yes" }, limit: 2 } }
 ];
 
 const $ = (id) => document.getElementById(id);
@@ -184,7 +185,7 @@ const endpoint = document.querySelector('meta[name="mcp-endpoint"]')?.content?.t
 $("endpoint-line").textContent = endpoint;
 
 let rpcId = 1;
-async function rpc(method, params = {}) {
+async function rpc(method, params = {}, { timeoutMs = 30000, retry = true } = {}) {
   const id = rpcId++;
   const readOnly = method === "tools/list" ||
     (method === "tools/call" && ["ireland_call", "ireland_catalogue"].includes(params.name));
@@ -194,7 +195,7 @@ async function rpc(method, params = {}) {
     try {
       response = await fetch(endpoint, {
         method: "POST",
-        signal: AbortSignal.timeout(30000),
+        signal: AbortSignal.timeout(timeoutMs),
         headers: {
           "content-type": "application/json",
           accept: "application/json, text/event-stream",
@@ -208,7 +209,7 @@ async function rpc(method, params = {}) {
       const timedOut = error?.name === "TimeoutError" || error?.name === "AbortError";
       const networkFailure = error instanceof TypeError;
       if (!timedOut && !networkFailure) throw error;
-      if (readOnly && attempt === 0) continue;
+      if (retry && readOnly && attempt === 0) continue;
       throw new Error(timedOut
         ? "The server took too long to respond. It may be waking up; please try again."
         : "Could not connect to the server. Check your connection and please try again.", { cause: error });
@@ -620,16 +621,19 @@ $("playground-form").addEventListener("submit", async (event) => {
   const started = performance.now();
   const source = $("pg-source").value.trim();
   const operation = $("pg-operation").value.trim();
+  const bringBanks = isBringBanksQuery(source, operation, args);
   $("pg-request-label").textContent = `Request: ${source} · ${operation}`;
   analytics.capture("ireland_query_started", { source, operation });
   let outcome = "error";
   try {
+    const metadata = bringBanks && rpc("tools/call", { name: "ireland_call", arguments: { source, operation: "smartdublin_get_dataset", args: { id: "bring-banks-dlr" }, max_tokens: 2000 } }, { timeoutMs: 5000, retry: false })
+      .then((response) => response?.isError ? undefined : decodeToolPayload(response)).catch(() => undefined);
     const result = await rpc("tools/call", { name: "ireland_call", arguments: { source, operation, args, limit: 5, max_tokens: 1400 } });
     outcome = result?.isError ? "error" : "ok";
     output.textContent = payloadFromToolResult(result);
     output.classList.toggle("error", Boolean(result?.isError));
     displayedRequest = { source, operation };
-    renderResultView($("pg-result"), buildResultView(decodeToolPayload(result), { source, operation, isError: Boolean(result?.isError) }));
+    renderResultView($("pg-result"), buildResultView(decodeToolPayload(result), { source, operation, args, dataset: result?.isError ? undefined : await metadata, isError: Boolean(result?.isError) }));
     $("pg-result").dataset.state = result?.isError ? "error" : "success";
     $("pg-raw-details").open = Boolean(result?.isError);
     status.textContent = result?.isError ? "Query failed. The source returned an error." : `Response received · ${new Intl.NumberFormat("en-IE").format(Math.round(performance.now() - started))} ms`;
@@ -637,7 +641,8 @@ $("playground-form").addEventListener("submit", async (event) => {
     outcome = "error";
     output.textContent = error instanceof Error ? error.message : String(error);
     output.classList.add("error");
-    $("pg-result").textContent = "The request failed. No data is shown. You can run it again.";
+    if (bringBanks) renderResultView($("pg-result"), buildResultView(undefined, { source, operation, args, isError: true }));
+    else $("pg-result").textContent = "The request failed. No data is shown. You can run it again.";
     $("pg-result").dataset.state = "error";
     $("pg-raw-details").open = true;
     status.textContent = "Query failed. You can try again.";

@@ -30,6 +30,19 @@ body:
     validations:
       required: true
   - type: checkboxes
+    id: route
+    attributes:
+      label: What can be verified?
+      options:
+        - label: I checked the existing catalogue for this question.
+        - label: There is a publisher licence covering the proposed reuse (please link it above).
+        - label: An official link would help even without importing the data.
+  - type: textarea
+    id: coverage
+    attributes:
+      label: Scope and freshness
+      description: Which areas or dates does it cover? How does the publisher date updates? If unknown, say so.
+  - type: checkboxes
     id: contribute
     attributes:
       label: Contributing

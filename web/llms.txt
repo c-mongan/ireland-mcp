@@ -6,7 +6,7 @@ Endpoint: [Ireland MCP Streamable HTTP endpoint](https://mcp.irishopendata.ie/mc
 Docs: [Ireland MCP documentation and playground](https://irishopendata.ie/)
 Transport: Streamable HTTP JSON-RPC over POST
 Auth: none
-Default tool surface: 9 tools, 14,784 characters, about 3.7k tokens
+Default tool surface: 9 tools, about 3.7k tokens
 Full surface: use ?toolsets=all only when a client needs all typed tools listed
 
 Install:
@@ -37,6 +37,8 @@ Toolsets:
 - One source: /mcp/x/{source-id} or ?toolsets={source-id}.
 
 Source domains: stats, law/politics, places/property, environment, transport, energy and economy. Data remains under each publisher licence; responses include source and licence metadata where available.
+
+For law, distinguish an Act as enacted from revised wording as of a stated date. A fresh retrieval is not evidence that an Act is in force unchanged. Check amendments and commencement on the Irish Statute Book and consult https://revisedacts.lawreform.ie/ where a Revised Act is available. If currency cannot be established, say so. No separate specialist law service is required or queried by default.
 
 ## Static data files
 

@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { serviceLinksFor } from "../../src/gateway/serviceLinks";
 
 test.beforeEach(async ({ page }) => {
   await page.route("https://raw.githubusercontent.com/**/status.json", (route) => route.abort());
@@ -24,6 +25,20 @@ test("source subjects link only to headings in the returned catalogue", async ({
   await law.focus();
   await page.keyboard.press("Enter");
   await expect(page.locator("#domain-law-politics")).toBeInViewport();
+});
+
+test("official publisher handoffs are readable without JavaScript or the live catalogue", async ({ browser }) => {
+  const page = await browser.newPage({ javaScriptEnabled: false });
+  try {
+    await page.goto("/#official-services");
+    const services = page.getByRole("region", { name: "Check with the publisher" });
+    const active = serviceLinksFor();
+    await expect(services.getByRole("link")).toHaveCount(active.length);
+    for (const { url, task } of active) {
+      await expect(services.getByRole("link", { name: task.replace(/^Check /, "") })).toHaveAttribute("href", url);
+    }
+    await expect(services).toContainText("does not check recall or supply status");
+  } finally { await page.close(); }
 });
 
 test("sample buttons load matching requests with keyboard access and never submit", async ({ page }) => {

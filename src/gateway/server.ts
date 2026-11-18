@@ -18,6 +18,7 @@ import { exampleArgs, listOperations, operationSchema, shortDescription, type Op
 import { applyBudget, DEFAULT_MAX_TOKENS, MAX_MAX_TOKENS } from "./envelope.js";
 import { ToolError, toToolError } from "./errors.js";
 import { DOMAINS, type AnyTool, type SourceModule, type ToolContext } from "./module.js";
+import { serviceLinksFor } from "./serviceLinks.js";
 import { QUERY_LIMITS, queryInputShape, runQuery } from "./query.js";
 import { tableId } from "./table.js";
 import { noopSink, type TelemetrySink } from "./telemetry.js";
@@ -238,8 +239,14 @@ export function catalogueOf(modules: SourceModule[], args: CatalogueArgs = {}) {
     }))
     .filter((d) => d.sources.length > 0);
   if (!filtering) {
-    return { domains, next: "ireland_describe(source, operation) for arguments, then ireland_call. Filter with topic, geo_level, join_key, has_time_series or text to get dataset cards." };
+    return {
+      domains,
+      ...(!args.domain ? { service_links: serviceLinksFor() } : {}),
+      next: "ireland_describe(source, operation) for arguments, then ireland_call. Filter for dataset cards. Official service links are handoffs, not data feeds."
+    };
   }
+  const links = args.text && !args.domain && !filter.topic && !filter.geo_level && !filter.join_key && filter.has_time_series === undefined
+    ? serviceLinksFor(args.text) : [];
   const count = domains.reduce((n, d) => n + d.sources.length, 0);
   return {
     filters: {
@@ -252,8 +259,10 @@ export function catalogueOf(modules: SourceModule[], args: CatalogueArgs = {}) {
     },
     count,
     domains,
-    next:
-      count > 0
+    ...(links.length ? { service_links: links } : {}),
+    next: links.length
+      ? "Open the publisher link. Ireland MCP does not verify incident or recall status."
+      : count > 0
         ? "ireland_describe(source) for the full card, ireland_describe(source, operation) for arguments, then ireland_call. A source-level card can be broader than an operation's; only matching operations are listed."
         : "Nothing matched. Drop a filter, try a related topic, or use search for keywords."
   };

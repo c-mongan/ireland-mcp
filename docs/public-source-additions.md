@@ -1,7 +1,7 @@
 # Public source additions and access
 
 Implemented on 13 October 2026. These adapters use the existing evidence envelope,
-bounded HTTP client and cache. The compact MCP surface still has seven tools.
+bounded HTTP client and cache. See [generated counts](../web/counts.json) for the current tool surface.
 Use `ireland_catalogue`, `ireland_describe`, then `ireland_call`.
 
 | Source | Operation | Access | Data limits |
@@ -21,6 +21,25 @@ Examples:
 ```
 
 ## Verification and cache rules
+
+### Worked example: glass recycling in Sandyford
+
+The [Bring Banks DLR dataset](https://data.gov.ie/dataset/bring-banks-dlr) is
+published by Dún Laoghaire-Rathdown County Council under CC BY 4.0. Use the
+existing `ireland_call` operation rather than a new source:
+
+```json
+{"source":"smart-dublin","operation":"smartdublin_query_datastore","args":{"resource_id":"46f3a338-cbc9-4c1a-acc5-0d2271763ecd","filters":{"area":"Sandyford","glass":"Yes"},"limit":2}}
+```
+
+In the November 2026 hosted check the page included Arkle Road and Bracken Road.
+Do not assert a fixed count against live data. The dataset updates irregularly;
+report the resource modification date when known, separately from retrieval.
+An empty successful lookup means no published match for those filters, not
+that there are no facilities. A failed lookup cannot establish either. Link
+back to the dataset; the results do not establish present opening hours.
+
+### Adapter checks
 
 Offline tests cover argument rejection, publisher-shaped responses, empty searches,
 malformed national feeds, upstream failure, missing coordinates, transfer limits,
